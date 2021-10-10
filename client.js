@@ -4,8 +4,8 @@
 const PORT = process.env.PORT || 3000;
 
 const io = require('socket.io-client');
-const socket = io('ws://localhost:' + PORT, {
-    // limit to websocket connections, no http polling
+const socket = io('wss://fronvosrv.herokuapp.com', {
+    // limit to websocket connections, no http polling due to pm2
     transports: ['websocket']
 });
 

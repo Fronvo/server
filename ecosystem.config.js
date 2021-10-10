@@ -6,7 +6,7 @@ module.exports = {
         watch_delay: 2000,
         instances: 'max',
         exec_mode: 'cluster',
-        max_memory_restart: '1G',
+        max_memory_restart: process.env.FRONVO_PM2_MEM || '1G',
         autorestart: true,
         max_restarts: 5,
         env: {"TARGET_PM2": true},
