@@ -1,0 +1,6 @@
+node_modules/
+.env
+
+# pm2
+*.cpuprofile
+*.heapprofile
