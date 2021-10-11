@@ -9,6 +9,6 @@ module.exports = {
         autorestart: true,
         max_restarts: 5,
         env: {"TARGET_PM2": true},
-        node_args: "--nouse-idle-notification --max-old-space-size=8192 --max-new-space-size=2048"
+        node_args: "--nouse-idle-notification"
     }]
 }
