@@ -15,6 +15,7 @@ const { createAdapter } = require('@socket.io/cluster-adapter');
 const { setupWorker } = require('@socket.io/sticky');
 
 const io = require('socket.io')(PORT, {
+    serveClient: false,
     wsEngine: require('eiows').Server,
 
     // admin panel
