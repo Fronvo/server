@@ -3,10 +3,16 @@
 
 const PORT = process.env.PORT || 3000;
 
+// in ms
+const RECONNECT_DELAY = 1000;
+const RECONNECT_DELAY_MAX = 5000;
+
 const io = require('socket.io-client');
 const socket = io('ws://localhost:' + PORT, {
     // limit to websocket connections, no http polling due to pm2
-    transports: ['websocket']
+    transports: ['websocket'],
+    reconnectionDelay: RECONNECT_DELAY,
+    reconnectionDelayMax: RECONNECT_DELAY_MAX
 });
 
 console.log('Client connecting to port ' + PORT + '...');
@@ -23,7 +29,5 @@ socket.on('disconnect', () => {
 });
 
 socket.on('connect_error', () => {
-    setTimeout(() => {
-        socket.connect();
-    }, 1000);
+    console.log('Connection failed, retrying...')
 });
