@@ -1,1 +1,1 @@
-web npm i -g @socket.io/pm2 && FRONVO_PM2_MEM=4G pm2 start ecosystem.config.js && pm2 logs --lines 1
+web npm i -g @socket.io/pm2 && FRONVO_PM2_MEM=4G pm2 start ecosystem.config.js && pm2 logs --lines 0
