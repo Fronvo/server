@@ -11,6 +11,7 @@ const io = require('socket.io-client');
 const socket = io('ws://localhost:' + PORT, {
     // limit to websocket connections, no http polling due to pm2
     transports: ['websocket'],
+    path: '/fronvo',
     reconnectionDelay: RECONNECT_DELAY,
     reconnectionDelayMax: RECONNECT_DELAY_MAX
 });

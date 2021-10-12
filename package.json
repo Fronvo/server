@@ -18,7 +18,8 @@
     "@socket.io/pm2": "^5.1.0",
     "dotenv": "^10.0.0",
     "eiows": "^3.6.1",
-    "socket.io": "^4.2.0"
+    "socket.io": "^4.2.0",
+    "mongodb": "^4.1.3"
   },
   "devDependencies": {
     "socket.io-client": "^4.2.0"
