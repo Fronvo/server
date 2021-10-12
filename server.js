@@ -138,16 +138,12 @@ function setupAdminPanel() {
 }
 
 function startup() {
-    console.log('Starting setup...');
-
     // connect requires a promise
     setupMongoDB().then(() => {
         setupServer();
         setupServerEvents();
         setupPM2();
         setupAdminPanel();
-
-        console.log('Setup finished.');
 
         console.log('Server running at localhost:' + PORT);
 
