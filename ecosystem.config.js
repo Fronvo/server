@@ -1,7 +1,7 @@
 module.exports = {
     apps: [{
         //customise to your liking
-        script: 'server.js',
+        script: 'main/server.js',
         instances: process.env.FRONVO_PM2_INSTANCES || '1',
         exec_mode: 'cluster',
         max_memory_restart: process.env.FRONVO_PM2_MEM || '1G',

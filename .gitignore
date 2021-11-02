@@ -4,3 +4,9 @@ node_modules/
 # pm2
 *.cpuprofile
 *.heapprofile
+
+# fronvo
+logs.txt
+
+# my local work :d
+testing/

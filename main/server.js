@@ -1,11 +1,12 @@
 // The server of Fronvo
 // Shadofer#6681
 
-// load .env
-require('dotenv').config();
+// Load .env, get parent directory regardless of node directory
+const { resolve } = require('path');
+require('dotenv').config({ path: resolve(__dirname, '..') + '/.env' });
 
 // Port to attach to
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Admin panel
 const { instrument, RedisStore } = require('@socket.io/admin-ui');
@@ -17,36 +18,39 @@ const { setupWorker } = require('@socket.io/sticky');
 // MongoDB
 const { MongoClient } = require('mongodb');
 
-var io, mdb_client;
+// Custom event files
+const registerEvents = require('../events/main');
+
+var io, mdbClient;
 
 function setupMongoDB() {
     return new Promise((resolve, reject) => {
-        const mdb_usr = process.env.FRONVO_MONGODB_USERNAME;
-        const mdb_pass = process.env.FRONVO_MONGODB_PASSWORD;
-        const mdb_proj = process.env.FRONVO_MONGODB_PROJECT;
-        const mdb_db = process.env.FRONVO_MONGODB_DB; // optional
+        const mdbUsr = process.env.FRONVO_MONGODB_USERNAME;
+        const mdbPass = process.env.FRONVO_MONGODB_PASSWORD;
+        const mdbProj = process.env.FRONVO_MONGODB_PROJECT;
+        const mdbDb = process.env.FRONVO_MONGODB_DB; // optional
     
-        if(!mdb_usr || !mdb_pass || !mdb_proj) {
+        if(!mdbUsr || !mdbPass || !mdbProj) {
             reject('Some MongoDB variables are missing.');
         } else {    
             console.log('Setting up MongoDB...');
 
-            const mdb_uri = 'mongodb+srv://' + 
-                            mdb_usr +
+            const mdbUri = 'mongodb+srv://' + 
+                            mdbUsr +
                             ':' +
-                            mdb_pass +
+                            mdbPass +
                             '@' +
-                            mdb_proj +
+                            mdbProj +
                             '.mongodb.net/' +
-                            mdb_db || 'fronvo' +
+                            mdbDb || 'fronvo' +
                             '?retryWrites=true&w=majority';
     
-            mdb_client = new MongoClient(mdb_uri, {
+            mdbClient = new MongoClient(mdbUri, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true
             });
-    
-            mdb_client.connect((err) => {
+
+            mdbClient.connect((err) => {
                 if(err) {
                     reject(err);
                 } else {
@@ -79,18 +83,7 @@ function setupServer() {
 function setupServerEvents() {
     console.log('Setting up server events...');
 
-    io.on('connection', (socket) => {
-        console.log('connection');
-    
-        // Events
-        socket.on('disconnect', (reason) => {
-            console.log('disconnect');
-        });
-    });
-    
-    io.engine.on('connection_error', (err) => {
-        console.log('Connection abnormally closed:  [' + err.code + ']' +  err.message);
-    });
+    registerEvents(io, mdbClient.db('fronvo'));
 
     console.log('Server events setup successfully.');
 }
@@ -127,7 +120,6 @@ function setupAdminPanel() {
             // preserve users who logged in with the panel before
             store: new RedisStore(),
 
-            // prevent invalid stats displayed
             readonly: true
         });
 
@@ -138,17 +130,16 @@ function setupAdminPanel() {
 }
 
 function startup() {
-    // connect requires a promise
     setupMongoDB().then(() => {
         setupServer();
         setupServerEvents();
         setupPM2();
         setupAdminPanel();
 
-        console.log('Server running at localhost:' + PORT);
+        console.log('Server running at localhost:' + PORT + '!');
 
     }).catch((err) => {
-        if(typeof(err) == Error) {
+        if(typeof(err) === Error) {
             console.log('MongoDB error: ' + err.message);
         } else {
             console.log(err);
