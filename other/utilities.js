@@ -1,5 +1,6 @@
 const variables = require('../other/variables');
 const { accountSchema } = require('./schemas');
+const { v4 } = require('uuid');
 
 module.exports = {
     generateId: () => {
@@ -23,9 +24,60 @@ module.exports = {
         return resultDict;
     },
 
-    loginSocket: (socket, accountDict) => {
-        variables.loggedInSockets[socket.id] = {accountId: Object.keys(accountDict)[0]};
-        console.log('Socket ' + socket.id + ' has logged in.');
+    registerAccount: (mdb, accountDict) => {
+        return new Promise((resolve, reject) => {
+            const accountId = Object.keys(accountDict)[0];
+
+            mdb.collection('accounts').insertOne(accountDict)
+            .then(() => {
+                const tokenDict = {};
+                const token = v4();
+    
+                tokenDict[token] = {accountId: accountId};
+    
+                mdb.collection('tokens').insertOne(tokenDict)
+                .then(() => {
+                    resolve(token);
+                    console.log('Registered user: ', accountDict[accountId].username);
+                });
+            });
+        });
+    },
+
+    loginSocket: (socket, mdb, accountId) => {
+        return new Promise((resolve, reject) => {
+            mdb.collection('tokens').find({}).toArray((err, keys) => {
+                let accountFound = false;
+
+                keys.forEach((key) => {
+                    delete key._id;
+                    
+                    if(key[Object.keys(key)[0]]['accountId'] === accountId) {
+                        accountFound = true;
+                        variables.loggedInSockets[socket.id] = {accountId: accountId};
+                        resolve(Object.keys(key)[0]);
+
+                        console.log('Socket ' + socket.id + ' has logged in.');
+                    }
+                });
+
+                // for accounts created before the new token system
+                if(!accountFound) {
+                    const tokenDict = {};
+                    const token = v4();
+        
+                    tokenDict[token] = {accountId: accountId};
+        
+                    mdb.collection('tokens').insertOne(tokenDict)
+                    .then(() => {
+                        variables.loggedInSockets[socket.id] = {accountId: accountId};
+                        resolve(token);
+
+                        console.log('Socket ' + socket.id + ' has logged in.');
+                    });
+                }
+            });
+        });
     },
 
     logoutSocket: (socket) => {

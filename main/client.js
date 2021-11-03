@@ -30,19 +30,19 @@ socket.on('connect', () => {
     socket.emit('register', {
         email: email,
         password: password
-    }, (err) => {        
+    }, (err, token) => {
         if(err) {
             socket.emit('login', {
                 email: email,
                 password: password
-            }, (err) => {
+            }, (err, token) => {
                 if(err) console.log(err);
                 else {
-                    console.log('Successfully logged in!');
+                    console.log('Successfully logged in, token: ', token);
                 }
             });
          } else {
-            console.log('Successfully registered!');
+            console.log('Successfully registered, token: ', token);
          }
     });
 });

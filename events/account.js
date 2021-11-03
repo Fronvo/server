@@ -6,6 +6,7 @@ const { format } = require('util');
 
 module.exports = (socket, mdb) => {
     mdbAccounts = mdb.collection('accounts');
+    mdbTokens = mdb.collection('tokens');
 
     function decideAccountSchemaResult(schemaResult, callback) {
         if(!schemaResult.error) return false;
@@ -29,7 +30,7 @@ module.exports = (socket, mdb) => {
                     case JoiE.TYPE_REQUIRED.value:
                     case JoiE.TYPE_EMPTY.value:
                         resultDict.msg = format(errors.ERR_REQUIRED, schemaPath);
-                        resultDict.code = Account.ERR_REQUIRED.value;
+                        resultDict.code = General.ERR_REQUIRED.value;
                         break;
 
                     case JoiE.TYPE_MIN.value:
@@ -54,11 +55,39 @@ module.exports = (socket, mdb) => {
         return true;
     }
 
+    function decideAccountTokenSchemaResult(schemaResult, callback) {
+        if(!schemaResult.error) return false;
+
+        function decideErrorDict() {
+            let resultDict = {msg: errors.ERR_UNKNOWN, code: General.ERR_UNKNOWN.value};
+
+            switch(schemaResult.error.details[0].type) {
+                case JoiE.TYPE_REQUIRED.value:
+                case JoiE.TYPE_EMPTY.value:
+                    resultDict.msg = format(errors.ERR_REQUIRED, 'token');
+                    resultDict.code = General.ERR_REQUIRED.value;
+                    break;
+
+                case JoiE.TYPE_LENGTH.value:
+                    resultDict.msg = format(errors.ERR_EXACT_LENGTH, 'token', 36);
+                    resultDict.code = General.ERR_EXACT_LENGTH.value;
+                    break;
+
+                case JoiE.TYPE_REGEX.value:
+                    resultDict.msg = format(errors.ERR_INVALID_REGEX, 'token');
+                    resultDict.code = Account.ERR_INVALID_REGEX.value;
+                    break;
+            }
+            return resultDict;
+        }
+
+        if(callback) callback(decideErrorDict());
+        return true;
+    }
+
     function enableMainEvents() {
         // first, remove account events
-        socket.removeAllListeners('register', 'login');
-
-        // then, wait for my brain to work
+        socket.removeAllListeners('register', 'login', 'loginToken');
     }
 
     socket.on('register', (data, callback) => {
@@ -95,14 +124,13 @@ module.exports = (socket, mdb) => {
                     password: require('bcrypt').hashSync(data.password, 12),
                     creationDate: new Date(),
                 };
-                    
-                mdbAccounts.insertOne(accountData).then(() => {    
-                    console.log('Registered user: ' + accountData[accountId].username);
-
-                    utilities.loginSocket(socket, accountData);
+                
+                utilities.registerAccount(mdb, accountData)
+                .then((token) => {
+                    utilities.loginSocket(socket, mdb, accountId);
                     enableMainEvents();
 
-                    if(callback) callback();
+                    if(callback) callback(null, token);
                 });
 
             } else {
@@ -126,17 +154,19 @@ module.exports = (socket, mdb) => {
             keys.forEach((key) => {
                 delete key._id;
 
-                const accountDict = key[Object.keys(key)[0]];
+                const accountId = Object.keys(key)[0];
+                const accountDict = key[accountId];
 
                 if(accountDict.email === data.email) {
                     accountFound = true;
 
                     // check if password is correct
                     if(require('bcrypt').compareSync(data.password, accountDict.password)) {
-                        utilities.loginSocket(socket, accountDict);
-                        enableMainEvents();
-
-                        if(callback) callback();
+                        utilities.loginSocket(socket, mdb, accountId)
+                        .then((token) => {
+                            enableMainEvents();
+                            if(callback) callback(null, token);
+                        });
                     } else {
                         if(callback) callback({msg: errors.ERR_INVALID_PASSWORD, code: Account.ERR_INVALID_PASSWORD.value});
                     }
@@ -147,6 +177,39 @@ module.exports = (socket, mdb) => {
 
             if(!accountFound) {
                 if(callback) callback({msg: errors.ERR_ACC_DOESNT_EXIST, code: Account.ERR_ACC_DOESNT_EXIST.value})
+            }
+        });
+    });
+
+    socket.on('loginToken', (data, callback) => {
+        if(!data) return;
+
+        if(decideAccountTokenSchemaResult(schemas.accountTokenSchema.validate({
+            token: data.token
+        }), callback)) { return; }
+
+        mdbTokens.find({}).toArray((err, keys) => {
+            let tokenFound = false;
+
+            keys.forEach((key) => {
+                delete key._id;
+
+                const targetToken = Object.keys(key)[0];
+                
+                if(targetToken === data.token) {
+                    tokenFound = true;
+
+                    utilities.loginSocket(socket, mdb, key[targetToken]['accountId'])
+                    .then((token) => {
+                        enableMainEvents();
+
+                        if(callback) callback();
+                    });
+                }
+            });
+
+            if(!tokenFound) {
+                if(callback) callback({msg: errors.ERR_INVALID_TOKEN, code: Account.ERR_INVALID_TOKEN.value})
             }
         });
     });
