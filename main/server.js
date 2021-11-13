@@ -21,7 +21,15 @@ const { MongoClient } = require('mongodb');
 // Custom event files
 const registerEvents = require('../events/main');
 
-var io, mdbClient;
+// Cool-ish loading
+const ora = require('ora');
+
+var io, mdbClient, loadingSpinner;
+const loadingSpinnerDefaultText = 'Starting server';
+
+function setLoading(currProcText) {
+    loadingSpinner.text = loadingSpinnerDefaultText + ': ' + currProcText;
+}
 
 function setupMongoDB() {
     return new Promise((resolve, reject) => {
@@ -33,7 +41,7 @@ function setupMongoDB() {
         if(!mdbUsr || !mdbPass || !mdbProj) {
             reject('Some MongoDB variables are missing.');
         } else {    
-            console.log('Setting up MongoDB...');
+            setLoading('Setting up MongoDB');
 
             const mdbUri = 'mongodb+srv://' + 
                             mdbUsr +
@@ -54,7 +62,6 @@ function setupMongoDB() {
                 if(err) {
                     reject(err);
                 } else {
-                    console.log('MongoDB setup successfully.');
                     resolve();
                 }
             });
@@ -63,7 +70,8 @@ function setupMongoDB() {
 };
 
 function setupServer() {
-    console.log('Setting up server...');
+    // this wont be seen by most devices, way too fast of a process
+    setLoading('Setting up the server process, server events and admin panel');
 
     io = require('socket.io')(PORT, {
         serveClient: false,
@@ -76,28 +84,16 @@ function setupServer() {
             credentials: true
         }
     });
-
-    console.log('Server setup successfully.');
 }
 
 function setupServerEvents() {
-    console.log('Setting up server events...');
-
     registerEvents(io, mdbClient.db('fronvo'));
-
-    console.log('Server events setup successfully.');
 }
 
 function setupPM2() {
     if(process.env.TARGET_PM2) {
-        console.log('Setting up PM2...');
-
         io.adapter(createAdapter());
         setupWorker(io);
-
-        console.log('PM2 setup successfully.');
-    } else {
-        console.log('PM2 setup skipped.');
     }
 }
 
@@ -106,8 +102,6 @@ function setupAdminPanel() {
     const panel_pass = process.env.FRONVO_ADMIN_PANEL_PASSWORD;
 
     if(panel_usr && panel_pass) {
-        console.log('Setting up admin panel...');
-
         instrument(io, {
             auth: {
                 type: 'basic',
@@ -122,28 +116,26 @@ function setupAdminPanel() {
 
             readonly: true
         });
-
-        console.log('Admin panel setup successfully.');
-    } else {
-        console.log('Admin panel setup skipped.');
     }
 }
 
 function startup() {
+    loadingSpinner = ora({
+        text: loadingSpinnerDefaultText,
+        spinner: 'dots12', // wonky windows 10 style
+        interval: 40,
+        color: 'magenta'
+    }).start();
+
     setupMongoDB().then(() => {
         setupServer();
         setupServerEvents();
         setupPM2();
         setupAdminPanel();
 
-        console.log('Server running at localhost:' + PORT + '!');
-
+        loadingSpinner.succeed('Server running at port ' + PORT + '.');
     }).catch((err) => {
-        if(typeof(err) === Error) {
-            console.log('MongoDB error: ' + err.message);
-        } else {
-            console.log(err);
-        }
+        loadingSpinner.fail(err.message)
     });
 }
 
