@@ -1,6 +1,4 @@
-let loggedInSockets = {};
-
 module.exports = {
-    // socketid: accountid
-    loggedInSockets: loggedInSockets
+    // Connected accounts for each socket (socketId: {'accountId': accountId})
+    loggedInSockets: {}
 }
