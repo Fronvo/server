@@ -21,8 +21,9 @@ const { MongoClient } = require('mongodb');
 // Custom event files
 const registerEvents = require('../events/main');
 
-// Cool-ish loading
+// Cool-ish styling
 const ora = require('ora');
+const gradient = require('gradient-string');
 
 var io, mdbClient, loadingSpinner;
 const loadingSpinnerDefaultText = 'Starting server';
@@ -120,6 +121,8 @@ function setupAdminPanel() {
 }
 
 function startup() {
+    console.log(gradient(['#e8128f', '#e812d2', '#e412e8', '#cb12e8', '#bd12e8', '#a812e8', '#8f12e8', '#8012e8'])('Fronvo server v0.1'))
+
     loadingSpinner = ora({
         text: loadingSpinnerDefaultText,
         spinner: 'dots12', // wonky windows 10 style
@@ -135,7 +138,7 @@ function startup() {
 
         loadingSpinner.succeed('Server running at port ' + PORT + '.');
     }).catch((err) => {
-        loadingSpinner.fail(err.message)
+        loadingSpinner.fail(err.message);
     });
 }
 
