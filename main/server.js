@@ -121,7 +121,7 @@ function setupAdminPanel() {
 }
 
 function startup() {
-    console.log(gradient(['#e8128f', '#e812d2', '#e412e8', '#cb12e8', '#bd12e8', '#a812e8', '#8f12e8', '#8012e8'])('Fronvo server v0.1'))
+    console.log(gradient(['#e8128f', '#e812d2', '#e412e8', '#cb12e8', '#bd12e8', '#a812e8', '#8f12e8', '#8012e8'])('Fronvo server v0.1'));
 
     loadingSpinner = ora({
         text: loadingSpinnerDefaultText,

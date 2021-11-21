@@ -1,216 +1,195 @@
 const utilities = require('../other/utilities');
 const schemas = require('../other/schemas');
-const { JoiE, General, Account } = require('../other/enums');
 const errors = require('../other/errors');
+const { defaultError } = require('../other/variables');
+const { JoiE, General, Account } = require('../other/enums');
 const { format } = require('util');
+const bcrypt = require('bcrypt');
+const variables = require('../other/variables');
 
-module.exports = (socket, mdb) => {
-    mdbAccounts = mdb.collection('accounts');
-    mdbTokens = mdb.collection('tokens');
+function decideAccountSchemaResult(email, password) {
+    const schemaResult = schemas.accountSchema.validate({
+        email: email,
+        password: password
+    });
 
-    function decideAccountSchemaResult(schemaResult, callback) {
-        if(!schemaResult.error) return false;
+    if(!schemaResult.error) return false;
 
-        function decideErrorDict() {
-            const schemaDetails = schemaResult.error.details[0];
-            const schemaType = schemaDetails.type;
-            const schemaMessage = schemaDetails.message;
-            const schemaPath = schemaDetails.path[0];
+    const schemaDetails = schemaResult.error.details[0];
+    const schemaType = schemaDetails.type;
+    const schemaMessage = schemaDetails.message;
+    const schemaPath = schemaDetails.path[0];
 
-            // default dict to reuse
-            let resultDict = {msg: schemaMessage, code: General.ERR_UNKNOWN.value};
+    // default dict to reuse, copy its value
+    let resultDict = {...defaultError};
 
-            if(schemaPath === 'email' || schemaPath === 'password') {
-                // provide additional info for the end user
-                resultDict['extras'] = {for: schemaPath};
+    // default to JOI message
+    resultDict.msg = schemaMessage;
 
-                let limits = utilities.getMinMaxEntriesForAccounts();
+    if(schemaPath === 'email' || schemaPath === 'password') {
+        // provide additional info for the end user
+        resultDict['extras'] = {for: schemaPath};
 
-                switch(schemaType) {
-                    case JoiE.TYPE_REQUIRED.value:
-                    case JoiE.TYPE_EMPTY.value:
-                        resultDict.msg = format(errors.ERR_REQUIRED, schemaPath);
-                        resultDict.code = General.ERR_REQUIRED.value;
-                        break;
+        let limits = utilities.getMinMaxEntriesForAccounts();
 
-                    case JoiE.TYPE_MIN.value:
-                    case JoiE.TYPE_MAX.value:
-                        resultDict.msg = format(errors.ERR_LENGTH, schemaPath, limits[schemaPath].min, limits[schemaPath].max);
-                        resultDict.code = General.ERR_LENGTH.value;
-                        resultDict.extras['min'] = limits[schemaPath].min;
-                        resultDict.extras['max'] = limits[schemaPath].max;
-                        break;
+        switch(schemaType) {
+            case JoiE.TYPE_REQUIRED.value:
+            case JoiE.TYPE_EMPTY.value:
+                resultDict.msg = format(errors.ERR_REQUIRED, schemaPath);
+                resultDict.code = General.ERR_REQUIRED.value;
+                break;
 
-                    case JoiE.TYPE_INVALID_EMAIL_FORMAT.value:
-                        resultDict.msg = errors.ERR_INVALID_EMAIL_FORMAT;
-                        resultDict.code = Account.ERR_INVALID_EMAIL_FORMAT.value;
-                        break;
-                }
+            case JoiE.TYPE_MIN.value:
+            case JoiE.TYPE_MAX.value:
+                resultDict.msg = format(errors.ERR_LENGTH, schemaPath, limits[schemaPath].min, limits[schemaPath].max);
+                resultDict.code = General.ERR_LENGTH.value;
+                resultDict.extras['min'] = limits[schemaPath].min;
+                resultDict.extras['max'] = limits[schemaPath].max;
+                break;
 
-                return resultDict;
-            }
+            case JoiE.TYPE_INVALID_EMAIL_FORMAT.value:
+                resultDict.msg = errors.ERR_INVALID_EMAIL_FORMAT;
+                resultDict.code = Account.ERR_INVALID_EMAIL_FORMAT.value;
+                break;
         }
-
-        if(callback) callback(decideErrorDict());
-        return true;
     }
 
-    function decideAccountTokenSchemaResult(schemaResult, callback) {
-        if(!schemaResult.error) return false;
+    return resultDict;
+}
 
-        function decideErrorDict() {
-            let resultDict = {msg: errors.ERR_UNKNOWN, code: General.ERR_UNKNOWN.value};
+function decideAccountTokenSchemaResult(token) {
+    const schemaResult = schemas.accountTokenSchema.validate({
+        token: token
+    });
+    
+    if(!schemaResult.error) return false;
 
-            switch(schemaResult.error.details[0].type) {
-                case JoiE.TYPE_REQUIRED.value:
-                case JoiE.TYPE_EMPTY.value:
-                    resultDict.msg = format(errors.ERR_REQUIRED, 'token');
-                    resultDict.code = General.ERR_REQUIRED.value;
-                    break;
+    let resultDict = {...defaultError};
 
-                case JoiE.TYPE_LENGTH.value:
-                    resultDict.msg = format(errors.ERR_EXACT_LENGTH, 'token', 36);
-                    resultDict.code = General.ERR_EXACT_LENGTH.value;
-                    break;
+    switch(schemaResult.error.details[0].type) {
+        case JoiE.TYPE_REQUIRED.value:
+        case JoiE.TYPE_EMPTY.value:
+            resultDict.msg = format(errors.ERR_REQUIRED, 'token');
+            resultDict.code = General.ERR_REQUIRED.value;
+            break;
 
-                case JoiE.TYPE_REGEX.value:
-                    resultDict.msg = format(errors.ERR_INVALID_REGEX, 'token');
-                    resultDict.code = Account.ERR_INVALID_REGEX.value;
-                    break;
+        case JoiE.TYPE_LENGTH.value:
+            resultDict.msg = format(errors.ERR_EXACT_LENGTH, 'token', 36);
+            resultDict.code = General.ERR_EXACT_LENGTH.value;
+            break;
+
+        case JoiE.TYPE_REGEX.value:
+            resultDict.msg = format(errors.ERR_INVALID_REGEX, 'token');
+            resultDict.code = Account.ERR_INVALID_REGEX.value;
+            break;
+    }
+
+    return resultDict;
+}
+
+module.exports = {
+    register: async (socket, mdb, email, password) => {
+        const schemaResult = decideAccountSchemaResult(email, password);
+
+        if(schemaResult) return schemaResult;
+
+        const accounts = await utilities.listDocuments(mdb, 'accounts');
+        
+        let accountFound = false;
+
+        // check if email exists
+        accounts.forEach((account) => {
+            delete account._id;
+
+            if(account[Object.keys(account)[0]].email === email) {
+                accountFound = true;
+                return;
             }
-            return resultDict;
+        });
+
+        if(!accountFound) {
+            // generate the account
+            const accountData = {};
+            const accountId = utilities.generateId();
+
+            accountData[accountId] = {
+                username: 'Fronvo User ' + (accounts.length + 1),
+                email: email,
+                password: require('bcrypt').hashSync(password, 12),
+                creationDate: new Date(),
+            };
+            
+            await mdb.collection('accounts').insertOne(accountData);
+            
+            return [null, await utilities.loginSocket(socket, mdb, accountId)];
+        } else {
+            return {msg: errors.ERR_ACC_ALR_EXISTS, code: Account.ERR_ACC_ALR_EXISTS.value};
         }
+    },
 
-        if(callback) callback(decideErrorDict());
-        return true;
-    }
+    login: async (socket, mdb, email, password) => {
+        const schemaResult = decideAccountSchemaResult(email, password);
 
-    function enableMainEvents() {
-        // first, remove account events
-        socket.removeAllListeners('register', 'login', 'loginToken');
-    }
+        if(schemaResult) return schemaResult;
 
-    socket.on('register', (data, callback) => {
-        if(!data) return;
+        const accounts = await utilities.listDocuments(mdb, 'accounts');
 
-        if(decideAccountSchemaResult(schemas.accountSchema.validate({
-            email: data.email,
-            password: data.password,
-        }), callback)) { return; };
+        let accountFound = false;
+        let accountId;
+        let accountPassword;
 
-        mdbAccounts.find({}).toArray((err, keys) => {
-            let accountFound = false;
+        // check if account exists
+        accounts.forEach(async (account) => {
+            delete account._id;
 
-            // check if email exists
-            keys.forEach((key) => {
-                delete key._id;
+            const accountIdKey = Object.keys(account)[0];
+            const accountDict = account[accountIdKey];
 
-                const accountDict = key[Object.keys(key)[0]];
+            if(accountDict.email === email) {
+                accountFound = true;
+                accountId = accountIdKey;
+                accountPassword = accountDict.password;
+                return;
+            }
+        });
 
-                if(accountDict.email === data.email) {
-                    accountFound = true;
-                    return;
-                }
-            });
-
-            if(!accountFound) {
-                // generate the account
-                let accountData = {};
-                let accountId = utilities.generateId();
-
-                accountData[accountId] = {
-                    username: 'Fronvo User ' + (keys.length + 1),
-                    email: data.email,
-                    password: require('bcrypt').hashSync(data.password, 12),
-                    creationDate: new Date(),
-                };
-                
-                utilities.registerAccount(mdb, accountData)
-                .then((token) => {
-                    utilities.loginSocket(socket, mdb, accountId);
-                    enableMainEvents();
-
-                    if(callback) callback(null, token);
-                });
-
+        if(accountFound) {
+            // validate password
+            if(bcrypt.compareSync(password, accountPassword)) {
+                return [null, await utilities.loginSocket(socket, mdb, accountId)];
             } else {
-                if(callback) callback({msg: errors.ERR_ACC_ALR_EXISTS, code: Account.ERR_ACC_ALR_EXISTS.value});
+                return {msg: errors.ERR_INVALID_PASSWORD, code: Account.ERR_INVALID_PASSWORD.value};
+            }
+        }
+        else return {msg: errors.ERR_ACC_DOESNT_EXIST, code: Account.ERR_ACC_DOESNT_EXIST.value};
+    },
+
+    loginToken: async (socket, mdb, token) => {
+        const schemaResult = decideAccountTokenSchemaResult(token);
+
+        if(schemaResult) return schemaResult;
+
+        const tokens = await utilities.listDocuments(mdb, 'tokens');
+
+        let tokenFound = false;
+        let accountId;
+
+        tokens.forEach(async (tokenItem) => {
+            delete tokenItem._id;
+
+            const targetToken = Object.keys(tokenItem)[0];
+
+            if(targetToken === token) {
+                tokenFound = true;
+                accountId = tokenItem[targetToken]['accountId'];
+                return;
             }
         });
-    });
 
-    socket.on('login', (data, callback) => {
-        if(!data) return;
-
-        if(decideAccountSchemaResult(schemas.accountSchema.validate({
-            email: data.email,
-            password: data.password,
-        }), callback)) { return; };
-
-        // check if account existt
-        mdbAccounts.find({}).toArray((err, keys) => {
-            let accountFound = false;
-
-            keys.forEach((key) => {
-                delete key._id;
-
-                const accountId = Object.keys(key)[0];
-                const accountDict = key[accountId];
-
-                if(accountDict.email === data.email) {
-                    accountFound = true;
-
-                    // check if password is correct
-                    if(require('bcrypt').compareSync(data.password, accountDict.password)) {
-                        utilities.loginSocket(socket, mdb, accountId)
-                        .then((token) => {
-                            enableMainEvents();
-                            if(callback) callback(null, token);
-                        });
-                    } else {
-                        if(callback) callback({msg: errors.ERR_INVALID_PASSWORD, code: Account.ERR_INVALID_PASSWORD.value});
-                    }
-
-                    return;
-                }
-            });
-
-            if(!accountFound) {
-                if(callback) callback({msg: errors.ERR_ACC_DOESNT_EXIST, code: Account.ERR_ACC_DOESNT_EXIST.value})
-            }
-        });
-    });
-
-    socket.on('loginToken', (data, callback) => {
-        if(!data) return;
-
-        if(decideAccountTokenSchemaResult(schemas.accountTokenSchema.validate({
-            token: data.token
-        }), callback)) { return; }
-
-        mdbTokens.find({}).toArray((err, keys) => {
-            let tokenFound = false;
-
-            keys.forEach((key) => {
-                delete key._id;
-
-                const targetToken = Object.keys(key)[0];
-                
-                if(targetToken === data.token) {
-                    tokenFound = true;
-
-                    utilities.loginSocket(socket, mdb, key[targetToken]['accountId'])
-                    .then((token) => {
-                        enableMainEvents();
-
-                        if(callback) callback();
-                    });
-                }
-            });
-
-            if(!tokenFound) {
-                if(callback) callback({msg: errors.ERR_INVALID_TOKEN, code: Account.ERR_INVALID_TOKEN.value})
-            }
-        });
-    });
+        if(tokenFound) {
+            await utilities.loginSocket(socket, mdb, accountId);
+            return [];
+        }
+        else return {msg: errors.ERR_INVALID_TOKEN, code: Account.ERR_INVALID_TOKEN.value};
+    }
 }

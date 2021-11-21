@@ -2,14 +2,41 @@ const variables = require('../other/variables');
 const { accountSchema } = require('./schemas');
 const { v4 } = require('uuid');
 
+// here to be used by this file, too
+function insertLog(mdb, logText) {
+    const logDict = {};
+    logDict['timestamp'] = new Date();
+    logDict['info'] = logText;
+
+    mdb.collection('logs').insertOne(logDict).catch(() => {});
+}
+
+async function listDocuments(mdb, collName) {
+    return await mdb.collection(collName).find({}).toArray();
+}
+
+// internal use
+async function createToken(mdb, accountId) {
+    const tokenDict = {};
+    const token = v4();
+    
+    tokenDict[token] = {accountId: Number(accountId)};
+
+    await mdb.collection('tokens').insertOne(tokenDict);
+
+    return token;
+}
+
 module.exports = {
     generateId: () => {
         // 8 digits
         return Math.floor(10000000 + Math.random() * 90000000);
     },
 
+    insertLog: insertLog,
+
     getMinMaxEntriesForAccounts: () => {
-        let resultDict = {email: {}, password: {}}
+        let resultDict = {email: {}, password: {}};
 
         for(const [key, value] of accountSchema._ids._byKey.entries()) {
             if(!(key === 'email' || key === 'password')) continue;
@@ -24,65 +51,33 @@ module.exports = {
         return resultDict;
     },
 
-    registerAccount: (mdb, accountDict) => {
-        return new Promise((resolve, reject) => {
-            const accountId = Object.keys(accountDict)[0];
+    loginSocket: async (socket, mdb, accountId) => {
+        const tokens = await listDocuments(mdb, 'tokens');
 
-            mdb.collection('accounts').insertOne(accountDict)
-            .then(() => {
-                const tokenDict = {};
-                const token = v4();
-    
-                tokenDict[token] = {accountId: accountId};
-    
-                mdb.collection('tokens').insertOne(tokenDict)
-                .then(() => {
-                    resolve(token);
-                    console.log('Registered user: ', accountDict[accountId].username);
-                });
-            });
+        let accountFound = false;
+        let finalAccountToken;
+
+        tokens.forEach((token) => {
+            delete token._id;
+            
+            const accountToken = Object.keys(token)[0];
+
+            if(token[accountToken]['accountId'] === Number(accountId)) {
+                accountFound = true;
+                finalAccountToken = accountToken;
+            }
         });
-    },
 
-    loginSocket: (socket, mdb, accountId) => {
-        return new Promise((resolve, reject) => {
-            mdb.collection('tokens').find({}).toArray((err, keys) => {
-                let accountFound = false;
+        // for accounts created before the new token system
+        if(!accountFound) finalAccountToken = await createToken(mdb, accountId);
 
-                keys.forEach((key) => {
-                    delete key._id;
-                    
-                    if(key[Object.keys(key)[0]]['accountId'] === accountId) {
-                        accountFound = true;
-                        variables.loggedInSockets[socket.id] = {accountId: accountId};
-                        resolve(Object.keys(key)[0]);
+        variables.loggedInSockets[socket.id] = {accountId: accountId};
 
-                        console.log('Socket ' + socket.id + ' has logged in.');
-                    }
-                });
-
-                // for accounts created before the new token system
-                if(!accountFound) {
-                    const tokenDict = {};
-                    const token = v4();
-        
-                    tokenDict[token] = {accountId: accountId};
-        
-                    mdb.collection('tokens').insertOne(tokenDict)
-                    .then(() => {
-                        variables.loggedInSockets[socket.id] = {accountId: accountId};
-                        resolve(token);
-
-                        console.log('Socket ' + socket.id + ' has logged in.');
-                    });
-                }
-            });
-        });
+        return finalAccountToken;
     },
 
     logoutSocket: (socket) => {
         delete variables.loggedInSockets[socket.id];
-        console.log('Socket ' + socket.id + ' has logged out.');
     },
 
     isSocketLoggedIn: (socket) => {
@@ -92,4 +87,6 @@ module.exports = {
     getLoggedInSockets: () => {
         return variables.loggedInSockets;
     },
+
+    listDocuments: listDocuments
 }
