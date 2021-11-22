@@ -5,6 +5,7 @@ const { defaultError } = require('../other/variables');
 const { JoiE, enums } = require('../other/enums');
 const { format } = require('util');
 const bcrypt = require('bcrypt');
+const variables = require('../other/variables');
 
 function decideAccountSchemaResult(email, password) {
     const schemaResult = schemas.accountSchema.validate({
@@ -100,7 +101,7 @@ module.exports = {
         accounts.forEach((account) => {
             delete account._id;
 
-            if(account[Object.keys(account)[0]].email === email) {
+            if(bcrypt.compareSync(email, account[Object.keys(account)[0]].email)) {
                 accountFound = true;
                 return;
             }
@@ -113,8 +114,8 @@ module.exports = {
 
             accountData[accountId] = {
                 username: 'Fronvo User ' + (accounts.length + 1),
-                email: email,
-                password: require('bcrypt').hashSync(password, 12),
+                email: bcrypt.hashSync(email, variables.secondaryBcryptHash),
+                password: bcrypt.hashSync(password, variables.mainBcryptHash),
                 creationDate: new Date(),
             };
             
@@ -144,7 +145,7 @@ module.exports = {
             const accountIdKey = Object.keys(account)[0];
             const accountDict = account[accountIdKey];
 
-            if(accountDict.email === email) {
+            if(bcrypt.compareSync(email, accountDict.email)) {
                 accountFound = true;
                 accountId = accountIdKey;
                 accountPassword = accountDict.password;
@@ -176,17 +177,18 @@ module.exports = {
         tokens.forEach(async (tokenItem) => {
             delete tokenItem._id;
 
-            const targetToken = Object.keys(tokenItem)[0];
+            const tokenAccountId = Object.keys(tokenItem)[0];
 
-            if(targetToken === token) {
+            if(bcrypt.compareSync(token, tokenItem[tokenAccountId])) {
                 tokenFound = true;
-                accountId = tokenItem[targetToken]['accountId'];
+                accountId = tokenAccountId;
                 return;
             }
         });
 
         if(tokenFound) {
-            await utilities.loginSocket(socket, mdb, accountId);
+            // do it ourselves, skip login checks
+            variables.loggedInSockets[socket.id] = {accountId: accountId};
             return [];
         }
         else return {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN};

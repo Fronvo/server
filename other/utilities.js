@@ -1,6 +1,7 @@
 const variables = require('../other/variables');
 const { accountSchema } = require('./schemas');
 const { v4 } = require('uuid');
+const bcrypt = require('bcrypt');
 
 // here to be used by this file, too
 function insertLog(mdb, logText) {
@@ -20,11 +21,26 @@ async function createToken(mdb, accountId) {
     const tokenDict = {};
     const token = v4();
     
-    tokenDict[token] = {accountId: Number(accountId)};
+    tokenDict[Number(accountId)] = bcrypt.hashSync(token, variables.mainBcryptHash);
 
     await mdb.collection('tokens').insertOne(tokenDict);
 
     return token;
+}
+
+async function regenerateToken(mdb, accountId) {
+    const tokens = await listDocuments(mdb, 'tokens');
+
+    tokens.forEach(async token => {
+        const tokenItemId = token._id;
+        delete token._id;
+
+        if(accountId === Object.keys(token)[0]) {
+            await mdb.collection('tokens').deleteOne({_id: tokenItemId});
+        }
+    });
+
+    return await createToken(mdb, accountId);
 }
 
 module.exports = {
@@ -55,22 +71,23 @@ module.exports = {
         const tokens = await listDocuments(mdb, 'tokens');
 
         let accountFound = false;
-        let finalAccountToken;
 
         tokens.forEach((token) => {
             delete token._id;
             
-            const accountToken = Object.keys(token)[0];
+            const tokenAccountId = Object.keys(token)[0];
 
-            if(token[accountToken]['accountId'] === Number(accountId)) {
+            if(tokenAccountId === accountId) {
                 accountFound = true;
-                finalAccountToken = accountToken;
             }
         });
 
-        // for accounts created before the new token system
-        if(!accountFound) finalAccountToken = await createToken(mdb, accountId);
+        let finalAccountToken;
 
+        // regenerate token if found, otherwise create it (cant decrypt current one)
+        if(!accountFound) finalAccountToken = await createToken(mdb, accountId);
+        else finalAccountToken = await regenerateToken(mdb, accountId);
+        
         variables.loggedInSockets[socket.id] = {accountId: accountId};
 
         return finalAccountToken;
