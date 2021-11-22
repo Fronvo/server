@@ -2,10 +2,9 @@ const utilities = require('../other/utilities');
 const schemas = require('../other/schemas');
 const errors = require('../other/errors');
 const { defaultError } = require('../other/variables');
-const { JoiE, General, Account } = require('../other/enums');
+const { JoiE, enums } = require('../other/enums');
 const { format } = require('util');
 const bcrypt = require('bcrypt');
-const variables = require('../other/variables');
 
 function decideAccountSchemaResult(email, password) {
     const schemaResult = schemas.accountSchema.validate({
@@ -33,23 +32,23 @@ function decideAccountSchemaResult(email, password) {
         let limits = utilities.getMinMaxEntriesForAccounts();
 
         switch(schemaType) {
-            case JoiE.TYPE_REQUIRED.value:
-            case JoiE.TYPE_EMPTY.value:
+            case JoiE.TYPE_REQUIRED:
+            case JoiE.TYPE_EMPTY:
                 resultDict.msg = format(errors.ERR_REQUIRED, schemaPath);
-                resultDict.code = General.ERR_REQUIRED.value;
+                resultDict.code = enums.ERR_REQUIRED;
                 break;
 
-            case JoiE.TYPE_MIN.value:
-            case JoiE.TYPE_MAX.value:
+            case JoiE.TYPE_MIN:
+            case JoiE.TYPE_MAX:
                 resultDict.msg = format(errors.ERR_LENGTH, schemaPath, limits[schemaPath].min, limits[schemaPath].max);
-                resultDict.code = General.ERR_LENGTH.value;
+                resultDict.code = enums.ERR_LENGTH;
                 resultDict.extras['min'] = limits[schemaPath].min;
                 resultDict.extras['max'] = limits[schemaPath].max;
                 break;
 
-            case JoiE.TYPE_INVALID_EMAIL_FORMAT.value:
+            case JoiE.TYPE_INVALID_EMAIL_FORMAT:
                 resultDict.msg = errors.ERR_INVALID_EMAIL_FORMAT;
-                resultDict.code = Account.ERR_INVALID_EMAIL_FORMAT.value;
+                resultDict.code = enums.ERR_INVALID_EMAIL_FORMAT;
                 break;
         }
     }
@@ -67,20 +66,20 @@ function decideAccountTokenSchemaResult(token) {
     let resultDict = {...defaultError};
 
     switch(schemaResult.error.details[0].type) {
-        case JoiE.TYPE_REQUIRED.value:
-        case JoiE.TYPE_EMPTY.value:
+        case JoiE.TYPE_REQUIRED:
+        case JoiE.TYPE_EMPTY:
             resultDict.msg = format(errors.ERR_REQUIRED, 'token');
-            resultDict.code = General.ERR_REQUIRED.value;
+            resultDict.code = enums.ERR_REQUIRED;
             break;
 
-        case JoiE.TYPE_LENGTH.value:
+        case JoiE.TYPE_LENGTH:
             resultDict.msg = format(errors.ERR_EXACT_LENGTH, 'token', 36);
-            resultDict.code = General.ERR_EXACT_LENGTH.value;
+            resultDict.code = enums.ERR_EXACT_LENGTH;
             break;
 
-        case JoiE.TYPE_REGEX.value:
+        case JoiE.TYPE_REGEX:
             resultDict.msg = format(errors.ERR_INVALID_REGEX, 'token');
-            resultDict.code = Account.ERR_INVALID_REGEX.value;
+            resultDict.code = enums.ERR_INVALID_REGEX;
             break;
     }
 
@@ -123,7 +122,7 @@ module.exports = {
             
             return [null, await utilities.loginSocket(socket, mdb, accountId)];
         } else {
-            return {msg: errors.ERR_ACC_ALR_EXISTS, code: Account.ERR_ACC_ALR_EXISTS.value};
+            return {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS};
         }
     },
 
@@ -158,10 +157,10 @@ module.exports = {
             if(bcrypt.compareSync(password, accountPassword)) {
                 return [null, await utilities.loginSocket(socket, mdb, accountId)];
             } else {
-                return {msg: errors.ERR_INVALID_PASSWORD, code: Account.ERR_INVALID_PASSWORD.value};
+                return {msg: errors.ERR_INVALID_PASSWORD, code: enums.ERR_INVALID_PASSWORD};
             }
         }
-        else return {msg: errors.ERR_ACC_DOESNT_EXIST, code: Account.ERR_ACC_DOESNT_EXIST.value};
+        else return {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST};
     },
 
     loginToken: async (socket, mdb, token) => {
@@ -190,6 +189,6 @@ module.exports = {
             await utilities.loginSocket(socket, mdb, accountId);
             return [];
         }
-        else return {msg: errors.ERR_INVALID_TOKEN, code: Account.ERR_INVALID_TOKEN.value};
+        else return {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN};
     }
 }

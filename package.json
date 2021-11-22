@@ -18,7 +18,6 @@
     "@socket.io/pm2": "^5.1.0",
     "dotenv": "^10.0.0",
     "eiows": "^3.6.1",
-    "enum": "^3.0.4",
     "gradient-string": "^1.2.0",
     "joi": "^17.4.2",
     "mongodb": "^4.1.3",

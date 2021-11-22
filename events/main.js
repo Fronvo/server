@@ -2,7 +2,7 @@ const account = require('./account');
 const general = require('./general');
 const utilities = require('../other/utilities');
 const errors = require('../other/errors');
-const enums = require('../other/enums');
+const { enums } = require('../other/enums');
 const templates = require('../other/templates');
 const { format } = require('util');
 
@@ -28,11 +28,11 @@ module.exports = (io, mdb) => {
 
                 if(event in accountOnlyFuncs && !utilities.isSocketLoggedIn(socket)) {
                     prematureError = true;
-                    callbackResponse = {msg: errors.ERR_MUST_BE_LOGGED_IN, code: enums.Account.ERR_MUST_BE_LOGGED_IN.value, event: event};
+                    callbackResponse = {msg: errors.ERR_MUST_BE_LOGGED_IN, code: enums.ERR_MUST_BE_LOGGED_IN, event: event};
 
                 } else if(event in noAccountOnlyFuncs && utilities.isSocketLoggedIn(socket)) {
                     prematureError = true;
-                    callbackResponse = {msg: errors.ERR_MUST_BE_LOGGED_OUT, code: enums.Account.ERR_MUST_BE_LOGGED_OUT.value, event: event};
+                    callbackResponse = {msg: errors.ERR_MUST_BE_LOGGED_OUT, code: enums.ERR_MUST_BE_LOGGED_OUT, event: event};
 
                 } else {
                     args.forEach((item) => {
@@ -80,7 +80,7 @@ module.exports = (io, mdb) => {
                             if(item == (neededArgs.length - 1)) neededArgsString += '.';
                         }
 
-                        callbackResponse = {msg: neededArgsString, code: enums.General.ERR_MISSING_ARGS.value, args_needed: neededArgs};
+                        callbackResponse = {msg: neededArgsString, code: enums.ERR_MISSING_ARGS, args_needed: neededArgs};
                     } else {
                         callbackResponse = funcs[event](socket, mdb, ...filteredArgs);
 
@@ -99,7 +99,7 @@ module.exports = (io, mdb) => {
                         else callback(callbackResponse);
                     } else {
                         utilities.insertLog(mdb, format(errors.ERR_FUNC_RETURN_NONE, event));
-                        callback({msg: errors.ERR_UNKNOWN, code: enums.General.ERR_UNKNOWN.value});
+                        callback({msg: errors.ERR_UNKNOWN, code: enums.ERR_UNKNOWN});
                     }
                 }
             }

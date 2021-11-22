@@ -1,9 +1,9 @@
 const errors = require('../other/errors');
-const { General } = require('../other/enums');
+const { enums } = require('../other/enums');
 
 module.exports = {
     // Connected accounts for each socket (socketId: {'accountId': accountId})
     loggedInSockets: {},
     
-    defaultError: {msg: errors.ERR_UNKNOWN, code: General.ERR_UNKNOWN.value}
+    defaultError: {msg: errors.ERR_UNKNOWN, code: enums.ERR_UNKNOWN}
 }
