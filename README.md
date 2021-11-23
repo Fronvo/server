@@ -2,7 +2,7 @@
 
 <h1 style='text-align: center;'>
 
-![GitHub](https://img.shields.io/github/license/Fronvo/fronvo) ![GitHub Repo stars](https://img.shields.io/github/stars/Fronvo/fronvo?style=social) ![GitHub forks](https://img.shields.io/github/forks/Fronvo/fronvo?style=social) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Fronvo/fronvo) ![Lines of code](https://img.shields.io/tokei/lines/github/Fronvo/fronvo)</h1>
+![GitHub](https://img.shields.io/github/license/fronvo/fronvo?style=for-the-badge) ![GitHub Repo stars](https://img.shields.io/github/stars/fronvo/fronvo?style=for-the-badge) ![GitHub forks](https://img.shields.io/github/forks/fronvo/fronvo?style=for-the-badge) ![Lines of code](https://img.shields.io/tokei/lines/github/fronvo/fronvo?style=for-the-badge) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/fronvo/fronvo?style=for-the-badge)</h1>
 
 ## The server of the open-source free-convo app.
 
