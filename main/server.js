@@ -83,7 +83,9 @@ function setupServer() {
         cors: {
             origin: ['https://admin.socket.io'],
             credentials: true
-        }
+        },
+        
+        parser: require('socket.io-msgpack-parser')
     });
 }
 

@@ -13,7 +13,8 @@ const socket = io('ws://localhost:' + PORT, {
     transports: ['websocket'],
     path: '/fronvo',
     reconnectionDelay: RECONNECT_DELAY,
-    reconnectionDelayMax: RECONNECT_DELAY_MAX
+    reconnectionDelayMax: RECONNECT_DELAY_MAX,
+    parser: require('socket.io-msgpack-parser')
 });
 
 console.log('Client connecting to port ' + PORT + '...');
