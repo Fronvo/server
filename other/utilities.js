@@ -75,10 +75,11 @@ module.exports = {
         for(const token in tokens) {
             if(accountId === Object.keys(tokens[token])[0]) {
                 await mdb.collection('tokens').deleteOne({_id: tokens[token][Object.keys(tokens[token])[1]]});
-    
-                return await createToken(mdb, accountId);
             }
         };
+
+        // if no token is found
+        return await createToken(mdb, accountId);
     },
     
     isSocketLoggedIn: (socket) => {
