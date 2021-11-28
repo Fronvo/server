@@ -192,8 +192,7 @@ module.exports = {
         const accountId = await findTokenAccountId;
 
         if(accountId) {
-            // do it ourselves, skip login checks
-            variables.loggedInSockets[socket.id] = {accountId: accountId};
+            utilities.loginSocket(socket, accountId);
             return [];
         }
         else return {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN};
