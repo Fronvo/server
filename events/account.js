@@ -94,37 +94,33 @@ module.exports = {
         if(schemaResult) return schemaResult;
 
         const accounts = await utilities.listDocuments(mdb, 'accounts');
-        
-        let accountFound = false;
 
-        // check if email exists
-        accounts.forEach((account) => {
-            delete account._id;
+        // check if the email is already registered
+        for(let account in accounts) {
+            account = accounts[account];
+            const accountDict = account[Object.keys(account)[0]];
 
-            if(bcrypt.compareSync(email, account[Object.keys(account)[0]].email)) {
-                accountFound = true;
-                return;
+            if(accountDict.email == email) {
+                return {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS};
             }
-        });
-
-        if(!accountFound) {
-            // generate the account
-            const accountData = {};
-            const accountId = utilities.generateId();
-
-            accountData[accountId] = {
-                username: 'Fronvo User ' + (accounts.length + 1),
-                email: bcrypt.hashSync(email, variables.secondaryBcryptHash),
-                password: bcrypt.hashSync(password, variables.mainBcryptHash),
-                creationDate: new Date(),
-            };
-            
-            await mdb.collection('accounts').insertOne(accountData);
-            
-            return [null, await utilities.loginSocket(socket, mdb, accountId)];
-        } else {
-            return {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS};
         }
+
+        // generate the account
+        const accountData = {};
+        const accountId = utilities.generateId();
+
+        accountData[accountId] = {
+            username: 'Fronvo User ' + (accounts.length + 1),
+            email: email,
+            password: bcrypt.hashSync(password, variables.mainBcryptHash),
+            creationDate: new Date(),
+        };
+        
+        await mdb.collection('accounts').insertOne(accountData);
+        
+        utilities.loginSocket(socket, accountId);
+
+        return [null, await utilities.createToken(mdb, accountId)];
     },
 
     login: async (socket, mdb, email, password) => {
@@ -134,59 +130,68 @@ module.exports = {
 
         const accounts = await utilities.listDocuments(mdb, 'accounts');
 
-        let accountFound = false;
-        let accountId;
-        let accountPassword;
+        // check if the email exists
+        for(let account in accounts) {
+            account = accounts[account];
 
-        // check if account exists
-        accounts.forEach(async (account) => {
-            delete account._id;
+            const accountId = Object.keys(account)[0];
+            const accountDict = account[accountId];
 
-            const accountIdKey = Object.keys(account)[0];
-            const accountDict = account[accountIdKey];
+            if(accountDict.email == email) {
+                // validate the password, leave as sync, only one to compare against, no time gain
+                if(bcrypt.compareSync(password, accountDict.password)) {
+                    utilities.loginSocket(socket, accountId);
 
-            if(bcrypt.compareSync(email, accountDict.email)) {
-                accountFound = true;
-                accountId = accountIdKey;
-                accountPassword = accountDict.password;
-                return;
+                    return [null, await utilities.regenerateToken(mdb, accountId)];
+                } else {
+                    return {msg: errors.ERR_INVALID_PASSWORD, code: enums.ERR_INVALID_PASSWORD};
+                }
             }
-        });
+        };
 
-        if(accountFound) {
-            // validate password
-            if(bcrypt.compareSync(password, accountPassword)) {
-                return [null, await utilities.loginSocket(socket, mdb, accountId)];
-            } else {
-                return {msg: errors.ERR_INVALID_PASSWORD, code: enums.ERR_INVALID_PASSWORD};
-            }
-        }
-        else return {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST};
+        return {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST};
     },
 
     loginToken: async (socket, mdb, token) => {
         const schemaResult = decideAccountTokenSchemaResult(token);
 
         if(schemaResult) return schemaResult;
-
+        
         const tokens = await utilities.listDocuments(mdb, 'tokens');
 
-        let tokenFound = false;
-        let accountId;
+        // a promise, used to increase bcrypt's speed of comparing, asynchronously
+        const findTokenAccountId = new Promise((resolve, reject) => {
+            let tokenFound = false;
+            let checkedTokens = 0;
 
-        tokens.forEach(async (tokenItem) => {
-            delete tokenItem._id;
+            for(let tokenItem in tokens) {
+                tokenItem = tokens[tokenItem];
 
-            const tokenAccountId = Object.keys(tokenItem)[0];
+                const tokenAccountId = Object.keys(tokenItem)[0];
+                const tokenKey = tokenItem[tokenAccountId];
 
-            if(bcrypt.compareSync(token, tokenItem[tokenAccountId])) {
-                tokenFound = true;
-                accountId = tokenAccountId;
-                return;
+                bcrypt.compare(token, tokenKey, (err, same) => {
+                    if(tokenFound) return;
+
+                    if(same) {
+                        tokenFound = true;
+                        return resolve(tokenAccountId);
+                    }
+
+                    // cant really check if this is the last iteration, async
+                    checkedTokens++;
+
+                    if(checkedTokens == tokens.length) return resolve();
+                });
             }
+
+            // if no tokens yet
+            if(tokens.length == 0) return resolve();
         });
 
-        if(tokenFound) {
+        const accountId = await findTokenAccountId;
+
+        if(accountId) {
             // do it ourselves, skip login checks
             variables.loggedInSockets[socket.id] = {accountId: accountId};
             return [];

@@ -7,9 +7,9 @@ module.exports = {
     
     defaultError: {msg: errors.ERR_UNKNOWN, code: enums.ERR_UNKNOWN},
 
-    // crucial data such as tokens, passwords
+    // passwords
     mainBcryptHash: 12,
 
-    // secondary such as emails and similar properties
+    // tokens
     secondaryBcryptHash: 8
 }

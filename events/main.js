@@ -35,7 +35,9 @@ module.exports = (io, mdb) => {
                     callbackResponse = {msg: errors.ERR_MUST_BE_LOGGED_OUT, code: enums.ERR_MUST_BE_LOGGED_OUT, event: event};
 
                 } else {
-                    args.forEach((item) => {
+                    for(let item in args) {
+                        item = args[item];
+
                         if(typeof(item) === 'object') {
                             for(const dictItem in item) {
                                 if(neededArgs.includes(dictItem)) {
@@ -52,19 +54,21 @@ module.exports = (io, mdb) => {
                             }
                             // can combine dicts, dont return here
                         }
-                    });
+                    };
                 }
 
                 // here, if we put it in the above else block prematureErrors wont be callback'd
                 let callback;
 
-                args.forEach((item) => {
+                for(let item in args) {
+                    item = args[item];
+
                     // only one callback, dont overwrite
                     if(typeof(item) === 'function' && !callback) {
                         callback = item;
-                        return;
+                        break;
                     }
-                });
+                };
 
                 if(!prematureError) {
                     if(neededArgs.length > 0) {

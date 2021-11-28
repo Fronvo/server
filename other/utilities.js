@@ -21,26 +21,11 @@ async function createToken(mdb, accountId) {
     const tokenDict = {};
     const token = v4();
     
-    tokenDict[Number(accountId)] = bcrypt.hashSync(token, variables.mainBcryptHash);
+    tokenDict[Number(accountId)] = bcrypt.hashSync(token, variables.secondaryBcryptHash);
 
     await mdb.collection('tokens').insertOne(tokenDict);
 
     return token;
-}
-
-async function regenerateToken(mdb, accountId) {
-    const tokens = await listDocuments(mdb, 'tokens');
-
-    tokens.forEach(async token => {
-        const tokenItemId = token._id;
-        delete token._id;
-
-        if(accountId === Object.keys(token)[0]) {
-            await mdb.collection('tokens').deleteOne({_id: tokenItemId});
-        }
-    });
-
-    return await createToken(mdb, accountId);
 }
 
 module.exports = {
@@ -67,36 +52,28 @@ module.exports = {
         return resultDict;
     },
 
-    loginSocket: async (socket, mdb, accountId) => {
-        const tokens = await listDocuments(mdb, 'tokens');
-
-        let accountFound = false;
-
-        tokens.forEach((token) => {
-            delete token._id;
-            
-            const tokenAccountId = Object.keys(token)[0];
-
-            if(tokenAccountId === accountId) {
-                accountFound = true;
-            }
-        });
-
-        let finalAccountToken;
-
-        // regenerate token if found, otherwise create it (cant decrypt current one)
-        if(!accountFound) finalAccountToken = await createToken(mdb, accountId);
-        else finalAccountToken = await regenerateToken(mdb, accountId);
-        
-        variables.loggedInSockets[socket.id] = {accountId: accountId};
-
-        return finalAccountToken;
+    loginSocket: (socket, accountId) => {
+        variables.loggedInSockets[socket.id] = {accountId: accountId}
     },
 
     logoutSocket: (socket) => {
         delete variables.loggedInSockets[socket.id];
     },
 
+    createToken: createToken,
+
+    regenerateToken: async (mdb, accountId) => {
+        const tokens = await listDocuments(mdb, 'tokens');
+
+        for(const token in tokens) {
+            if(accountId === Object.keys(tokens[token])[0]) {
+                await mdb.collection('tokens').deleteOne({_id: tokens[token][Object.keys(tokens[token])[1]]});
+    
+                return await createToken(mdb, accountId);
+            }
+        };
+    },
+    
     isSocketLoggedIn: (socket) => {
         return socket.id in variables.loggedInSockets;
     },
