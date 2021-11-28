@@ -142,7 +142,11 @@ module.exports = {
                 if(bcrypt.compareSync(password, accountDict.password)) {
                     utilities.loginSocket(socket, accountId);
 
-                    return [null, await utilities.regenerateToken(mdb, accountId)];
+                    let accountToken = await utilities.getToken(mdb, accountId);
+
+                    if(!accountToken) accountToken = await utilities.createToken(mdb, accountId);
+
+                    return [null, accountToken];
                 } else {
                     return {msg: errors.ERR_INVALID_PASSWORD, code: enums.ERR_INVALID_PASSWORD};
                 }
@@ -159,42 +163,14 @@ module.exports = {
         
         const tokens = await utilities.listDocuments(mdb, 'tokens');
 
-        // a promise, used to increase bcrypt's speed of comparing, asynchronously
-        const findTokenAccountId = new Promise((resolve, reject) => {
-            let tokenFound = false;
-            let checkedTokens = 0;
+        for(let tokenItem in tokens) {
+            tokenItem = tokens[tokenItem];
+            const tokenAccountId = Object.keys(tokenItem)[0];
+            const tokenKey = tokenItem[tokenAccountId];
 
-            for(let tokenItem in tokens) {
-                tokenItem = tokens[tokenItem];
-
-                const tokenAccountId = Object.keys(tokenItem)[0];
-                const tokenKey = tokenItem[tokenAccountId];
-
-                bcrypt.compare(token, tokenKey, (err, same) => {
-                    if(tokenFound) return;
-
-                    if(same) {
-                        tokenFound = true;
-                        return resolve(tokenAccountId);
-                    }
-
-                    // cant really check if this is the last iteration, async
-                    checkedTokens++;
-
-                    if(checkedTokens == tokens.length) return resolve();
-                });
-            }
-
-            // if no tokens yet
-            if(tokens.length == 0) return resolve();
-        });
-
-        const accountId = await findTokenAccountId;
-
-        if(accountId) {
-            utilities.loginSocket(socket, accountId);
-            return [];
+            if(token == tokenKey) return [];
         }
-        else return {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN};
+
+        return {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN};
     }
 }

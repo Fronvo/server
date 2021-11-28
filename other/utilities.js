@@ -1,7 +1,6 @@
 const variables = require('../other/variables');
 const { accountSchema } = require('./schemas');
 const { v4 } = require('uuid');
-const bcrypt = require('bcrypt');
 
 // here to be used by this file, too
 function insertLog(mdb, logText) {
@@ -21,18 +20,6 @@ function insertTextToCollection(mdb, collName, text) {
 
 async function listDocuments(mdb, collName) {
     return await mdb.collection(collName).find({}).toArray();
-}
-
-// internal use
-async function createToken(mdb, accountId) {
-    const tokenDict = {};
-    const token = v4();
-    
-    tokenDict[Number(accountId)] = bcrypt.hashSync(token, variables.secondaryBcryptHash);
-
-    await mdb.collection('tokens').insertOne(tokenDict);
-
-    return token;
 }
 
 module.exports = {
@@ -67,19 +54,28 @@ module.exports = {
         delete variables.loggedInSockets[socket.id];
     },
 
-    createToken: createToken,
+    createToken: async (mdb, accountId) => {
+        const tokenDict = {};
+        const token = v4();
+        
+        tokenDict[Number(accountId)] = token;
+    
+        await mdb.collection('tokens').insertOne(tokenDict);
+    
+        return token;
+    },
 
-    regenerateToken: async (mdb, accountId) => {
+    getToken: async (mdb, accountId) => {
         const tokens = await listDocuments(mdb, 'tokens');
 
-        for(const token in tokens) {
-            if(accountId === Object.keys(tokens[token])[0]) {
-                await mdb.collection('tokens').deleteOne({_id: tokens[token][Object.keys(tokens[token])[1]]});
-            }
-        };
+        for(let token in tokens) {
+            token = tokens[token];
+            const tokenAccountId = Object.keys(token)[0];
 
-        // if no token is found
-        return await createToken(mdb, accountId);
+            if(accountId === tokenAccountId) {
+                return token[tokenAccountId];
+            }
+        }
     },
     
     isSocketLoggedIn: (socket) => {
