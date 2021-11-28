@@ -11,5 +11,11 @@ module.exports = {
     mainBcryptHash: 12,
 
     // tokens
-    secondaryBcryptHash: 8
+    secondaryBcryptHash: 8,
+
+    // logging of performance for every function, dotenv doesnt auto-convert types..
+    performanceReportsEnabled: process.env.FRONVO_PERFORMANCE_REPORTS == 'true' || false,
+
+    // storage of temporary performance reports
+    performanceReports: {}
 }

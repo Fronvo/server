@@ -12,6 +12,13 @@ function insertLog(mdb, logText) {
     mdb.collection('logs').insertOne(logDict).catch(() => {});
 }
 
+function insertTextToCollection(mdb, collName, text) {
+    const dictToInsert = {};
+    dictToInsert[v4()] = text;
+
+    mdb.collection(collName).insertOne(dictToInsert).catch(() => {});
+}
+
 async function listDocuments(mdb, collName) {
     return await mdb.collection(collName).find({}).toArray();
 }
@@ -82,5 +89,30 @@ module.exports = {
         return variables.loggedInSockets;
     },
 
-    listDocuments: listDocuments
+    listDocuments: listDocuments,
+
+    perfStart: (perfName) => {
+        if(!variables.performanceReportsEnabled) return;
+
+        // mantain uniqueness, dont base it off solely the name
+        const perfUUID = v4();
+
+        variables.performanceReports[perfUUID] = {
+            perfName: perfName,
+            timestamp: new Date()
+        };
+
+        return perfUUID;
+    },
+
+    perfEnd: (mdb, perfUUID) => {
+        if(!variables.performanceReportsEnabled || !perfUUID in variables.performanceReports) return;
+
+        const perfReportDict = variables.performanceReports[perfUUID];
+        const msDuration = new Date() - perfReportDict.timestamp;
+
+        insertTextToCollection(mdb, 'reports', perfReportDict.perfName + ' took ' + msDuration + 'ms.');
+
+        delete variables.performanceReports[perfUUID];
+    }
 }

@@ -86,12 +86,16 @@ module.exports = (io, mdb) => {
 
                         callbackResponse = {msg: neededArgsString, code: enums.ERR_MISSING_ARGS, args_needed: neededArgs};
                     } else {
+                        const perfId = utilities.perfStart(event);
+
                         callbackResponse = funcs[event](socket, mdb, ...filteredArgs);
 
                         // if async
                         if(callbackResponse) {
                             if(typeof(callbackResponse.then) === 'function') callbackResponse = await callbackResponse;
                         }
+
+                        utilities.perfEnd(mdb, perfId);
                     }
                 }
 
