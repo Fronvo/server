@@ -16,8 +16,6 @@
 
 **The server should be running locally at port 3001.**
 
-**Helpful tip: ```node main/client.js``` to test if the server actually works.**
-
 **Another tip: For hosting, it is recommended that you use [pm2](https://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/) for load balancing, auto restarts and more. By default, heroku will make use of it.**
 
 ## [Future plans](https://github.com/Fronvo/fronvo/projects/1)
