@@ -88,7 +88,7 @@ module.exports = (io, mdb) => {
                     } else {
                         const perfId = utilities.perfStart(event);
 
-                        callbackResponse = funcs[event](socket, mdb, ...filteredArgs);
+                        callbackResponse = funcs[event](io, socket, mdb, ...filteredArgs);
 
                         // if async
                         if(callbackResponse) {

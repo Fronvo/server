@@ -88,7 +88,7 @@ function decideAccountTokenSchemaResult(token) {
 }
 
 module.exports = {
-    register: async (socket, mdb, email, password) => {
+    register: async (io, socket, mdb, email, password) => {
         const schemaResult = decideAccountSchemaResult(email, password);
 
         if(schemaResult) return schemaResult;
@@ -123,7 +123,7 @@ module.exports = {
         return [null, await utilities.createToken(mdb, accountId)];
     },
 
-    login: async (socket, mdb, email, password) => {
+    login: async (io, socket, mdb, email, password) => {
         const schemaResult = decideAccountSchemaResult(email, password);
 
         if(schemaResult) return schemaResult;
@@ -156,7 +156,7 @@ module.exports = {
         return {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST};
     },
 
-    loginToken: async (socket, mdb, token) => {
+    loginToken: async (io, socket, mdb, token) => {
         const schemaResult = decideAccountTokenSchemaResult(token);
 
         if(schemaResult) return schemaResult;
