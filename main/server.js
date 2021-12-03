@@ -94,7 +94,7 @@ function setupServerEvents() {
 }
 
 function setupPM2() {
-    if(process.env.TARGET_PM2) {
+    if(process.env.TARGET_PM2 == 'true') {
         io.adapter(createAdapter());
         setupWorker(io);
     }
