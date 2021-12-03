@@ -168,7 +168,10 @@ module.exports = {
             const tokenAccountId = Object.keys(tokenItem)[0];
             const tokenKey = tokenItem[tokenAccountId];
 
-            if(token == tokenKey) return [];
+            if(token == tokenKey) {
+                utilities.loginSocket(io, socket, tokenAccountId);
+                return [];
+            }
         }
 
         return {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN};
