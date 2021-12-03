@@ -5,6 +5,7 @@ const errors = require('../other/errors');
 const { enums } = require('../other/enums');
 const templates = require('../other/templates');
 const { format } = require('util');
+const variables = require('../other/variables');
 
 module.exports = (io, mdb) => {
     // add each file with functions here
@@ -115,7 +116,7 @@ module.exports = (io, mdb) => {
         
         socket.on('disconnect', () => {
             if(utilities.isSocketLoggedIn(socket)) {
-                utilities.logoutSocket(socket);
+                utilities.logoutSocket(io, socket);
             }
             
             console.log('Socket ' + socket.id + ' has disconnected.');
@@ -124,5 +125,14 @@ module.exports = (io, mdb) => {
     
     io.engine.on('connection_error', (err) => {
         console.log('Connection abnormally closed:  [' + err.code + ']' +  err.message);
+    });
+
+    // following events are only called in cluster mode
+    io.on('loginSocket', (socketId, accountId) => {
+        variables.loggedInSockets[socketId] = {accountId: accountId};
+    });
+
+    io.on('logoutSocket', socketId => {
+        delete variables.loggedInSockets[socketId];
     });
 }

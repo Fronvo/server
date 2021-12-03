@@ -14,5 +14,7 @@ module.exports = {
     performanceReportsEnabled: process.env.FRONVO_PERFORMANCE_REPORTS == 'true' || false,
 
     // storage of temporary performance reports
-    performanceReports: {}
+    performanceReports: {},
+
+    cluster: process.env.TARGET_PM2 == 'true' || false
 }

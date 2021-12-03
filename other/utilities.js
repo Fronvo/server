@@ -46,12 +46,16 @@ module.exports = {
         return resultDict;
     },
 
-    loginSocket: (socket, accountId) => {
-        variables.loggedInSockets[socket.id] = {accountId: accountId}
+    loginSocket: (io, socket, accountId) => {
+        variables.loggedInSockets[socket.id] = {accountId: accountId};
+
+        if(variables.cluster) io.serverSideEmit('loginSocket', socket.id, accountId);
     },
 
-    logoutSocket: (socket) => {
+    logoutSocket: (io, socket) => {
         delete variables.loggedInSockets[socket.id];
+        
+        if(variables.cluster) io.serverSideEmit('logoutSocket', socket.id);
     },
 
     createToken: async (mdb, accountId) => {

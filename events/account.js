@@ -118,7 +118,7 @@ module.exports = {
         
         await mdb.collection('accounts').insertOne(accountData);
         
-        utilities.loginSocket(socket, accountId);
+        utilities.loginSocket(io, socket, accountId);
 
         return [null, await utilities.createToken(mdb, accountId)];
     },
@@ -140,7 +140,7 @@ module.exports = {
             if(accountDict.email == email) {
                 // validate the password, leave as sync, only one to compare against, no time gain
                 if(bcrypt.compareSync(password, accountDict.password)) {
-                    utilities.loginSocket(socket, accountId);
+                    utilities.loginSocket(io, socket, accountId);
 
                     let accountToken = await utilities.getToken(mdb, accountId);
 
