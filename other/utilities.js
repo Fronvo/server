@@ -23,9 +23,9 @@ async function listDocuments(mdb, collName) {
 }
 
 module.exports = {
-    generateId: () => {
-        // 8 digits
-        return Math.floor(10000000 + Math.random() * 90000000);
+    convertToId: (username) => {
+        // Fronvo user 1 => fronvouser1
+        return username.replace(/ /g, '').toLowerCase();
     },
 
     insertLog: insertLog,
@@ -62,7 +62,7 @@ module.exports = {
         const tokenDict = {};
         const token = v4();
         
-        tokenDict[Number(accountId)] = token;
+        tokenDict[accountId] = token;
     
         await mdb.collection('tokens').insertOne(tokenDict);
     
@@ -74,7 +74,7 @@ module.exports = {
 
         for(let token in tokens) {
             token = tokens[token];
-            const tokenAccountId = Object.keys(token)[0];
+            const tokenAccountId = Object.keys(token)[1];
 
             if(accountId === tokenAccountId) {
                 return token[tokenAccountId];

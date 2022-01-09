@@ -98,7 +98,7 @@ module.exports = {
         // check if the email is already registered
         for(let account in accounts) {
             account = accounts[account];
-            const accountDict = account[Object.keys(account)[0]];
+            const accountDict = account[Object.keys(account)[1]];
 
             if(accountDict.email == email) {
                 return {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS};
@@ -107,10 +107,11 @@ module.exports = {
 
         // generate the account
         const accountData = {};
-        const accountId = utilities.generateId();
+        const accountUsername = 'Fronvo user ' + (accounts.length + 1);
+        const accountId = utilities.convertToId(accountUsername);
 
         accountData[accountId] = {
-            username: 'Fronvo User ' + (accounts.length + 1),
+            username: accountUsername,
             email: email,
             password: bcrypt.hashSync(password, variables.mainBcryptHash),
             creationDate: new Date(),
@@ -134,7 +135,7 @@ module.exports = {
         for(let account in accounts) {
             account = accounts[account];
 
-            const accountId = Object.keys(account)[0];
+            const accountId = Object.keys(account)[1];
             const accountDict = account[accountId];
 
             if(accountDict.email == email) {
@@ -142,6 +143,7 @@ module.exports = {
                 if(bcrypt.compareSync(password, accountDict.password)) {
                     utilities.loginSocket(io, socket, accountId);
 
+                    // refresh token / use available one
                     let accountToken = await utilities.getToken(mdb, accountId);
 
                     if(!accountToken) accountToken = await utilities.createToken(mdb, accountId);
@@ -165,7 +167,7 @@ module.exports = {
 
         for(let tokenItem in tokens) {
             tokenItem = tokens[tokenItem];
-            const tokenAccountId = Object.keys(tokenItem)[0];
+            const tokenAccountId = Object.keys(tokenItem)[1];
             const tokenKey = tokenItem[tokenAccountId];
 
             if(token == tokenKey) {
