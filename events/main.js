@@ -1,5 +1,13 @@
-const account = require('./account');
-const general = require('./general');
+// No account only
+const noAccountEvents = require('./noAccount');
+
+// Account only
+const accountEvents = require('./account');
+
+// General
+const generalFuncs = require('./general');
+
+// Other
 const utilities = require('../other/utilities');
 const errors = require('../other/errors');
 const { enums } = require('../other/enums');
@@ -9,10 +17,10 @@ const variables = require('../other/variables');
 
 module.exports = (io, mdb) => {
     // add each file with functions here
-    const noAccountOnlyFuncs = {...account};
-    const accountOnlyFuncs = {};
+    const noAccountOnlyFuncs = {...noAccountEvents};
+    const accountOnlyFuncs = {...accountEvents};
 
-    const funcs = {...account, ...general};
+    const funcs = {...noAccountOnlyFuncs, ...accountOnlyFuncs, ...generalFuncs};
 
     io.on('connection', (socket) => {
         console.log('Socket ' + socket.id + ' has connected.');
