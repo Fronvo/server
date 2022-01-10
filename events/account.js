@@ -1,7 +1,7 @@
 const utilities = require("../other/utilities");
 
 module.exports = {
-    fetchProfileData: async (io, socket, mdb) => {
+    fetchSelfData: async (io, socket, mdb) => {
         const accounts = await utilities.listDocuments(mdb, 'accounts');
 
         const loggedInSockets = utilities.getLoggedInSockets();
