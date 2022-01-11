@@ -9,9 +9,9 @@ module.exports = {
     },
 
     fetchProfileData: async (io, socket, mdb, profileId) => {
-        const accounts = await utilities.listDocuments(mdb, 'accounts');
-
         const loggedInSockets = utilities.getLoggedInSockets();
+
+        const accounts = await utilities.listDocuments(mdb, 'accounts');
         
         for(let account in accounts) {
             account = accounts[account];
