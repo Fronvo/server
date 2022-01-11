@@ -21,7 +21,8 @@ const enums = [
     'ERR_INVALID_REGEX',
     'ERR_INVALID_TOKEN',
     'ERR_MUST_BE_LOGGED_IN',
-    'ERR_MUST_BE_LOGGED_OUT'
+    'ERR_MUST_BE_LOGGED_OUT',
+    'ERR_PROFILE_NOT_FOUND'
 ];
 
 const enumsDict = {};

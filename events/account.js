@@ -1,25 +1,40 @@
-const utilities = require("../other/utilities");
+const { enums } = require('../other/enums');
+const errors = require('../other/errors');
+const utilities = require('../other/utilities');
+const { format } = require('util');
 
 module.exports = {
-    fetchSelfData: async (io, socket, mdb) => {
+    fetchProfileId: (io, socket, mdb) => {
+        return utilities.getLoggedInSockets()[socket.id]['accountId'];
+    },
+
+    fetchProfileData: async (io, socket, mdb, profileId) => {
         const accounts = await utilities.listDocuments(mdb, 'accounts');
 
         const loggedInSockets = utilities.getLoggedInSockets();
-
+        
         for(let account in accounts) {
             account = accounts[account];
 
             const accountId = Object.keys(account)[1];
 
-            // compare account id with connected & logged in socket's account id
-            if(accountId == loggedInSockets[socket.id]['accountId']) {
-                let accountDict = account[accountId];
+            if(accountId != profileId) continue;
 
-                // no.
-                delete accountDict.password;
+            const accountDict = account[accountId];
 
-                return accountDict;
+            const finalAccountDict = {
+                username: accountDict.username,
+                creationDate: accountDict.creationDate
             }
+
+            // more info for personal profile
+            if(profileId == loggedInSockets[socket.id]['accountId']) {
+                finalAccountDict.email = accountDict.email;
+            }
+
+            return [null, finalAccountDict];
         }
+
+        return {msg: format(errors.ERR_PROFILE_NOT_FOUND, profileId), code: enums.ERR_PROFILE_NOT_FOUND};
     }
 }

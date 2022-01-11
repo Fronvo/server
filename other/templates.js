@@ -3,5 +3,6 @@ module.exports = {
     login: ['email', 'password'],
     loginToken: ['token'],
     isLoggedIn: [],
-    fetchSelfData: []
+    fetchProfileData: ['profileId'],
+    fetchProfileId: []
 }
