@@ -28,7 +28,7 @@ module.exports = {
             }
 
             // more info for personal profile
-            if(profileId == loggedInSockets[socket.id]['accountId']) {
+            if(socket.id in loggedInSockets && profileId == loggedInSockets[socket.id]['accountId']) {
                 finalAccountDict.email = accountDict.email;
             }
 
