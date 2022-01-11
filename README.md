@@ -24,3 +24,9 @@
 
 ## Documentation
 **Coming soon.**
+
+## Tools used
+
+**[socket.io](https://socket.io/) for ease of cummunication and cross-platform ability.**
+
+**[MongoDB](https://www.mongodb.com/) for flexibility, performance and low storage plans.**
