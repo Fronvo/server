@@ -21,3 +21,6 @@
 **When hosting, remember to pass the appropriate environmental variables in order to enable pm2 for a [ton of cool features](https://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/).**
 
 **By default, [heroku](https://heroku.com) will make use of it.**
+
+## Documentation
+**Coming soon.**
