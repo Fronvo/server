@@ -16,4 +16,8 @@
 
 **The server should be running locally at port 3001.**
 
-**Another tip: For hosting, it is recommended that you use [pm2](https://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/) for load balancing, auto restarts and more. By default, heroku will make use of it.**
+## Hosting
+
+**When hosting, remember to pass the appropriate environmental variables in order to enable pm2 for a [ton of cool features](https://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/).**
+
+**By default, [heroku](https://heroku.com) will make use of it.**
