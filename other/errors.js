@@ -12,5 +12,6 @@ module.exports = {
     ERR_INVALID_TOKEN: 'The token is invalid.',
     ERR_MISSING_ARGS: 'The following arguments are missing: ',
     ERR_MUST_BE_LOGGED_IN: 'You must login first before using this event.',
-    ERR_MUST_BE_LOGGED_OUT: 'You must logout first before using this event.'
+    ERR_MUST_BE_LOGGED_OUT: 'You must logout first before using this event.',
+    ERR_PROFILE_NOT_FOUND: 'The requested profile (%s) couldn\'t be found.'
 }

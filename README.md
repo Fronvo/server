@@ -16,6 +16,17 @@
 
 **The server should be running locally at port 3001.**
 
-**Another tip: For hosting, it is recommended that you use [pm2](https://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/) for load balancing, auto restarts and more. By default, heroku will make use of it.**
+## Hosting
 
-## [Future plans](https://github.com/Fronvo/fronvo/projects/1)
+**When hosting, remember to pass the appropriate environmental variables in order to enable pm2 for a [ton of cool features](https://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/).**
+
+**By default, [heroku](https://heroku.com) will make use of it.**
+
+## Documentation
+**Coming soon.**
+
+## Tools used
+
+**[socket.io](https://socket.io/) for ease of cummunication and cross-platform ability.**
+
+**[MongoDB](https://www.mongodb.com/) for flexibility, performance and low storage plans.**
