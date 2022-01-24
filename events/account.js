@@ -5,7 +5,7 @@ const { format } = require('util');
 
 module.exports = {
     fetchProfileId: (io, socket, mdb) => {
-        return utilities.getLoggedInSockets()[socket.id]['accountId'];
+        return utilities.getLoggedInSockets()[socket.id];
     },
 
     fetchProfileData: async (io, socket, mdb, profileId) => {
@@ -28,7 +28,7 @@ module.exports = {
             }
 
             // more info for personal profile
-            if(socket.id in loggedInSockets && profileId == loggedInSockets[socket.id]['accountId']) {
+            if(profileId == loggedInSockets[socket.id]) {
                 finalAccountDict.email = accountDict.email;
             }
 

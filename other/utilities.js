@@ -47,7 +47,7 @@ module.exports = {
     },
 
     loginSocket: (io, socket, accountId) => {
-        variables.loggedInSockets[socket.id] = {accountId: accountId};
+        variables.loggedInSockets[socket.id] = accountId;
 
         if(variables.cluster) io.serverSideEmit('loginSocket', socket.id, accountId);
     },

@@ -137,7 +137,7 @@ module.exports = (io, mdb) => {
 
     // following events are only called in cluster mode
     io.on('loginSocket', (socketId, accountId) => {
-        variables.loggedInSockets[socketId] = {accountId: accountId};
+        variables.loggedInSockets[socketId] = accountId;
     });
 
     io.on('logoutSocket', socketId => {
