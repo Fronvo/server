@@ -10,8 +10,8 @@ module.exports = {
     // passwords
     mainBcryptHash: 12,
 
-    // logging of performance for every function, dotenv doesnt auto-convert types..
-    performanceReportsEnabled: process.env.FRONVO_PERFORMANCE_REPORTS == 'true' || false,
+    // logging of performance for every function
+    performanceReportsEnabled: Boolean(process.env.FRONVO_PERFORMANCE_REPORTS) || false,
 
     // storage of temporary performance reports
     performanceReports: {},
