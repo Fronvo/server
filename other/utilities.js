@@ -112,7 +112,9 @@ module.exports = {
         const perfReportDict = variables.performanceReports[perfUUID];
         const msDuration = new Date() - perfReportDict.timestamp;
 
-        insertTextToCollection(mdb, 'reports', perfReportDict.perfName + ' took ' + msDuration + 'ms.');
+        if(msDuration >= variables.performanceReportsMinMS) {
+            insertTextToCollection(mdb, 'reports', perfReportDict.perfName + ' took ' + msDuration + 'ms.');
+        }
 
         delete variables.performanceReports[perfUUID];
     }
