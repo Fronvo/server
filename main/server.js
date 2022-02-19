@@ -140,7 +140,7 @@ function startup() {
 
         loadingSpinner.succeed('Server running at port ' + PORT + '.');
     }).catch((err) => {
-        loadingSpinner.fail(err.message);
+        loadingSpinner.fail(err);
     });
 }
 
