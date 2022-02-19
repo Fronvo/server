@@ -3,7 +3,7 @@
 
 // Load .env, get parent directory regardless of node directory
 const { resolve } = require('path');
-require('dotenv').config({ path: resolve(__dirname, '..') + '/.env' });
+require('dotenv').config({ path: resolve(__dirname, '..', '.env') });
 
 // Port to attach to
 const PORT = process.env.PORT || 3001;
