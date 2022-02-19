@@ -95,12 +95,15 @@ module.exports = {
 
         const accounts = await utilities.listDocuments(mdb, 'accounts');
 
-        // check if the email is already registered
+        // check if the email is already registered / from a dummy domain
         for(let account in accounts) {
             account = accounts[account];
             const accountDict = account[Object.keys(account)[1]];
 
-            if(accountDict.email == email) {
+            if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(accountDict.email)) > -1) {
+                return {msg: errors.ERR_INVALID_EMAIL, code: enums.ERR_INVALID_EMAIL};
+                
+            } else if(accountDict.email == email) {
                 return {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS};
             }
         }

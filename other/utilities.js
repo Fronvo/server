@@ -117,5 +117,9 @@ module.exports = {
         }
 
         delete variables.performanceReports[perfUUID];
+    },
+    
+    getEmailDomain: (email) => {
+        return email.split('@')[1];
     }
 }

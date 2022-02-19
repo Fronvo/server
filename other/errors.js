@@ -4,6 +4,7 @@ module.exports = {
     ERR_REQUIRED: 'The %s is required.',
     ERR_LENGTH: 'The %s must contain %i to %i characters.',
     ERR_EXACT_LENGTH: 'The %s must consist of exactly %i characters.',
+    ERR_INVALID_EMAIL: 'The email provided is invalid.',
     ERR_INVALID_EMAIL_FORMAT: 'The email is badly formatted.',
     ERR_ACC_ALR_EXISTS: 'An account with that email already exists.',
     ERR_ACC_DOESNT_EXIST: 'The account with the specified email could not be found.',
