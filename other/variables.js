@@ -4,6 +4,10 @@ const { resolve } = require('path');
 
 const generatedFilesDirectory = resolve(__dirname, '../generated');
 
+function decideBooleanEnvValue(value, valueIfNull) {
+    return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
+}
+
 module.exports = {
     // Connected accounts for each socket (socketId: accountId)
     loggedInSockets: {},
@@ -14,7 +18,7 @@ module.exports = {
     mainBcryptHash: 12,
 
     // logging of performance for every function
-    performanceReportsEnabled: Boolean(process.env.FRONVO_PERFORMANCE_REPORTS) || false,
+    performanceReportsEnabled: decideBooleanEnvValue(process.env.FRONVO_PERFORMANCE_REPORTS, false),
 
     // storage of temporary performance reports
     performanceReports: {},
