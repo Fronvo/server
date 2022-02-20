@@ -31,5 +31,6 @@ module.exports = {
     generatedFilesDirectory: generatedFilesDirectory,
 
     // blacklisted emails, https://github.com/disposable-email-domains/disposable-email-domains
-    blacklistedEmailDomains: require(resolve(generatedFilesDirectory, 'disposable_email_blocklist.json'))
+    blacklistedEmailDomains: require(resolve(generatedFilesDirectory, 'disposable_email_blocklist.json')),
+    blacklistedEmailDomainsEnabled: decideBooleanEnvValue(process.env.FRONVO_EMAIL_BLACKLISTING_ENABLED, true)
 }

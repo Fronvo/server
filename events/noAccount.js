@@ -95,9 +95,11 @@ module.exports = {
 
         const accounts = await utilities.listDocuments(mdb, 'accounts');
 
-        // check if the email is from a dummy domain
-        if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(email)) > -1) {
-            return {msg: errors.ERR_INVALID_EMAIL, code: enums.ERR_INVALID_EMAIL};
+        // check if the email is from a dummy domain, if enabled
+        if(variables.blacklistedEmailDomainsEnabled) {
+            if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(email)) > -1) {
+                return {msg: errors.ERR_INVALID_EMAIL, code: enums.ERR_INVALID_EMAIL};
+            }
         }
 
         // check if the email is already registered
