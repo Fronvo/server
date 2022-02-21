@@ -12,7 +12,7 @@ function insertLog(mdb, logText) {
 }
 
 function insertTextToCollection(mdb, collName, text) {
-    const dictToInsert = {};
+    const dictToInsert = {timestamp: new Date()};
     dictToInsert[v4()] = text;
 
     mdb.collection(collName).insertOne(dictToInsert).catch(() => {});
