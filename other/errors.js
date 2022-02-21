@@ -1,6 +1,14 @@
+// ******************** //
+// Used in combination with enums.js to output complete error messages.
+// ******************** //
+
+// Remember to require('util').format() depending on the error's symbols.
 module.exports = {
     ERR_UNKNOWN: 'An unknown error has occured.',
-    ERR_FUNC_RETURN_NONE: 'Registered event \'%s\' didn\'t return any value.',
+
+    // TODO: Improve (bad value type?)
+    ERR_FUNC_RETURN_NONE: 'Registered event \'%s\' didn\'t return any value.', 
+
     ERR_REQUIRED: 'The %s is required.',
     ERR_LENGTH: 'The %s must contain %i to %i characters.',
     ERR_EXACT_LENGTH: 'The %s must consist of exactly %i characters.',

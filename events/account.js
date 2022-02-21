@@ -1,3 +1,7 @@
+// ******************** //
+// Events which are only usable while logged in.
+// ******************** //
+
 const { enums } = require('../other/enums');
 const errors = require('../other/errors');
 const utilities = require('../other/utilities');
@@ -5,10 +9,12 @@ const { format } = require('util');
 
 module.exports = {
     fetchProfileId: (io, socket, mdb) => {
+        // According to variables.js comment on loggedInSockets fill method
         return utilities.getLoggedInSockets()[socket.id];
     },
 
-    fetchProfileData: async (io, socket, mdb, profileId) => {
+    fetchProfileData: async ({socket, mdb}, profileId) => {
+        // TODO: Move to the if statement, will return null if logged out so who cares
         const loggedInSockets = utilities.getLoggedInSockets();
 
         const accounts = await utilities.listDocuments(mdb, 'accounts');
@@ -18,16 +24,18 @@ module.exports = {
 
             const accountId = Object.keys(account)[1];
 
+            // If target account id isn't what were looking for, move on
             if(accountId != profileId) continue;
 
             const accountDict = account[accountId];
 
+            // Dont spread the dictionary, only provide select info
             const finalAccountDict = {
                 username: accountDict.username,
                 creationDate: accountDict.creationDate
             }
 
-            // more info for personal profile
+            // If it's the user's profile, provide more details (better than having 2 seperate events)
             if(profileId == loggedInSockets[socket.id]) {
                 finalAccountDict.email = accountDict.email;
             }

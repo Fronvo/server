@@ -1,3 +1,7 @@
+// ******************** //
+// Events which are only usable while not logged in.
+// ******************** //
+
 const utilities = require('../other/utilities');
 const schemas = require('../other/schemas');
 const errors = require('../other/errors');
@@ -20,19 +24,22 @@ function decideAccountSchemaResult(email, password) {
     const schemaMessage = schemaDetails.message;
     const schemaPath = schemaDetails.path[0];
 
-    // default dict to reuse, copy its value
+    // Default dictionary to reuse, copy its values
     let resultDict = {...defaultError};
 
-    // default to JOI message
+    // Default to JOI message
     resultDict.msg = schemaMessage;
 
     if(schemaPath === 'email' || schemaPath === 'password') {
-        // provide additional info for the end user
+
+        // Provide additional info for the end user
         resultDict['extras'] = {for: schemaPath};
 
         let limits = utilities.getMinMaxEntriesForAccounts();
 
         switch(schemaType) {
+
+            // Fall-through, reuse
             case JoiE.TYPE_REQUIRED:
             case JoiE.TYPE_EMPTY:
                 resultDict.msg = format(errors.ERR_REQUIRED, schemaPath);
@@ -87,23 +94,25 @@ function decideAccountTokenSchemaResult(token) {
     return resultDict;
 }
 
+// TODO: export function register instead of in module.exports, better readability for tabs
 module.exports = {
     register: async (io, socket, mdb, email, password) => {
+        // Schema validation
         const schemaResult = decideAccountSchemaResult(email, password);
-
         if(schemaResult) return schemaResult;
 
         const accounts = await utilities.listDocuments(mdb, 'accounts');
 
-        // check if the email is from a dummy domain, if enabled
+        // Check if the email is from a dummy (blacklisted) domain, if applicable
         if(variables.blacklistedEmailDomainsEnabled) {
             if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(email)) > -1) {
                 return {msg: errors.ERR_INVALID_EMAIL, code: enums.ERR_INVALID_EMAIL};
             }
         }
 
-        // check if the email is already registered
+        // Check if the email is already registered by another user
         for(let account in accounts) {
+            // TODO: Utility function cuz this is very boring to repeat
             account = accounts[account];
             const accountDict = account[Object.keys(account)[1]];
             
@@ -112,11 +121,14 @@ module.exports = {
             }
         }
 
-        // generate the account
+        // Generate the account once all checks have passed
         const accountData = {};
+
+        // TODO: Fronver?
         const accountUsername = 'Fronvo user ' + (accounts.length + 1);
         const accountId = utilities.convertToId(accountUsername);
 
+        // TODO: Convert such account creation dictionaries to a function?
         accountData[accountId] = {
             username: accountUsername,
             email: email,
@@ -126,19 +138,20 @@ module.exports = {
         
         await mdb.collection('accounts').insertOne(accountData);
         
+        // Also login to the account
         utilities.loginSocket(io, socket, accountId);
 
         return [null, await utilities.createToken(mdb, accountId)];
     },
 
     login: async (io, socket, mdb, email, password) => {
+        // Schema validation
         const schemaResult = decideAccountSchemaResult(email, password);
-
         if(schemaResult) return schemaResult;
 
         const accounts = await utilities.listDocuments(mdb, 'accounts');
 
-        // check if the email exists
+        // Check if the email already exists to be able to login
         for(let account in accounts) {
             account = accounts[account];
 
@@ -146,13 +159,14 @@ module.exports = {
             const accountDict = account[accountId];
 
             if(accountDict.email == email) {
-                // validate the password, leave as sync, only one to compare against, no time gain
+                // Found the one we need
+
+                // Validate the password, synchronously
                 if(bcrypt.compareSync(password, accountDict.password)) {
                     utilities.loginSocket(io, socket, accountId);
 
-                    // refresh token / use available one
+                    // Refresh token / Use available one
                     let accountToken = await utilities.getToken(mdb, accountId);
-
                     if(!accountToken) accountToken = await utilities.createToken(mdb, accountId);
 
                     return [null, accountToken];
@@ -166,8 +180,8 @@ module.exports = {
     },
 
     loginToken: async (io, socket, mdb, token) => {
+        // Schema validation
         const schemaResult = decideAccountTokenSchemaResult(token);
-
         if(schemaResult) return schemaResult;
         
         const tokens = await utilities.listDocuments(mdb, 'tokens');
@@ -178,6 +192,7 @@ module.exports = {
             const tokenKey = tokenItem[tokenAccountId];
 
             if(token == tokenKey) {
+                // Just login to the account
                 utilities.loginSocket(io, socket, tokenAccountId);
                 return [];
             }

@@ -1,3 +1,7 @@
+// ******************** //
+// Constant values used for outputing error codes.
+// ******************** //
+
 const JoiE = {
     TYPE_REQUIRED: 'any.required',
     TYPE_EMPTY: 'string.empty',
@@ -28,9 +32,9 @@ const enums = [
 
 const enumsDict = {};
 
-// eg: {ERR_UNKNOWN: 1, ERR_LENGTH: 2}
+// Eg.: {ERR_UNKNOWN: 1, ERR_LENGTH: 2}
 enums.forEach(item => {
-    enumsDict[item] = enums.indexOf(item) + 1
+    enumsDict[item] = enums.indexOf(item) + 1;
 });
 
 module.exports = {
