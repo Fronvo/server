@@ -123,10 +123,10 @@ module.exports = (io, mdb) => {
                 if(callback) {
                     if(callbackResponse) {
                         // Eg.: [null, token] | [false]
-                        if(Array.isArray(callbackResponse)) { callback(...callbackResponse); console.log(...callbackResponse) }
+                        if(Array.isArray(callbackResponse)) callback(...callbackResponse);
                         
                         // Pass normal dictionary, no spreading
-                        else { callback(callbackResponse); console.log(callbackResponse) }
+                        else callback(callbackResponse);
                     } else {
                         utilities.insertLog(mdb, format(errors.ERR_FUNC_RETURN_NONE, event));
                         callback({msg: errors.ERR_UNKNOWN, code: enums.ERR_UNKNOWN});
