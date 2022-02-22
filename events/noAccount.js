@@ -123,8 +123,6 @@ module.exports = {
 
         // Generate the account once all checks have passed
         const accountData = {};
-
-        // TODO: Fronver?
         const accountUsername = 'Fronvo user ' + (accounts.length + 1);
         const accountId = utilities.convertToId(accountUsername);
 
