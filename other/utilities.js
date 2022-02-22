@@ -9,10 +9,7 @@ const { v4 } = require('uuid');
 // TODO: Move many of these to their respective files, only have a use there.
 
 function insertLog(mdb, logText) {
-    // TODO: Do everything during initialisation
-    const logDict = {};
-    logDict['timestamp'] = new Date();
-    logDict['info'] = logText;
+    const logDict = {timestamp: new Date(), info: logText};
 
     mdb.collection('logs').insertOne(logDict).catch(() => {});
 }
