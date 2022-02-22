@@ -141,7 +141,6 @@ async function register(io, socket, mdb, email, password) {
     const accountUsername = 'Fronvo user ' + (accounts.length + 1);
     const accountId = utilities.convertToId(accountUsername);
 
-    // TODO: Convert such account creation dictionaries to a function?
     accountData[accountId] = {
         username: accountUsername,
         email: email,
