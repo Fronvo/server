@@ -19,7 +19,7 @@ const templates = require('../other/templates');
 const { format } = require('util');
 const variables = require('../other/variables');
 
-module.exports = (io, mdb) => {
+function entry(io, mdb) {
     // Add each file with functions here
     const noAccountOnlyFuncs = {...noAccountEvents};
     const accountOnlyFuncs = {...accountEvents};
@@ -146,7 +146,7 @@ module.exports = (io, mdb) => {
             console.log('Socket ' + socket.id + ' has disconnected.');
         });
     });
-    
+
     io.engine.on('connection_error', (err) => {
         console.log('Connection abnormally closed:  [' + err.code + ']' +  err.message);
     });
@@ -160,3 +160,5 @@ module.exports = (io, mdb) => {
         delete variables.loggedInSockets[socketId];
     });
 }
+
+module.exports = entry;
