@@ -14,9 +14,6 @@ module.exports = {
     },
 
     fetchProfileData: async ({socket, mdb}, profileId) => {
-        // TODO: Move to the if statement, will return null if logged out so who cares
-        const loggedInSockets = utilities.getLoggedInSockets();
-
         const accounts = await utilities.listDocuments(mdb, 'accounts');
         
         for(let account in accounts) {
@@ -36,7 +33,7 @@ module.exports = {
             }
 
             // If it's the user's profile, provide more details (better than having 2 seperate events)
-            if(profileId == loggedInSockets[socket.id]) {
+            if(profileId == utilities.getLoggedInSockets()[socket.id]) {
                 finalAccountDict.email = accountDict.email;
             }
 
