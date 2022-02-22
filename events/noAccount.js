@@ -214,8 +214,4 @@ async function loginToken (io, socket, mdb, token) {
     return {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN};
 }
 
-module.exports = {
-    register: register,
-    login: login,
-    loginToken: loginToken
-}
+module.exports = { register, login, loginToken }

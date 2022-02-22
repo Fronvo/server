@@ -8,6 +8,4 @@ function isLoggedIn(io, socket, mdb) {
     return [isSocketLoggedIn(socket)];
 }
 
-module.exports = {
-    isLoggedIn: isLoggedIn
-}
+module.exports = { isLoggedIn }

@@ -42,7 +42,4 @@ async function fetchProfileData({socket, mdb}, profileId) {
     return {msg: format(errors.ERR_PROFILE_NOT_FOUND, profileId), code: enums.ERR_PROFILE_NOT_FOUND};
 }
 
-module.exports = {
-    fetchProfileId: fetchProfileId,
-    fetchProfileData: fetchProfileData
-}
+module.exports = { fetchProfileId, fetchProfileData }
