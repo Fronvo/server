@@ -3,7 +3,6 @@
 // ******************** //
 
 const variables = require('../other/variables');
-const { accountSchema } = require('./schemas');
 const { v4 } = require('uuid');
 
 // TODO: Move many of these to their respective files, only have a use there.
@@ -32,23 +31,6 @@ module.exports = {
     },
 
     insertLog: insertLog,
-
-    // TODO: Move to noAccount
-    getMinMaxEntriesForAccounts: () => {
-        let resultDict = {email: {}, password: {}};
-
-        for(const [key, value] of accountSchema._ids._byKey.entries()) {
-            if(!(key === 'email' || key === 'password')) continue;
-
-            for(const [_, value2] of value.schema._singleRules.entries()) {
-                if(!(value2.name === 'min' || value2.name === 'max')) continue;
-
-                resultDict[key][value2.name] = value2.args.limit;
-            }
-        };
-
-        return resultDict;
-    },
 
     loginSocket: (io, socket, accountId) => {
         variables.loggedInSockets[socket.id] = accountId;

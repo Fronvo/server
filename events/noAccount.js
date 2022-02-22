@@ -10,6 +10,23 @@ const { JoiE, enums } = require('../other/enums');
 const { format } = require('util');
 const bcrypt = require('bcrypt');
 const variables = require('../other/variables');
+const { accountSchema } = require('../other/schemas');
+
+function getMinMaxEntriesForAccounts() {
+    let resultDict = {email: {}, password: {}};
+
+    for(const [key, value] of accountSchema._ids._byKey.entries()) {
+        if(!(key === 'email' || key === 'password')) continue;
+
+        for(const [_, value2] of value.schema._singleRules.entries()) {
+            if(!(value2.name === 'min' || value2.name === 'max')) continue;
+
+            resultDict[key][value2.name] = value2.args.limit;
+        }
+    };
+
+    return resultDict;
+}
 
 function decideAccountSchemaResult(email, password) {
     const schemaResult = schemas.accountSchema.validate({
@@ -35,7 +52,7 @@ function decideAccountSchemaResult(email, password) {
         // Provide additional info for the end user
         resultDict['extras'] = {for: schemaPath};
 
-        let limits = utilities.getMinMaxEntriesForAccounts();
+        let limits = getMinMaxEntriesForAccounts();
 
         switch(schemaType) {
 
