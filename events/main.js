@@ -27,6 +27,8 @@ module.exports = (io, mdb) => {
     const funcs = {...noAccountOnlyFuncs, ...accountOnlyFuncs, ...generalFuncs};
 
     io.on('connection', (socket) => {
+
+        // TODO: Make most console logs optional (env variable).
         console.log('Socket ' + socket.id + ' has connected.');
 
         // Anything sent, which is an event, is forwarded here
