@@ -37,7 +37,4 @@ enums.forEach(item => {
     enumsDict[item] = enums.indexOf(item) + 1;
 });
 
-module.exports = {
-    JoiE: JoiE,
-    enums: enumsDict
-}
+module.exports = { JoiE, enums: enumsDict }

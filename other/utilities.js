@@ -40,7 +40,7 @@ module.exports = {
         return username.replace(/ /g, '').toLowerCase();
     },
 
-    insertLog: insertLog,
+    insertLog,
 
     loginSocket: (io, socket, accountId) => {
         variables.loggedInSockets[socket.id] = accountId;
@@ -86,7 +86,7 @@ module.exports = {
         return variables.loggedInSockets;
     },
 
-    listDocuments: listDocuments,
+    listDocuments,
 
     perfStart: (perfName) => {
         if(!variables.performanceReportsEnabled) return;
@@ -135,7 +135,7 @@ module.exports = {
         return Object.keys(accountsArray[accountIndex])[1];
     },
 
-    getTokenKey: getTokenKey,
+    getTokenKey,
 
-    getTokenAccountId: getTokenAccountId
+    getTokenAccountId
 }

@@ -34,7 +34,7 @@ module.exports = {
     // When using PM2 for production
     cluster: process.env.TARGET_PM2 == 'true' || false,
 
-    generatedFilesDirectory: generatedFilesDirectory,
+    generatedFilesDirectory,
 
     // Blacklisted emails: https://github.com/disposable-email-domains/disposable-email-domains
     blacklistedEmailDomains: require(resolve(generatedFilesDirectory, 'disposable_email_blocklist.json')),
