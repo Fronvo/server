@@ -27,7 +27,6 @@ function entry(io, mdb) {
     const funcs = {...noAccountOnlyFuncs, ...accountOnlyFuncs, ...generalFuncs};
 
     io.on('connection', (socket) => {
-
         console.log('Socket ' + socket.id + ' has connected.');
 
         // Anything sent, which is an event, is forwarded here
