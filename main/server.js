@@ -29,9 +29,15 @@ const gradient = require('gradient-string');
 // Variables
 var io, mdbClient, loadingSpinner;
 const loadingSpinnerDefaultText = 'Starting server';
+const variables = require('../other/variables');
 
 function setLoading(currProcText) {
-    loadingSpinner.text = loadingSpinnerDefaultText + ': ' + currProcText;
+    if(!variables.silentLogging) loadingSpinner.text = loadingSpinnerDefaultText + ': ' + currProcText;
+}
+
+function preStartupChecks() {
+    // Disable logging
+    if(variables.silentLogging) console.log = () => {};
 }
 
 function setupMongoDB() {
@@ -131,15 +137,21 @@ function setupAdminPanel() {
 }
 
 function startup() {
+    // Prevent startup logging, too
+    preStartupChecks();
+
     // Gradient shenanigans
     console.log(gradient(['#e8128f', '#e812d2', '#e412e8', '#cb12e8', '#bd12e8', '#a812e8', '#8f12e8', '#8012e8'])('Fronvo server v0.1'));
 
-    loadingSpinner = ora({
-        text: loadingSpinnerDefaultText,
-        spinner: 'dots12', // wonky windows 10 style
-        interval: 40,
-        color: 'magenta'
-    }).start();
+    // Special check because ora doesnt care
+    if(!variables.silentLogging) {
+        loadingSpinner = ora({
+            text: loadingSpinnerDefaultText,
+            spinner: 'dots12', // wonky windows 10 style
+            interval: 40,
+            color: 'magenta'
+        }).start();
+    }
 
     // Attempt to run each check one-by-one
     setupMongoDB().then(() => {
@@ -149,11 +161,11 @@ function startup() {
         setupAdminPanel();
 
         // Finally, display successful server run
-        loadingSpinner.succeed('Server running at port ' + PORT + '.');
+        if(!variables.silentLogging) loadingSpinner.succeed('Server running at port ' + PORT + '.');
 
     }).catch((err) => {
         // Depends on the error's context
-        loadingSpinner.fail(err.message ? err.message : err);
+        if(!variables.silentLogging) loadingSpinner.fail(err.message ? err.message : err);
     });
 }
 
