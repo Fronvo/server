@@ -74,12 +74,10 @@ module.exports = {
         }
     },
     
-    // TODO: Remove
     isSocketLoggedIn: (socket) => {
         return socket.id in variables.loggedInSockets;
     },
 
-    // TODO: Remove this nightmare of a function aswell
     getLoggedInSockets: () => {
         return variables.loggedInSockets;
     },
