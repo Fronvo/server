@@ -4,8 +4,8 @@
 
 const { isSocketLoggedIn } = require('../other/utilities');
 
-function isLoggedIn(io, socket, mdb) {
-    return [isSocketLoggedIn(socket)];
+function isLoggedIn({ socket }) {
+    return {loggedIn: isSocketLoggedIn(socket)};
 }
 
 module.exports = { isLoggedIn }

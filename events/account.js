@@ -8,12 +8,12 @@ const utilities = require('../other/utilities');
 const { getAccountData, getAccountId } = require('../other/utilities');
 const { format } = require('util');
 
-function fetchProfileId(io, socket, mdb) {
+function fetchProfileId({ socket }) {
     // According to variables.js comment on loggedInSockets fill method
-    return utilities.getLoggedInSockets()[socket.id];
+    return {profileId: utilities.getLoggedInSockets()[socket.id]};
 }
 
-async function fetchProfileData(io, socket, mdb, profileId) {
+async function fetchProfileData({ socket, mdb, profileId }) {
     const accounts = await utilities.listDocuments(mdb, 'accounts');
     
     for(let account in accounts) {
@@ -33,10 +33,10 @@ async function fetchProfileData(io, socket, mdb, profileId) {
             finalAccountDict.email = accountData.email;
         }
 
-        return [null, finalAccountDict];
+        return {profileData: finalAccountDict};
     }
 
-    return {msg: format(errors.ERR_PROFILE_NOT_FOUND, profileId), code: enums.ERR_PROFILE_NOT_FOUND};
+    return {err: {msg: format(errors.ERR_PROFILE_NOT_FOUND, profileId), code: enums.ERR_PROFILE_NOT_FOUND}};
 }
 
 module.exports = { fetchProfileId, fetchProfileData }

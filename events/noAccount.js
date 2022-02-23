@@ -79,7 +79,7 @@ function decideAccountSchemaResult(email, password) {
         }
     }
 
-    return resultDict;
+    return {err: {...resultDict}};
 }
 
 function decideAccountTokenSchemaResult(token) {
@@ -109,10 +109,10 @@ function decideAccountTokenSchemaResult(token) {
             break;
     }
 
-    return resultDict;
+    return {err: {...resultDict}};
 }
 
-async function register(io, socket, mdb, email, password) {
+async function register({ io, socket, mdb, email, password }) {
     // Schema validation
     const schemaResult = decideAccountSchemaResult(email, password);
     if(schemaResult) return schemaResult;
@@ -122,14 +122,14 @@ async function register(io, socket, mdb, email, password) {
     // Check if the email is from a dummy (blacklisted) domain, if applicable
     if(variables.blacklistedEmailDomainsEnabled) {
         if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(email)) > -1) {
-            return {msg: errors.ERR_INVALID_EMAIL, code: enums.ERR_INVALID_EMAIL};
+            return {err: {msg: errors.ERR_INVALID_EMAIL, code: enums.ERR_INVALID_EMAIL}};
         }
     }
 
     // Check if the email is already registered by another user
     for(let account in accounts) {
         if(utilities.getAccountData(accounts, account).email == email) {
-            return {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS};
+            return {err: {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS}};
         }
     }
 
@@ -150,10 +150,10 @@ async function register(io, socket, mdb, email, password) {
     // Also login to the account
     utilities.loginSocket(io, socket, accountId);
 
-    return [null, await utilities.createToken(mdb, accountId)];
+    return {token: await utilities.createToken(mdb, accountId)};
 }
 
-async function login(io, socket, mdb, email, password) {
+async function login({ io, socket, mdb, email, password}) {
     // Schema validation
     const schemaResult = decideAccountSchemaResult(email, password);
     if(schemaResult) return schemaResult;
@@ -175,17 +175,17 @@ async function login(io, socket, mdb, email, password) {
                 let accountToken = await utilities.getToken(mdb, accountId);
                 if(!accountToken) accountToken = await utilities.createToken(mdb, accountId);
 
-                return [null, accountToken];
+                return {token: accountToken};
             } else {
-                return {msg: errors.ERR_INVALID_PASSWORD, code: enums.ERR_INVALID_PASSWORD};
+                return {err: {msg: errors.ERR_INVALID_PASSWORD, code: enums.ERR_INVALID_PASSWORD}};
             }
         }
     };
 
-    return {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST};
+    return {err: {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST}};
 }
 
-async function loginToken(io, socket, mdb, token) {
+async function loginToken({ io, socket, mdb, token }) {
     // Schema validation
     const schemaResult = decideAccountTokenSchemaResult(token);
     if(schemaResult) return schemaResult;
@@ -196,11 +196,11 @@ async function loginToken(io, socket, mdb, token) {
         if(token == getTokenKey(tokens, tokenItem)) {
             // Just login to the account
             utilities.loginSocket(io, socket, getTokenAccountId(tokens, tokenItem));
-            return [];
+            return {};
         }
     }
 
-    return {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN};
+    return {err: {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN}};
 }
 
 module.exports = { register, login, loginToken }

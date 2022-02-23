@@ -39,19 +39,20 @@ function entry(io, mdb) {
                 const neededArgs = templates[event].slice();
                 const neededArgsOriginal = templates[event].slice();
 
-                const filteredArgs = [];
+                const filteredArgs = {};
+                let callback;
                 let callbackResponse;
                 let prematureError = false;
 
                 // Account only
                 if(event in accountOnlyFuncs && !utilities.isSocketLoggedIn(socket)) {
                     prematureError = true;
-                    callbackResponse = {msg: errors.ERR_MUST_BE_LOGGED_IN, code: enums.ERR_MUST_BE_LOGGED_IN, event: event};
+                    callbackResponse = {err: {msg: errors.ERR_MUST_BE_LOGGED_IN, code: enums.ERR_MUST_BE_LOGGED_IN, event: event}};
 
                 // No account only
                 } else if(event in noAccountOnlyFuncs && utilities.isSocketLoggedIn(socket)) {
                     prematureError = true;
-                    callbackResponse = {msg: errors.ERR_MUST_BE_LOGGED_OUT, code: enums.ERR_MUST_BE_LOGGED_OUT, event: event};
+                    callbackResponse = {err: {msg: errors.ERR_MUST_BE_LOGGED_OUT, code: enums.ERR_MUST_BE_LOGGED_OUT, event: event}};
 
                 // Order the arguments according to the event's template
                 } else {
@@ -64,7 +65,8 @@ function entry(io, mdb) {
                                     // Maintain value order, use the original dictionary to preserve index
                                     let dictItemIndex = neededArgsOriginal.indexOf(dictItem);
 
-                                    filteredArgs[dictItemIndex] = item[dictItem];
+                                    // Add named argument to be passed later on
+                                    filteredArgs[dictItem] = item[dictItem];
 
                                     // Delete has weird functionality, roll with this
                                     // Dynamic index, reassign
@@ -77,9 +79,7 @@ function entry(io, mdb) {
                     };
                 }
 
-                // Here, if we put it in the above else block prematureErrors wont be callback'd
-                let callback;
-
+                // Find the callback
                 for(let item in args) {
                     item = args[item];
 
@@ -92,6 +92,8 @@ function entry(io, mdb) {
 
                 if(!prematureError) {
                     if(neededArgs.length > 0) {
+
+                        // Stylise missing arguments
                         let neededArgsString = errors.ERR_MISSING_ARGS;
                         
                         for(const item in neededArgs) {
@@ -104,12 +106,13 @@ function entry(io, mdb) {
                             if(item == (neededArgs.length - 1)) neededArgsString += '.';
                         }
 
-                        callbackResponse = {msg: neededArgsString, code: enums.ERR_MISSING_ARGS, args_needed: neededArgs};
+                        callbackResponse = {err: {msg: neededArgsString, code: enums.ERR_MISSING_ARGS, args_needed: neededArgs}};
                     } else {
                         // Start it anyway, will be decided in the function itself if applicable
                         const perfId = utilities.perfStart(event);
 
-                        callbackResponse = funcs[event](io, socket, mdb, ...filteredArgs);
+                        // Works for optional arguments
+                        callbackResponse = funcs[event]({io, socket, mdb, ...filteredArgs});
 
                         // If async, await
                         if(callbackResponse) {
@@ -122,14 +125,11 @@ function entry(io, mdb) {
 
                 if(callback) {
                     if(callbackResponse) {
-                        // Eg.: [null, token] | [false]
-                        if(Array.isArray(callbackResponse)) callback(...callbackResponse);
-                        
-                        // Pass normal dictionary, no spreading
-                        else callback(callbackResponse);
+                        callback(callbackResponse);
+
                     } else {
                         utilities.insertLog(mdb, format(errors.ERR_FUNC_RETURN_NONE, event));
-                        callback({msg: errors.ERR_UNKNOWN, code: enums.ERR_UNKNOWN});
+                        callback({err: {msg: errors.ERR_UNKNOWN, code: enums.ERR_UNKNOWN}});
                     }
                 }
             }
