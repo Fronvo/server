@@ -5,8 +5,6 @@
 const variables = require('../other/variables');
 const { v4 } = require('uuid');
 
-// TODO: Move many of these to their respective files, only have a use there.
-
 function insertLog(mdb, logText) {
     const logDict = {timestamp: new Date(), info: logText};
 
