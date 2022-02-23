@@ -13,7 +13,7 @@ function fetchProfileId(io, socket, mdb) {
     return utilities.getLoggedInSockets()[socket.id];
 }
 
-async function fetchProfileData({socket, mdb}, profileId) {
+async function fetchProfileData(io, socket, mdb, profileId) {
     const accounts = await utilities.listDocuments(mdb, 'accounts');
     
     for(let account in accounts) {
