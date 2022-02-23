@@ -8,7 +8,6 @@ const { resolve } = require('path');
 
 const generatedFilesDirectory = resolve(__dirname, '../generated');
 
-// TODO: Export this for use in more files
 function decideBooleanEnvValue(value, valueIfNull) {
     return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
 }
