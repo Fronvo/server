@@ -5,6 +5,7 @@
 const { enums } = require('../other/enums');
 const errors = require('../other/errors');
 const utilities = require('../other/utilities');
+const { getAccountData, getAccountId } = require('../other/utilities');
 const { format } = require('util');
 
 function fetchProfileId(io, socket, mdb) {
@@ -16,24 +17,20 @@ async function fetchProfileData({socket, mdb}, profileId) {
     const accounts = await utilities.listDocuments(mdb, 'accounts');
     
     for(let account in accounts) {
-        account = accounts[account];
-
-        const accountId = Object.keys(account)[1];
-
         // If target account id isn't what were looking for, move on
-        if(accountId != profileId) continue;
+        if(getAccountId(accounts, account) != profileId) continue;
 
-        const accountDict = account[accountId];
+        const accountData = getAccountData(accounts, account);
 
         // Dont spread the dictionary, only provide select info
         const finalAccountDict = {
-            username: accountDict.username,
-            creationDate: accountDict.creationDate
+            username: accountData.username,
+            creationDate: accountData.creationDate
         }
 
         // If it's the user's profile, provide more details (better than having 2 seperate events)
         if(profileId == utilities.getLoggedInSockets()[socket.id]) {
-            finalAccountDict.email = accountDict.email;
+            finalAccountDict.email = accountData.email;
         }
 
         return [null, finalAccountDict];

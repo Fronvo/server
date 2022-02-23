@@ -3,6 +3,7 @@
 // ******************** //
 
 const utilities = require('../other/utilities');
+const { getAccountData, getAccountId, getTokenAccountId, getTokenKey } = require('../other/utilities');
 const schemas = require('../other/schemas');
 const errors = require('../other/errors');
 const { defaultError } = require('../other/variables');
@@ -127,11 +128,7 @@ async function register(io, socket, mdb, email, password) {
 
     // Check if the email is already registered by another user
     for(let account in accounts) {
-        // TODO: Utility function cuz this is very boring to repeat
-        account = accounts[account];
-        const accountDict = account[Object.keys(account)[1]];
-        
-        if(accountDict.email == email) {
+        if(utilities.getAccountData(accounts, account).email == email) {
             return {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS};
         }
     }
@@ -165,16 +162,13 @@ async function login(io, socket, mdb, email, password) {
 
     // Check if the email already exists to be able to login
     for(let account in accounts) {
-        account = accounts[account];
+        const accountData = getAccountData(accounts, account);
 
-        const accountId = Object.keys(account)[1];
-        const accountDict = account[accountId];
-
-        if(accountDict.email == email) {
-            // Found the one we need
-
+        if(accountData.email == email) {
             // Validate the password, synchronously
-            if(bcrypt.compareSync(password, accountDict.password)) {
+            if(bcrypt.compareSync(password, accountData.password)) {
+                const accountId = getAccountId(accounts, account);
+
                 utilities.loginSocket(io, socket, accountId);
 
                 // Refresh token / Use available one
@@ -191,7 +185,7 @@ async function login(io, socket, mdb, email, password) {
     return {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST};
 }
 
-async function loginToken (io, socket, mdb, token) {
+async function loginToken(io, socket, mdb, token) {
     // Schema validation
     const schemaResult = decideAccountTokenSchemaResult(token);
     if(schemaResult) return schemaResult;
@@ -199,13 +193,9 @@ async function loginToken (io, socket, mdb, token) {
     const tokens = await utilities.listDocuments(mdb, 'tokens');
 
     for(let tokenItem in tokens) {
-        tokenItem = tokens[tokenItem];
-        const tokenAccountId = Object.keys(tokenItem)[1];
-        const tokenKey = tokenItem[tokenAccountId];
-
-        if(token == tokenKey) {
+        if(token == getTokenKey(tokens, tokenItem)) {
             // Just login to the account
-            utilities.loginSocket(io, socket, tokenAccountId);
+            utilities.loginSocket(io, socket, getTokenAccountId(tokens, tokenItem));
             return [];
         }
     }

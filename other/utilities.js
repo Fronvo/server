@@ -24,6 +24,16 @@ async function listDocuments(mdb, collName) {
     return await mdb.collection(collName).find({}).toArray();
 }
 
+function getTokenAccountId(tokensArray, tokenIndex) {
+    return Object.keys(tokensArray[tokenIndex])[1];
+}
+
+function getTokenKey(tokensArray, tokenIndex) {
+    const tokenAccountId = getTokenAccountId(tokensArray, tokenIndex);
+    
+    return tokensArray[tokenIndex][tokenAccountId];
+}
+
 module.exports = {
     convertToId: (username) => {
         // 'Fronvo user 1' => 'fronvouser1'
@@ -60,11 +70,8 @@ module.exports = {
         const tokens = await listDocuments(mdb, 'tokens');
 
         for(let token in tokens) {
-            token = tokens[token];
-            const tokenAccountId = Object.keys(token)[1];
-
-            if(accountId === tokenAccountId) {
-                return token[tokenAccountId];
+            if(accountId === getTokenAccountId(tokens, token)) {
+                return getTokenKey(tokens, token);
             }
         }
     },
@@ -116,5 +123,19 @@ module.exports = {
     getEmailDomain: (email) => {
         // Will fail Joi schema checks if the email doesnt comply with this format
         return email.split('@')[1];
-    }
+    },
+
+    getAccountData: (accountsArray, accountIndex) => {
+        const accountDictionary = accountsArray[accountIndex];
+
+        return accountDictionary[Object.keys(accountDictionary)[1]];
+    },
+
+    getAccountId: (accountsArray, accountIndex) => {
+        return Object.keys(accountsArray[accountIndex])[1];
+    },
+
+    getTokenKey: getTokenKey,
+
+    getTokenAccountId: getTokenAccountId
 }
