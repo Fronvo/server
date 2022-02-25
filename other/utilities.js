@@ -133,5 +133,10 @@ module.exports = {
 
     getTokenKey,
 
-    getTokenAccountId
+    getTokenAccountId,
+
+    // Duplicate of variables.js function to prevent recursive import errors
+    decideBooleanEnvValue: (value, valueIfNull) => {
+        return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
+    }
 }
