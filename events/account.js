@@ -39,4 +39,9 @@ async function fetchProfileData({ socket, mdb, profileId }) {
     return {err: {msg: format(errors.ERR_PROFILE_NOT_FOUND, profileId), code: enums.ERR_PROFILE_NOT_FOUND}};
 }
 
-module.exports = { fetchProfileId, fetchProfileData }
+function logout({ io, socket }) {
+    utilities.logoutSocket(io, socket);
+    return {};
+}
+
+module.exports = { fetchProfileId, fetchProfileData, logout }

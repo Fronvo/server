@@ -8,5 +8,6 @@ module.exports = {
     loginToken: ['token'],
     isLoggedIn: [],
     fetchProfileData: ['profileId'],
-    fetchProfileId: []
+    fetchProfileId: [],
+    logout: []
 }
