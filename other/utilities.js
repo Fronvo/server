@@ -11,6 +11,10 @@ function insertLog(mdb, logText) {
     mdb.collection('logs').insertOne(logDict).catch(() => {});
 }
 
+async function insertToCollection(mdb, collName, dict) {
+    await mdb.collection(collName).insertOne(dict).catch(() => {});
+}
+
 function insertTextToCollection(mdb, collName, text) {
     const dictToInsert = {timestamp: new Date()};
     dictToInsert[v4()] = text;
@@ -39,6 +43,8 @@ module.exports = {
     },
 
     insertLog,
+
+    insertToCollection,
 
     loginSocket: (io, socket, accountId) => {
         variables.loggedInSockets[socket.id] = accountId;
