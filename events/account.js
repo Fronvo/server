@@ -36,7 +36,7 @@ async function fetchProfileData({ socket, mdb, profileId }) {
         return {profileData: finalAccountDict};
     }
 
-    return {err: {msg: format(errors.ERR_PROFILE_NOT_FOUND, profileId), code: enums.ERR_PROFILE_NOT_FOUND}};
+    return {err: {msg: errors.ERR_PROFILE_NOT_FOUND, code: enums.ERR_PROFILE_NOT_FOUND}};
 }
 
 function logout({ io, socket }) {
