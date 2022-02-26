@@ -99,7 +99,7 @@ function setupServer() {
         },
 
         // Enable / Disable binary parser
-        parser: decideBooleanEnvValue(process.env.FRONVO_BINARY_PARSER, false) ? require('socket.io-msgpack-parser') : ''
+        parser: decideBooleanEnvValue(process.env.FRONVO_BINARY_PARSER, true) ? require('socket.io-msgpack-parser') : ''
     });
 }
 
