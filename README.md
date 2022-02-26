@@ -12,7 +12,7 @@
 
 **```npm install```**
 
-**```node main/server.js```**
+**```npm start```**
 
 **The server should be running locally at port 3001.**
 
