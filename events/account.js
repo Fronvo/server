@@ -6,7 +6,6 @@ const { enums } = require('../other/enums');
 const errors = require('../other/errors');
 const utilities = require('../other/utilities');
 const { getAccountData, getAccountId } = require('../other/utilities');
-const { format } = require('util');
 
 function fetchProfileId({ socket }) {
     // According to variables.js comment on loggedInSockets fill method
