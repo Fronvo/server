@@ -30,6 +30,7 @@ const gradient = require('gradient-string');
 var io, mdbClient, loadingSpinner;
 const loadingSpinnerDefaultText = 'Starting server';
 const variables = require('../other/variables');
+const { decideBooleanEnvValue } = require('../other/utilities');
 
 function setLoading(currProcText) {
     if(!variables.silentLogging) loadingSpinner.text = loadingSpinnerDefaultText + ': ' + currProcText;
@@ -91,13 +92,14 @@ function setupServer() {
         wsEngine: require('eiows').Server,
         path: '/fronvo',
     
-        // admin panel
+        // Admin panel
         cors: {
             origin: ['https://admin.socket.io'],
             credentials: true
         },
-        
-        parser: require('socket.io-msgpack-parser')
+
+        // Enable / Disable binary parser
+        parser: decideBooleanEnvValue(process.env.FRONVO_BINARY_PARSER, false) ? require('socket.io-msgpack-parser') : ''
     });
 }
 
