@@ -1,9 +1,10 @@
-// The server of Fronvo
-// Shadofer#6681
+// ******************** //
+// The starting point of the Fronvo server.
+// ******************** //
 
 // Load .env, get parent directory regardless of node directory
 const { resolve } = require('path');
-require('dotenv').config({ path: resolve(__dirname, '..') + '/.env' });
+require('dotenv').config({ path: resolve(__dirname, '..', '.env') });
 
 // Port to attach to
 const PORT = process.env.PORT || 3001;
@@ -25,11 +26,19 @@ const registerEvents = require('../events/main');
 const ora = require('ora');
 const gradient = require('gradient-string');
 
+// Variables
 var io, mdbClient, loadingSpinner;
 const loadingSpinnerDefaultText = 'Starting server';
+const variables = require('../other/variables');
+const { decideBooleanEnvValue } = require('../other/utilities');
 
 function setLoading(currProcText) {
-    loadingSpinner.text = loadingSpinnerDefaultText + ': ' + currProcText;
+    if(!variables.silentLogging) loadingSpinner.text = loadingSpinnerDefaultText + ': ' + currProcText;
+}
+
+function preStartupChecks() {
+    // Disable logging
+    if(variables.silentLogging) console.log = () => {};
 }
 
 function setupMongoDB() {
@@ -39,11 +48,13 @@ function setupMongoDB() {
         const mdbProj = process.env.FRONVO_MONGODB_PROJECT;
         const mdbDb = process.env.FRONVO_MONGODB_DB; // optional
     
+        // Check environmental variables
         if(!mdbUsr || !mdbPass || !mdbProj) {
             reject('Some MongoDB variables are missing.');
-        } else {    
+        } else {
             setLoading('Setting up MongoDB');
 
+            // MongoDB connection uri, customised for readability
             const mdbUri = 'mongodb+srv://' + 
                             mdbUsr +
                             ':' +
@@ -54,11 +65,13 @@ function setupMongoDB() {
                             mdbDb || 'fronvo' +
                             '?retryWrites=true&w=majority';
     
+            // Create the MongoDB client with optimised options
             mdbClient = new MongoClient(mdbUri, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true
             });
 
+            // Finally, try to connect with the given credentials
             mdbClient.connect((err) => {
                 if(err) {
                     reject(err);
@@ -71,21 +84,22 @@ function setupMongoDB() {
 };
 
 function setupServer() {
-    // this wont be seen by most devices, way too fast of a process
     setLoading('Setting up the server process, server events and admin panel');
 
+    // Setup the socket.io server with tailored options
     io = require('socket.io')(PORT, {
         serveClient: false,
         wsEngine: require('eiows').Server,
         path: '/fronvo',
     
-        // admin panel
+        // Admin panel
         cors: {
             origin: ['https://admin.socket.io'],
             credentials: true
         },
-        
-        parser: require('socket.io-msgpack-parser')
+
+        // Enable / Disable binary parser
+        parser: decideBooleanEnvValue(process.env.FRONVO_BINARY_PARSER, true) ? require('socket.io-msgpack-parser') : ''
     });
 }
 
@@ -94,6 +108,7 @@ function setupServerEvents() {
 }
 
 function setupPM2() {
+    // Mostly for hosting on production
     if(process.env.TARGET_PM2 == 'true') {
         io.adapter(createAdapter());
         setupWorker(io);
@@ -104,6 +119,7 @@ function setupAdminPanel() {
     const panel_usr = process.env.FRONVO_ADMIN_PANEL_USERNAME;
     const panel_pass = process.env.FRONVO_ADMIN_PANEL_PASSWORD;
 
+    // Check environmental variables and hash the admin panel password
     if(panel_usr && panel_pass) {
         instrument(io, {
             auth: {
@@ -123,24 +139,35 @@ function setupAdminPanel() {
 }
 
 function startup() {
+    // Prevent startup logging, too
+    preStartupChecks();
+
+    // Gradient shenanigans
     console.log(gradient(['#e8128f', '#e812d2', '#e412e8', '#cb12e8', '#bd12e8', '#a812e8', '#8f12e8', '#8012e8'])('Fronvo server v0.1'));
 
-    loadingSpinner = ora({
-        text: loadingSpinnerDefaultText,
-        spinner: 'dots12', // wonky windows 10 style
-        interval: 40,
-        color: 'magenta'
-    }).start();
+    // Special check because ora doesnt care
+    if(!variables.silentLogging) {
+        loadingSpinner = ora({
+            text: loadingSpinnerDefaultText,
+            spinner: 'dots12', // wonky windows 10 style
+            interval: 40,
+            color: 'magenta'
+        }).start();
+    }
 
+    // Attempt to run each check one-by-one
     setupMongoDB().then(() => {
         setupServer();
         setupServerEvents();
         setupPM2();
         setupAdminPanel();
 
-        loadingSpinner.succeed('Server running at port ' + PORT + '.');
+        // Finally, display successful server run
+        if(!variables.silentLogging) loadingSpinner.succeed('Server running at port ' + PORT + '.');
+
     }).catch((err) => {
-        loadingSpinner.fail(err.message);
+        // Depends on the error's context
+        if(!variables.silentLogging) loadingSpinner.fail(err.message ? err.message : err);
     });
 }
 

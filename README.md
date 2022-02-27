@@ -1,4 +1,4 @@
-<p align='center'><img src='https://i.ibb.co/1q07v7b/fronvo-icon-large.webp' alt='Fronvo icon'></p>
+<p align='center'><img src='https://i.ibb.co/88C4JbF/fronvo-logo.png' alt='Fronvo icon'></p>
 
 <h1 style='text-align: center;'>
 
@@ -12,7 +12,7 @@
 
 **```npm install```**
 
-**```node main/server.js```**
+**```npm start```**
 
 **The server should be running locally at port 3001.**
 

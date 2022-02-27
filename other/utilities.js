@@ -1,18 +1,22 @@
+// ******************** //
+// Reusable functions to avoid repetition.
+// ******************** //
+
 const variables = require('../other/variables');
-const { accountSchema } = require('./schemas');
 const { v4 } = require('uuid');
 
-// here to be used by this file, too
 function insertLog(mdb, logText) {
-    const logDict = {};
-    logDict['timestamp'] = new Date();
-    logDict['info'] = logText;
+    const logDict = {timestamp: new Date(), info: logText};
 
     mdb.collection('logs').insertOne(logDict).catch(() => {});
 }
 
+async function insertToCollection(mdb, collName, dict) {
+    await mdb.collection(collName).insertOne(dict).catch(() => {});
+}
+
 function insertTextToCollection(mdb, collName, text) {
-    const dictToInsert = {};
+    const dictToInsert = {timestamp: new Date()};
     dictToInsert[v4()] = text;
 
     mdb.collection(collName).insertOne(dictToInsert).catch(() => {});
@@ -22,33 +26,30 @@ async function listDocuments(mdb, collName) {
     return await mdb.collection(collName).find({}).toArray();
 }
 
+function getTokenAccountId(tokensArray, tokenIndex) {
+    return Object.keys(tokensArray[tokenIndex])[1];
+}
+
+function getTokenKey(tokensArray, tokenIndex) {
+    const tokenAccountId = getTokenAccountId(tokensArray, tokenIndex);
+    
+    return tokensArray[tokenIndex][tokenAccountId];
+}
+
 module.exports = {
     convertToId: (username) => {
-        // Fronvo user 1 => fronvouser1
+        // 'Fronvo user 1' => 'fronvouser1'
         return username.replace(/ /g, '').toLowerCase();
     },
 
-    insertLog: insertLog,
+    insertLog,
 
-    getMinMaxEntriesForAccounts: () => {
-        let resultDict = {email: {}, password: {}};
-
-        for(const [key, value] of accountSchema._ids._byKey.entries()) {
-            if(!(key === 'email' || key === 'password')) continue;
-
-            for(const [_, value2] of value.schema._singleRules.entries()) {
-                if(!(value2.name === 'min' || value2.name === 'max')) continue;
-
-                resultDict[key][value2.name] = value2.args.limit;
-            }
-        };
-
-        return resultDict;
-    },
+    insertToCollection,
 
     loginSocket: (io, socket, accountId) => {
         variables.loggedInSockets[socket.id] = accountId;
 
+        // Update other servers in cluster mode
         if(variables.cluster) io.serverSideEmit('loginSocket', socket.id, accountId);
     },
 
@@ -73,11 +74,8 @@ module.exports = {
         const tokens = await listDocuments(mdb, 'tokens');
 
         for(let token in tokens) {
-            token = tokens[token];
-            const tokenAccountId = Object.keys(token)[1];
-
-            if(accountId === tokenAccountId) {
-                return token[tokenAccountId];
+            if(accountId === getTokenAccountId(tokens, token)) {
+                return getTokenKey(tokens, token);
             }
         }
     },
@@ -90,12 +88,12 @@ module.exports = {
         return variables.loggedInSockets;
     },
 
-    listDocuments: listDocuments,
+    listDocuments,
 
     perfStart: (perfName) => {
         if(!variables.performanceReportsEnabled) return;
 
-        // mantain uniqueness, dont base it off solely the name
+        // Mantain uniqueness regardless of perfName
         const perfUUID = v4();
 
         variables.performanceReports[perfUUID] = {
@@ -103,17 +101,48 @@ module.exports = {
             timestamp: new Date()
         };
 
+        // Return it for perfEnd
         return perfUUID;
     },
 
     perfEnd: (mdb, perfUUID) => {
         if(!variables.performanceReportsEnabled || !perfUUID in variables.performanceReports) return;
 
+        // Basically copy the dictionary
         const perfReportDict = variables.performanceReports[perfUUID];
+
         const msDuration = new Date() - perfReportDict.timestamp;
 
-        insertTextToCollection(mdb, 'reports', perfReportDict.perfName + ' took ' + msDuration + 'ms.');
+        // Check if it passes the min report MS duration (optional)
+        if(msDuration >= variables.performanceReportsMinMS) {
+            insertTextToCollection(mdb, 'reports', perfReportDict.perfName + ' took ' + msDuration + 'ms.');
+        }
 
+        // Delete to save memory
         delete variables.performanceReports[perfUUID];
+    },
+    
+    getEmailDomain: (email) => {
+        // Will fail Joi schema checks if the email doesnt comply with this format
+        return email.split('@')[1];
+    },
+
+    getAccountData: (accountsArray, accountIndex) => {
+        const accountDictionary = accountsArray[accountIndex];
+
+        return accountDictionary[Object.keys(accountDictionary)[1]];
+    },
+
+    getAccountId: (accountsArray, accountIndex) => {
+        return Object.keys(accountsArray[accountIndex])[1];
+    },
+
+    getTokenKey,
+
+    getTokenAccountId,
+
+    // Duplicate of variables.js function to prevent recursive import errors
+    decideBooleanEnvValue: (value, valueIfNull) => {
+        return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
     }
 }

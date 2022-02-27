@@ -1,3 +1,7 @@
+// ******************** //
+// Constant values used for outputing error codes.
+// ******************** //
+
 const JoiE = {
     TYPE_REQUIRED: 'any.required',
     TYPE_EMPTY: 'string.empty',
@@ -14,6 +18,7 @@ const enums = [
     'ERR_EXACT_LENGTH',
     'ERR_REQUIRED',
     'ERR_MISSING_ARGS',
+    'ERR_INVALID_EMAIL',
     'ERR_INVALID_EMAIL_FORMAT',
     'ERR_ACC_DOESNT_EXIST',
     'ERR_ACC_ALR_EXISTS',
@@ -27,12 +32,9 @@ const enums = [
 
 const enumsDict = {};
 
-// eg: {ERR_UNKNOWN: 1, ERR_LENGTH: 2}
+// Eg.: {ERR_UNKNOWN: 1, ERR_LENGTH: 2}
 enums.forEach(item => {
-    enumsDict[item] = enums.indexOf(item) + 1
+    enumsDict[item] = enums.indexOf(item) + 1;
 });
 
-module.exports = {
-    JoiE: JoiE,
-    enums: enumsDict
-}
+module.exports = { JoiE, enums: enumsDict }

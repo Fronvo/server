@@ -1,4 +1,9 @@
+// ******************** //
+// Events which are only usable while not logged in.
+// ******************** //
+
 const utilities = require('../other/utilities');
+const { getAccountData, getAccountId, getTokenAccountId, getTokenKey } = require('../other/utilities');
 const schemas = require('../other/schemas');
 const errors = require('../other/errors');
 const { defaultError } = require('../other/variables');
@@ -6,6 +11,23 @@ const { JoiE, enums } = require('../other/enums');
 const { format } = require('util');
 const bcrypt = require('bcrypt');
 const variables = require('../other/variables');
+const { accountSchema } = require('../other/schemas');
+
+function getMinMaxEntriesForAccounts() {
+    let resultDict = {email: {}, password: {}};
+
+    for(const [key, value] of accountSchema._ids._byKey.entries()) {
+        if(!(key === 'email' || key === 'password')) continue;
+
+        for(const [_, value2] of value.schema._singleRules.entries()) {
+            if(!(value2.name === 'min' || value2.name === 'max')) continue;
+
+            resultDict[key][value2.name] = value2.args.limit;
+        }
+    };
+
+    return resultDict;
+}
 
 function decideAccountSchemaResult(email, password) {
     const schemaResult = schemas.accountSchema.validate({
@@ -20,19 +42,22 @@ function decideAccountSchemaResult(email, password) {
     const schemaMessage = schemaDetails.message;
     const schemaPath = schemaDetails.path[0];
 
-    // default dict to reuse, copy its value
+    // Default dictionary to reuse, copy its values
     let resultDict = {...defaultError};
 
-    // default to JOI message
+    // Default to JOI message
     resultDict.msg = schemaMessage;
 
     if(schemaPath === 'email' || schemaPath === 'password') {
-        // provide additional info for the end user
+
+        // Provide additional info for the end user
         resultDict['extras'] = {for: schemaPath};
 
-        let limits = utilities.getMinMaxEntriesForAccounts();
+        let limits = getMinMaxEntriesForAccounts();
 
         switch(schemaType) {
+
+            // Fall-through, reuse
             case JoiE.TYPE_REQUIRED:
             case JoiE.TYPE_EMPTY:
                 resultDict.msg = format(errors.ERR_REQUIRED, schemaPath);
@@ -54,7 +79,7 @@ function decideAccountSchemaResult(email, password) {
         }
     }
 
-    return resultDict;
+    return {err: {...resultDict}};
 }
 
 function decideAccountTokenSchemaResult(token) {
@@ -84,98 +109,98 @@ function decideAccountTokenSchemaResult(token) {
             break;
     }
 
-    return resultDict;
+    return {err: {...resultDict}};
 }
 
-module.exports = {
-    register: async (io, socket, mdb, email, password) => {
-        const schemaResult = decideAccountSchemaResult(email, password);
+async function register({ io, socket, mdb, email, password }) {
+    // Schema validation
+    const schemaResult = decideAccountSchemaResult(email, password);
+    if(schemaResult) return schemaResult;
 
-        if(schemaResult) return schemaResult;
+    const accounts = await utilities.listDocuments(mdb, 'accounts');
 
-        const accounts = await utilities.listDocuments(mdb, 'accounts');
-
-        // check if the email is already registered
-        for(let account in accounts) {
-            account = accounts[account];
-            const accountDict = account[Object.keys(account)[1]];
-
-            if(accountDict.email == email) {
-                return {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS};
-            }
+    // Check if the email is from a dummy (blacklisted) domain, if applicable
+    if(variables.blacklistedEmailDomainsEnabled) {
+        if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(email)) > -1) {
+            return {err: {msg: errors.ERR_INVALID_EMAIL, code: enums.ERR_INVALID_EMAIL}};
         }
-
-        // generate the account
-        const accountData = {};
-        const accountUsername = 'Fronvo user ' + (accounts.length + 1);
-        const accountId = utilities.convertToId(accountUsername);
-
-        accountData[accountId] = {
-            username: accountUsername,
-            email: email,
-            password: bcrypt.hashSync(password, variables.mainBcryptHash),
-            creationDate: new Date(),
-        };
-        
-        await mdb.collection('accounts').insertOne(accountData);
-        
-        utilities.loginSocket(io, socket, accountId);
-
-        return [null, await utilities.createToken(mdb, accountId)];
-    },
-
-    login: async (io, socket, mdb, email, password) => {
-        const schemaResult = decideAccountSchemaResult(email, password);
-
-        if(schemaResult) return schemaResult;
-
-        const accounts = await utilities.listDocuments(mdb, 'accounts');
-
-        // check if the email exists
-        for(let account in accounts) {
-            account = accounts[account];
-
-            const accountId = Object.keys(account)[1];
-            const accountDict = account[accountId];
-
-            if(accountDict.email == email) {
-                // validate the password, leave as sync, only one to compare against, no time gain
-                if(bcrypt.compareSync(password, accountDict.password)) {
-                    utilities.loginSocket(io, socket, accountId);
-
-                    // refresh token / use available one
-                    let accountToken = await utilities.getToken(mdb, accountId);
-
-                    if(!accountToken) accountToken = await utilities.createToken(mdb, accountId);
-
-                    return [null, accountToken];
-                } else {
-                    return {msg: errors.ERR_INVALID_PASSWORD, code: enums.ERR_INVALID_PASSWORD};
-                }
-            }
-        };
-
-        return {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST};
-    },
-
-    loginToken: async (io, socket, mdb, token) => {
-        const schemaResult = decideAccountTokenSchemaResult(token);
-
-        if(schemaResult) return schemaResult;
-        
-        const tokens = await utilities.listDocuments(mdb, 'tokens');
-
-        for(let tokenItem in tokens) {
-            tokenItem = tokens[tokenItem];
-            const tokenAccountId = Object.keys(tokenItem)[1];
-            const tokenKey = tokenItem[tokenAccountId];
-
-            if(token == tokenKey) {
-                utilities.loginSocket(io, socket, tokenAccountId);
-                return [];
-            }
-        }
-
-        return {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN};
     }
+
+    // Check if the email is already registered by another user
+    for(let account in accounts) {
+        if(utilities.getAccountData(accounts, account).email == email) {
+            return {err: {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS}};
+        }
+    }
+
+    // Generate the account once all checks have passed
+    const accountData = {};
+    const accountUsername = 'Fronvo user ' + (accounts.length + 1);
+    const accountId = utilities.convertToId(accountUsername);
+
+    accountData[accountId] = {
+        username: accountUsername,
+        email: email,
+        password: bcrypt.hashSync(password, variables.mainBcryptHash),
+        creationDate: new Date(),
+    };
+    
+    await mdb.collection('accounts').insertOne(accountData);
+    
+    // Also login to the account
+    utilities.loginSocket(io, socket, accountId);
+
+    return {token: await utilities.createToken(mdb, accountId)};
 }
+
+async function login({ io, socket, mdb, email, password}) {
+    // Schema validation
+    const schemaResult = decideAccountSchemaResult(email, password);
+    if(schemaResult) return schemaResult;
+
+    const accounts = await utilities.listDocuments(mdb, 'accounts');
+
+    // Check if the email already exists to be able to login
+    for(let account in accounts) {
+        const accountData = getAccountData(accounts, account);
+
+        if(accountData.email == email) {
+            // Validate the password, synchronously
+            if(bcrypt.compareSync(password, accountData.password)) {
+                const accountId = getAccountId(accounts, account);
+
+                utilities.loginSocket(io, socket, accountId);
+
+                // Refresh token / Use available one
+                let accountToken = await utilities.getToken(mdb, accountId);
+                if(!accountToken) accountToken = await utilities.createToken(mdb, accountId);
+
+                return {token: accountToken};
+            } else {
+                return {err: {msg: errors.ERR_INVALID_PASSWORD, code: enums.ERR_INVALID_PASSWORD}};
+            }
+        }
+    };
+
+    return {err: {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST}};
+}
+
+async function loginToken({ io, socket, mdb, token }) {
+    // Schema validation
+    const schemaResult = decideAccountTokenSchemaResult(token);
+    if(schemaResult) return schemaResult;
+    
+    const tokens = await utilities.listDocuments(mdb, 'tokens');
+
+    for(let tokenItem in tokens) {
+        if(token == getTokenKey(tokens, tokenItem)) {
+            // Just login to the account
+            utilities.loginSocket(io, socket, getTokenAccountId(tokens, tokenItem));
+            return {};
+        }
+    }
+
+    return {err: {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN}};
+}
+
+module.exports = { register, login, loginToken }

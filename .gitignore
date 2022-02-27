@@ -1,12 +1,12 @@
 node_modules/
 .env
 
-# pm2
+# PM2
 *.cpuprofile
 *.heapprofile
 
-# fronvo
+# Fronvo
 logs.txt
 
-# my local work :d
+# Local work
 testing/

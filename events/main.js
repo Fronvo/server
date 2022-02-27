@@ -1,3 +1,7 @@
+// ******************** //
+// The main event file which provides arguments to the rest of the events and manages access states.
+// ******************** //
+
 // No account only
 const noAccountEvents = require('./noAccount');
 
@@ -15,8 +19,8 @@ const templates = require('../other/templates');
 const { format } = require('util');
 const variables = require('../other/variables');
 
-module.exports = (io, mdb) => {
-    // add each file with functions here
+function entry(io, mdb) {
+    // Add each file with functions here
     const noAccountOnlyFuncs = {...noAccountEvents};
     const accountOnlyFuncs = {...accountEvents};
 
@@ -25,24 +29,32 @@ module.exports = (io, mdb) => {
     io.on('connection', (socket) => {
         console.log('Socket ' + socket.id + ' has connected.');
 
+        // Anything sent, which is an event, is forwarded here
         socket.onAny(async (event, ...args) => {
+
+            // Pay attention, every event MUST be in the templates file aswell
             if(event in funcs && event in templates) {
-                // prevent modifications to templates, just copy
+
+                // Prevent modifications to templates, just copy
                 const neededArgs = templates[event].slice();
                 const neededArgsOriginal = templates[event].slice();
 
-                const filteredArgs = [];
+                const filteredArgs = {};
+                let callback;
                 let callbackResponse;
                 let prematureError = false;
 
+                // Account only
                 if(event in accountOnlyFuncs && !utilities.isSocketLoggedIn(socket)) {
                     prematureError = true;
-                    callbackResponse = {msg: errors.ERR_MUST_BE_LOGGED_IN, code: enums.ERR_MUST_BE_LOGGED_IN, event: event};
+                    callbackResponse = {err: {msg: errors.ERR_MUST_BE_LOGGED_IN, code: enums.ERR_MUST_BE_LOGGED_IN, event: event}};
 
+                // No account only
                 } else if(event in noAccountOnlyFuncs && utilities.isSocketLoggedIn(socket)) {
                     prematureError = true;
-                    callbackResponse = {msg: errors.ERR_MUST_BE_LOGGED_OUT, code: enums.ERR_MUST_BE_LOGGED_OUT, event: event};
+                    callbackResponse = {err: {msg: errors.ERR_MUST_BE_LOGGED_OUT, code: enums.ERR_MUST_BE_LOGGED_OUT, event: event}};
 
+                // Order the arguments according to the event's template
                 } else {
                     for(let item in args) {
                         item = args[item];
@@ -50,29 +62,28 @@ module.exports = (io, mdb) => {
                         if(typeof(item) === 'object') {
                             for(const dictItem in item) {
                                 if(neededArgs.includes(dictItem)) {
-                                    // maintain value order, original dict to preserve index
+                                    // Maintain value order, use the original dictionary to preserve index
                                     let dictItemIndex = neededArgsOriginal.indexOf(dictItem);
 
-                                    filteredArgs[dictItemIndex] = item[dictItem];
+                                    // Add named argument to be passed later on
+                                    filteredArgs[dictItem] = item[dictItem];
 
-                                    // delete has weird functionality, roll with this
-                                    // dynamic index, reassign
+                                    // Delete has weird functionality, roll with this
+                                    // Dynamic index, reassign
                                     dictItemIndex = neededArgs.indexOf(dictItem);
                                     neededArgs.splice(dictItemIndex, dictItemIndex + 1);
                                 }
                             }
-                            // can combine dicts, dont return here
+                            // Can combine dictionaries, dont return here
                         }
                     };
                 }
 
-                // here, if we put it in the above else block prematureErrors wont be callback'd
-                let callback;
-
+                // Find the callback
                 for(let item in args) {
                     item = args[item];
 
-                    // only one callback, dont overwrite
+                    // Only one callback, dont overwrite
                     if(typeof(item) === 'function' && !callback) {
                         callback = item;
                         break;
@@ -81,6 +92,8 @@ module.exports = (io, mdb) => {
 
                 if(!prematureError) {
                     if(neededArgs.length > 0) {
+
+                        // Stylise missing arguments
                         let neededArgsString = errors.ERR_MISSING_ARGS;
                         
                         for(const item in neededArgs) {
@@ -93,13 +106,15 @@ module.exports = (io, mdb) => {
                             if(item == (neededArgs.length - 1)) neededArgsString += '.';
                         }
 
-                        callbackResponse = {msg: neededArgsString, code: enums.ERR_MISSING_ARGS, args_needed: neededArgs};
+                        callbackResponse = {err: {msg: neededArgsString, code: enums.ERR_MISSING_ARGS, args_needed: neededArgs}};
                     } else {
+                        // Start it anyway, will be decided in the function itself if applicable
                         const perfId = utilities.perfStart(event);
 
-                        callbackResponse = funcs[event](io, socket, mdb, ...filteredArgs);
+                        // Works for optional arguments
+                        callbackResponse = funcs[event]({io, socket, mdb, ...filteredArgs});
 
-                        // if async
+                        // If async, await
                         if(callbackResponse) {
                             if(typeof(callbackResponse.then) === 'function') callbackResponse = await callbackResponse;
                         }
@@ -110,19 +125,18 @@ module.exports = (io, mdb) => {
 
                 if(callback) {
                     if(callbackResponse) {
-                        // eg: [null, token] | [false]
-                        if(Array.isArray(callbackResponse)) callback(...callbackResponse);
-                        
-                        else callback(callbackResponse);
+                        callback(callbackResponse);
+
                     } else {
                         utilities.insertLog(mdb, format(errors.ERR_FUNC_RETURN_NONE, event));
-                        callback({msg: errors.ERR_UNKNOWN, code: enums.ERR_UNKNOWN});
+                        callback({err: {msg: errors.ERR_UNKNOWN, code: enums.ERR_UNKNOWN}});
                     }
                 }
             }
         });
         
         socket.on('disconnect', () => {
+            // Logout if logged in
             if(utilities.isSocketLoggedIn(socket)) {
                 utilities.logoutSocket(io, socket);
             }
@@ -130,12 +144,12 @@ module.exports = (io, mdb) => {
             console.log('Socket ' + socket.id + ' has disconnected.');
         });
     });
-    
+
     io.engine.on('connection_error', (err) => {
         console.log('Connection abnormally closed:  [' + err.code + ']' +  err.message);
     });
 
-    // following events are only called in cluster mode
+    // The following events are only called while using PM2 to be able to synchronise each server's variables
     io.on('loginSocket', (socketId, accountId) => {
         variables.loggedInSockets[socketId] = accountId;
     });
@@ -144,3 +158,5 @@ module.exports = (io, mdb) => {
         delete variables.loggedInSockets[socketId];
     });
 }
+
+module.exports = entry;

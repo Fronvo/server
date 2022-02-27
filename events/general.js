@@ -1,7 +1,11 @@
+// ******************** //
+// Events which are usable regardless of login state.
+// ******************** //
+
 const { isSocketLoggedIn } = require('../other/utilities');
 
-module.exports = {
-    isLoggedIn: (io, socket, mdb) => {
-        return [isSocketLoggedIn(socket)];
-    }
+function isLoggedIn({ socket }) {
+    return {loggedIn: isSocketLoggedIn(socket)};
 }
+
+module.exports = { isLoggedIn }
