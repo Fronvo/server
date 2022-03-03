@@ -31,7 +31,7 @@ module.exports = {
     performanceReportsMinMS: parseInt(process.env.FRONVO_PERFORMANCE_REPORTS_MIN_MS) || -1,
 
     // When using PM2 for production
-    cluster: process.env.TARGET_PM2 == 'true' || false,
+    cluster: decideBooleanEnvValue(process.env.TARGET_PM2, false),
 
     generatedFilesDirectory,
 
