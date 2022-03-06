@@ -26,8 +26,7 @@ const localDBTemplate = {
 };
 
 // Reusable variables
-// TODO: Make default?
-const localMode = decideBooleanEnvValue(process.env.FRONVO_LOCAL_MODE, false);
+const localMode = decideBooleanEnvValue(process.env.FRONVO_LOCAL_MODE, true);
 const localSave = decideBooleanEnvValue(process.env.FRONVO_LOCAL_SAVE, true);
 
 module.exports = {
