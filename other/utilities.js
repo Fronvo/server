@@ -12,7 +12,7 @@ function saveLocalDB() {
     if(!variables.localMode || !variables.localSave) return;
 
     // Asynchronous write, boosts local development even more
-    writeFile(variables.localDBPath, JSON.stringify(variables.localDB), (err) => {
+    writeFile(variables.localDBPath, JSON.stringify(variables.localDB, null, '\t'), (err) => {
         if(err) {
             console.log(errors.ERR_LOCAL_DB_FAIL);
         }
