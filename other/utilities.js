@@ -42,7 +42,6 @@ async function insertToCollection(mdb, collName, dict) {
 
         // Fallback, create a new key
         localDB[collName].push(dict);
-        // TODO: Periodically save contents to preserve I/O usage?
         saveLocalDB();
     }
 }
