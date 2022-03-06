@@ -135,7 +135,7 @@ async function register({ io, socket, mdb, email, password }) {
 
     // Generate the account once all checks have passed
     const accountData = {};
-    const accountUsername = 'Fronvo user ' + (accounts.length + 1);
+    const accountUsername = 'Fronvo user ' + (accounts != null ? Object.keys(accounts).length + 1 : '1');
     const accountId = utilities.convertToId(accountUsername);
 
     accountData[accountId] = {
@@ -145,7 +145,7 @@ async function register({ io, socket, mdb, email, password }) {
         creationDate: new Date(),
     };
     
-    await mdb.collection('accounts').insertOne(accountData);
+    await utilities.insertToCollection(mdb, 'accounts', accountData);
     
     // Also login to the account
     utilities.loginSocket(io, socket, accountId);

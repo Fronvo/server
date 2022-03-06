@@ -3,31 +3,59 @@
 // ******************** //
 
 const variables = require('../other/variables');
+const { localDB } = require('../other/variables');
 const { v4 } = require('uuid');
 
-function insertLog(mdb, logText) {
-    const logDict = {timestamp: new Date(), info: logText};
+async function insertToCollection(mdb, collName, dict) {
+    if(!variables.localMode) {
+        await mdb.collection(collName).insertOne(dict).catch(() => {});
 
-    mdb.collection('logs').insertOne(logDict).catch(() => {});
+    } else {
+        // Loop and find if a dictionary with the same root key exists
+        for(let dictItem in localDB[collName]) {
+            const dictItemIndex = dictItem;
+            dictItem = localDB[collName][dictItem];
+            const dictItemRootKey = Object.keys(dictItem)[0];
+
+            if(dictItemRootKey == Object.keys(dict)[0]) {
+                // Found the one
+                // Use dictionary spreading, create new keys and overwrite older ones
+                localDB[collName][dictItemIndex][dictItemRootKey] = {...dictItem[dictItemRootKey], ...dict};
+                // Dont fallback
+                return;
+            }
+        }
+
+        // Fallback, create a new key
+        localDB[collName].push(dict);
+    }
 }
 
-async function insertToCollection(mdb, collName, dict) {
-    await mdb.collection(collName).insertOne(dict).catch(() => {});
+function insertLog(mdb, logText) {
+    const logDict = {};
+    logDict[v4()] = {timestamp: new Date(), info: logText};
+
+    insertToCollection(mdb, 'logs', logDict);
 }
 
 function insertTextToCollection(mdb, collName, text) {
-    const dictToInsert = {timestamp: new Date()};
-    dictToInsert[v4()] = text;
+    const dictToInsert = {};
+    dictToInsert[v4()] = {timestamp: new Date(), text};
 
-    mdb.collection(collName).insertOne(dictToInsert).catch(() => {});
+    insertToCollection(mdb, collName, dictToInsert);
 }
 
 async function listDocuments(mdb, collName) {
-    return await mdb.collection(collName).find({}).toArray();
+    if(!variables.localMode) {
+        return await mdb.collection(collName).find({}).toArray();
+
+    } else {
+        return localDB[collName];
+    }
 }
 
 function getTokenAccountId(tokensArray, tokenIndex) {
-    return Object.keys(tokensArray[tokenIndex])[1];
+    return Object.keys(tokensArray[tokenIndex])[variables.localMode ? 0 : 1];
 }
 
 function getTokenKey(tokensArray, tokenIndex) {
@@ -62,10 +90,9 @@ module.exports = {
     createToken: async (mdb, accountId) => {
         const tokenDict = {};
         const token = v4();
-        
         tokenDict[accountId] = token;
-    
-        await mdb.collection('tokens').insertOne(tokenDict);
+
+        await insertToCollection(mdb, 'tokens', tokenDict);
     
         return token;
     },
@@ -128,13 +155,18 @@ module.exports = {
     },
 
     getAccountData: (accountsArray, accountIndex) => {
+        // Empty check
+        if(variables.localMode) {
+            if(Object.keys(accountsArray[0]).length == 0) return {};
+        }
+
         const accountDictionary = accountsArray[accountIndex];
 
-        return accountDictionary[Object.keys(accountDictionary)[1]];
+        return accountDictionary[Object.keys(accountDictionary)[variables.localMode ? 0 : 1]];
     },
 
     getAccountId: (accountsArray, accountIndex) => {
-        return Object.keys(accountsArray[accountIndex])[1];
+        return Object.keys(accountsArray[accountIndex])[variables.localMode ? 0 : 1];
     },
 
     getTokenKey,

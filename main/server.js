@@ -16,9 +16,6 @@ const { instrument, RedisStore } = require('@socket.io/admin-ui');
 const { createAdapter } = require('@socket.io/cluster-adapter');
 const { setupWorker } = require('@socket.io/sticky');
 
-// MongoDB
-const { MongoClient } = require('mongodb');
-
 // Custom event files
 const registerEvents = require('../events/main');
 
@@ -64,8 +61,10 @@ function setupMongoDB() {
                             '.mongodb.net/' +
                             mdbDb || 'fronvo' +
                             '?retryWrites=true&w=majority';
-    
+
             // Create the MongoDB client with optimised options
+            const { MongoClient } = require('mongodb');
+
             mdbClient = new MongoClient(mdbUri, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true
@@ -104,7 +103,7 @@ function setupServer() {
 }
 
 function setupServerEvents() {
-    registerEvents(io, mdbClient.db('fronvo'));
+    registerEvents(io, !variables.localMode ? mdbClient.db('fronvo') : null);
 }
 
 function setupPM2() {
@@ -156,19 +155,28 @@ function startup() {
     }
 
     // Attempt to run each check one-by-one
-    setupMongoDB().then(() => {
+    if(!variables.localMode) {
+        setupMongoDB().then(() => {
+            postDBInit();
+            
+        }).catch((err) => {
+            // Depends on the error's context
+            if(!variables.silentLogging) loadingSpinner.fail(err.message ? err.message : err);
+        });
+
+    } else {
+        postDBInit();
+    }
+
+    function postDBInit() {
         setupServer();
         setupServerEvents();
         setupPM2();
         setupAdminPanel();
-
+    
         // Finally, display successful server run
         if(!variables.silentLogging) loadingSpinner.succeed('Server running at port ' + PORT + '.');
-
-    }).catch((err) => {
-        // Depends on the error's context
-        if(!variables.silentLogging) loadingSpinner.fail(err.message ? err.message : err);
-    });
+    }
 }
 
 startup();

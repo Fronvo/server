@@ -31,7 +31,7 @@ module.exports = {
     performanceReportsMinMS: parseInt(process.env.FRONVO_PERFORMANCE_REPORTS_MIN_MS) || -1,
 
     // When using PM2 for production
-    cluster: decideBooleanEnvValue(process.env.FRONVO_TARGET_PM2, false),
+    cluster: decideBooleanEnvValue(process.env.TARGET_PM2, false),
 
     generatedFilesDirectory,
 
@@ -39,5 +39,14 @@ module.exports = {
     blacklistedEmailDomains: require(resolve(generatedFilesDirectory, 'disposable_email_blocklist.json')),
     blacklistedEmailDomainsEnabled: decideBooleanEnvValue(process.env.FRONVO_EMAIL_BLACKLISTING_ENABLED, true),
 
-    silentLogging: decideBooleanEnvValue(process.env.FRONVO_SILENT_LOGGING, false)
+    silentLogging: decideBooleanEnvValue(process.env.FRONVO_SILENT_LOGGING, false),
+
+    // Rapid local development, no MongoDB integration
+    localMode: decideBooleanEnvValue(process.env.FRONVO_LOCAL_MODE, false),
+    localDB: {
+        accounts: [],
+        tokens: [],
+        reports: [],
+        logs: []
+    }
 }
