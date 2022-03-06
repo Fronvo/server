@@ -3,8 +3,21 @@
 // ******************** //
 
 const variables = require('../other/variables');
+const errors = require('../other/errors');
 const { localDB } = require('../other/variables');
 const { v4 } = require('uuid');
+const { writeFile } = require('fs');
+
+function saveLocalDB() {
+    if(!variables.localMode || !variables.localSave) return;
+
+    // Asynchronous write, boosts local development even more
+    writeFile(variables.localDBPath, JSON.stringify(variables.localDB), (err) => {
+        if(err) {
+            console.log(errors.ERR_LOCAL_DB_FAIL);
+        }
+    });
+}
 
 async function insertToCollection(mdb, collName, dict) {
     if(!variables.localMode) {
@@ -21,6 +34,7 @@ async function insertToCollection(mdb, collName, dict) {
                 // Found the one
                 // Use dictionary spreading, create new keys and overwrite older ones
                 localDB[collName][dictItemIndex][dictItemRootKey] = {...dictItem[dictItemRootKey], ...dict};
+                saveLocalDB();
                 // Dont fallback
                 return;
             }
@@ -28,6 +42,8 @@ async function insertToCollection(mdb, collName, dict) {
 
         // Fallback, create a new key
         localDB[collName].push(dict);
+        // TODO: Periodically save contents to preserve I/O usage?
+        saveLocalDB();
     }
 }
 

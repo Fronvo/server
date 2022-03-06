@@ -23,6 +23,9 @@ const registerEvents = require('../events/main');
 const ora = require('ora');
 const gradient = require('gradient-string');
 
+// Other imports
+const fs = require('fs');
+
 // Variables
 var io, mdbClient, loadingSpinner;
 const loadingSpinnerDefaultText = 'Starting server';
@@ -34,8 +37,36 @@ function setLoading(currProcText) {
 }
 
 function preStartupChecks() {
-    // Disable logging
-    if(variables.silentLogging) console.log = () => {};
+    function checkSilentLogging() {
+        if(variables.silentLogging) console.log = () => {};
+    }
+
+    function checkRequiredFiles() {
+        // Check directories
+        for(let directory in variables.requiredStartupDirectories) {
+            directory = variables.requiredStartupDirectories[directory];
+
+            // No errors thrown with recursive option
+            fs.mkdirSync(directory, {recursive: true});
+        }
+
+        // Check individual files
+        for(let file in variables.requiredStartupFiles) {
+            file = variables.requiredStartupFiles[file][Object.keys(variables.requiredStartupFiles[file])[0]];
+            const filePath = file.path;
+
+            // This is optional for non-JSON files
+            const fileTemplate = file.template;
+
+            // Overwrite if it doesnt exist
+            if(!fs.existsSync(filePath)) {
+                fs.writeFileSync(filePath, fileTemplate ? JSON.stringify(fileTemplate) : '');
+            }
+        }
+    }
+
+    checkSilentLogging();
+    checkRequiredFiles();
 }
 
 function setupMongoDB() {

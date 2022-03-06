@@ -5,12 +5,30 @@
 const errors = require('../other/errors');
 const { enums } = require('../other/enums');
 const { resolve } = require('path');
-
-const generatedFilesDirectory = resolve(__dirname, '../generated');
+const fs = require('fs');
 
 function decideBooleanEnvValue(value, valueIfNull) {
     return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
 }
+
+const generatedFilesDirectory = resolve(__dirname, '../generated');
+
+// Add generated paths here
+const localDBDirectory = resolve(generatedFilesDirectory, 'local');
+const localDBPath = resolve(localDBDirectory, 'db.json');
+
+// File templates
+const localDBTemplate = {
+    accounts: [],
+    tokens: [],
+    reports: [],
+    logs: []
+};
+
+// Reusable variables
+// TODO: Make default?
+const localMode = decideBooleanEnvValue(process.env.FRONVO_LOCAL_MODE, false);
+const localSave = decideBooleanEnvValue(process.env.FRONVO_LOCAL_SAVE, true);
 
 module.exports = {
     // Associating accounts with sockets, format: {socketId: accountId}
@@ -35,6 +53,12 @@ module.exports = {
 
     generatedFilesDirectory,
 
+    // [directory]
+    requiredStartupDirectories: [localDBDirectory],
+    
+    // {item: {path, template (Optional)}}
+    requiredStartupFiles: [{localDBItem: {path: localDBPath, template: localDBTemplate}}],
+
     // Blacklisted emails: https://github.com/disposable-email-domains/disposable-email-domains
     blacklistedEmailDomains: require(resolve(generatedFilesDirectory, 'disposable_email_blocklist.json')),
     blacklistedEmailDomainsEnabled: decideBooleanEnvValue(process.env.FRONVO_EMAIL_BLACKLISTING_ENABLED, true),
@@ -42,11 +66,10 @@ module.exports = {
     silentLogging: decideBooleanEnvValue(process.env.FRONVO_SILENT_LOGGING, false),
 
     // Rapid local development, no MongoDB integration
-    localMode: decideBooleanEnvValue(process.env.FRONVO_LOCAL_MODE, false),
-    localDB: {
-        accounts: [],
-        tokens: [],
-        reports: [],
-        logs: []
-    }
+    localMode,
+    localSave,
+
+    // Checks in server.js to generate files arent fast enough, prevent errors
+    localDB: localMode && localSave && fs.existsSync(localDBPath) ? require(localDBPath) : localDBTemplate,
+    localDBPath
 }

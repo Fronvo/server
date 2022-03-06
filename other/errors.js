@@ -5,6 +5,7 @@
 // Remember to require('util').format() depending on the error's symbols.
 module.exports = {
     ERR_UNKNOWN: 'An unknown error has occured.',
+    ERR_LOCAL_DB_FAIL: 'Failed to save the local database.',
     ERR_FUNC_RETURN_NONE: 'Registered event \'%s\' didn\'t return any value or the value format is invalid.', 
     ERR_REQUIRED: 'The %s is required.',
     ERR_LENGTH: 'The %s must contain %i to %i characters.',
