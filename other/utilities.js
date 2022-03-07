@@ -4,7 +4,10 @@
 
 const variables = require('../other/variables');
 const errors = require('../other/errors');
+
+// Dont import mdb explicitly, wont update with the passed client
 const { localDB } = require('../other/variables');
+
 const { v4 } = require('uuid');
 const { writeFile } = require('fs');
 
@@ -19,9 +22,9 @@ function saveLocalDB() {
     });
 }
 
-async function insertToCollection(mdb, collName, dict) {
+async function insertToCollection(collName, dict) {
     if(!variables.localMode) {
-        await mdb.collection(collName).insertOne(dict).catch(() => {});
+        await variables.mdb.collection(collName).insertOne(dict).catch(() => {});
 
     } else {
         // Loop and find if a dictionary with the same root key exists
@@ -46,23 +49,23 @@ async function insertToCollection(mdb, collName, dict) {
     }
 }
 
-function insertLog(mdb, logText) {
+function insertLog(logText) {
     const logDict = {};
     logDict[v4()] = {timestamp: new Date(), info: logText};
 
-    insertToCollection(mdb, 'logs', logDict);
+    insertToCollection('logs', logDict);
 }
 
-function insertTextToCollection(mdb, collName, text) {
+function insertTextToCollection(collName, text) {
     const dictToInsert = {};
     dictToInsert[v4()] = {timestamp: new Date(), text};
 
-    insertToCollection(mdb, collName, dictToInsert);
+    insertToCollection(collName, dictToInsert);
 }
 
-async function listDocuments(mdb, collName) {
+async function listDocuments(collName) {
     if(!variables.localMode) {
-        return await mdb.collection(collName).find({}).toArray();
+        return await variables.mdb.collection(collName).find({}).toArray();
 
     } else {
         return localDB[collName];
@@ -102,18 +105,18 @@ module.exports = {
         if(variables.cluster) io.serverSideEmit('logoutSocket', socket.id);
     },
 
-    createToken: async (mdb, accountId) => {
+    createToken: async (accountId) => {
         const tokenDict = {};
         const token = v4();
         tokenDict[accountId] = token;
 
-        await insertToCollection(mdb, 'tokens', tokenDict);
+        await insertToCollection('tokens', tokenDict);
     
         return token;
     },
 
-    getToken: async (mdb, accountId) => {
-        const tokens = await listDocuments(mdb, 'tokens');
+    getToken: async (accountId) => {
+        const tokens = await listDocuments('tokens');
 
         for(let token in tokens) {
             if(accountId === getTokenAccountId(tokens, token)) {
@@ -147,7 +150,7 @@ module.exports = {
         return perfUUID;
     },
 
-    perfEnd: (mdb, perfUUID) => {
+    perfEnd: (perfUUID) => {
         if(!variables.performanceReportsEnabled || !perfUUID in variables.performanceReports) return;
 
         // Basically copy the dictionary
@@ -157,7 +160,7 @@ module.exports = {
 
         // Check if it passes the min report MS duration (optional)
         if(msDuration >= variables.performanceReportsMinMS) {
-            insertTextToCollection(mdb, 'reports', perfReportDict.perfName + ' took ' + msDuration + 'ms.');
+            insertTextToCollection('reports', perfReportDict.perfName + ' took ' + msDuration + 'ms.');
         }
 
         // Delete to save memory

@@ -27,7 +27,7 @@ const gradient = require('gradient-string');
 const fs = require('fs');
 
 // Variables
-var io, mdbClient, loadingSpinner;
+var io, loadingSpinner;
 const loadingSpinnerDefaultText = 'Starting server';
 const variables = require('../other/variables');
 const { decideBooleanEnvValue } = require('../other/utilities');
@@ -96,7 +96,7 @@ function setupMongoDB() {
             // Create the MongoDB client with optimised options
             const { MongoClient } = require('mongodb');
 
-            mdbClient = new MongoClient(mdbUri, {
+            const mdbClient = new MongoClient(mdbUri, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true
             });
@@ -106,6 +106,7 @@ function setupMongoDB() {
                 if(err) {
                     reject(err);
                 } else {
+                    variables.mdb = mdbClient.db(mdbDb || 'fronvo');
                     resolve();
                 }
             });
@@ -134,7 +135,7 @@ function setupServer() {
 }
 
 function setupServerEvents() {
-    registerEvents(io, !variables.localMode ? mdbClient.db('fronvo') : null);
+    registerEvents(io);
 }
 
 function setupPM2() {

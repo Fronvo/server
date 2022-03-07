@@ -19,7 +19,7 @@ const templates = require('../other/templates');
 const { format } = require('util');
 const variables = require('../other/variables');
 
-function entry(io, mdb) {
+function entry(io) {
     // Add each file with functions here
     const noAccountOnlyFuncs = {...noAccountEvents};
     const accountOnlyFuncs = {...accountEvents};
@@ -112,14 +112,14 @@ function entry(io, mdb) {
                         const perfId = utilities.perfStart(event);
 
                         // Works for optional arguments
-                        callbackResponse = funcs[event]({io, socket, mdb, ...filteredArgs});
+                        callbackResponse = funcs[event]({io, socket, ...filteredArgs});
 
                         // If async, await
                         if(callbackResponse) {
                             if(typeof(callbackResponse.then) === 'function') callbackResponse = await callbackResponse;
                         }
 
-                        utilities.perfEnd(mdb, perfId);
+                        utilities.perfEnd(perfId);
                     }
                 }
 
@@ -128,7 +128,7 @@ function entry(io, mdb) {
                         callback(callbackResponse);
 
                     } else {
-                        utilities.insertLog(mdb, format(errors.ERR_FUNC_RETURN_NONE, event));
+                        utilities.insertLog(format(errors.ERR_FUNC_RETURN_NONE, event));
                         callback({err: {msg: errors.ERR_UNKNOWN, code: enums.ERR_UNKNOWN}});
                     }
                 }

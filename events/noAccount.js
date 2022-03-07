@@ -112,7 +112,7 @@ function decideAccountTokenSchemaResult(token) {
     return {err: {...resultDict}};
 }
 
-async function register({ io, socket, mdb, email, password }) {
+async function register({ io, socket, email, password }) {
     // Schema validation
     const schemaResult = decideAccountSchemaResult(email, password);
     if(schemaResult) return schemaResult;
@@ -124,7 +124,7 @@ async function register({ io, socket, mdb, email, password }) {
         }
     }
 
-    const accounts = await utilities.listDocuments(mdb, 'accounts');
+    const accounts = await utilities.listDocuments('accounts');
     
     // Check if the email is already registered by another user
     for(let account in accounts) {
@@ -145,20 +145,20 @@ async function register({ io, socket, mdb, email, password }) {
         creationDate: new Date(),
     };
     
-    await utilities.insertToCollection(mdb, 'accounts', accountData);
+    await utilities.insertToCollection('accounts', accountData);
     
     // Also login to the account
     utilities.loginSocket(io, socket, accountId);
 
-    return {token: await utilities.createToken(mdb, accountId)};
+    return {token: await utilities.createToken(accountId)};
 }
 
-async function login({ io, socket, mdb, email, password}) {
+async function login({ io, socket, email, password}) {
     // Schema validation
     const schemaResult = decideAccountSchemaResult(email, password);
     if(schemaResult) return schemaResult;
 
-    const accounts = await utilities.listDocuments(mdb, 'accounts');
+    const accounts = await utilities.listDocuments('accounts');
 
     // Check if the email already exists to be able to login
     for(let account in accounts) {
@@ -172,8 +172,8 @@ async function login({ io, socket, mdb, email, password}) {
                 utilities.loginSocket(io, socket, accountId);
 
                 // Refresh token / Use available one
-                let accountToken = await utilities.getToken(mdb, accountId);
-                if(!accountToken) accountToken = await utilities.createToken(mdb, accountId);
+                let accountToken = await utilities.getToken(accountId);
+                if(!accountToken) accountToken = await utilities.createToken(accountId);
 
                 return {token: accountToken};
             } else {
@@ -185,12 +185,12 @@ async function login({ io, socket, mdb, email, password}) {
     return {err: {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST}};
 }
 
-async function loginToken({ io, socket, mdb, token }) {
+async function loginToken({ io, socket, token }) {
     // Schema validation
     const schemaResult = decideAccountTokenSchemaResult(token);
     if(schemaResult) return schemaResult;
     
-    const tokens = await utilities.listDocuments(mdb, 'tokens');
+    const tokens = await utilities.listDocuments('tokens');
 
     for(let tokenItem in tokens) {
         if(token == getTokenKey(tokens, tokenItem)) {

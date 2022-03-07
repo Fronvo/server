@@ -71,5 +71,8 @@ module.exports = {
 
     // Checks in server.js to generate files arent fast enough, prevent errors
     localDB: localMode && localSave && fs.existsSync(localDBPath) ? require(localDBPath) : localDBTemplate,
-    localDBPath
+    localDBPath,
+
+    // The MongoDB client, set from server.js
+    mdb: null
 }

@@ -12,8 +12,8 @@ function fetchProfileId({ socket }) {
     return {profileId: utilities.getLoggedInSockets()[socket.id]};
 }
 
-async function fetchProfileData({ socket, mdb, profileId }) {
-    const accounts = await utilities.listDocuments(mdb, 'accounts');
+async function fetchProfileData({ socket, profileId }) {
+    const accounts = await utilities.listDocuments('accounts');
     
     for(let account in accounts) {
         // If target account id isn't what were looking for, move on
