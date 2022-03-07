@@ -117,8 +117,6 @@ async function register({ io, socket, mdb, email, password }) {
     const schemaResult = decideAccountSchemaResult(email, password);
     if(schemaResult) return schemaResult;
 
-    const accounts = await utilities.listDocuments(mdb, 'accounts');
-
     // Check if the email is from a dummy (blacklisted) domain, if applicable
     if(variables.blacklistedEmailDomainsEnabled) {
         if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(email)) > -1) {
@@ -126,6 +124,8 @@ async function register({ io, socket, mdb, email, password }) {
         }
     }
 
+    const accounts = await utilities.listDocuments(mdb, 'accounts');
+    
     // Check if the email is already registered by another user
     for(let account in accounts) {
         if(utilities.getAccountData(accounts, account).email == email) {
