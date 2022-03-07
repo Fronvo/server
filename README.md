@@ -16,11 +16,7 @@
 
 **The server should be running locally at port 3001.**
 
-## Hosting
-
-**When hosting, remember to pass the appropriate environmental variables in order to enable pm2 for a [ton of cool features](https://pm2.keymetrics.io/docs/usage/pm2-doc-single-page/).**
-
-**By default, [heroku](https://heroku.com) will make use of it.**
+## [Hosting](https://github.com/Fronvo/fronvo/blob/master/HOSTING.md)
 
 ## Documentation
 **Coming soon.**

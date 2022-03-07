@@ -16,15 +16,15 @@ const { instrument, RedisStore } = require('@socket.io/admin-ui');
 const { createAdapter } = require('@socket.io/cluster-adapter');
 const { setupWorker } = require('@socket.io/sticky');
 
-// MongoDB
-const { MongoClient } = require('mongodb');
-
 // Custom event files
 const registerEvents = require('../events/main');
 
 // Cool-ish styling
 const ora = require('ora');
 const gradient = require('gradient-string');
+
+// Other imports
+const fs = require('fs');
 
 // Variables
 var io, mdbClient, loadingSpinner;
@@ -37,8 +37,36 @@ function setLoading(currProcText) {
 }
 
 function preStartupChecks() {
-    // Disable logging
-    if(variables.silentLogging) console.log = () => {};
+    function checkSilentLogging() {
+        if(variables.silentLogging) console.log = () => {};
+    }
+
+    function checkRequiredFiles() {
+        // Check directories
+        for(let directory in variables.requiredStartupDirectories) {
+            directory = variables.requiredStartupDirectories[directory];
+
+            // No errors thrown with recursive option
+            fs.mkdirSync(directory, {recursive: true});
+        }
+
+        // Check individual files
+        for(let file in variables.requiredStartupFiles) {
+            file = variables.requiredStartupFiles[file][Object.keys(variables.requiredStartupFiles[file])[0]];
+            const filePath = file.path;
+
+            // This is optional for non-JSON files
+            const fileTemplate = file.template;
+
+            // Overwrite if it doesnt exist
+            if(!fs.existsSync(filePath)) {
+                fs.writeFileSync(filePath, fileTemplate ? JSON.stringify(fileTemplate) : '');
+            }
+        }
+    }
+
+    checkSilentLogging();
+    checkRequiredFiles();
 }
 
 function setupMongoDB() {
@@ -64,8 +92,10 @@ function setupMongoDB() {
                             '.mongodb.net/' +
                             mdbDb || 'fronvo' +
                             '?retryWrites=true&w=majority';
-    
+
             // Create the MongoDB client with optimised options
+            const { MongoClient } = require('mongodb');
+
             mdbClient = new MongoClient(mdbUri, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true
@@ -104,7 +134,7 @@ function setupServer() {
 }
 
 function setupServerEvents() {
-    registerEvents(io, mdbClient.db('fronvo'));
+    registerEvents(io, !variables.localMode ? mdbClient.db('fronvo') : null);
 }
 
 function setupPM2() {
@@ -156,19 +186,28 @@ function startup() {
     }
 
     // Attempt to run each check one-by-one
-    setupMongoDB().then(() => {
+    if(!variables.localMode) {
+        setupMongoDB().then(() => {
+            postDBInit();
+            
+        }).catch((err) => {
+            // Depends on the error's context
+            if(!variables.silentLogging) loadingSpinner.fail(err.message ? err.message : err);
+        });
+
+    } else {
+        postDBInit();
+    }
+
+    function postDBInit() {
         setupServer();
         setupServerEvents();
         setupPM2();
         setupAdminPanel();
-
+    
         // Finally, display successful server run
         if(!variables.silentLogging) loadingSpinner.succeed('Server running at port ' + PORT + '.');
-
-    }).catch((err) => {
-        // Depends on the error's context
-        if(!variables.silentLogging) loadingSpinner.fail(err.message ? err.message : err);
-    });
+    }
 }
 
 startup();
