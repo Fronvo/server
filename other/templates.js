@@ -1,5 +1,5 @@
 // ******************** //
-// The templates for each event of Fronvo to specify passed arguments and their order.
+// The templates for each event of Fronvo to specify passed arguments.
 // ******************** //
 
 module.exports = {
