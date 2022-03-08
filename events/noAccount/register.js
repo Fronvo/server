@@ -38,7 +38,7 @@ async function register({ io, socket, email, password }) {
     accountData[accountId] = {
         username: accountUsername,
         email: email,
-        password: bcrypt.hashSync(password, variables.mainBcryptHash),
+        password: !variables.testMode ? bcrypt.hashSync(password, variables.mainBcryptHash) : password,
         creationDate: new Date(),
     };
     

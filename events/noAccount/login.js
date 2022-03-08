@@ -7,6 +7,7 @@ const utilities = require('../../other/utilities');
 const errors = require('../../other/errors');
 const { enums } = require('../../other/enums');
 const bcrypt = require('bcrypt');
+const variables = require('../../other/variables');
 
 async function login({ io, socket, email, password}) {
     // Schema validation
@@ -21,7 +22,7 @@ async function login({ io, socket, email, password}) {
 
         if(accountData.email == email) {
             // Validate the password, synchronously
-            if(bcrypt.compareSync(password, accountData.password)) {
+            if(!variables.testMode ? bcrypt.compareSync(password, accountData.password) : password == accountData.password) {
                 const accountId = utilities.getAccountId(accounts, account);
 
                 utilities.loginSocket(io, socket, accountId);
