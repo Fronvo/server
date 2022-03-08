@@ -28,7 +28,8 @@ const localDBTemplate = {
 
 // Reusable variables
 const blacklistedEmailDomainsEnabled = decideBooleanEnvValue(process.env.FRONVO_EMAIL_BLACKLISTING_ENABLED, true);
-const localMode = decideBooleanEnvValue(process.env.FRONVO_LOCAL_MODE, true);
+const testMode = decideBooleanEnvValue(process.env.FRONVO_TEST_MODE, false);
+const localMode = testMode || decideBooleanEnvValue(process.env.FRONVO_LOCAL_MODE, true);
 const localSave = decideBooleanEnvValue(process.env.FRONVO_LOCAL_SAVE, true);
 
 module.exports = {
@@ -75,5 +76,8 @@ module.exports = {
     localDBPath,
 
     // The MongoDB client, set from server.js
-    mdb: null
+    mdb: null,
+
+    // While running mocha tests
+    testMode
 }

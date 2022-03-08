@@ -142,6 +142,11 @@ function entry(io) {
             }
             
             console.log('Socket ' + socket.id + ' has disconnected.');
+
+            // Exit process when the test client disconnects
+            if(variables.testMode) {
+                process.exit();
+            }
         });
     });
 
