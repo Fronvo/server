@@ -27,6 +27,7 @@ const localDBTemplate = {
 };
 
 // Reusable variables
+const blacklistedEmailDomainsEnabled = decideBooleanEnvValue(process.env.FRONVO_EMAIL_BLACKLISTING_ENABLED, true);
 const localMode = decideBooleanEnvValue(process.env.FRONVO_LOCAL_MODE, true);
 const localSave = decideBooleanEnvValue(process.env.FRONVO_LOCAL_SAVE, true);
 
@@ -60,8 +61,8 @@ module.exports = {
     requiredStartupFiles: [{localDBItem: {path: localDBPath, template: localDBTemplate}}],
 
     // Blacklisted emails: https://github.com/disposable-email-domains/disposable-email-domains
-    blacklistedEmailDomains: require(resolve(generatedFilesDirectory, 'disposable_email_blocklist.json')),
-    blacklistedEmailDomainsEnabled: decideBooleanEnvValue(process.env.FRONVO_EMAIL_BLACKLISTING_ENABLED, true),
+    blacklistedEmailDomains: blacklistedEmailDomainsEnabled && require(resolve(generatedFilesDirectory, 'disposable_email_blocklist.json')),
+    blacklistedEmailDomainsEnabled,
 
     silentLogging: decideBooleanEnvValue(process.env.FRONVO_SILENT_LOGGING, false),
 
