@@ -1,6 +1,6 @@
 <h1 align='center'>Hosting Fronvo</h1>
 
-<p align='center'><b>This page provides guides on hosting the server of Fronvo on various platforms.</b></p>
+<p align='center'><b>This page provides guides on hosting the server of Fronvo on various databases.</b></p>
 
 # With MongoDB
 
