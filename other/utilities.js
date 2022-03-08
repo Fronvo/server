@@ -118,7 +118,7 @@ module.exports = {
     getToken: async (accountId) => {
         const tokens = await listDocuments('tokens');
 
-        for(let token in tokens) {
+        for(const token in tokens) {
             if(accountId === getTokenAccountId(tokens, token)) {
                 return getTokenKey(tokens, token);
             }

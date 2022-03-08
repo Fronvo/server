@@ -8,7 +8,7 @@ const { JoiE, enums } = require('../../other/enums');
 const errors = require('../../other/errors');
 
 function getMinMaxEntriesForAccounts() {
-    let resultDict = {email: {}, password: {}};
+    const resultDict = {email: {}, password: {}};
 
     for(const [key, value] of schemas.accountSchema._ids._byKey.entries()) {
         if(!(key === 'email' || key === 'password')) continue;
@@ -38,7 +38,7 @@ module.exports = {
         const schemaPath = schemaDetails.path[0];
     
         // Default dictionary to reuse, copy its values
-        let resultDict = {...defaultError};
+        const resultDict = {...defaultError};
     
         // Default to JOI message
         resultDict.msg = schemaMessage;
@@ -48,7 +48,7 @@ module.exports = {
             // Provide additional info for the end user
             resultDict['extras'] = {for: schemaPath};
     
-            let limits = getMinMaxEntriesForAccounts();
+            const limits = getMinMaxEntriesForAccounts();
     
             switch(schemaType) {
     
@@ -84,7 +84,7 @@ module.exports = {
         
         if(!schemaResult.error) return false;
     
-        let resultDict = {...defaultError};
+        const resultDict = {...defaultError};
     
         switch(schemaResult.error.details[0].type) {
             case JoiE.TYPE_REQUIRED:

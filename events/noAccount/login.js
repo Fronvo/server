@@ -16,7 +16,7 @@ async function login({ io, socket, email, password}) {
     const accounts = await utilities.listDocuments('accounts');
 
     // Check if the email already exists to be able to login
-    for(let account in accounts) {
+    for(const account in accounts) {
         const accountData = utilities.getAccountData(accounts, account);
 
         if(accountData.email == email) {

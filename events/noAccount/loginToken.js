@@ -15,7 +15,7 @@ async function loginToken({ io, socket, token }) {
     
     const tokens = await utilities.listDocuments('tokens');
 
-    for(let tokenItem in tokens) {
+    for(const tokenItem in tokens) {
         if(token == getTokenKey(tokens, tokenItem)) {
             // Just login to the account
             utilities.loginSocket(io, socket, getTokenAccountId(tokens, tokenItem));

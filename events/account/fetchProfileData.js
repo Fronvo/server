@@ -7,7 +7,7 @@ const utilities = require('../../other/utilities');
 async function fetchProfileData({ socket, profileId }) {
     const accounts = await utilities.listDocuments('accounts');
     
-    for(let account in accounts) {
+    for(const account in accounts) {
         // If target account id isn't what were looking for, move on
         if(utilities.getAccountId(accounts, account) != profileId) continue;
 

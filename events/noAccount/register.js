@@ -24,7 +24,7 @@ async function register({ io, socket, email, password }) {
     const accounts = await utilities.listDocuments('accounts');
     
     // Check if the email is already registered by another user
-    for(let account in accounts) {
+    for(const account in accounts) {
         if(utilities.getAccountData(accounts, account).email == email) {
             return {err: {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS}};
         }
