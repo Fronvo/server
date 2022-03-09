@@ -23,7 +23,7 @@ async function loginToken({ io, socket, token }) {
         }
     }
 
-    return {err: {msg: errors.ERR_INVALID_TOKEN, code: enums.ERR_INVALID_TOKEN}};
+    return utilities.generateError(errors.ERR_INVALID_TOKEN, enums.ERR_INVALID_TOKEN);
 }
 
 module.exports = loginToken;

@@ -17,7 +17,7 @@ async function register({ io, socket, email, password }) {
     // Check if the email is from a dummy (blacklisted) domain, if applicable
     if(variables.blacklistedEmailDomainsEnabled) {
         if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(email)) > -1) {
-            return {err: {msg: errors.ERR_INVALID_EMAIL, code: enums.ERR_INVALID_EMAIL}};
+            return utilities.generateError(errors.ERR_INVALID_EMAIL, enums.ERR_INVALID_EMAIL);
         }
     }
 
@@ -26,7 +26,7 @@ async function register({ io, socket, email, password }) {
     // Check if the email is already registered by another user
     for(const account in accounts) {
         if(utilities.getAccountData(accounts, account).email == email) {
-            return {err: {msg: errors.ERR_ACC_ALR_EXISTS, code: enums.ERR_ACC_ALR_EXISTS}};
+            return utilities.generateError(errors.ERR_ACC_ALR_EXISTS, enums.ERR_ACC_ALR_EXISTS);
         }
     }
 

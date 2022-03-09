@@ -33,12 +33,12 @@ async function login({ io, socket, email, password}) {
 
                 return {token: accountToken};
             } else {
-                return {err: {msg: errors.ERR_INVALID_PASSWORD, code: enums.ERR_INVALID_PASSWORD}};
+                return utilities.generateError(errors.ERR_INVALID_PASSWORD, enums.ERR_INVALID_PASSWORD);
             }
         }
     };
 
-    return {err: {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST}};
+    return utilities.generateError(errors.ERR_ACC_DOESNT_EXIST, enums.ERR_ACC_DOESNT_EXIST);
 }
 
 module.exports = login;

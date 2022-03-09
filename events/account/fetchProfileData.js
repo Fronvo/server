@@ -27,7 +27,7 @@ async function fetchProfileData({ socket, profileId }) {
         return {profileData: finalAccountDict};
     }
 
-    return {err: {msg: errors.ERR_PROFILE_NOT_FOUND, code: enums.ERR_PROFILE_NOT_FOUND}};
+    return utilities.generateError(errors.ERR_PROFILE_NOT_FOUND, enums.ERR_PROFILE_NOT_FOUND);
 }
 
 module.exports = fetchProfileData;

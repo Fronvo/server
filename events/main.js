@@ -13,6 +13,7 @@ const generalFuncs = require('./general');
 
 // Other
 const utilities = require('../other/utilities');
+const { generateError } = require('../other/utilities');
 const errors = require('../other/errors');
 const { enums } = require('../other/enums');
 const templates = require('../other/templates');
@@ -47,12 +48,12 @@ function entry(io) {
                 // Account only
                 if(event in accountOnlyFuncs && !utilities.isSocketLoggedIn(socket)) {
                     prematureError = true;
-                    callbackResponse = {err: {msg: errors.ERR_MUST_BE_LOGGED_IN, code: enums.ERR_MUST_BE_LOGGED_IN, event: event}};
+                    callbackResponse = generateError(errors.ERR_MUST_BE_LOGGED_IN, enums.ERR_MUST_BE_LOGGED_IN, {event: event});
 
                 // No account only
                 } else if(event in noAccountOnlyFuncs && utilities.isSocketLoggedIn(socket)) {
                     prematureError = true;
-                    callbackResponse = {err: {msg: errors.ERR_MUST_BE_LOGGED_OUT, code: enums.ERR_MUST_BE_LOGGED_OUT, event: event}};
+                    callbackResponse = generateError(errors.ERR_MUST_BE_LOGGED_OUT, enums.ERR_MUST_BE_LOGGED_OUT, {event: event});
 
                 // Order the arguments according to the event's template
                 } else {
@@ -106,7 +107,7 @@ function entry(io) {
                             if(item == (neededArgs.length - 1)) neededArgsString += '.';
                         }
 
-                        callbackResponse = {err: {msg: neededArgsString, code: enums.ERR_MISSING_ARGS, args_needed: neededArgs}};
+                        callbackResponse = generateError(neededArgsString, enums.ERR_MISSING_ARGS, {args_needed: neededArgs});
                     } else {
                         // Start it anyway, will be decided in the function itself if applicable
                         const perfId = utilities.perfStart(event);
@@ -129,7 +130,7 @@ function entry(io) {
 
                     } else {
                         utilities.insertLog(format(errors.ERR_FUNC_RETURN_NONE, event));
-                        callback({err: {msg: errors.ERR_UNKNOWN, code: enums.ERR_UNKNOWN}});
+                        callback(generateError(errors.ERR_UNKNOWN, enums.ERR_UNKNOWN));
                     }
                 }
             }

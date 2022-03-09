@@ -6,6 +6,7 @@ const schemas = require('../../other/schemas');
 const { defaultError } = require('../../other/variables');
 const { JoiE, enums } = require('../../other/enums');
 const errors = require('../../other/errors');
+const { generateError } = require('../../other/utilities');
 
 function getMinMaxEntriesForAccounts() {
     const resultDict = {email: {}, password: {}};
@@ -74,7 +75,7 @@ module.exports = {
             }
         }
         
-        return {err: {...resultDict}};
+        return generateError(resultDict.msg, resultDict.code, {...resultDict});
     },
 
     decideAccountTokenSchemaResult: (token) => {
@@ -104,6 +105,6 @@ module.exports = {
                 break;
         }
     
-        return {err: {...resultDict}};
+        return generateError(resultDict.msg, resultDict.code, {...resultDict});
     }
 }

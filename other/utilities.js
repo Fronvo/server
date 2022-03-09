@@ -194,5 +194,9 @@ module.exports = {
     // Duplicate of variables.js function to prevent recursive import errors
     decideBooleanEnvValue: (value, valueIfNull) => {
         return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
+    },
+
+    generateError: (msg, code, extras) => {
+        return {err: {msg, code, ...extras}};
     }
 }
