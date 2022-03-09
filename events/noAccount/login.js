@@ -41,4 +41,4 @@ async function login({ io, socket, email, password}) {
     return {err: {msg: errors.ERR_ACC_DOESNT_EXIST, code: enums.ERR_ACC_DOESNT_EXIST}};
 }
 
-module.exports = { func: login }
+module.exports = login;

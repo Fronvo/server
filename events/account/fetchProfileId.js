@@ -9,4 +9,4 @@ function fetchProfileId({ socket }) {
     return {profileId: getLoggedInSockets()[socket.id]};
 }
 
-module.exports = { func: fetchProfileId }
+module.exports = fetchProfileId;

@@ -8,4 +8,4 @@ function isLoggedIn({ socket }) {
     return {loggedIn: isSocketLoggedIn(socket)};
 }
 
-module.exports = { func: isLoggedIn };
+module.exports = isLoggedIn;

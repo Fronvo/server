@@ -50,4 +50,4 @@ async function register({ io, socket, email, password }) {
     return {token: await utilities.createToken(accountId)};
 }
 
-module.exports = { func: register }
+module.exports = register;

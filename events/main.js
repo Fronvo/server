@@ -112,7 +112,7 @@ function entry(io) {
                         const perfId = utilities.perfStart(event);
 
                         // Works for optional arguments
-                        callbackResponse = funcs[event].func({io, socket, ...filteredArgs});
+                        callbackResponse = funcs[event]({io, socket, ...filteredArgs});
 
                         // If async, await
                         if(callbackResponse) {

@@ -9,4 +9,4 @@ function logout({ io, socket }) {
     return {};
 }
 
-module.exports = { func: logout }
+module.exports = logout;

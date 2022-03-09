@@ -30,4 +30,4 @@ async function fetchProfileData({ socket, profileId }) {
     return {err: {msg: errors.ERR_PROFILE_NOT_FOUND, code: enums.ERR_PROFILE_NOT_FOUND}};
 }
 
-module.exports = { func: fetchProfileData }
+module.exports = fetchProfileData;
