@@ -14,9 +14,10 @@
   "homepage": "https://github.com/Fronvo/fronvo#readme",
   "private": true,
   "scripts": {
-    "start": "node main/server.js",
-    "test:mocha": "mocha",
-    "test:server": "FRONVO_TEST_MODE=true FRONVO_LOCAL_SAVE=false FRONVO_BINARY_PARSER=false FRONVO_SILENT_LOGGING=true node main/server.js",
+    "start": "node output/main/server.js",
+    "build": "tsc; copyfiles generated/*.json output/",
+    "test:mocha": "mocha \"output/test/**/*.js\"",
+    "test:server": "FRONVO_TEST_MODE=true FRONVO_LOCAL_SAVE=false FRONVO_BINARY_PARSER=false FRONVO_SILENT_LOGGING=true node output/main/server.js",
     "test": "run-p test:server test:mocha"
   },
   "dependencies": {
@@ -34,9 +35,11 @@
   },
   "devDependencies": {
     "chai": "^4.3.6",
+    "copyfiles": "^2.4.1",
     "mocha": "^9.2.1",
     "npm-run-all": "^4.1.5",
-    "socket.io-client": "^4.2.0"
+    "socket.io-client": "^4.2.0",
+    "typescript": "^4.6.2"
   },
   "engines": {
     "node": "16.x",

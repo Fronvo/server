@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "./output",
+    "allowJs": true,
+    "target": "es6"
+  },
+  "include": [
+    "./events/**/*",
+    "./generated/**/*.json",
+    "./main/**/*",
+    "./other/**/*",
+    "./test/**/*"
+  ]
+}

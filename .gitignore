@@ -11,3 +11,6 @@ generated/local
 
 # Local work
 testing/
+
+# TypeScript Output
+output/
