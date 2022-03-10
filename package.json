@@ -31,15 +31,15 @@
     "ora": "5.4.1",
     "socket.io": "^4.2.0",
     "socket.io-msgpack-parser": "^3.0.1",
-    "uuid": "^8.3.2"
+    "typescript": "^4.6.2",
+    "uuid": "^8.3.2",
+    "copyfiles": "^2.4.1"
   },
   "devDependencies": {
     "chai": "^4.3.6",
-    "copyfiles": "^2.4.1",
     "mocha": "^9.2.1",
     "npm-run-all": "^4.1.5",
-    "socket.io-client": "^4.2.0",
-    "typescript": "^4.6.2"
+    "socket.io-client": "^4.2.0"
   },
   "engines": {
     "node": "16.x",
