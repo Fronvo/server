@@ -14,8 +14,9 @@
   "homepage": "https://github.com/Fronvo/fronvo#readme",
   "private": true,
   "scripts": {
-    "start": "node output/main/server.js",
+    "start:cached": "node output/main/server.js",
     "build": "tsc && copyfiles generated/*.json output/",
+    "start": "run-s build start:cached",
     "test:mocha": "mocha \"output/test/**/*.js\"",
     "test:server": "FRONVO_TEST_MODE=true FRONVO_LOCAL_SAVE=false FRONVO_BINARY_PARSER=false FRONVO_SILENT_LOGGING=true node output/main/server.js",
     "test": "run-p test:server test:mocha"
