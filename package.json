@@ -15,10 +15,10 @@
   "private": true,
   "scripts": {
     "start": "node output/main/server.js",
-    "build": "tsc; copyfiles generated/*.json output/",
+    "build": "tsc && copyfiles generated/*.json output/",
     "test:mocha": "mocha \"output/test/**/*.js\"",
     "test:server": "FRONVO_TEST_MODE=true FRONVO_LOCAL_SAVE=false FRONVO_BINARY_PARSER=false FRONVO_SILENT_LOGGING=true node output/main/server.js",
-    "test": "npm run build; run-p test:server test:mocha"
+    "test": "run-p test:server test:mocha"
   },
   "dependencies": {
     "@socket.io/admin-ui": "^0.2.0",

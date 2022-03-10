@@ -6,7 +6,6 @@
   },
   "include": [
     "./events/**/*",
-    "./generated/**/*.json",
     "./main/**/*",
     "./other/**/*",
     "./test/**/*"
