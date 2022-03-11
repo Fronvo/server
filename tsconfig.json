@@ -5,7 +5,8 @@
     "allowJs": true,
     "target": "es6",
     "removeComments": true,
-    "pretty": true
+    "pretty": true,
+    "module": "CommonJS"
   },
   "include": [
     "./events/**/*",
