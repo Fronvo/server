@@ -4,7 +4,8 @@
     // TODO: Remove when all files are converted
     "allowJs": true,
     "target": "es6",
-    "removeComments": true
+    "removeComments": true,
+    "pretty": true
   },
   "include": [
     "./events/**/*",
