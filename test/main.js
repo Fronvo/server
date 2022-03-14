@@ -18,7 +18,7 @@ const { io } = require('socket.io-client');
 const shared = require('./shared');
 
 // Create the client
-socket = io(`ws://localhost:${PORT}`, {
+const socket = io(`ws://localhost:${PORT}`, {
 	transports: ['websocket'],
 	path: '/fronvo',
 	reconnectionDelay: 100,
@@ -28,8 +28,6 @@ socket = io(`ws://localhost:${PORT}`, {
 });
 
 describe('Fronvo', () => {
-	let socket;
-	
 	// Before the tests start
 	before((done) => {
 		// Wait for the server to come alive
