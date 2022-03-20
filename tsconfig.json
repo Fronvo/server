@@ -8,7 +8,7 @@
     "pretty": true,
     "module": "CommonJS",
     "moduleResolution": "node",
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
       "@other*": ["other/*"],
       "@events*": ["events/*"]
@@ -17,10 +17,10 @@
     "sourceMap": true
   },
   "include": [
-    "./events/**/*",
-    "./main/**/*",
-    "./other/**/*",
-    "./test/**/*"
+    "src/events/**/*",
+    "src/main/**/*",
+    "src/other/**/*",
+    "src/test/**/*"
   ],
   "ts-node": {
     "swc": true
