@@ -2,41 +2,41 @@
 // The starting point of the Fronvo server.
 // ******************** //
 
-// Load .env, get parent directory regardless of node directory
-const { resolve } = require('path');
-require('dotenv').config({ path: resolve(__dirname, '..', '.env') });
-
 // Port to attach to
-const PORT = process.env.PORT || 3001;
+const PORT = parseInt(process.env.PORT) || 3001;
 
 // Admin panel
-const { instrument, RedisStore } = require('@socket.io/admin-ui');
+import { instrument, RedisStore } from '@socket.io/admin-ui';
 
 // PM2
-const { createAdapter } = require('@socket.io/cluster-adapter');
-const { setupWorker } = require('@socket.io/sticky');
+import { createAdapter } from '@socket.io/cluster-adapter';
+import { setupWorker } from '@socket.io/sticky';
 
 // Custom event files
-const registerEvents = require('../events/main');
+import registerEvents from 'events/main';
 
 // Cool-ish styling
-const ora = require('ora');
-const gradient = require('gradient-string');
+import ora, { Ora } from 'ora';
+import gradient from 'gradient-string';
 
 // Other imports
-const fs = require('fs');
+import fs from 'fs';
+import * as variables from 'other/variables';
+import { decideBooleanEnvValue } from 'other/utilities';
+import { Server } from 'socket.io';
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from 'other/interfaces';
+import { AnyError, MongoClient } from 'mongodb';
 
 // Variables
-var io, loadingSpinner;
+let io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>;
+let loadingSpinner: Ora;
 const loadingSpinnerDefaultText = 'Starting server';
-const variables = require('../other/variables');
-const { decideBooleanEnvValue } = require('../other/utilities');
 
-function setLoading(currProcText) {
+function setLoading(currProcText: string): void {
     if(!variables.silentLogging) loadingSpinner.text = loadingSpinnerDefaultText + ': ' + currProcText;
 }
 
-function preStartupChecks() {
+function preStartupChecks(): void {
     function checkSilentLogging() {
         if(variables.silentLogging) console.log = () => {};
     }
@@ -51,12 +51,12 @@ function preStartupChecks() {
         }
 
         // Check individual files
-        for(let file in variables.requiredStartupFiles) {
-            file = variables.requiredStartupFiles[file][Object.keys(variables.requiredStartupFiles[file])[0]];
-            const filePath = file.path;
+        for(const file in variables.requiredStartupFiles) {
+            const fileObj = variables.requiredStartupFiles[file][Object.keys(variables.requiredStartupFiles[file])[0]];
+            const filePath = fileObj.path;
 
             // This is optional for non-JSON files
-            const fileTemplate = file.template;
+            const fileTemplate = fileObj.template;
 
             // Overwrite if it doesnt exist
             if(!fs.existsSync(filePath)) {
@@ -69,7 +69,7 @@ function preStartupChecks() {
     checkRequiredFiles();
 }
 
-function setupMongoDB() {
+function setupMongoDB(): Promise<void | AnyError> {
     return new Promise((resolve, reject) => {
         const mdbUsr = process.env.FRONVO_MONGODB_USERNAME;
         const mdbPass = process.env.FRONVO_MONGODB_PASSWORD;
@@ -93,32 +93,28 @@ function setupMongoDB() {
                             mdbDb || 'fronvo' +
                             '?retryWrites=true&w=majority';
 
-            // Create the MongoDB client with optimised options
-            const { MongoClient } = require('mongodb');
-
-            const mdbClient = new MongoClient(mdbUri, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            });
+            // Create the MongoDB client
+            const mdbClient = new MongoClient(mdbUri);
 
             // Finally, try to connect with the given credentials
             mdbClient.connect((err) => {
                 if(err) {
                     reject(err);
                 } else {
-                    variables.mdb = mdbClient.db(mdbDb || 'fronvo');
-                    resolve();
+                    // variables.js comment
+                    variables.setMDB(mdbClient.db(mdbDb || 'fronvo'));
+                    resolve(null);
                 }
             });
         }
     });
 };
 
-function setupServer() {
+function setupServer(): void {
     setLoading('Setting up the server process, server events and admin panel');
 
     // Setup the socket.io server with tailored options
-    io = require('socket.io')(PORT, {
+    io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(PORT, {
         serveClient: false,
         wsEngine: require('eiows').Server,
         path: '/fronvo',
@@ -131,22 +127,22 @@ function setupServer() {
 
         // Enable / Disable binary parser
         parser: decideBooleanEnvValue(process.env.FRONVO_BINARY_PARSER, true) ? require('socket.io-msgpack-parser') : ''
-    });
+    })
 }
 
-function setupServerEvents() {
+function setupServerEvents(): void {
     registerEvents(io);
 }
 
-function setupPM2() {
+function setupPM2(): void {
     // Mostly for hosting on production
-    if(process.env.TARGET_PM2 == 'true') {
+    if(variables.cluster) {
         io.adapter(createAdapter());
         setupWorker(io);
     }
 }
 
-function setupAdminPanel() {
+function setupAdminPanel(): void {
     const panel_usr = process.env.FRONVO_ADMIN_PANEL_USERNAME;
     const panel_pass = process.env.FRONVO_ADMIN_PANEL_PASSWORD;
 
@@ -162,14 +158,14 @@ function setupAdminPanel() {
             },
 
             // preserve users who logged in with the panel before
-            store: new RedisStore(),
+            store: new RedisStore(null),
 
             readonly: true
         });
     }
 }
 
-function startup() {
+function startup(): void {
     // Prevent startup logging, too
     preStartupChecks();
 
@@ -191,9 +187,9 @@ function startup() {
         setupMongoDB().then(() => {
             postDBInit();
             
-        }).catch((err) => {
+        }).catch((err: Error) => {
             // Depends on the error's context
-            if(!variables.silentLogging) loadingSpinner.fail(err.message ? err.message : err);
+            if(!variables.silentLogging) loadingSpinner.fail(err.message ? err.message : String(err));
         });
 
     } else {

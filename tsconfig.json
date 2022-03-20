@@ -6,7 +6,15 @@
     "target": "es6",
     "removeComments": true,
     "pretty": true,
-    "module": "CommonJS"
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@other*": ["other/*"],
+      "@events*": ["events/*"]
+    },
+    "esModuleInterop": true,
+    "sourceMap": true
   },
   "include": [
     "./events/**/*",

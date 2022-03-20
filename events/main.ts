@@ -2,47 +2,44 @@
 // The main event file which provides arguments to the rest of the events and manages access states.
 // ******************** //
 
-// No account only
-const noAccountEvents = require('./noAccount');
+import { enums } from 'other/enums';
+import * as errors from 'other/errors';
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from 'other/interfaces';
+import * as templates from 'other/templates';
+import * as utilities from 'other/utilities';
+import { generateError } from 'other/utilities';
+import * as variables from 'other/variables';
+import { Server } from 'socket.io';
+import { format } from 'util';
 
-// Account only
-const accountEvents = require('./account');
+// Events
+import accountEvents from './account';
+import generalFuncs from './general';
+import noAccountEvents from './noAccount';
 
-// General
-const generalFuncs = require('./general');
-
-// Other
-const utilities = require('../other/utilities');
-const { generateError } = require('../other/utilities');
-const errors = require('../other/errors');
-const { enums } = require('../other/enums');
-const templates = require('../other/templates');
-const { format } = require('util');
-const variables = require('../other/variables');
-
-function entry(io) {
+export default function entry(io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>): void {
     // Add each file with functions here
     const noAccountOnlyFuncs = {...noAccountEvents};
     const accountOnlyFuncs = {...accountEvents};
 
-    const funcs = {...noAccountOnlyFuncs, ...accountOnlyFuncs, ...generalFuncs};
+    const funcs: {[eventName: string]: Function} = {...noAccountOnlyFuncs, ...accountOnlyFuncs, ...generalFuncs};
 
-    io.on('connection', (socket) => {
+    io.on('connection', (socket): void => {
         console.log('Socket ' + socket.id + ' has connected.');
 
         // Anything sent, which is an event, is forwarded here
-        socket.onAny(async (event, ...args) => {
+        socket.onAny(async (event: string, ...args: {[arg: string]: any}[]): Promise<void> => {
 
             // Pay attention, every event MUST be in the templates file aswell
             if(event in funcs && event in templates) {
 
                 // Prevent modifications to templates, just copy
-                const neededArgs = templates[event].slice();
-                const neededArgsOriginal = templates[event].slice();
+                const neededArgs: string[] = templates[event].slice();
+                const neededArgsOriginal: string[] = templates[event].slice();
 
-                const filteredArgs = {};
-                let callback;
-                let callbackResponse;
+                const filteredArgs: {[arg: string]: any} = {};
+                let callback: Function;
+                let callbackResponse: {[key: string]: any};
                 let prematureError = false;
 
                 // Account only
@@ -57,17 +54,17 @@ function entry(io) {
 
                 // Order the arguments according to the event's template
                 } else {
-                    for(let item in args) {
-                        item = args[item];
+                    for(const item in args) {
+                        const argItem = args[item];
 
-                        if(typeof(item) === 'object') {
-                            for(const dictItem in item) {
+                        if(typeof(argItem) === 'object') {
+                            for(const dictItem in argItem) {
                                 if(neededArgs.includes(dictItem)) {
                                     // Maintain value order, use the original dictionary to preserve index
                                     let dictItemIndex = neededArgsOriginal.indexOf(dictItem);
 
                                     // Add named argument to be passed later on
-                                    filteredArgs[dictItem] = item[dictItem];
+                                    filteredArgs[dictItem] = argItem[dictItem];
 
                                     // Delete has weird functionality, roll with this
                                     // Dynamic index, reassign
@@ -81,12 +78,12 @@ function entry(io) {
                 }
 
                 // Find the callback
-                for(let item in args) {
-                    item = args[item];
+                for(const item in args) {
+                    const argItem = args[item];
 
                     // Only one callback, dont overwrite
-                    if(typeof(item) === 'function' && !callback) {
-                        callback = item;
+                    if(typeof(argItem) === 'function' && !callback) {
+                        callback = argItem;
                         break;
                     }
                 };
@@ -98,13 +95,13 @@ function entry(io) {
                         let neededArgsString = errors.ERR_MISSING_ARGS;
                         
                         for(const item in neededArgs) {
-                            if(!(item == 0)) {
+                            if(!(parseInt(item) == 0)) {
                                 neededArgsString += ', ';
                             }
                         
                             neededArgsString += '\'' + neededArgs[item] + '\'';
                         
-                            if(item == (neededArgs.length - 1)) neededArgsString += '.';
+                            if(parseInt(item) == (neededArgs.length - 1)) neededArgsString += '.';
                         }
 
                         callbackResponse = generateError(neededArgsString, enums.ERR_MISSING_ARGS, {args_needed: neededArgs});
@@ -117,7 +114,11 @@ function entry(io) {
 
                         // If async, await
                         if(callbackResponse) {
-                            if(typeof(callbackResponse.then) === 'function') callbackResponse = await callbackResponse;
+                            // @ts-ignore
+                            // Yes it IS an async function
+                            if(typeof(callbackResponse.then) === 'function') {
+                                callbackResponse = await callbackResponse;
+                            }
                         }
 
                         utilities.perfEnd(perfId);
@@ -136,7 +137,7 @@ function entry(io) {
             }
         });
         
-        socket.on('disconnect', () => {
+        socket.on('disconnect', (): void => {
             // Logout if logged in
             if(utilities.isSocketLoggedIn(socket)) {
                 utilities.logoutSocket(io, socket);
@@ -151,18 +152,19 @@ function entry(io) {
         });
     });
 
-    io.engine.on('connection_error', (err) => {
+    io.engine.on('connection_error', (err: Error) => {
+        // @ts-ignore
+        // Socket.IO adds the code property
         console.log('Connection abnormally closed:  [' + err.code + ']' +  err.message);
     });
 
     // The following events are only called while using PM2 to be able to synchronise each server's variables
+    // TODO: Seperate PM2 events into files
     io.on('loginSocket', (socketId, accountId) => {
-        variables.loggedInSockets[socketId] = accountId;
+        variables.loggedInSockets[socketId] = {accountId};
     });
 
-    io.on('logoutSocket', socketId => {
+    io.on('logoutSocket', (socketId) => {
         delete variables.loggedInSockets[socketId];
     });
 }
-
-module.exports = entry;

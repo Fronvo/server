@@ -2,19 +2,21 @@
 // The login no-account-only event file.
 // ******************** //
 
-const { decideAccountSchemaResult } = require('./shared');
-const utilities = require('../../other/utilities');
-const errors = require('../../other/errors');
-const { enums } = require('../../other/enums');
-const bcrypt = require('bcrypt');
-const variables = require('../../other/variables');
+import { compareSync } from 'bcrypt';
+import { enums } from 'other/enums';
+import { ERR_ACC_DOESNT_EXIST, ERR_INVALID_PASSWORD } from 'other/errors';
+import { Account, Error } from 'other/interfaces';
+import * as utilities from 'other/utilities';
+import { testMode } from 'other/variables';
+import { Login, LoginResult } from './interfaces';
+import { decideAccountSchemaResult } from './shared';
 
-async function login({ io, socket, email, password}) {
+export default async function login({ io, socket, email, password}: Login): Promise<LoginResult | Error> {
     // Schema validation
     const schemaResult = decideAccountSchemaResult(email, password);
     if(schemaResult) return schemaResult;
 
-    const accounts = await utilities.listDocuments('accounts');
+    const accounts: Account[] = await utilities.listDocuments('accounts');
 
     // Check if the email already exists to be able to login
     for(const account in accounts) {
@@ -22,7 +24,7 @@ async function login({ io, socket, email, password}) {
 
         if(accountData.email == email) {
             // Validate the password, synchronously
-            if(!variables.testMode ? bcrypt.compareSync(password, accountData.password) : password == accountData.password) {
+            if(!testMode ? compareSync(password, accountData.password) : password == accountData.password) {
                 const accountId = utilities.getAccountId(accounts, account);
 
                 utilities.loginSocket(io, socket, accountId);
@@ -33,12 +35,10 @@ async function login({ io, socket, email, password}) {
 
                 return {token: accountToken};
             } else {
-                return utilities.generateError(errors.ERR_INVALID_PASSWORD, enums.ERR_INVALID_PASSWORD);
+                return utilities.generateError(ERR_INVALID_PASSWORD, enums.ERR_INVALID_PASSWORD);
             }
         }
     };
 
-    return utilities.generateError(errors.ERR_ACC_DOESNT_EXIST, enums.ERR_ACC_DOESNT_EXIST);
+    return utilities.generateError(ERR_ACC_DOESNT_EXIST, enums.ERR_ACC_DOESNT_EXIST);
 }
-
-module.exports = login;

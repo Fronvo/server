@@ -14,17 +14,19 @@
   "homepage": "https://github.com/Fronvo/fronvo#readme",
   "private": true,
   "scripts": {
-    "start:cached": "node output/main/server.js",
+    "start:cached": "node -r ts-node/register/transpile-only -r tsconfig-paths/register output/main/server.js",
     "build": "tsc && copyfiles generated/*.json output/",
     "start": "run-s build start:cached",
-    "start:dev": "ts-node main/server.js",
-    "test:mocha": "mocha \"output/test/**/*.js\"",
-    "test:server": "FRONVO_TEST_MODE=true FRONVO_LOCAL_SAVE=false FRONVO_BINARY_PARSER=false FRONVO_SILENT_LOGGING=true node output/main/server.js",
+    "start:dev": "ts-node-dev -r tsconfig-paths/register main/server.ts",
+    "test:mocha": "mocha -r ts-node/register -r tsconfig-paths/register \"output/test/**/*.js\"",
+    "test:server": "FRONVO_TEST_MODE=true FRONVO_LOCAL_SAVE=false FRONVO_BINARY_PARSER=false FRONVO_SILENT_LOGGING=true node -r ts-node/register/transpile-only -r tsconfig-paths/register output/main/server.js",
     "test": "run-p test:server test:mocha"
   },
   "dependencies": {
     "@socket.io/admin-ui": "^0.2.0",
     "@socket.io/pm2": "^5.1.0",
+    "@swc/core": "^1.2.159",
+    "@swc/helpers": "^0.3.8",
     "copyfiles": "^2.4.1",
     "dotenv": "^10.0.0",
     "eiows": "^3.6.1",
@@ -33,19 +35,21 @@
     "mongodb": "^4.1.3",
     "npm-run-all": "^4.1.5",
     "ora": "5.4.1",
+    "regenerator-runtime": "^0.13.9",
     "socket.io": "^4.2.0",
     "socket.io-msgpack-parser": "^3.0.1",
+    "ts-node": "^10.7.0",
+    "tsconfig-paths": "^3.14.0",
     "typescript": "^4.6.2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@swc/core": "^1.2.153",
-    "@swc/helpers": "^0.3.6",
+    "@types/gradient-string": "^1.1.2",
+    "@types/uuid": "^8.3.4",
     "chai": "^4.3.6",
-    "mocha": "^9.2.1",
-    "regenerator-runtime": "^0.13.9",
-    "socket.io-client": "^4.2.0",
-    "ts-node": "^10.7.0"
+    "mocha": "^9.2.2",
+    "socket.io-client": "^4.4.1",
+    "ts-node-dev": "^1.1.8"
   },
   "engines": {
     "node": "16.x",
