@@ -3,7 +3,7 @@
 // ******************** //
 
 // Put all of the event test files here
-const fetchProfileId = require('./account/fetchProfileId');
+const fetchProfileId = require('./account/fetchProfileId/fetchProfileId');
 const fetchProfileData = require('./account/fetchProfileData/fetchProfileData');
 const logout = require('./account/logout/logout');
 
