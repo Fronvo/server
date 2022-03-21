@@ -9,7 +9,7 @@ import { Account, Error } from 'other/interfaces';
 import * as utilities from 'other/utilities';
 import { testMode } from 'other/variables';
 import { Login, LoginResult } from './interfaces';
-import { decideAccountSchemaResult } from './shared';
+import { decideAccountSchemaResult } from '../shared';
 
 export default async function login({ io, socket, email, password}: Login): Promise<LoginResult | Error> {
     // Schema validation

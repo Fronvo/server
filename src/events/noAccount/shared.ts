@@ -1,5 +1,5 @@
 // ******************** //
-// Interfaces for the no-account-only event files.
+// Shared variables for the no-account-only event files.
 // ******************** //
 
 import { enums, JoiE } from 'other/enums';

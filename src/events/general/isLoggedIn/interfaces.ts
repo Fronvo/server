@@ -1,8 +1,7 @@
 // ******************** //
-// Interfaces for the general event files.
+// Interfaces for the isLoggedIn general event file.
 // ******************** //
 
-// isLoggedIn
 export interface IsLoggedInResult {
     loggedIn: boolean;
 }

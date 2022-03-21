@@ -8,7 +8,7 @@ import { Token } from 'other/interfaces';
 import * as utilities from 'other/utilities';
 import { getTokenAccountId, getTokenKey } from 'other/utilities';
 import { LoginToken } from './interfaces';
-import { decideAccountTokenSchemaResult } from './shared';
+import { decideAccountTokenSchemaResult } from '../shared';
 
 export default async function loginToken({ io, socket, token }: LoginToken): Promise<{} | Error> {
     // Schema validation

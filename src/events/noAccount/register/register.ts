@@ -9,7 +9,7 @@ import { Account, Error } from 'other/interfaces';
 import * as utilities from 'other/utilities';
 import * as variables from 'other/variables';
 import { Register, RegisterResult } from './interfaces';
-import { decideAccountSchemaResult } from './shared';
+import { decideAccountSchemaResult } from '../shared';
 
 export default async function register({ io, socket, email, password }: Register): Promise<RegisterResult | Error> {
     // Schema validation
