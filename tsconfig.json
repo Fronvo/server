@@ -14,7 +14,8 @@
       "events": ["events"]
     },
     "esModuleInterop": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "strictFunctionTypes": true
   },
   "include": [
     "src/events/**/*",
