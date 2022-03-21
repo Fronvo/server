@@ -4,8 +4,8 @@
 
 // Put all of the event test files here
 const fetchProfileId = require('./account/fetchProfileId');
-const fetchProfileData = require('./account/fetchProfileData');
-const logout = require('./account/logout');
+const fetchProfileData = require('./account/fetchProfileData/fetchProfileData');
+const logout = require('./account/logout/logout');
 
 module.exports = { fetchProfileId, fetchProfileData, logout }
 

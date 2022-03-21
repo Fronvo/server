@@ -3,6 +3,6 @@
 // ******************** //
 
 // Put all of the event test files here
-const isLoggedIn = require('./general/isLoggedIn');
+const isLoggedIn = require('./general/isLoggedIn/isLoggedIn');
 
 module.exports = { isLoggedIn }

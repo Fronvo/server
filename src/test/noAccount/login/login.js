@@ -3,7 +3,7 @@
 // ******************** //
 
 // Manual variable change
-const shared = require('./../shared');
+const shared = require('../../shared');
 
 module.exports = ({ socket, done, assert }) => {
     const email = shared.email;

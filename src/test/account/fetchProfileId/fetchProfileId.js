@@ -2,7 +2,7 @@
 // The test file for the fetchProfileId event.
 // ******************** //
 
-const shared = require('./../shared');
+const shared = require('../../shared');
 
 module.exports = ({ socket, done, assert }) => {
 

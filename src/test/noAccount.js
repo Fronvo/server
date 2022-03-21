@@ -3,8 +3,8 @@
 // ******************** //
 
 // Put all of the event test files here
-const register = require('./noAccount/register');
+const register = require('./noAccount/register/register');
 const login = require('./noAccount/login');
-const loginToken  = require('./noAccount/loginToken');
+const loginToken  = require('./noAccount/loginToken/loginToken');
 
 module.exports = { register, login, loginToken }
