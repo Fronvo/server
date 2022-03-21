@@ -10,8 +10,8 @@
     "moduleResolution": "node",
     "baseUrl": "src",
     "paths": {
-      "@other*": ["other/*"],
-      "@events*": ["events/*"]
+      "other": ["other"],
+      "events": ["events"]
     },
     "esModuleInterop": true,
     "sourceMap": true
