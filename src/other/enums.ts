@@ -38,5 +38,3 @@ export const enums: Partial<Enums> = {};
 enumsArr.forEach(item => {
     enums[item] = enumsArr.indexOf(item) + 1;
 });
-
-// TODO: Error code completion function in a utilities function, retrieve from there, dont use directly
