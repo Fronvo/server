@@ -2,15 +2,15 @@
 // The loginToken no-account-only event file.
 // ******************** //
 
+import { FronvoError, Token } from 'interfaces/all';
+import { LoginTokenResult, LoginTokenServerParams } from 'interfaces/noAccount/loginToken';
 import { enums } from 'other/enums';
 import { ERR_INVALID_TOKEN } from 'other/errors';
-import { Token } from 'other/interfaces';
 import * as utilities from 'other/utilities';
 import { getTokenAccountId, getTokenKey } from 'other/utilities';
-import { LoginToken } from './interfaces';
-import { decideAccountTokenSchemaResult } from '../shared';
+import { decideAccountTokenSchemaResult } from 'events/noAccount/shared';
 
-export default async function loginToken({ io, socket, token }: LoginToken): Promise<{} | Error> {
+export default async ({ io, socket, token }: LoginTokenServerParams): Promise<LoginTokenResult | FronvoError> => {
     // Schema validation
     const schemaResult = decideAccountTokenSchemaResult(token);
     if(schemaResult) return schemaResult;

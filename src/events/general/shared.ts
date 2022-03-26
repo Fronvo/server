@@ -1,3 +1,3 @@
 // ******************** //
-// Shared variables for account-only event files.
+// Shared variables for general event files.
 // ******************** //

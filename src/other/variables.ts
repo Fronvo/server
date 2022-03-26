@@ -11,7 +11,7 @@ config({ path: resolve(__dirname, '..', '.env') });
 import * as errors from './errors';
 import { Db } from 'mongodb';
 import { enums } from './enums';
-import { Error, LoggedInSocket, PerformanceReport, RequiredStartupFile } from './interfaces';
+import { FronvoError, LoggedInSocket, PerformanceReport, RequiredStartupFile } from 'interfaces/all';
 import { existsSync } from 'fs';
 
 function decideBooleanEnvValue(value: string, valueIfNull: boolean): boolean {
@@ -41,7 +41,7 @@ export const localSave = decideBooleanEnvValue(process.env.FRONVO_LOCAL_SAVE, tr
 
 export const loggedInSockets: {[socketId: string]: LoggedInSocket} = {};
 
-export const defaultError: Error = {
+export const defaultError: FronvoError = {
     err: {
         msg: errors.ERR_UNKNOWN,
         code: enums.ERR_UNKNOWN

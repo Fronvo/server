@@ -2,10 +2,9 @@
 // The isLoggedIn general event file.
 // ******************** //
 
-import { EventArguments } from 'other/interfaces';
+import { IsLoggedInResult, isLoggedInServerParams } from 'interfaces/general/isLoggedIn';
 import { isSocketLoggedIn } from 'other/utilities';
-import { IsLoggedInResult } from './interfaces';
 
-export default function isLoggedIn({ socket }: EventArguments): IsLoggedInResult {
+export default ({ socket }: isLoggedInServerParams): IsLoggedInResult => {
     return {loggedIn: isSocketLoggedIn(socket)};
 }

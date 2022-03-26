@@ -2,10 +2,10 @@
 // The logout account-only event file.
 // ******************** //
 
-import { EventArguments } from 'other/interfaces';
+import { LogoutResult, LogoutServerParams } from 'interfaces/account/logout';
 import { logoutSocket } from 'other/utilities';
 
-export default function logout({ io, socket }: EventArguments): {} {
+export default ({ io, socket }: LogoutServerParams): LogoutResult => {
     logoutSocket(io, socket);
     return {};
 }

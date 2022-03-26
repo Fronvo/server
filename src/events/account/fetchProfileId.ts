@@ -2,10 +2,9 @@
 // The fetchProfileId account-only event file.
 // ******************** //
 
-import { EventArguments } from 'other/interfaces';
+import { FetchProfileIdResult, FetchProfileIdServerParams } from 'interfaces/account/fetchProfileId';
 import { getLoggedInSockets } from 'other/utilities';
-import { FetchProfileIdResult } from './interfaces';
 
-export default function fetchProfileId({ socket }: EventArguments): FetchProfileIdResult {
+export default ({ socket }: FetchProfileIdServerParams): FetchProfileIdResult => {
     return {profileId: getLoggedInSockets()[socket.id].accountId};
 }

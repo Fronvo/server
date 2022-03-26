@@ -24,7 +24,7 @@ import fs from 'fs';
 import * as variables from 'other/variables';
 import { decideBooleanEnvValue } from 'other/utilities';
 import { Server } from 'socket.io';
-import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from 'other/interfaces';
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from 'interfaces/all';
 import { AnyError, MongoClient } from 'mongodb';
 
 // Variables

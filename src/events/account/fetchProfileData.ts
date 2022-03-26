@@ -2,13 +2,13 @@
 // The fetchProfileData account-only event file.
 // ******************** //
 
+import { FetchProfileDataResult, FetchProfileDataServerParams } from 'interfaces/account/fetchProfileData';
+import { Account, FronvoError } from 'interfaces/all';
 import { enums } from 'other/enums';
 import { ERR_PROFILE_NOT_FOUND } from 'other/errors';
-import { Account, Error } from 'other/interfaces';
 import { generateError, getAccountData, getAccountId, getLoggedInSockets, listDocuments } from 'other/utilities';
-import { FetchProfileData, FetchProfileDataResult } from './interfaces';
 
-export default async function fetchProfileData({ socket, profileId }: FetchProfileData): Promise<FetchProfileDataResult | Error> {
+export default async ({ socket, profileId }: FetchProfileDataServerParams): Promise<FetchProfileDataResult | FronvoError> => {
     const accounts: Account[] = await listDocuments('accounts');
     
     for(const account in accounts) {

@@ -3,15 +3,15 @@
 // ******************** //
 
 import bcrypt from 'bcrypt';
+import { Account, FronvoError } from 'interfaces/all';
+import { RegisterResult, RegisterServerParams } from 'interfaces/noAccount/register';
 import { enums } from 'other/enums';
 import { ERR_ACC_ALR_EXISTS, ERR_INVALID_EMAIL } from 'other/errors';
-import { Account, Error } from 'other/interfaces';
 import * as utilities from 'other/utilities';
 import * as variables from 'other/variables';
-import { Register, RegisterResult } from './interfaces';
-import { decideAccountSchemaResult } from '../shared';
+import { decideAccountSchemaResult } from 'events/noAccount/shared';
 
-export default async function register({ io, socket, email, password }: Register): Promise<RegisterResult | Error> {
+export default async ({ io, socket, email, password }: RegisterServerParams): Promise<RegisterResult | FronvoError> => {
     // Schema validation
     const schemaResult = decideAccountSchemaResult(email, password);
     if(schemaResult) return schemaResult;

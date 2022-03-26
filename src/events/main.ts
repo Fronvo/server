@@ -4,7 +4,7 @@
 
 import { enums } from 'other/enums';
 import * as errors from 'other/errors';
-import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from 'other/interfaces';
+import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from 'interfaces/all';
 import * as templates from 'other/templates';
 import * as utilities from 'other/utilities';
 import { generateError } from 'other/utilities';
@@ -13,9 +13,9 @@ import { Server } from 'socket.io';
 import { format } from 'util';
 
 // Events
-import accountEvents from './account';
-import generalFuncs from './general';
-import noAccountEvents from './noAccount';
+import accountEvents from 'events/account';
+import generalFuncs from 'events/general';
+import noAccountEvents from 'events/noAccount';
 
 export default function entry(io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>): void {
     // Add each file with functions here

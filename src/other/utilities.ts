@@ -6,7 +6,7 @@ import { writeFile } from 'fs';
 import { Server, Socket } from 'socket.io';
 import { v4 } from 'uuid';
 import * as errors from './errors';
-import { Account, ClientToServerEvents, Error, InterServerEvents, LoggedInSocket, ServerToClientEvents, Token } from './interfaces';
+import { Account, ClientToServerEvents, FronvoError, InterServerEvents, LoggedInSocket, ServerToClientEvents, Token } from 'interfaces/all';
 import * as variables from './variables';
 // Dont import mdb explicitly, wont update with the passed client
 import { localDB } from './variables';
@@ -180,7 +180,7 @@ export function decideBooleanEnvValue(value: string, valueIfNull: boolean): bool
     return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
 }
 
-export function generateError(msg: string, code: number, extras?: {[key: string]: any}): Error {
+export function generateError(msg: string, code: number, extras?: {[key: string]: any}): FronvoError {
     return {
         err: {
             msg,

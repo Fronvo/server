@@ -2,14 +2,14 @@
 // Shared variables for the no-account-only event files.
 // ******************** //
 
+import { FronvoError } from 'interfaces/all';
+import { MinMaxEntries } from 'interfaces/noAccount/shared';
 import { enums, JoiE } from 'other/enums';
 import * as errors from 'other/errors';
 import { accountSchema, accountTokenSchema } from 'other/schemas';
 import { generateError } from 'other/utilities';
 import { defaultError } from 'other/variables';
-import { MinMaxEntries } from './interfaces';
 import { format } from 'util';
-import { Error } from 'other/interfaces';
 
 function getMinMaxEntriesForAccounts(): MinMaxEntries {
     const resultDict: MinMaxEntries = {
@@ -32,7 +32,7 @@ function getMinMaxEntriesForAccounts(): MinMaxEntries {
     return resultDict;
 };
 
-export function decideAccountSchemaResult(email: string, password: string): Error {
+export function decideAccountSchemaResult(email: string, password: string): FronvoError {
     const schemaResult = accountSchema.validate({
         email: email,
         password: password
@@ -86,7 +86,7 @@ export function decideAccountSchemaResult(email: string, password: string): Erro
     return generateError(resultDict.err.msg, resultDict.err.code, { ...resultDict.err.extras });
 }
 
-export function decideAccountTokenSchemaResult(token: string): Error {
+export function decideAccountTokenSchemaResult(token: string): FronvoError {
     const schemaResult = accountTokenSchema.validate({ token });
 
     if (!schemaResult.error)

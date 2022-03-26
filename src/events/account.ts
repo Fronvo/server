@@ -2,8 +2,8 @@
 // Events which are only usable while logged in.
 // ******************** //
 
-import fetchProfileId from './account/fetchProfileId/fetchProfileId';
-import fetchProfileData from './account/fetchProfileData/fetchProfileData';
-import logout from './account/logout/logout';
+import fetchProfileId from 'events/account/fetchProfileId';
+import fetchProfileData from 'events/account/fetchProfileData';
+import logout from 'events/account/logout';
 
 export default { fetchProfileId, fetchProfileData, logout }
