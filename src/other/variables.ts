@@ -26,7 +26,7 @@ export const localDBPath = resolve(localDBDirectory, 'db.json');
 
 // File templates
 const localDBTemplate: {[dbName: string]: {}[]} = {
-    // TODO: Prisma when we have TypeScript
+    // TODO: Prisma when we have TypeScript, different PR
     accounts: [],
     tokens: [],
     reports: [],
