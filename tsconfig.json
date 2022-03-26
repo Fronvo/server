@@ -11,7 +11,8 @@
     "baseUrl": "src",
     "paths": {
       "other": ["other"],
-      "events": ["events"]
+      "events": ["events"],
+      "interfaces": ["interfaces"]
     },
     "esModuleInterop": true,
     "sourceMap": true,
@@ -21,7 +22,8 @@
     "src/events/**/*",
     "src/main/**/*",
     "src/other/**/*",
-    "src/test/**/*"
+    "src/test/**/*",
+    "src/interfaces/**/*"
   ],
   "ts-node": {
     "swc": true
