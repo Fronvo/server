@@ -3,6 +3,6 @@
 // ******************** //
 
 export interface ServerToClientEvents {
-    // TODO: Start adding events which are called on their own here
+    // Add events which are called on their own here
     // with io.emit(...), not callback-able
 }
