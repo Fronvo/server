@@ -161,7 +161,6 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
     });
 
     // The following events are only called while using PM2 to be able to synchronise each server's variables
-    // TODO: Seperate PM2 events into files
     io.on('loginSocket', (socketId, accountId) => {
         variables.loggedInSockets[socketId] = {accountId};
     });
