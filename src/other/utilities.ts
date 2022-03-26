@@ -6,10 +6,13 @@ import { writeFile } from 'fs';
 import { Server, Socket } from 'socket.io';
 import { v4 } from 'uuid';
 import * as errors from './errors';
-import { Account, ClientToServerEvents, FronvoError, InterServerEvents, LoggedInSocket, ServerToClientEvents, Token } from 'interfaces/all';
+import { Account, FronvoError, LoggedInSocket, Token } from 'interfaces/all';
 import * as variables from './variables';
 // Dont import mdb explicitly, wont update with the passed client
 import { localDB } from './variables';
+import { ClientToServerEvents } from 'interfaces/events/c2s';
+import { ServerToClientEvents } from 'interfaces/events/s2c';
+import { InterServerEvents } from 'interfaces/events/inter';
 
 export function saveLocalDB(): void {
     if(!variables.localMode || !variables.localSave) return;

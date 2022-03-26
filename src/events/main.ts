@@ -4,7 +4,6 @@
 
 import { enums } from 'other/enums';
 import * as errors from 'other/errors';
-import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from 'interfaces/all';
 import * as templates from 'other/templates';
 import * as utilities from 'other/utilities';
 import { generateError } from 'other/utilities';
@@ -16,6 +15,9 @@ import { format } from 'util';
 import accountEvents from 'events/account';
 import generalFuncs from 'events/general';
 import noAccountEvents from 'events/noAccount';
+import { ClientToServerEvents } from 'interfaces/events/c2s';
+import { ServerToClientEvents } from 'interfaces/events/s2c';
+import { InterServerEvents } from 'interfaces/events/inter';
 
 export default function entry(io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>): void {
     // Add each file with functions here

@@ -2,8 +2,9 @@
 // Interfaces for all test event files.
 // ******************** //
 
-import { ClientToServerEvents, ServerToClientEvents } from 'interfaces/all';
 import { Socket } from 'socket.io';
+import { ClientToServerEvents } from 'interfaces/events/c2s';
+import { ServerToClientEvents } from 'interfaces/events/s2c';
 
 export interface TestArguments {
     socket: Socket<ServerToClientEvents, ClientToServerEvents>;

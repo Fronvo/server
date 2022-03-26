@@ -18,7 +18,8 @@ import { io } from 'socket.io-client';
 import shared from 'test/shared';
 import { TestArguments } from 'interfaces/test';
 import { Socket } from 'socket.io';
-import { ClientToServerEvents, ServerToClientEvents } from 'interfaces/all';
+import { ServerToClientEvents } from 'interfaces/events/s2c';
+import { ClientToServerEvents } from 'interfaces/events/c2s';
 
 // Create the client
 // @ts-ignore
