@@ -1,1 +1,1 @@
-web npm i -g @socket.io/pm2 && FRONVO_PM2_INSTANCES='max' FRONVO_PM2_MEM=4G pm2 start ecosystem.config.js && pm2 logs --lines 0
+web npm i -g @socket.io/pm2 && npm i -g typescript && tsc && copyfiles generated/*.json output/ && FRONVO_PM2_INSTANCES='max' FRONVO_PM2_MEM=4G pm2 start ecosystem.config.js && pm2 logs --lines 0

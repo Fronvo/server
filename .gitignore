@@ -7,7 +7,10 @@ node_modules/
 
 # Fronvo
 logs.txt
-generated/local
+src/generated/local
 
 # Local work
 testing/
+
+# TypeScript Output
+output/
