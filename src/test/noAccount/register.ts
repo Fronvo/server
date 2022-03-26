@@ -2,14 +2,16 @@
 // The test file for the register event.
 // ******************** //
 
-module.exports = ({ socket, done, assert, shared }) => {
+import { TestArguments } from 'interfaces/test';
+
+export default ({ socket, done, assert, shared }: TestArguments): void => {
     const email = shared.email;
     const password = shared.password;
     
     // Safe check
     socket.emit('logout');
 
-    socket.emit('register', { email, password }, ({ err, token }) => {
+    socket.emit('register', { email, password }, ({ err, token }): void => {
         assert(!err && typeof(token) == 'string');
         done();
     });

@@ -2,12 +2,14 @@
 // The test file for the loginToken event.
 // ******************** //
 
-module.exports = ({ socket, done, assert, shared }) => {
+import { TestArguments } from 'interfaces/test';
+
+export default ({ socket, done, assert, shared }: TestArguments): void => {
     const token = shared.token;
 
     socket.emit('logout');
 
-    socket.emit('loginToken', { token }, ({ err }) => {
+    socket.emit('loginToken', { token }, ({ err }): void => {
         assert(!err);
         done();
     });

@@ -2,11 +2,12 @@
 // The test file for the fetchProfileId event.
 // ******************** //
 
-const shared = require('../../shared');
+import { TestArguments } from 'interfaces/test';
+import shared from 'test/shared';
 
-module.exports = ({ socket, done, assert }) => {
+export default ({ socket, done, assert }: TestArguments): void => {
 
-    socket.emit('fetchProfileId', ({ err, profileId }) => {
+    socket.emit('fetchProfileId', ({ err, profileId }): void => {
         assert(!err && typeof(profileId) == 'string');
         
         shared.profileId = profileId;

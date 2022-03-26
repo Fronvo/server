@@ -6,19 +6,23 @@
 const PORT = process.env.PORT || 3001;
 
 // Test files
-const generalTests = require('./general');
-const accountTests = require('./account');
-const noAccountTests = require('./noAccount');
+import generalTests from 'test/general';
+import accountTests from 'test/account';
+import noAccountTests from 'test/noAccount';
 
-// Mocha
-const { assert } = require('chai');
+// Chai
+import { assert } from 'chai';
 
 // Other
-const { io } = require('socket.io-client');
-const shared = require('./shared');
+import { io } from 'socket.io-client';
+import shared from 'test/shared';
+import { TestArguments } from 'interfaces/test';
+import { Socket } from 'socket.io';
+import { ClientToServerEvents, ServerToClientEvents } from 'interfaces/all';
 
 // Create the client
-const socket = io(`ws://localhost:${PORT}`, {
+// @ts-ignore
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`ws://localhost:${PORT}`, {
 	transports: ['websocket'],
 	path: '/fronvo',
 	reconnectionDelay: 100,
@@ -29,8 +33,9 @@ const socket = io(`ws://localhost:${PORT}`, {
 
 describe('Fronvo', () => {
 	// Before the tests start
-	before((done) => {
+	before((done: Mocha.Done) => {
 		// Wait for the server to come alive
+		// @ts-ignore
 		socket.on('connect', done);
 	});
 
@@ -39,14 +44,21 @@ describe('Fronvo', () => {
 		socket.disconnect();
 	});
 
-	// DYNAMIC TESTS AREA
-
 	// Order: noAccount, general, account
 	const tests = {...noAccountTests, ...generalTests, ...accountTests};
 
+	// Done is filled in every test
+	const testArguments: Partial<TestArguments> = {
+		socket,
+		assert,
+		shared
+	};
+
 	for(const test in tests) {
 		it(test, (done) => {
-			tests[test]({ socket, done, assert, shared });
+			testArguments.done = done;
+
+			tests[test](testArguments);
 		});
 	}
 

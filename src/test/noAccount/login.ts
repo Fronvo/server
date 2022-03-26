@@ -2,16 +2,16 @@
 // The test file for the login event.
 // ******************** //
 
-// Manual variable change
-const shared = require('../../shared');
+import { TestArguments } from 'interfaces/test';
+import shared from 'test/shared';
 
-module.exports = ({ socket, done, assert }) => {
+export default ({ socket, done, assert }: TestArguments): void => {
     const email = shared.email;
     const password = shared.password;
     
     socket.emit('logout');
 
-    socket.emit('login', { email, password}, ({ err, token }) => {
+    socket.emit('login', { email, password }, ({ err, token }): void => {
         assert(!err && typeof(token) == 'string');
         
         shared.token = token;
