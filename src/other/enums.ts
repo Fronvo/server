@@ -2,6 +2,8 @@
 // Constant values used for outputing error codes.
 // ******************** //
 
+import { Enums } from 'interfaces/enums';
+
 export const JoiE: {[errorCode: string]: string} = {
     TYPE_REQUIRED: 'any.required',
     TYPE_EMPTY: 'string.empty',
@@ -30,7 +32,7 @@ const enumsArr = [
     'ERR_PROFILE_NOT_FOUND'
 ];
 
-export const enums: {[errorCode: string]: number} = {};
+export const enums: Partial<Enums> = {};
 
 // Eg.: {ERR_UNKNOWN: 1, ERR_LENGTH: 2}
 enumsArr.forEach(item => {
