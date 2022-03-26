@@ -9,11 +9,6 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "baseUrl": "src",
-    "paths": {
-      "other": ["other"],
-      "events": ["events"],
-      "interfaces": ["interfaces"]
-    },
     "esModuleInterop": true,
     "sourceMap": true,
     "strictFunctionTypes": true
