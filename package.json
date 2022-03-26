@@ -18,8 +18,8 @@
     "build": "tsc && copyfiles -u 1 src/generated/** src/generated/**/* output",
     "start": "run-s build start:cached",
     "start:dev": "ts-node-dev -r tsconfig-paths/register src/main/server.ts",
-    "test:mocha": "mocha -r ts-node/register -r tsconfig-paths/register \"output/test/**/*.js\"",
-    "test:server": "FRONVO_TEST_MODE=true FRONVO_LOCAL_SAVE=false FRONVO_BINARY_PARSER=false FRONVO_SILENT_LOGGING=true node -r ts-node/register/transpile-only -r tsconfig-paths/register output/main/server.js",
+    "test:mocha": "mocha -r ts-node/register -r tsconfig-paths/register \"src/test/**/*.ts\"",
+    "test:server": "FRONVO_TEST_MODE=true FRONVO_LOCAL_SAVE=false FRONVO_BINARY_PARSER=false FRONVO_SILENT_LOGGING=true node -r ts-node/register/transpile-only -r tsconfig-paths/register src/main/server.ts",
     "test": "run-p test:server test:mocha"
   },
   "dependencies": {
