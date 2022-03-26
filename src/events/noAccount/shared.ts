@@ -4,7 +4,7 @@
 
 import { FronvoError } from 'interfaces/all';
 import { MinMaxEntries } from 'interfaces/noAccount/shared';
-import { enums, JoiE } from 'other/enums';
+import { enums, joiErrorTypes } from 'other/enums';
 import * as errors from 'other/errors';
 import { accountSchema, accountTokenSchema } from 'other/schemas';
 import { generateError } from 'other/utilities';
@@ -62,21 +62,21 @@ export function decideAccountSchemaResult(email: string, password: string): Fron
         switch (schemaType) {
 
             // Fall-through, reuse
-            case JoiE.TYPE_REQUIRED:
-            case JoiE.TYPE_EMPTY:
+            case joiErrorTypes.TYPE_REQUIRED:
+            case joiErrorTypes.TYPE_EMPTY:
                 resultDict.err.msg = format(errors.ERR_REQUIRED, schemaPath);
                 resultDict.err.code = enums.ERR_REQUIRED;
                 break;
 
-            case JoiE.TYPE_MIN:
-            case JoiE.TYPE_MAX:
+            case joiErrorTypes.TYPE_MIN:
+            case joiErrorTypes.TYPE_MAX:
                 resultDict.err.msg = format(errors.ERR_LENGTH, schemaPath, limits[schemaPath].min, limits[schemaPath].max);
                 resultDict.err.code = enums.ERR_LENGTH;
                 resultDict.err.extras.min = limits[schemaPath].min;
                 resultDict.err.extras.max = limits[schemaPath].max;
                 break;
 
-            case JoiE.TYPE_INVALID_EMAIL_FORMAT:
+            case joiErrorTypes.TYPE_INVALID_EMAIL_FORMAT:
                 resultDict.err.msg = errors.ERR_INVALID_EMAIL_FORMAT;
                 resultDict.err.code = enums.ERR_INVALID_EMAIL_FORMAT;
                 break;
@@ -95,18 +95,18 @@ export function decideAccountTokenSchemaResult(token: string): FronvoError {
     const resultDict = { ...defaultError };
 
     switch (schemaResult.error.details[0].type) {
-        case JoiE.TYPE_REQUIRED:
-        case JoiE.TYPE_EMPTY:
+        case joiErrorTypes.TYPE_REQUIRED:
+        case joiErrorTypes.TYPE_EMPTY:
             resultDict.err.msg = format(errors.ERR_REQUIRED, 'token');
             resultDict.err.code = enums.ERR_REQUIRED;
             break;
 
-        case JoiE.TYPE_LENGTH:
+        case joiErrorTypes.TYPE_LENGTH:
             resultDict.err.msg = format(errors.ERR_EXACT_LENGTH, 'token', 36);
             resultDict.err.code = enums.ERR_EXACT_LENGTH;
             break;
 
-        case JoiE.TYPE_REGEX:
+        case joiErrorTypes.TYPE_REGEX:
             resultDict.err.msg = format(errors.ERR_INVALID_REGEX, 'token');
             resultDict.err.code = enums.ERR_INVALID_REGEX;
             break;

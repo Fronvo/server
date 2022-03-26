@@ -2,9 +2,10 @@
 // Constant values used for outputing error codes.
 // ******************** //
 
-import { Enums } from 'interfaces/enums';
+import { Enums } from 'interfaces/errors/enums';
+import { JoiErrorTypes } from 'interfaces/errors/joi';
 
-export const JoiE: {[errorCode: string]: string} = {
+export const joiErrorTypes: JoiErrorTypes = {
     TYPE_REQUIRED: 'any.required',
     TYPE_EMPTY: 'string.empty',
     TYPE_MIN: 'string.min',
