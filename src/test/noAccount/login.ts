@@ -12,9 +12,11 @@ export default ({ socket, done, assert }: TestArguments): void => {
     socket.emit('logout');
 
     socket.emit('login', { email, password }, ({ err, token }): void => {
-        assert(!err && typeof(token) == 'string');
+        assert(!err);
+        assert(typeof token == 'string');
         
         shared.token = token;
+        
         done();
     });
 }

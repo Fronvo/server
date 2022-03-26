@@ -11,6 +11,7 @@ export default ({ socket, done, assert, shared }: TestArguments): void => {
 
     socket.emit('loginToken', { token }, ({ err }): void => {
         assert(!err);
+        
         done();
     });
 }

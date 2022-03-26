@@ -8,11 +8,12 @@ export default ({ socket, done, assert, shared }: TestArguments): void => {
     const email = shared.email;
     const password = shared.password;
     
-    // Safe check
     socket.emit('logout');
 
     socket.emit('register', { email, password }, ({ err, token }): void => {
-        assert(!err && typeof(token) == 'string');
+        assert(!err);
+        assert(typeof token == 'string');
+
         done();
     });
 }

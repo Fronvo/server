@@ -8,9 +8,11 @@ import shared from 'test/shared';
 export default ({ socket, done, assert }: TestArguments): void => {
 
     socket.emit('fetchProfileId', ({ err, profileId }): void => {
-        assert(!err && typeof(profileId) == 'string');
-        
+        assert(!err);
+        assert(typeof profileId == 'string');
+
         shared.profileId = profileId;
+        
         done();
     });
 
