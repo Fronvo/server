@@ -8,7 +8,6 @@ import { v4 } from 'uuid';
 import * as errors from './errors';
 import { Account, FronvoError, LoggedInSocket, Token } from 'interfaces/all';
 import * as variables from './variables';
-// Dont import mdb explicitly, wont update with the passed client
 import { localDB } from './variables';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
