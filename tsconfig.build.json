@@ -1,0 +1,12 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"removeComments": true,
+		"pretty": false,
+		"sourceMap": false
+	},
+	"exclude": [
+		"src/test/**/*",
+		"src/interfaces/test*"
+	]
+}

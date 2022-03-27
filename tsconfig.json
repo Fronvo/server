@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./output",
     "target": "es6",
-    "removeComments": true,
+    "removeComments": false,
     "pretty": true,
     "module": "CommonJS",
     "moduleResolution": "node",
@@ -12,11 +12,7 @@
     "strictFunctionTypes": true
   },
   "include": [
-    "src/events/**/*",
-    "src/main/**/*",
-    "src/other/**/*",
-    "src/test/**/*",
-    "src/interfaces/**/*"
+    "src/**/*"
   ],
   "ts-node": {
     "swc": true
