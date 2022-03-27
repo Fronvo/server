@@ -17,6 +17,8 @@
 
 ## [Hosting](https://github.com/Fronvo/fronvo/blob/master/HOSTING.md)
 
+## [Testing](https://github.com/Fronvo/fronvo/blob/master/TESTING.md)
+
 ## Documentation
 **Coming soon.**
 
