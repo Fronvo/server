@@ -10,6 +10,7 @@
 
 **After creation, fill the following variables in the [.env](https://github.com/Fronvo/fronvo/blob/master/.env.example) file:**
 
+- **``FRONVO_PRISMA_URL``**
 - **``FRONVO_MONGODB_USERNAME``**
 - **``FRONVO_MONGODB_PASSWORD``**
 - **``FRONVO_MONGODB_PROJECT``**
