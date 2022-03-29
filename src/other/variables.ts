@@ -9,9 +9,9 @@ import { config } from 'dotenv';
 config({ path: resolve(__dirname, '..', '.env') });
 
 import * as errors from './errors';
-import { Db } from 'mongodb';
 import { enums } from './enums';
 import { FronvoError, LoggedInSocket, PerformanceReport, RequiredStartupFile } from 'interfaces/all';
+import { PrismaClient } from '@prisma/client';
 import { existsSync } from 'fs';
 
 function decideBooleanEnvValue(value: string, valueIfNull: boolean): boolean {
@@ -26,11 +26,10 @@ export const localDBPath = resolve(localDBDirectory, 'db.json');
 
 // File templates
 const localDBTemplate: {[dbName: string]: {}[]} = {
-    // TODO: Prisma when we have TypeScript, different PR
-    accounts: [],
-    tokens: [],
-    reports: [],
-    logs: []
+    Account: [],
+    Token: [],
+    Report: [],
+    Log: []
 };
 
 // Reusable variables
@@ -70,14 +69,10 @@ export const requiredStartupFiles: [{[file: string]: RequiredStartupFile}] = [{l
 // Blacklisted emails: https://github.com/disposable-email-domains/disposable-email-domains
 export const blacklistedEmailDomains: string[] = blacklistedEmailDomainsEnabled && require(resolve(generatedFilesDirectory, 'disposable_email_blocklist.json'));
 
-export const silentLogging = decideBooleanEnvValue(process.env.FRONVO_SILENT_LOGGING, false)
+export const silentLogging = decideBooleanEnvValue(process.env.FRONVO_SILENT_LOGGING, false);
 
 // The local virtualised Mongo database
 export const localDB: {[dbName: string]: {}[]} = localMode && localSave && existsSync(localDBPath) ? require(localDBPath) : localDBTemplate;
 
-// The MongoDB client, set below dynamically
-export let mdb: Db;
-
-export function setMDB(newMDB: Db): void {
-    mdb = newMDB;
-}
+// Prisma MongoDB client, filled in server.ts
+export const prismaClient = !localMode ? new PrismaClient() : null;

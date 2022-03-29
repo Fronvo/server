@@ -2,25 +2,27 @@
 // The loginToken no-account-only event file.
 // ******************** //
 
-import { FronvoError, Token } from 'interfaces/all';
+import { TokenData } from '@prisma/client';
+import { decideAccountTokenSchemaResult } from 'events/noAccount/shared';
+import { FronvoError } from 'interfaces/all';
 import { LoginTokenResult, LoginTokenServerParams } from 'interfaces/noAccount/loginToken';
 import { enums } from 'other/enums';
 import { ERR_INVALID_TOKEN } from 'other/errors';
-import * as utilities from 'other/utilities';
-import { getTokenAccountId, getTokenKey } from 'other/utilities';
-import { decideAccountTokenSchemaResult } from 'events/noAccount/shared';
+import * as utilities from 'utilities/global';
 
 export default async ({ io, socket, token }: LoginTokenServerParams): Promise<LoginTokenResult | FronvoError> => {
     // Schema validation
     const schemaResult = decideAccountTokenSchemaResult(token);
     if(schemaResult) return schemaResult;
     
-    const tokens: Token[] = await utilities.listDocuments('tokens');
+    const tokens: {tokenData: TokenData}[] = await utilities.findDocuments('Token', {select: {tokenData: true}});
 
-    for(const tokenItem in tokens) {
-        if(token == getTokenKey(tokens, tokenItem)) {
+    for(const tokenIndex in tokens) {
+        const tokenData = tokens[tokenIndex].tokenData;
+
+        if(tokenData.token == token) {
             // Just login to the account
-            utilities.loginSocket(io, socket, getTokenAccountId(tokens, tokenItem));
+            utilities.loginSocket(io, socket, tokenData.accountId);
             return {};
         }
     }

@@ -23,6 +23,7 @@
     "test:server": "FRONVO_TEST_MODE=true FRONVO_LOCAL_SAVE=false FRONVO_BINARY_PARSER=false FRONVO_SILENT_LOGGING=true node -r ts-node/register/transpile-only -r tsconfig-paths/register src/main/server.ts"
   },
   "dependencies": {
+    "@prisma/client": "^3.11.1",
     "@socket.io/admin-ui": "^0.2.0",
     "@socket.io/pm2": "^5.1.0",
     "@swc/core": "^1.2.159",
@@ -50,6 +51,7 @@
     "@types/uuid": "^8.3.4",
     "chai": "^4.3.6",
     "mocha": "^9.2.2",
+    "prisma": "^3.11.1",
     "socket.io-client": "^4.4.1",
     "ts-node-dev": "^1.1.8"
   },

@@ -7,9 +7,9 @@ import { MinMaxEntries } from 'interfaces/noAccount/shared';
 import { enums, joiErrorTypes } from 'other/enums';
 import * as errors from 'other/errors';
 import { accountSchema, accountTokenSchema } from 'other/schemas';
-import { generateError } from 'other/utilities';
 import { defaultError } from 'other/variables';
 import { format } from 'util';
+import { generateError } from 'utilities/global';
 
 function getMinMaxEntriesForAccounts(): MinMaxEntries {
     const resultDict: MinMaxEntries = {

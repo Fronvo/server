@@ -3,7 +3,7 @@
 // ******************** //
 
 import { LogoutResult, LogoutServerParams } from 'interfaces/account/logout';
-import { logoutSocket } from 'other/utilities';
+import { logoutSocket } from 'utilities/global';
 
 export default ({ io, socket }: LogoutServerParams): LogoutResult => {
     logoutSocket(io, socket);

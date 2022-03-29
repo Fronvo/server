@@ -2,33 +2,34 @@
 // The fetchProfileData account-only event file.
 // ******************** //
 
+import { AccountData } from '@prisma/client';
 import { FetchProfileDataResult, FetchProfileDataServerParams } from 'interfaces/account/fetchProfileData';
-import { Account, FronvoError } from 'interfaces/all';
+import { FronvoAccount, FronvoError } from 'interfaces/all';
 import { enums } from 'other/enums';
 import { ERR_PROFILE_NOT_FOUND } from 'other/errors';
-import { generateError, getAccountData, getAccountId, getLoggedInSockets, listDocuments } from 'other/utilities';
+import { findDocuments, generateError, getLoggedInSockets } from 'utilities/global';
 
 export default async ({ socket, profileId }: FetchProfileDataServerParams): Promise<FetchProfileDataResult | FronvoError> => {
-    const accounts: Account[] = await listDocuments('accounts');
+    const accounts: {accountData: AccountData}[] = await findDocuments('Account', {select: {accountData: true}});
     
     for(const account in accounts) {
-        // If target account id isn't what were looking for, move on
-        if(getAccountId(accounts, account) != profileId) continue;
+        const accountData = accounts[account].accountData;
 
-        const accountData: Account = getAccountData(accounts, account);
+        // If target account id isn't what were looking for, move on
+        if(accountData.id != profileId) continue;
 
         // Dont spread the dictionary, only provide select info
-        const finalAccountDict: Partial<Account> = {
+        const finalAccountData: Partial<FronvoAccount> = {
             username: accountData.username,
             creationDate: accountData.creationDate
         }
 
         // If it's the user's profile, provide more details (better than having 2 seperate events)
         if(profileId == getLoggedInSockets()[socket.id].accountId) {
-            finalAccountDict.email = accountData.email;
+            finalAccountData.email = accountData.email;
         }
 
-        return {profileData: finalAccountDict};
+        return {profileData: finalAccountData};
     }
 
     return generateError(ERR_PROFILE_NOT_FOUND, enums.ERR_PROFILE_NOT_FOUND);

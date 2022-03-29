@@ -3,7 +3,7 @@
 // ******************** //
 
 import { IsLoggedInResult, isLoggedInServerParams } from 'interfaces/general/isLoggedIn';
-import { isSocketLoggedIn } from 'other/utilities';
+import { isSocketLoggedIn } from 'utilities/global';
 
 export default ({ socket }: isLoggedInServerParams): IsLoggedInResult => {
     return {loggedIn: isSocketLoggedIn(socket)};

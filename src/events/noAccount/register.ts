@@ -2,14 +2,16 @@
 // The register no-account-only event file.
 // ******************** //
 
+import { AccountData } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import { Account, FronvoError } from 'interfaces/all';
+import { decideAccountSchemaResult } from 'events/noAccount/shared';
+import { FronvoError } from 'interfaces/all';
 import { RegisterResult, RegisterServerParams } from 'interfaces/noAccount/register';
 import { enums } from 'other/enums';
 import { ERR_ACC_ALR_EXISTS, ERR_INVALID_EMAIL } from 'other/errors';
-import * as utilities from 'other/utilities';
 import * as variables from 'other/variables';
-import { decideAccountSchemaResult } from 'events/noAccount/shared';
+import utilities from 'utilities/all';
+import { findDocuments } from 'utilities/global';
 
 export default async ({ io, socket, email, password }: RegisterServerParams): Promise<RegisterResult | FronvoError> => {
     // Schema validation
@@ -23,32 +25,30 @@ export default async ({ io, socket, email, password }: RegisterServerParams): Pr
         }
     }
 
-    const accounts: Account[] = await utilities.listDocuments('accounts');
-    
+    const accounts: {accountData: AccountData}[] = await findDocuments('Account', {select: {accountData: true}});
+
     // Check if the email is already registered by another user
     for(const account in accounts) {
-        if(utilities.getAccountData(accounts, account).email == email) {
+        const accountData = accounts[account].accountData;
+
+        if(accountData.email == email) {
             return utilities.generateError(ERR_ACC_ALR_EXISTS, enums.ERR_ACC_ALR_EXISTS);
         }
     }
-
-    // Generate the account once all checks have passed
-    const accountUsername = 'Fronvo user ' + (accounts != null ? Object.keys(accounts).length + 1 : '1');
-    const accountId = utilities.convertToId(accountUsername);
-
-    const accountData: {[accountId: string]: Account} = {};
-
-    accountData[accountId] = {
-        username: accountUsername,
-        email: email,
-        password: !variables.testMode ? bcrypt.hashSync(password, variables.mainBcryptHash) : password,
-        creationDate: new Date()
-    };
     
-    await utilities.insertToCollection('accounts', accountData);
+    // Generate the account once all checks have passed
+    const username = 'Fronvo user ' + (accounts != null ? Object.keys(accounts).length + 1 : '1');
+    const id = utilities.convertToId(username);
+
+    await utilities.createAccount({
+        id,
+        email,
+        username,
+        password: !variables.testMode ? bcrypt.hashSync(password, variables.mainBcryptHash) : password
+    });
     
     // Also login to the account
-    utilities.loginSocket(io, socket, accountId);
+    utilities.loginSocket(io, socket, id);
 
-    return {token: await utilities.createToken(accountId)};
+    return {token: await utilities.createToken(id)};
 }

@@ -24,7 +24,7 @@ export interface LoggedInSocket {
 }
 
 export interface PerformanceReport {
-    perfName: string;
+    reportName: string;
     timestamp: Date;
 }
 
@@ -38,13 +38,9 @@ export interface EventArguments {
     socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
 
-export interface Account {
+export interface FronvoAccount {
     username: string;
     email: string;
     password: string;
     creationDate: Date;
-}
-
-export interface Token {
-    [accountId: string]: string;
 }

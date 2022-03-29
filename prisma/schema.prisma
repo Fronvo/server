@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("FRONVO_PRISMA_URL")
+}
+
+// Accounts
+model Account {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  accountData AccountData
+}
+
+type AccountData {
+  id           String
+  email        String
+  username     String
+  password     String
+  creationDate DateTime @default(now())
+}
+
+// Tokens
+model Token {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  tokenData TokenData
+}
+
+type TokenData {
+  token     String
+  accountId String
+}
+
+// Logs
+model Log {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  logData LogData
+}
+
+type LogData {
+  info      String
+  timestamp DateTime @default(now())
+}
+
+// Reports
+model Report {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  reportData ReportData
+}
+
+type ReportData {
+  reportName String
+  timestamp  DateTime @default(now())
+}

@@ -22,9 +22,8 @@ import gradient from 'gradient-string';
 // Other imports
 import fs from 'fs';
 import * as variables from 'other/variables';
-import { decideBooleanEnvValue } from 'other/utilities';
+import { decideBooleanEnvValue } from 'utilities/global';
 import { Server } from 'socket.io';
-import { AnyError, MongoClient } from 'mongodb';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { InterServerEvents } from 'interfaces/events/inter';
@@ -71,46 +70,33 @@ function preStartupChecks(): void {
     checkRequiredFiles();
 }
 
-function setupMongoDB(): Promise<void | AnyError> {
-    return new Promise((resolve, reject) => {
-        const mdbUsr = process.env.FRONVO_MONGODB_USERNAME;
-        const mdbPass = process.env.FRONVO_MONGODB_PASSWORD;
-        const mdbProj = process.env.FRONVO_MONGODB_PROJECT;
-        const mdbDb = process.env.FRONVO_MONGODB_DB; // optional
-    
-        // Check environmental variables
-        if(!mdbUsr || !mdbPass || !mdbProj) {
-            reject('Some MongoDB variables are missing.');
-        } else {
-            setLoading('Setting up MongoDB');
+async function setupPrisma(): Promise<void> {
+    if(!variables.localMode) {
+        setLoading('Setting up Prisma');
 
-            // MongoDB connection uri, customised for readability
-            const mdbUri = 'mongodb+srv://' + 
-                            mdbUsr +
-                            ':' +
-                            mdbPass +
-                            '@' +
-                            mdbProj +
-                            '.mongodb.net/' +
-                            mdbDb || 'fronvo' +
-                            '?retryWrites=true&w=majority';
-
-            // Create the MongoDB client
-            const mdbClient = new MongoClient(mdbUri);
-
-            // Finally, try to connect with the given credentials
-            mdbClient.connect((err) => {
-                if(err) {
-                    reject(err);
-                } else {
-                    // variables.js comment
-                    variables.setMDB(mdbClient.db(mdbDb || 'fronvo'));
-                    resolve(null);
+        // Prepare for requests before-hand, prevent cold requests
+        const tempLog = await variables.prismaClient.log.create({
+            data: {
+                logData: {
+                    info: 'Temporary log, to be deleted.'
                 }
-            });
-        }
-    });
-};
+            }
+        });
+
+        // Read operations aswell
+        await variables.prismaClient.log.findMany();
+
+        // Update operations
+        await variables.prismaClient.log.update({where: {id: tempLog.id}, data: {
+            logData: {
+                info: 'Updated temporary log, to be deleted.'
+            }
+        }});
+
+        // And delete operations
+        await variables.prismaClient.log.delete({where: {id: tempLog.id}});
+    }
+}
 
 function setupServer(): void {
     setLoading('Setting up the server process, server events and admin panel');
@@ -167,7 +153,7 @@ function setupAdminPanel(): void {
     }
 }
 
-function startup(): void {
+async function startup(): Promise<void> {
     // Prevent startup logging, too
     preStartupChecks();
 
@@ -185,28 +171,14 @@ function startup(): void {
     }
 
     // Attempt to run each check one-by-one
-    if(!variables.localMode) {
-        setupMongoDB().then(() => {
-            postDBInit();
-            
-        }).catch((err: Error) => {
-            // Depends on the error's context
-            if(!variables.silentLogging) loadingSpinner.fail(err.message ? err.message : String(err));
-        });
+    await setupPrisma();
+    setupServer();
+    setupServerEvents();
+    setupPM2();
+    setupAdminPanel();
 
-    } else {
-        postDBInit();
-    }
-
-    function postDBInit() {
-        setupServer();
-        setupServerEvents();
-        setupPM2();
-        setupAdminPanel();
-    
-        // Finally, display successful server run
-        if(!variables.silentLogging) loadingSpinner.succeed('Server running at port ' + PORT + '.');
-    }
+    // Finally, display successful server run
+    if(!variables.silentLogging) loadingSpinner.succeed('Server running at port ' + PORT + '.');
 }
 
 startup();

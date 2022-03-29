@@ -5,8 +5,8 @@
 import { enums } from 'other/enums';
 import * as errors from 'other/errors';
 import * as templates from 'other/templates';
-import * as utilities from 'other/utilities';
-import { generateError } from 'other/utilities';
+import utilities from 'utilities/all';
+import { generateError } from 'utilities/global';
 import * as variables from 'other/variables';
 import { Server } from 'socket.io';
 import { format } from 'util';
@@ -109,7 +109,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                         callbackResponse = generateError(neededArgsString, enums.ERR_MISSING_ARGS, {args_needed: neededArgs});
                     } else {
                         // Start it anyway, will be decided in the function itself if applicable
-                        const perfId = utilities.perfStart(event);
+                        const perfId = utilities.reportStart(event);
 
                         // Works for optional arguments
                         callbackResponse = funcs[event]({io, socket, ...filteredArgs});
@@ -123,7 +123,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                             }
                         }
 
-                        utilities.perfEnd(perfId);
+                        utilities.reportEnd(perfId);
                     }
                 }
 

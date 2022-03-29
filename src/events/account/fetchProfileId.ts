@@ -3,7 +3,7 @@
 // ******************** //
 
 import { FetchProfileIdResult, FetchProfileIdServerParams } from 'interfaces/account/fetchProfileId';
-import { getLoggedInSockets } from 'other/utilities';
+import { getLoggedInSockets } from 'utilities/global';
 
 export default ({ socket }: FetchProfileIdServerParams): FetchProfileIdResult => {
     return {profileId: getLoggedInSockets()[socket.id].accountId};
