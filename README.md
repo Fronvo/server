@@ -27,3 +27,5 @@
 **[socket.io](https://socket.io/) for ease of cummunication and cross-platform ability.**
 
 **[MongoDB](https://www.mongodb.com/) for flexibility, performance and low storage plans.**
+
+**[Prisma](https://www.prisma.io/) for database types.**
