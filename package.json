@@ -31,7 +31,6 @@
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
-    "eiows": "^3.6.1",
     "gradient-string": "^1.2.0",
     "joi": "^17.4.2",
     "mongodb": "^4.1.3",

@@ -104,7 +104,6 @@ function setupServer(): void {
     // Setup the socket.io server with tailored options
     io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(PORT, {
         serveClient: false,
-        wsEngine: require('eiows').Server,
         path: '/fronvo',
     
         // Admin panel
