@@ -143,18 +143,18 @@ function setupPM2(): void {
 }
 
 function setupAdminPanel(): void {
-    const panel_usr = process.env.FRONVO_ADMIN_PANEL_USERNAME;
-    const panel_pass = process.env.FRONVO_ADMIN_PANEL_PASSWORD;
+    const panelUsername = process.env.FRONVO_ADMIN_PANEL_USERNAME;
+    const panelPassword = process.env.FRONVO_ADMIN_PANEL_PASSWORD;
 
     // Check environmental variables and hash the admin panel password
-    if(panel_usr && panel_pass) {
+    if(panelUsername && panelPassword) {
         instrument(io, {
             auth: {
                 type: 'basic',
-                username: panel_usr,
+                username: panelUsername,
 
                 // hash
-                password: require('bcrypt').hashSync(panel_pass, 10)
+                password: require('bcrypt').hashSync(panelPassword, 10)
             },
 
             // preserve users who logged in with the panel before
