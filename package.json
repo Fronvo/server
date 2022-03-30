@@ -14,7 +14,7 @@
   "homepage": "https://github.com/Fronvo/fronvo#readme",
   "private": true,
   "scripts": {
-    "build": "tsc --project tsconfig.build.json && copyfiles -u 1 src/generated/** src/generated/**/* output && rm -rf output/interfaces output/test",
+    "build": "tsc --project tsconfig.build.json && copyfiles -u 1 src/generated/** src/generated/**/* output",
     "start": "run-s build start:cached",
     "start:cached": "node -r ts-node/register/transpile-only -r tsconfig-paths/register output/main/server.js",
     "start:dev": "ts-node-dev --watch src/ --transpile-only --clear -r tsconfig-paths/register src/main/server.ts",
