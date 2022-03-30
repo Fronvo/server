@@ -113,7 +113,20 @@ function setupServer(): void {
         },
 
         // Enable / Disable binary parser
-        parser: decideBooleanEnvValue(process.env.FRONVO_BINARY_PARSER, true) ? require('socket.io-msgpack-parser') : ''
+        parser: decideBooleanEnvValue(process.env.FRONVO_BINARY_PARSER, true) ? require('socket.io-msgpack-parser') : '',
+        
+        // No namespace detected, disconnect
+        connectTimeout: 5000,
+
+        // Disable HTTPS requests
+        httpCompression: false,
+        maxHttpBufferSize: 0,
+
+        // Strict pong timeout
+        pingTimeout: 5000,
+
+        // Limit to websocket connections
+        transports: ['websocket']
     })
 }
 
