@@ -5,7 +5,7 @@
 import { AccountData } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { decideAccountSchemaResult } from 'events/noAccount/shared';
-import { FronvoError } from 'interfaces/all';
+import { EventTemplate, FronvoError } from 'interfaces/all';
 import { RegisterResult, RegisterServerParams } from 'interfaces/noAccount/register';
 import { enums } from 'other/enums';
 import { ERR_ACC_ALR_EXISTS, ERR_INVALID_EMAIL } from 'other/errors';
@@ -13,7 +13,7 @@ import * as variables from 'other/variables';
 import utilities from 'utilities/all';
 import { findDocuments } from 'utilities/global';
 
-export default async ({ io, socket, email, password }: RegisterServerParams): Promise<RegisterResult | FronvoError> => {
+async function register({ io, socket, email, password }: RegisterServerParams): Promise<RegisterResult | FronvoError> {
     // Schema validation
     const schemaResult = decideAccountSchemaResult(email, password);
     if(schemaResult) return schemaResult;
@@ -52,3 +52,11 @@ export default async ({ io, socket, email, password }: RegisterServerParams): Pr
 
     return {token: await utilities.createToken(id)};
 }
+
+const registerTemplate: EventTemplate = {
+    func: register,
+    template: ['email', 'password'],
+    points: 5
+};
+
+export default registerTemplate;

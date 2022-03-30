@@ -38,6 +38,23 @@ export interface EventArguments {
     socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
 
+export interface EventTemplate {
+    func: Function;
+    template: string[];
+    points: number;
+}
+
+export interface EventExportTemplate {
+    [funcName: string]: EventTemplate;
+}
+
+export interface RateLimiterReason {
+    remainingPoints: number;
+    msBeforeNext: number;
+    consumedPoints: number;
+    isFirstInDuration: boolean;
+}
+
 export interface FronvoAccount {
     username: string;
     email: string;

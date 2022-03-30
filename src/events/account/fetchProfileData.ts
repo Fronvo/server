@@ -4,12 +4,12 @@
 
 import { AccountData } from '@prisma/client';
 import { FetchProfileDataResult, FetchProfileDataServerParams } from 'interfaces/account/fetchProfileData';
-import { FronvoAccount, FronvoError } from 'interfaces/all';
+import { EventTemplate, FronvoAccount, FronvoError } from 'interfaces/all';
 import { enums } from 'other/enums';
 import { ERR_PROFILE_NOT_FOUND } from 'other/errors';
 import { findDocuments, generateError, getLoggedInSockets } from 'utilities/global';
 
-export default async ({ socket, profileId }: FetchProfileDataServerParams): Promise<FetchProfileDataResult | FronvoError> => {
+async function fetchProfileData({ socket, profileId }: FetchProfileDataServerParams): Promise<FetchProfileDataResult | FronvoError> {
     const accounts: {accountData: AccountData}[] = await findDocuments('Account', {select: {accountData: true}});
     
     for(const account in accounts) {
@@ -34,3 +34,11 @@ export default async ({ socket, profileId }: FetchProfileDataServerParams): Prom
 
     return generateError(ERR_PROFILE_NOT_FOUND, enums.ERR_PROFILE_NOT_FOUND);
 }
+
+const fetchProfileDataTemplate: EventTemplate = {
+    func: fetchProfileData,
+    template: ['profileId'],
+    points: 3
+};
+
+export default fetchProfileDataTemplate;

@@ -5,14 +5,14 @@
 import { AccountData } from '@prisma/client';
 import { compareSync } from 'bcrypt';
 import { decideAccountSchemaResult } from 'events/noAccount/shared';
-import { FronvoError } from 'interfaces/all';
+import { EventTemplate, FronvoError } from 'interfaces/all';
 import { LoginResult, LoginServerParams } from 'interfaces/noAccount/login';
 import { enums } from 'other/enums';
 import { ERR_ACC_DOESNT_EXIST, ERR_INVALID_PASSWORD } from 'other/errors';
 import { testMode } from 'other/variables';
 import * as utilities from 'utilities/global';
 
-export default async ({ io, socket, email, password}: LoginServerParams): Promise<LoginResult | FronvoError> => {
+async function login({ io, socket, email, password}: LoginServerParams): Promise<LoginResult | FronvoError> {
     // Schema validation
     const schemaResult = decideAccountSchemaResult(email, password);
     if(schemaResult) return schemaResult;
@@ -41,3 +41,11 @@ export default async ({ io, socket, email, password}: LoginServerParams): Promis
 
     return utilities.generateError(ERR_ACC_DOESNT_EXIST, enums.ERR_ACC_DOESNT_EXIST);
 }
+
+const loginTemplate: EventTemplate = {
+    func: login,
+    template: ['email', 'password'],
+    points: 5
+};
+
+export default loginTemplate;

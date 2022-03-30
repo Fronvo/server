@@ -17,6 +17,7 @@ export const joiErrorTypes: JoiErrorTypes = {
 
 const enumsArr = [
     'ERR_UNKNOWN',
+    'ERR_RATELIMITED',
     'ERR_LENGTH',
     'ERR_EXACT_LENGTH',
     'ERR_REQUIRED',
@@ -35,7 +36,7 @@ const enumsArr = [
 
 export const enums: Partial<Enums> = {};
 
-// Eg.: {ERR_UNKNOWN: 1, ERR_LENGTH: 2}
+// Eg.: {ERR_UNKNOWN: 1, ERR_RATELIMITED: 2}
 enumsArr.forEach(item => {
     enums[item] = enumsArr.indexOf(item) + 1;
 });

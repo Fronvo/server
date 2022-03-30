@@ -136,13 +136,16 @@ export function decideBooleanEnvValue(value: string, valueIfNull: boolean): bool
 }
 
 export function generateError(msg: string, code: number, extras?: {[key: string]: any}): FronvoError {
-    return {
+    const err: FronvoError = {
         err: {
             msg,
-            code,
-            ...extras
+            code
         }
     };
+
+    if(extras) err.err.extras = {...extras};
+
+    return err;
 }
 
 export async function createToken(accountId: string): Promise<string> {
@@ -167,3 +170,7 @@ export async function getToken(accountId: string): Promise<string> {
         }
     }
 };
+
+export function rateLimitAnnounce(io: Server<ServerToClientEvents, ClientToServerEvents, InterServerEvents>, socket: Socket<ClientToServerEvents, ServerToClientEvents>, pointsToConsume: number): void {
+    if(variables.cluster) io.serverSideEmit('updateRateLimit', socket.handshake.address, pointsToConsume);
+}

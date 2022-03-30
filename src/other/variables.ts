@@ -13,6 +13,7 @@ import { enums } from './enums';
 import { FronvoError, LoggedInSocket, PerformanceReport, RequiredStartupFile } from 'interfaces/all';
 import { PrismaClient } from '@prisma/client';
 import { existsSync } from 'fs';
+import { RateLimiterMemory } from 'rate-limiter-flexible';
 
 function decideBooleanEnvValue(value: string, valueIfNull: boolean): boolean {
     return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
@@ -60,7 +61,7 @@ export const performanceReports: {[perfUUID: string]: PerformanceReport} = {};
 export const performanceReportsMinMS = parseInt(process.env.FRONVO_PERFORMANCE_REPORTS_MIN_MS) || -1;
 
 // When using PM2 for production
-export const cluster = decideBooleanEnvValue(process.env.TARGET_PM2, false);
+export const cluster = decideBooleanEnvValue(process.env.FRONVO_TARGET_PM2, false);
 
 // Directories/Files to check at startup
 export const requiredStartupDirectories = [localDBDirectory];
@@ -76,3 +77,9 @@ export const localDB: {[dbName: string]: {}[]} = localMode && localSave && exist
 
 // Prisma MongoDB client, filled in server.ts
 export const prismaClient = !localMode ? new PrismaClient() : null;
+
+export let rateLimiter: RateLimiterMemory;
+
+export function setRateLimiter(rateLimiterObject: RateLimiterMemory): void {
+    rateLimiter = rateLimiterObject;
+}

@@ -4,7 +4,6 @@
 
 import { enums } from 'other/enums';
 import * as errors from 'other/errors';
-import * as templates from 'other/templates';
 import utilities from 'utilities/all';
 import { generateError } from 'utilities/global';
 import * as variables from 'other/variables';
@@ -13,49 +12,77 @@ import { format } from 'util';
 
 // Events
 import accountEvents from 'events/account';
-import generalFuncs from 'events/general';
+import generalEvents from 'events/general';
 import noAccountEvents from 'events/noAccount';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { InterServerEvents } from 'interfaces/events/inter';
+import { RateLimiterRes } from 'rate-limiter-flexible';
+import { EventExportTemplate, RateLimiterReason } from 'interfaces/all';
+import { rateLimiter } from 'other/variables';
 
 export default function entry(io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>): void {
-    // Add each file with functions here
-    const noAccountOnlyFuncs = {...noAccountEvents};
-    const accountOnlyFuncs = {...accountEvents};
-
-    const funcs: {[eventName: string]: Function} = {...noAccountOnlyFuncs, ...accountOnlyFuncs, ...generalFuncs};
-
+    const funcs: EventExportTemplate = {...noAccountEvents, ...generalEvents, ...accountEvents};
+    
     io.on('connection', (socket): void => {
+        // TODO: Just show connected client number
         console.log('Socket ' + socket.id + ' has connected.');
 
         // Anything sent, which is an event, is forwarded here
         socket.onAny(async (event: string, ...args: {[arg: string]: any}[]): Promise<void> => {
+            let perfId: string;
+            let callback: Function;
+            const filteredArgs: {[arg: string]: any} = {};
 
-            // Pay attention, every event MUST be in the templates file aswell
-            if(event in funcs && event in templates) {
+            if(event in funcs) {
+                async function runFunc(): Promise<{[key: string]: any}> {
+                    let callbackResponse = funcs[event].func({io, socket, ...filteredArgs});
 
-                // Prevent modifications to templates, just copy
-                const neededArgs: string[] = templates[event].slice();
-                const neededArgsOriginal: string[] = templates[event].slice();
+                    if(typeof callbackResponse.then == 'function') {
+                        return await callbackResponse;
+                    } else {
+                        return callbackResponse;
+                    }
+                }
 
-                const filteredArgs: {[arg: string]: any} = {};
-                let callback: Function;
-                let callbackResponse: {[key: string]: any};
-                let prematureError = false;
+                function sendCallback(callbackResponse: {[key: string]: any}, rateLimiterResult?: RateLimiterRes | RateLimiterReason): void {
+                    if(callback) {
+                        if(callbackResponse) {
+                            // Check if the event wasnt ratelimited
+                            if(perfId) {
+                                utilities.reportEnd(perfId);
+                                perfId = null;
+                            }
+
+                            if(!variables.testMode) {
+                                callbackResponse.extras = {remainingPoints: rateLimiterResult.remainingPoints};
+                            }
+
+                            console.log(callbackResponse);
+                            
+                            callback(callbackResponse);
+
+                        } else {
+                            utilities.insertLog(format(errors.ERR_FUNC_RETURN_NONE, event));
+                            callback(generateError(errors.ERR_UNKNOWN, enums.ERR_UNKNOWN));
+                        }
+                    }
+                }
 
                 // Account only
-                if(event in accountOnlyFuncs && !utilities.isSocketLoggedIn(socket)) {
-                    prematureError = true;
-                    callbackResponse = generateError(errors.ERR_MUST_BE_LOGGED_IN, enums.ERR_MUST_BE_LOGGED_IN, {event: event});
+                if(event in {...accountEvents} && !utilities.isSocketLoggedIn(socket)) {
+                    sendCallback(generateError(errors.ERR_MUST_BE_LOGGED_IN, enums.ERR_MUST_BE_LOGGED_IN, {event: event}));
 
                 // No account only
-                } else if(event in noAccountOnlyFuncs && utilities.isSocketLoggedIn(socket)) {
-                    prematureError = true;
-                    callbackResponse = generateError(errors.ERR_MUST_BE_LOGGED_OUT, enums.ERR_MUST_BE_LOGGED_OUT, {event: event});
+                } else if(event in {...noAccountEvents} && utilities.isSocketLoggedIn(socket)) {
+                    sendCallback(generateError(errors.ERR_MUST_BE_LOGGED_OUT, enums.ERR_MUST_BE_LOGGED_OUT, {event: event}));
 
-                // Order the arguments according to the event's template
                 } else {
+                    // Prevent modifications to templates, just copy
+                    const neededArgs = funcs[event].template.slice();
+                    const neededArgsOriginal = funcs[event].template.slice();
+
+                    // Order the arguments according to the event's template
                     for(const item in args) {
                         const argItem = args[item];
 
@@ -77,22 +104,19 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                             // Can combine dictionaries, dont return here
                         }
                     };
-                }
 
-                // Find the callback
-                for(const item in args) {
-                    const argItem = args[item];
+                    // Find the callback
+                    for(const item in args) {
+                        const argItem = args[item];
 
-                    // Only one callback, dont overwrite
-                    if(typeof(argItem) === 'function' && !callback) {
-                        callback = argItem;
-                        break;
-                    }
-                };
+                        // Only one callback, dont overwrite
+                        if(typeof(argItem) === 'function' && !callback) {
+                            callback = argItem;
+                            break;
+                        }
+                    };
 
-                if(!prematureError) {
                     if(neededArgs.length > 0) {
-
                         // Stylise missing arguments
                         let neededArgsString = errors.ERR_MISSING_ARGS;
                         
@@ -106,34 +130,33 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                             if(parseInt(item) == (neededArgs.length - 1)) neededArgsString += '.';
                         }
 
-                        callbackResponse = generateError(neededArgsString, enums.ERR_MISSING_ARGS, {args_needed: neededArgs});
+                        sendCallback(generateError(neededArgsString, enums.ERR_MISSING_ARGS, {args_needed: neededArgs}));
+
                     } else {
-                        // Start it anyway, will be decided in the function itself if applicable
-                        const perfId = utilities.reportStart(event);
+                        perfId = utilities.reportStart(event);
 
-                        // Works for optional arguments
-                        callbackResponse = funcs[event]({io, socket, ...filteredArgs});
+                        if(!variables.testMode) {
+                            // Consume event points, credited to the client's IP
+                            rateLimiter.consume(socket.handshake.address, funcs[event].points)
 
-                        // If async, await
-                        if(callbackResponse) {
-                            // @ts-ignore
-                            // Yes it IS an async function
-                            if(typeof(callbackResponse.then) === 'function') {
-                                callbackResponse = await callbackResponse;
-                            }
+                            .then(async (result) => {
+                                // Notify other servers
+                                utilities.rateLimitAnnounce(io, socket, funcs[event].points);
+
+                                // Start the performance counter
+                                perfId = utilities.reportStart(event);
+
+                                sendCallback(await runFunc(), result);
+                            })
+
+                            .catch((reason: RateLimiterReason) => {
+                                // Not enough points / Out of points, give ratelimit info
+                                sendCallback(generateError(errors.ERR_RATELIMITED, enums.ERR_RATELIMITED, {ratelimitMS: reason.msBeforeNext}), reason);
+                            });
+                        } else {
+                            // Test mode, only run
+                            sendCallback(await runFunc());
                         }
-
-                        utilities.reportEnd(perfId);
-                    }
-                }
-
-                if(callback) {
-                    if(callbackResponse) {
-                        callback(callbackResponse);
-
-                    } else {
-                        utilities.insertLog(format(errors.ERR_FUNC_RETURN_NONE, event));
-                        callback(generateError(errors.ERR_UNKNOWN, enums.ERR_UNKNOWN));
                     }
                 }
             }
@@ -157,10 +180,17 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
     io.engine.on('connection_error', (err: Error) => {
         // @ts-ignore
         // Socket.IO adds the code property
+        // TODO: Make a custom type
         console.log('Connection abnormally closed:  [' + err.code + ']' +  err.message);
     });
 
     // The following events are only called while using PM2 to be able to synchronise each server's variables
+    // TODO: Seperate folder for inter-server events
+    io.on('updateRateLimit', (socketIP, pointsToConsume) => {
+        // There can't be an exception here, called inside of consumption from other servers
+        rateLimiter.consume(socketIP, pointsToConsume).catch(() => {});
+    });
+
     io.on('loginSocket', (socketId, accountId) => {
         variables.loggedInSockets[socketId] = {accountId};
     });

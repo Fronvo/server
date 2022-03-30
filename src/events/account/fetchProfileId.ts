@@ -3,8 +3,17 @@
 // ******************** //
 
 import { FetchProfileIdResult, FetchProfileIdServerParams } from 'interfaces/account/fetchProfileId';
+import { EventTemplate } from 'interfaces/all';
 import { getLoggedInSockets } from 'utilities/global';
 
-export default ({ socket }: FetchProfileIdServerParams): FetchProfileIdResult => {
+function fetchProfileId({ socket }: FetchProfileIdServerParams): FetchProfileIdResult {
     return {profileId: getLoggedInSockets()[socket.id].accountId};
 }
+
+const fetchProfileIdTemplate: EventTemplate = {
+    func: fetchProfileId,
+    template: [],
+    points: 1
+};
+
+export default fetchProfileIdTemplate;

@@ -4,6 +4,7 @@
 
 export interface Enums {
     ERR_UNKNOWN: number;
+    ERR_RATELIMITED: number;
     ERR_LENGTH: number
     ERR_EXACT_LENGTH: number;
     ERR_REQUIRED: number;

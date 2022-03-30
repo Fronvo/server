@@ -4,6 +4,7 @@
 
 // Remember to require('util').format() depending on the error's symbols.
 export const ERR_UNKNOWN = 'An unknown error has occured.';
+export const ERR_RATELIMITED = 'You are ratelimited.';
 export const ERR_LOCAL_DB_FAIL = 'Failed to save the local database.';
 export const ERR_FUNC_RETURN_NONE = 'Registered event \'%s\' didn\'t return any value or the value format is invalid.'; 
 export const ERR_REQUIRED = 'The %s is required.';

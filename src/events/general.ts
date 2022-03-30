@@ -4,4 +4,10 @@
 
 import isLoggedIn from 'events/general/isLoggedIn';
 
-export default { isLoggedIn }
+import { EventExportTemplate } from 'interfaces/all';
+
+const generalTemplate: EventExportTemplate = {
+    isLoggedIn
+}
+
+export default generalTemplate;
