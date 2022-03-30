@@ -57,8 +57,6 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                             if(!variables.testMode) {
                                 callbackResponse.extras = {remainingPoints: rateLimiterResult.remainingPoints};
                             }
-
-                            console.log(callbackResponse);
                             
                             callback(callbackResponse);
 
