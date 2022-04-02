@@ -22,6 +22,8 @@
 ## Documentation
 **Coming soon.**
 
+**In the meantime, take a look at the [interfaces](https://github.com/Fronvo/fronvo/tree/master/src/interfaces) for each event.**
+
 ## Tools used
 
 **[socket.io](https://socket.io/) for ease of cummunication and cross-platform ability.**
