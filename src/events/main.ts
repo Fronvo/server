@@ -17,9 +17,9 @@ import noAccountEvents from 'events/noAccount';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { InterServerEvents } from 'interfaces/events/inter';
-import { RateLimiterRes } from 'rate-limiter-flexible';
-import { EventExportTemplate, RateLimiterReason } from 'interfaces/all';
+import { EventExportTemplate } from 'interfaces/all';
 import { rateLimiter } from 'other/variables';
+import { EzError } from 'ez-ratelimiter';
 
 export default function entry(io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>): void {
     const funcs: EventExportTemplate = {...noAccountEvents, ...generalEvents, ...accountEvents};
@@ -45,7 +45,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                     }
                 }
 
-                function sendCallback(callbackResponse: {[key: string]: any}, rateLimiterResult?: RateLimiterRes | RateLimiterReason): void {
+                function sendCallback(callbackResponse: {[key: string]: any}, remainingPoints?: number): void {
                     if(callback) {
                         if(callbackResponse) {
                             // Check if the event wasnt ratelimited
@@ -55,7 +55,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                             }
 
                             if(!variables.testMode) {
-                                callbackResponse.extras = {remainingPoints: rateLimiterResult.remainingPoints};
+                                callbackResponse.extras = {remainingPoints};
                             }
                             
                             callback(callbackResponse);
@@ -135,21 +135,21 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
 
                         if(!variables.testMode) {
                             // Consume event points, credited to the client's IP
-                            rateLimiter.consume(socket.handshake.address, funcs[event].points)
+                            rateLimiter.consumePoints(socket.handshake.address, funcs[event].points)
 
-                            .then(async (result) => {
+                            .then(async (limit) => {
                                 // Notify other servers
                                 utilities.rateLimitAnnounce(io, socket, funcs[event].points);
 
                                 // Start the performance counter
                                 perfId = utilities.reportStart(event);
 
-                                sendCallback(await runFunc(), result);
+                                sendCallback(await runFunc(), limit.remainingPoints);
                             })
 
-                            .catch((reason: RateLimiterReason) => {
-                                // Not enough points / Out of points, give ratelimit info
-                                sendCallback(generateError(errors.ERR_RATELIMITED, enums.ERR_RATELIMITED, {ratelimitMS: reason.msBeforeNext}), reason);
+                            .catch((reason: EzError) => {
+                                // Not enough points / Out of points, give  ratelimit info
+                                sendCallback(generateError(errors.ERR_RATELIMITED, enums.ERR_RATELIMITED), reason.currentPoints);
                             });
                         } else {
                             // Test mode, only run
@@ -186,7 +186,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
     // TODO: Seperate folder for inter-server events
     io.on('updateRateLimit', (socketIP, pointsToConsume) => {
         // There can't be an exception here, called inside of consumption from other servers
-        rateLimiter.consume(socketIP, pointsToConsume).catch(() => {});
+        rateLimiter.consumePoints(socketIP, pointsToConsume);
     });
 
     io.on('loginSocket', (socketId, accountId) => {

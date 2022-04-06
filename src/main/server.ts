@@ -12,8 +12,8 @@ import { instrument, RedisStore } from '@socket.io/admin-ui';
 import { createAdapter } from '@socket.io/cluster-adapter';
 import { setupWorker } from '@socket.io/sticky';
 
-// Ratelimiters
-import { RateLimiterMemory } from 'rate-limiter-flexible';
+// Ratelimiter
+import { EzRateLimiter } from 'ez-ratelimiter';
 
 // Custom event files
 import registerEvents from 'events/main';
@@ -104,13 +104,15 @@ async function setupPrisma(): Promise<void> {
 function setupRatelimiter(): void {
     setLoading('Setting up the ratelimiter');
 
-    const rateLimiterPoints = parseInt(process.env.FRONVO_RATELIMITER_POINTS) || 40;
-    const rateLimiterDuration = parseInt(process.env.FRONVO_RATELIMITER_DURATION) || 2.5;
+    const ezLimiterPoints = parseInt(process.env.FRONVO_RATELIMITER_POINTS) || 40;
+    const ezLimiterDuration = parseInt(process.env.FRONVO_RATELIMITER_DURATION) || 2500;
 
-    variables.setRateLimiter(new RateLimiterMemory({
-        points: rateLimiterPoints,
-        duration: rateLimiterDuration
-    }))
+    const ezLimiter = new EzRateLimiter({
+        maxPoints: ezLimiterPoints,
+        clearDelay: ezLimiterDuration
+    });
+
+    variables.setRateLimiter(ezLimiter);
 }
 
 function setupServer(): void {

@@ -13,7 +13,7 @@ import { enums } from './enums';
 import { FronvoError, LoggedInSocket, PerformanceReport, RequiredStartupFile } from 'interfaces/all';
 import { PrismaClient } from '@prisma/client';
 import { existsSync } from 'fs';
-import { RateLimiterMemory } from 'rate-limiter-flexible';
+import { EzRateLimiter } from 'ez-ratelimiter';
 
 function decideBooleanEnvValue(value: string, valueIfNull: boolean): boolean {
     return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
@@ -78,8 +78,8 @@ export const localDB: {[dbName: string]: {}[]} = localMode && localSave && exist
 // Prisma MongoDB client, filled in server.ts
 export const prismaClient = !localMode ? new PrismaClient() : null;
 
-export let rateLimiter: RateLimiterMemory;
+export let rateLimiter: EzRateLimiter;
 
-export function setRateLimiter(rateLimiterObject: RateLimiterMemory): void {
+export function setRateLimiter(rateLimiterObject: EzRateLimiter): void {
     rateLimiter = rateLimiterObject;
 }
