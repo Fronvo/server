@@ -185,8 +185,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
     // The following events are only called while using PM2 to be able to synchronise each server's variables
     // TODO: Seperate folder for inter-server events
     io.on('updateRateLimit', (socketIP, pointsToConsume) => {
-        // There can't be an exception here, called inside of consumption from other servers
-        rateLimiter.consumePoints(socketIP, pointsToConsume);
+        rateLimiter.consumePoints(socketIP, pointsToConsume).catch(() => {});
     });
 
     io.on('loginSocket', (socketId, accountId) => {
