@@ -8,6 +8,7 @@ import { FronvoError, LoggedInSocket } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
+import { CollectionNames } from 'interfaces/types';
 import * as errors from 'other/errors';
 import * as variables from 'other/variables';
 import { localDB, prismaClient } from 'other/variables';
@@ -25,7 +26,7 @@ export function saveLocalDB(): void {
     });
 }
 
-export async function insertDocument(collName: 'Account' | 'Token' | 'Report' | 'Log', dict: {[key: string]: any}, recordId?: string): Promise<void> {
+export async function insertDocument(collName: CollectionNames, dict: {[key: string]: any}, recordId?: string): Promise<void> {
     if(!variables.localMode) {
         await prismaClient[collName].create({
             data: {...dict}
@@ -55,7 +56,7 @@ export async function insertDocument(collName: 'Account' | 'Token' | 'Report' | 
     }
 }
 
-export async function findDocuments(collName: 'Account' | 'Token' | 'Report' | 'Log', prismaFilter?: Partial<Prisma.SelectAndInclude>): Promise<any[]> {
+export async function findDocuments(collName: CollectionNames, prismaFilter?: Partial<Prisma.SelectAndInclude>): Promise<any[]> {
     if(!variables.localMode) {
         return await prismaClient[collName].findMany(prismaFilter ? prismaFilter : {});
     } else {
