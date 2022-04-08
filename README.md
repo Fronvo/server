@@ -31,3 +31,5 @@
 **[MongoDB](https://www.mongodb.com/) for flexibility, performance and low storage plans.**
 
 **[Prisma](https://www.prisma.io/) for database types.**
+
+**[Ez-Ratelimiter](https://github.com/Fronvo/ez-ratelimiter) to simplify the rate-limiting process.**
