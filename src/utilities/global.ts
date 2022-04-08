@@ -8,7 +8,7 @@ import { FronvoError, LoggedInSocket } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
-import { CollectionNames } from 'interfaces/types';
+import { CollectionNames } from 'other/types';
 import * as errors from 'other/errors';
 import * as variables from 'other/variables';
 import { localDB, prismaClient } from 'other/variables';
