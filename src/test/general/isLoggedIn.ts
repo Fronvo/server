@@ -2,13 +2,21 @@
 // The test file for the isLoggedIn event.
 // ******************** //
 
-import { TestArguments } from 'interfaces/test';
+import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import { assertEquals, assertError, assertErrors } from 'utilities/test';
 
-export default ({ socket, done, assert }: TestArguments): void => {
-    socket.emit('isLoggedIn', ({ err, loggedIn }): void => {
-        assert(!err);
-        assert(typeof(loggedIn) == 'boolean');
-        
+function isLoggedIn({ socket, done }: TestArguments, callback: TestErrorCallback): void {
+    socket.emit('isLoggedIn', ({ err, loggedIn }) => {
+        callback(assertError({err}));
+
+        callback(assertEquals({loggedIn}, true));
+
         done();
     });
+}
+
+export default (testArgs: TestArguments): void => {
+    assertErrors({
+        
+    }, testArgs, isLoggedIn);
 }

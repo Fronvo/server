@@ -3,18 +3,18 @@
 // ******************** //
 
 import { SharedVariables } from 'interfaces/test';
-import { v4 } from 'uuid';
+import { generateEmail, generatePassword } from 'utilities/test';
 
-const email = v4().replace(/-/g, '') + '@gmail.com';
-const password = email.substring(0, 30);
+const email = generateEmail();
+const password = generatePassword();
 let token: string;
 let profileId: string;
 
-const sharedVariables: SharedVariables = {
+const shared: SharedVariables = {
     email,
     password,
     token,
     profileId
 };
 
-export default sharedVariables;
+export default shared;

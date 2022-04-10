@@ -2,12 +2,19 @@
 // The test file for the logout event.
 // ******************** //
 
-import { TestArguments } from 'interfaces/test';
+import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import { assertError, assertErrors } from 'utilities/test';
 
-export default ({ socket, done, assert }: TestArguments): void => {
-    socket.emit('logout', ({ err}): void => {
-        assert(!err);
-        
+function logout({ socket, done }: TestArguments, callback: TestErrorCallback): void {
+    socket.emit('logout', ({ err }) => {
+        callback(assertError({err}));
+
         done();
     });
+}
+
+export default (testArgs: TestArguments): void => {
+    assertErrors({
+        
+    }, testArgs, logout);
 }

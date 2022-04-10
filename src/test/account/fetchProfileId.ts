@@ -2,18 +2,23 @@
 // The test file for the fetchProfileId event.
 // ******************** //
 
-import { TestArguments } from 'interfaces/test';
+import { TestArguments, TestErrorCallback } from 'interfaces/test';
 import shared from 'test/shared';
+import { assertError, assertErrors, assertType } from 'utilities/test';
 
-export default ({ socket, done, assert }: TestArguments): void => {
-
+function fetchProfileId({ socket, done }: TestArguments, callback: TestErrorCallback): void {
     socket.emit('fetchProfileId', ({ err, profileId }): void => {
-        assert(!err);
-        assert(typeof profileId == 'string');
-
-        shared.profileId = profileId;
+        callback(assertError({err}));
         
+        callback(assertType({profileId}, 'string'));
+        
+        shared.profileId = profileId;
         done();
     });
+}
 
+export default (testArgs: TestArguments): void => {
+    assertErrors({
+        
+    }, testArgs, fetchProfileId);
 }

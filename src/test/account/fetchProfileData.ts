@@ -2,17 +2,34 @@
 // The test file for the fetchProfileData event.
 // ******************** //
 
-import { TestArguments } from 'interfaces/test';
+import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import { assertCode, assertError, assertErrors, assertNotEqual, assertType } from 'utilities/test';
+import { v4 } from 'uuid';
 
-export default ({ socket, done, assert, shared }: TestArguments): void => {
-    const profileId = shared.profileId;
+function profileNotFound({ socket }: Partial<TestArguments>, callback: TestErrorCallback): void {
+    socket.emit('fetchProfileData', {
+        profileId: v4()
+    }, ({ err }) => {
+        callback(assertCode(err.code, 'PROFILE_NOT_FOUND'));
+    });
+}
 
-    socket.emit('fetchProfileData', { profileId }, ({ err, profileData }): void => {
-        assert(!err);
-        assert(typeof profileData == 'object');
-        assert((profileData.email, profileData.username, profileData.creationDate));
+function fetchProfileData({ socket, done, shared }: TestArguments, callback: TestErrorCallback): void {    
+    socket.emit('fetchProfileData', {
+        profileId: shared.profileId
+    }, ({ err, profileData }): void => {
+        callback(assertError({err}));
+        
+        callback(assertType({email: profileData.email}, 'string')
+        || assertType({username: profileData.username}, 'string')
+        || assertNotEqual({creationDate: new Date(profileData.creationDate)}, 'Invalid Date'));
 
         done();
     });
+}
 
+export default (testArgs: TestArguments): void => {
+    assertErrors({
+        profileNotFound
+    }, testArgs, fetchProfileData);
 }

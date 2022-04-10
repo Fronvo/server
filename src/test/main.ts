@@ -10,9 +10,6 @@ import generalTests from 'test/general';
 import accountTests from 'test/account';
 import noAccountTests from 'test/noAccount';
 
-// Chai
-import { assert } from 'chai';
-
 // Other
 import { io } from 'socket.io-client';
 import shared from 'test/shared';
@@ -51,7 +48,6 @@ describe('Fronvo', () => {
 	// Done is filled in every test
 	const testArguments: Partial<TestArguments> = {
 		socket,
-		assert,
 		shared
 	};
 
