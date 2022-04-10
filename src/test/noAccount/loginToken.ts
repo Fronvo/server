@@ -3,7 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import { assertCode, assertEquals, assertError, assertErrors } from 'utilities/test';
+import { assertCode, assertEquals, assertError, assertErrors } from 'test/utilities';
 import { v4 } from 'uuid';
 
 function required({ socket }: Partial<TestArguments>, callback: TestErrorCallback): void {

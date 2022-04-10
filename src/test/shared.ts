@@ -3,7 +3,7 @@
 // ******************** //
 
 import { SharedVariables } from 'interfaces/test';
-import { generateEmail, generatePassword } from 'utilities/test';
+import { generateEmail, generatePassword } from 'test/utilities';
 
 const email = generateEmail();
 const password = generatePassword();

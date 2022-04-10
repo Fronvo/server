@@ -4,7 +4,7 @@
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
 import shared from 'test/shared';
-import { assertError, assertErrors, assertType } from 'utilities/test';
+import { assertError, assertErrors, assertType } from 'test/utilities';
 
 function fetchProfileId({ socket, done }: TestArguments, callback: TestErrorCallback): void {
     socket.emit('fetchProfileId', ({ err, profileId }): void => {

@@ -3,7 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import { assertEquals, assertError, assertErrors } from 'utilities/test';
+import { assertEquals, assertError, assertErrors } from 'test/utilities';
 
 function isLoggedIn({ socket, done }: TestArguments, callback: TestErrorCallback): void {
     socket.emit('isLoggedIn', ({ err, loggedIn }) => {

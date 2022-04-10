@@ -3,7 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import { assertCode, assertError, assertErrors, assertNotEqual, assertType } from 'utilities/test';
+import { assertCode, assertError, assertErrors, assertNotEqual, assertType } from 'test/utilities';
 import { v4 } from 'uuid';
 
 function profileNotFound({ socket }: Partial<TestArguments>, callback: TestErrorCallback): void {

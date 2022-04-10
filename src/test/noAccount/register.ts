@@ -4,7 +4,7 @@
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
 import sharedVars from 'test/shared';
-import { assertCode, assertEquals, assertError, assertErrors, assertLength, assertType, generateEmail, generatePassword } from 'utilities/test';
+import { assertCode, assertEquals, assertError, assertErrors, assertLength, assertType, generateEmail, generatePassword } from 'test/utilities';
 
 function requiredEmail({ socket }: Partial<TestArguments>, callback: TestErrorCallback): void {
     socket.emit('register', {
