@@ -8,9 +8,7 @@ import { config } from 'dotenv';
 
 config({ path: resolve(__dirname, '..', '.env') });
 
-import * as errors from './errors';
-import { enums } from './enums';
-import { FronvoError, LoggedInSocket, PerformanceReport, RequiredStartupFile } from 'interfaces/all';
+import { LoggedInSocket, PerformanceReport, RequiredStartupFile } from 'interfaces/all';
 import { PrismaClient } from '@prisma/client';
 import { existsSync } from 'fs';
 import { EzRateLimiter } from 'ez-ratelimiter';
@@ -40,13 +38,6 @@ export const localMode = testMode || decideBooleanEnvValue(process.env.FRONVO_LO
 export const localSave = decideBooleanEnvValue(process.env.FRONVO_LOCAL_SAVE, true);
 
 export const loggedInSockets: {[socketId: string]: LoggedInSocket} = {};
-
-export const defaultError: FronvoError = {
-    err: {
-        msg: errors.ERR_UNKNOWN,
-        code: enums.ERR_UNKNOWN
-    }
-};
 
 // Passwords
 export const mainBcryptHash = 12;

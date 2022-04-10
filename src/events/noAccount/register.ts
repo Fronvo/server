@@ -7,8 +7,6 @@ import bcrypt from 'bcrypt';
 import { decideAccountSchemaResult } from 'events/noAccount/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { RegisterResult, RegisterServerParams } from 'interfaces/noAccount/register';
-import { enums } from 'other/enums';
-import { ERR_ACC_ALR_EXISTS, ERR_INVALID_EMAIL } from 'other/errors';
 import * as variables from 'other/variables';
 import utilities from 'utilities/all';
 import { findDocuments } from 'utilities/global';
@@ -21,7 +19,7 @@ async function register({ io, socket, email, password }: RegisterServerParams): 
     // Check if the email is from a dummy (blacklisted) domain, if applicable
     if(variables.blacklistedEmailDomainsEnabled) {
         if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(email)) > -1) {
-            return utilities.generateError(ERR_INVALID_EMAIL, enums.ERR_INVALID_EMAIL);
+            return utilities.generateError('INVALID_EMAIL');
         }
     }
 
@@ -32,7 +30,7 @@ async function register({ io, socket, email, password }: RegisterServerParams): 
         const accountData = accounts[account].accountData;
 
         if(accountData.email == email) {
-            return utilities.generateError(ERR_ACC_ALR_EXISTS, enums.ERR_ACC_ALR_EXISTS);
+            return utilities.generateError('ACC_ALR_EXISTS');
         }
     }
     

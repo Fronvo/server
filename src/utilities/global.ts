@@ -8,11 +8,13 @@ import { FronvoError, LoggedInSocket } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
-import { CollectionNames } from 'other/types';
-import * as errors from 'other/errors';
+import errors from 'other/errors';
+import errorsExtra from 'other/errorsExtra';
+import { CollectionNames, Errors } from 'other/types';
 import * as variables from 'other/variables';
 import { localDB, prismaClient } from 'other/variables';
 import { Server, Socket } from 'socket.io';
+import { format } from 'util';
 import { v4 } from 'uuid';
 
 export function saveLocalDB(): void {
@@ -21,7 +23,7 @@ export function saveLocalDB(): void {
     // Asynchronous write, boosts local development even more
     writeFile(variables.localDBPath, JSON.stringify(localDB, null, '\t'), (err) => {
         if(err) {
-            console.log(errors.ERR_LOCAL_DB_FAIL);
+            console.log(errorsExtra.LOCAL_DB_FAIL);
         }
     });
 }
@@ -136,7 +138,23 @@ export function decideBooleanEnvValue(value: string, valueIfNull: boolean): bool
     return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
 }
 
-export function generateError(msg: string, code: number, extras?: {[key: string]: any}): FronvoError {
+export function getErrorCode(errName: Errors): number {
+    return Object.keys(errors).indexOf(errName) + 1;
+}
+
+export function getErrorKey(errCode: number): Errors {
+    // @ts-ignore
+    // It is an Errors string
+    return Object.keys(errors).at(errCode - 1);
+}
+
+export function generateError(errName: Errors, extras?: {[key: string]: any}, formatParams?: any[]): FronvoError {
+    let msg: string = errors[errName];
+    const code = getErrorCode(errName);
+
+    if(formatParams) msg = format(msg, ...formatParams);
+    
+
     const err: FronvoError = {
         err: {
             msg,
@@ -144,7 +162,7 @@ export function generateError(msg: string, code: number, extras?: {[key: string]
         }
     };
 
-    if(extras) err.err.extras = {...extras};
+    if(extras) err.err.extras = extras;
 
     return err;
 }

@@ -9,7 +9,6 @@ import { ServerToClientEvents } from 'interfaces/events/s2c';
 export interface TestArguments {
     socket: Socket<ServerToClientEvents, ClientToServerEvents>;
     done: Mocha.Done;
-    assert: Chai.Assert;
     shared: SharedVariables;
 }
 
@@ -18,4 +17,8 @@ export interface SharedVariables {
     password: string;
     token: string;
     profileId: string;
+}
+
+export interface TestErrorCallback {
+    (err?: string);
 }

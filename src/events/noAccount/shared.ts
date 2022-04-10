@@ -4,11 +4,8 @@
 
 import { FronvoError } from 'interfaces/all';
 import { MinMaxEntries } from 'interfaces/noAccount/shared';
-import { enums, joiErrorTypes } from 'other/enums';
-import * as errors from 'other/errors';
+import { joiErrorTypes } from 'other/enums';
 import { accountSchema, accountTokenSchema } from 'other/schemas';
-import { defaultError } from 'other/variables';
-import { format } from 'util';
 import { generateError } from 'utilities/global';
 
 function getMinMaxEntriesForAccounts(): MinMaxEntries {
@@ -33,57 +30,35 @@ function getMinMaxEntriesForAccounts(): MinMaxEntries {
 };
 
 export function decideAccountSchemaResult(email: string, password: string): FronvoError {
-    const schemaResult = accountSchema.validate({
-        email: email,
-        password: password
-    });
+    const schemaResult = accountSchema.validate({ email, password });
 
     if (!schemaResult.error)
         return;
 
     const schemaDetails = schemaResult.error.details[0];
-    const schemaType = schemaDetails.type;
-    const schemaMessage = schemaDetails.message;
     const schemaPath = schemaDetails.path[0];
 
-    // Default dictionary to reuse, copy its values
-    const resultDict = { ...defaultError };
+    switch (schemaDetails.type) {
+        case joiErrorTypes.TYPE_REQUIRED:
+        case joiErrorTypes.TYPE_EMPTY:
+            return generateError('REQUIRED', {for: schemaPath}, [schemaPath]);
 
-    // Default to JOI message
-    resultDict.err.msg = schemaMessage;
+        case joiErrorTypes.TYPE_MIN:
+        case joiErrorTypes.TYPE_MAX:
+            const limits = getMinMaxEntriesForAccounts();
+            const min = limits[schemaPath].min;
+            const max = limits[schemaPath].max;
+            
+            return generateError('LENGTH', {for: schemaPath, min, max}, [schemaPath, min, max]);
 
-    if (schemaPath === 'email' || schemaPath === 'password') {
+        case joiErrorTypes.TYPE_INVALID_EMAIL_FORMAT:
+            return generateError('INVALID_EMAIL_FORMAT');
 
-        // Provide additional info for the end user
-        resultDict.err.extras = { for: schemaPath };
-
-        const limits = getMinMaxEntriesForAccounts();
-
-        switch (schemaType) {
-
-            // Fall-through, reuse
-            case joiErrorTypes.TYPE_REQUIRED:
-            case joiErrorTypes.TYPE_EMPTY:
-                resultDict.err.msg = format(errors.ERR_REQUIRED, schemaPath);
-                resultDict.err.code = enums.ERR_REQUIRED;
-                break;
-
-            case joiErrorTypes.TYPE_MIN:
-            case joiErrorTypes.TYPE_MAX:
-                resultDict.err.msg = format(errors.ERR_LENGTH, schemaPath, limits[schemaPath].min, limits[schemaPath].max);
-                resultDict.err.code = enums.ERR_LENGTH;
-                resultDict.err.extras.min = limits[schemaPath].min;
-                resultDict.err.extras.max = limits[schemaPath].max;
-                break;
-
-            case joiErrorTypes.TYPE_INVALID_EMAIL_FORMAT:
-                resultDict.err.msg = errors.ERR_INVALID_EMAIL_FORMAT;
-                resultDict.err.code = enums.ERR_INVALID_EMAIL_FORMAT;
-                break;
-        }
+        case joiErrorTypes.TYPE_REGEX:
+            return generateError('INVALID_REGEX', {for: schemaPath}, [schemaPath]);
     }
 
-    return generateError(resultDict.err.msg, resultDict.err.code, { ...resultDict.err.extras });
+    return generateError('UNKNOWN');
 }
 
 export function decideAccountTokenSchemaResult(token: string): FronvoError {
@@ -92,25 +67,17 @@ export function decideAccountTokenSchemaResult(token: string): FronvoError {
     if (!schemaResult.error)
         return;
 
-    const resultDict = { ...defaultError };
-
     switch (schemaResult.error.details[0].type) {
         case joiErrorTypes.TYPE_REQUIRED:
         case joiErrorTypes.TYPE_EMPTY:
-            resultDict.err.msg = format(errors.ERR_REQUIRED, 'token');
-            resultDict.err.code = enums.ERR_REQUIRED;
-            break;
+            return generateError('REQUIRED', {for: 'token'}, ['token']);
 
         case joiErrorTypes.TYPE_LENGTH:
-            resultDict.err.msg = format(errors.ERR_EXACT_LENGTH, 'token', 36);
-            resultDict.err.code = enums.ERR_EXACT_LENGTH;
-            break;
+            return generateError('EXACT_LENGTH', {for: 'token'}, ['token', 36]);
 
         case joiErrorTypes.TYPE_REGEX:
-            resultDict.err.msg = format(errors.ERR_INVALID_REGEX, 'token');
-            resultDict.err.code = enums.ERR_INVALID_REGEX;
-            break;
+            return generateError('INVALID_REGEX', {for: 'token'}, ['token']);
     }
 
-    return generateError(resultDict.err.msg, resultDict.err.code, { ...resultDict.err.extras });
+    return generateError('UNKNOWN');
 }

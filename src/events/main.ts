@@ -2,8 +2,7 @@
 // The main event file which provides arguments to the rest of the events and manages access states.
 // ******************** //
 
-import { enums } from 'other/enums';
-import * as errors from 'other/errors';
+import errorsExtra from 'other/errorsExtra';
 import utilities from 'utilities/all';
 import { generateError } from 'utilities/global';
 import * as variables from 'other/variables';
@@ -61,25 +60,26 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                             callback(callbackResponse);
 
                         } else {
-                            utilities.insertLog(format(errors.ERR_FUNC_RETURN_NONE, event));
-                            callback(generateError(errors.ERR_UNKNOWN, enums.ERR_UNKNOWN));
+                            utilities.insertLog(format(errorsExtra.FUNC_RETURN_NONE, event));
+                            callback(generateError('UNKNOWN'));
                         }
                     }
                 }
 
                 // Account only
                 if(event in {...accountEvents} && !utilities.isSocketLoggedIn(socket)) {
-                    sendCallback(generateError(errors.ERR_MUST_BE_LOGGED_IN, enums.ERR_MUST_BE_LOGGED_IN, {event: event}));
+                    sendCallback(generateError('MUST_BE_LOGGED_IN', {event: event}));
 
                 // No account only
                 } else if(event in {...noAccountEvents} && utilities.isSocketLoggedIn(socket)) {
-                    sendCallback(generateError(errors.ERR_MUST_BE_LOGGED_OUT, enums.ERR_MUST_BE_LOGGED_OUT, {event: event}));
+                    sendCallback(generateError('MUST_BE_LOGGED_OUT', {event: event}));
 
                 } else {
                     // Prevent modifications to templates, just copy
                     const neededArgs = funcs[event].template.slice();
                     const neededArgsOriginal = funcs[event].template.slice();
 
+                    // TODO: Before 0.2: Place this before login/logout checks above to find the callback first
                     // Order the arguments according to the event's template
                     for(const item in args) {
                         const argItem = args[item];
@@ -115,20 +115,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                     };
 
                     if(neededArgs.length > 0) {
-                        // Stylise missing arguments
-                        let neededArgsString = errors.ERR_MISSING_ARGS;
-                        
-                        for(const item in neededArgs) {
-                            if(!(parseInt(item) == 0)) {
-                                neededArgsString += ', ';
-                            }
-                        
-                            neededArgsString += '\'' + neededArgs[item] + '\'';
-                        
-                            if(parseInt(item) == (neededArgs.length - 1)) neededArgsString += '.';
-                        }
-
-                        sendCallback(generateError(neededArgsString, enums.ERR_MISSING_ARGS, {args_needed: neededArgs}));
+                        sendCallback(generateError('MISSING_ARGS', {neededArgs}));
 
                     } else {
                         perfId = utilities.reportStart(event);
@@ -149,7 +136,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
 
                             .catch((reason: EzError) => {
                                 // Not enough points / Out of points, give  ratelimit info
-                                sendCallback(generateError(errors.ERR_RATELIMITED, enums.ERR_RATELIMITED), reason.currentPoints);
+                                sendCallback(generateError('RATELIMITED'), reason.currentPoints);
                             });
                         } else {
                             // Test mode, only run

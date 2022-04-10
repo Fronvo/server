@@ -7,8 +7,6 @@ import { compareSync } from 'bcrypt';
 import { decideAccountSchemaResult } from 'events/noAccount/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { LoginResult, LoginServerParams } from 'interfaces/noAccount/login';
-import { enums } from 'other/enums';
-import { ERR_ACC_DOESNT_EXIST, ERR_INVALID_PASSWORD } from 'other/errors';
 import { testMode } from 'other/variables';
 import * as utilities from 'utilities/global';
 
@@ -34,12 +32,12 @@ async function login({ io, socket, email, password}: LoginServerParams): Promise
 
                 return {token: accountToken};
             } else {
-                return utilities.generateError(ERR_INVALID_PASSWORD, enums.ERR_INVALID_PASSWORD);
+                return utilities.generateError('INVALID_PASSWORD');
             }
         }
     };
 
-    return utilities.generateError(ERR_ACC_DOESNT_EXIST, enums.ERR_ACC_DOESNT_EXIST);
+    return utilities.generateError('ACC_DOESNT_EXIST');
 }
 
 const loginTemplate: EventTemplate = {
