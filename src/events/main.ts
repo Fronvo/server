@@ -66,6 +66,17 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                     }
                 }
 
+                // Find the callback first
+                for(const item in args) {
+                    const argItem = args[item];
+
+                    // Only one callback, dont overwrite
+                    if(typeof(argItem) === 'function' && !callback) {
+                        callback = argItem;
+                        break;
+                    }
+                }
+
                 // Account only
                 if(event in {...accountEvents} && !utilities.isSocketLoggedIn(socket)) {
                     sendCallback(generateError('MUST_BE_LOGGED_IN', {event: event}));
@@ -79,7 +90,6 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                     const neededArgs = funcs[event].template.slice();
                     const neededArgsOriginal = funcs[event].template.slice();
 
-                    // TODO: Before 0.2: Place this before login/logout checks above to find the callback first
                     // Order the arguments according to the event's template
                     for(const item in args) {
                         const argItem = args[item];
@@ -100,17 +110,6 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
                                 }
                             }
                             // Can combine dictionaries, dont return here
-                        }
-                    };
-
-                    // Find the callback
-                    for(const item in args) {
-                        const argItem = args[item];
-
-                        // Only one callback, dont overwrite
-                        if(typeof(argItem) === 'function' && !callback) {
-                            callback = argItem;
-                            break;
                         }
                     };
 
