@@ -3,8 +3,8 @@
 // ******************** //
 
 // Put all of the event test files here
-import register from 'test/noAccount/register';
-import login from 'test/noAccount/login';
-import loginToken from 'test/noAccount/loginToken';
+import register from 'test/noAccount/register.test';
+import login from 'test/noAccount/login.test';
+import loginToken from 'test/noAccount/loginToken.test';
 
 export default { register, login, loginToken }
