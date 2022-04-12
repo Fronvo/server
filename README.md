@@ -33,3 +33,5 @@
 **[Prisma](https://www.prisma.io/) for database types.**
 
 **[Ez-Ratelimiter](https://github.com/Fronvo/ez-ratelimiter) to simplify the rate-limiting process.**
+
+**[swc](https://github.com/swc-project) to make the compiling process as speedy as possible.**
