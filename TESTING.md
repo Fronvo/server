@@ -13,7 +13,7 @@
 
 **In order to create your own tests, take a look at the existing [test files](https://github.com/Fronvo/fronvo/tree/master/src/test).**
 
-**As you can see, there exist a handful of helper functions for assertion, located in [test utilities](https://github.com/Fronvo/fronvo/blob/master/src/test/utilities.ts) such as [assertCode]().**
+**As you can see, there exist a handful of helper functions for assertion, located in [test utilities](https://github.com/Fronvo/fronvo/blob/master/src/test/utilities.ts) such as [assertCode](https://github.com/swc-project/swc-node).**
 
 **Simply take a look at the rest of the tests and imitate their behaviour.**
 
