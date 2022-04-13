@@ -20,7 +20,7 @@
     "start:dev": "tsnd --transpile-only --respawn --exit-child --clear -r tsconfig-paths/register src/main/server.ts",
     "test": "run-p test:server test:mocha",
     "test:mocha": "mocha -r @swc-node/register -r tsconfig-paths/register src/test/main.ts",
-    "test:server": "cross-env FRONVO_TEST_MODE=true FRONVO_LOCAL_SAVE=false FRONVO_BINARY_PARSER=false FRONVO_SILENT_LOGGING=true node -r @swc-node/register -r tsconfig-paths/register src/main/server.ts"
+    "test:server": "cross-env FRONVO_TEST_MODE=true FRONVO_BINARY_PARSER=false node -r @swc-node/register -r tsconfig-paths/register src/main/server.ts"
   },
   "dependencies": {
     "@prisma/client": "^3.12.0",

@@ -35,7 +35,7 @@ const localDBTemplate: {[dbName: string]: {}[]} = {
 export const blacklistedEmailDomainsEnabled = decideBooleanEnvValue(process.env.FRONVO_EMAIL_BLACKLISTING_ENABLED, true);
 export const testMode = decideBooleanEnvValue(process.env.FRONVO_TEST_MODE, false);
 export const localMode = testMode || decideBooleanEnvValue(process.env.FRONVO_LOCAL_MODE, true);
-export const localSave = decideBooleanEnvValue(process.env.FRONVO_LOCAL_SAVE, true);
+export const localSave = decideBooleanEnvValue(process.env.FRONVO_LOCAL_SAVE, true) && !testMode;
 
 export const loggedInSockets: {[socketId: string]: LoggedInSocket} = {};
 
@@ -61,7 +61,7 @@ export const requiredStartupFiles: [{[file: string]: RequiredStartupFile}] = [{l
 // Blacklisted emails: https://github.com/disposable-email-domains/disposable-email-domains
 export const blacklistedEmailDomains: string[] = blacklistedEmailDomainsEnabled && require(resolve(generatedFilesDirectory, 'disposable_email_blocklist.json'));
 
-export const silentLogging = decideBooleanEnvValue(process.env.FRONVO_SILENT_LOGGING, false);
+export const silentLogging = testMode || decideBooleanEnvValue(process.env.FRONVO_SILENT_LOGGING, false);
 
 // The local virtualised Mongo database
 export const localDB: {[dbName: string]: {}[]} = localMode && localSave && existsSync(localDBPath) ? require(localDBPath) : localDBTemplate;
