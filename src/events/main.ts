@@ -24,7 +24,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
     const funcs: EventExportTemplate = {...noAccountEvents, ...generalEvents, ...accountEvents};
     
     io.on('connection', (socket): void => {
-        // TODO: Just show connected client number
+        // TODO: Register fronvo handlers here located in a seperate file, provide io, socket params.
         console.log('Socket ' + socket.id + ' has connected.');
 
         // Anything sent, which is an event, is forwarded here
