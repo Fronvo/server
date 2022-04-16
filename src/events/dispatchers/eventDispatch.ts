@@ -90,7 +90,6 @@ async function fireEvent(io: Server<ClientToServerEvents, ServerToClientEvents, 
             sendCallback(callback, generateError('RATELIMITED'), undefined, reason.currentPoints);
         });
     } else {
-        // TODO: Use uuid
         const perfId = utilities.reportStart(eventName);
 
         // Test mode, only run
