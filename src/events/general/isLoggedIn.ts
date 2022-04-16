@@ -7,7 +7,9 @@ import { IsLoggedInResult, isLoggedInServerParams } from 'interfaces/general/isL
 import { isSocketLoggedIn } from 'utilities/global';
 
 function isLoggedIn({ socket }: isLoggedInServerParams): IsLoggedInResult {
-    return {loggedIn: isSocketLoggedIn(socket)};
+    return {
+        loggedIn: isSocketLoggedIn(socket)
+    };
 }
 
 const isLoggedInTemplate: EventTemplate = {

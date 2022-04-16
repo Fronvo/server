@@ -28,7 +28,9 @@ async function fetchProfileData({ socket, profileId }: FetchProfileDataServerPar
             finalAccountData.email = accountData.email;
         }
 
-        return {profileData: finalAccountData};
+        return {
+            profileData: finalAccountData
+        };
     }
 
     return generateError('PROFILE_NOT_FOUND');

@@ -30,7 +30,10 @@ async function login({ io, socket, email, password}: LoginServerParams): Promise
                 let accountToken = await utilities.getToken(accountData.id);
                 if(!accountToken) accountToken = await utilities.createToken(accountData.id);
 
-                return {token: accountToken};
+                return {
+                    token: accountToken
+                };
+                
             } else {
                 return utilities.generateError('INVALID_PASSWORD');
             }

@@ -48,7 +48,9 @@ async function register({ io, socket, email, password }: RegisterServerParams): 
     // Also login to the account
     utilities.loginSocket(io, socket, id);
 
-    return {token: await utilities.createToken(id)};
+    return {
+        token: await utilities.createToken(id)
+    };
 }
 
 const registerTemplate: EventTemplate = {

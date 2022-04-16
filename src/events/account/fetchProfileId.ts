@@ -7,7 +7,9 @@ import { EventTemplate } from 'interfaces/all';
 import { getLoggedInSockets } from 'utilities/global';
 
 function fetchProfileId({ socket }: FetchProfileIdServerParams): FetchProfileIdResult {
-    return {profileId: getLoggedInSockets()[socket.id].accountId};
+    return {
+        profileId: getLoggedInSockets()[socket.id].accountId
+    };
 }
 
 const fetchProfileIdTemplate: EventTemplate = {
