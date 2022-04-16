@@ -21,32 +21,25 @@ const funcs: EventExportTemplate = {...noAccountEvents, ...generalEvents, ...acc
 function filterEventArgs(eventName: string, eventArgs: {[key: string]: any}): {[key: string]: any} {
     // Prevent modifications to templates, just copy
     const finalEventArgs: {[key: string]: any} = {};
-    const neededArgs = funcs[eventName].template.slice();
-    const neededArgsOriginal = funcs[eventName].template.slice();
 
-    // Order the arguments according to the event's template
-    // TODO: Remake, only delete, no ordering since {}
-    for(const item in eventArgs) {
-        const argItem = eventArgs[item];
+    for(const eventArgIndex in eventArgs) {
+        const eventArgItem = eventArgs[eventArgIndex];
+        
+        // Must be a dictionary, probably, thanks js
+        if(typeof(eventArgItem) === 'object') {
 
-        if(typeof(argItem) === 'object') {
-            for(const dictItem in argItem) {
-                if(neededArgs.includes(dictItem)) {
-                    // Maintain value order, use the original dictionary to preserve index
-                    let dictItemIndex = neededArgsOriginal.indexOf(dictItem);
+            for(const eventArg in eventArgItem) {                
+                
+                // Must be a needed argument, prevent invalid ones
+                if(funcs[eventName].template.includes(eventArg)) {
 
-                    // Add named argument to be passed later on
-                    finalEventArgs[dictItem] = argItem[dictItem];
-
-                    // Delete has weird functionality, roll with this
-                    // Dynamic index, reassign
-                    dictItemIndex = neededArgs.indexOf(dictItem);
-                    neededArgs.splice(dictItemIndex, dictItemIndex + 1);
+                    // Add to final arguments
+                    finalEventArgs[eventArg] = eventArgItem[eventArg];
                 }
             }
             // Can combine dictionaries, dont return here
         }
-    };
+    }
 
     return finalEventArgs;
 }
@@ -128,7 +121,7 @@ function sendCallback(callback: undefined | Function, callbackResponse: undefine
 }
 
 export default function eventDispatch(io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>, socket: Socket<ServerToClientEvents, ClientToServerEvents>, event: string, ...args: {[arg: string]: any}[]): void {
-    if(event in funcs) {        
+    if(event in funcs) {
         const eventPermissionResult = checkEventPermission(event, socket);
 
         const callback = findCallback(args);
