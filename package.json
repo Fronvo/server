@@ -19,7 +19,9 @@
     "start:cached": "node -r @swc-node/register -r tsconfig-paths/register output/main/server.js",
     "start:dev": "tsnd --ignore-watch src/generated --transpile-only --respawn --exit-child --clear -r tsconfig-paths/register src/main/server.ts",
     "test": "run-p test:server test:mocha",
+    "test:report": "run-p test:server test:mocha:report",
     "test:mocha": "mocha -r @swc-node/register -r tsconfig-paths/register src/test/main.ts",
+    "test:mocha:report": "mocha -r @swc-node/register -r tsconfig-paths/register --reporter mocha-junit-reporter --reporter-options mochaFile=./src/generated/tests/test-results.xml src/test/main.ts",
     "test:server": "cross-env FRONVO_TEST_MODE=true FRONVO_BINARY_PARSER=false node -r @swc-node/register -r tsconfig-paths/register src/main/server.ts"
   },
   "dependencies": {
@@ -48,6 +50,7 @@
     "@types/mocha": "^9.1.0",
     "@types/uuid": "^8.3.4",
     "mocha": "^9.2.2",
+    "mocha-junit-reporter": "^2.0.2",
     "prisma": "^3.12.0",
     "socket.io-client": "^4.4.1",
     "ts-node-dev": "^1.1.8"
