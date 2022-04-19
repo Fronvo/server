@@ -44,6 +44,21 @@ function filterEventArgs(eventName: string, eventArgs: {[key: string]: any}): {[
     return finalEventArgs;
 }
 
+function getNeededArgs(eventName: string, givenArgs: {[key: string]: any}): string[] {
+    const finalNeededArgs: string[] = [];
+    const eventTemplate = funcs[eventName].template;
+
+    for(const neededArgIndex in eventTemplate) {
+        const neededArg = eventTemplate[neededArgIndex];
+
+        if(!(neededArg in givenArgs)) {
+            finalNeededArgs.push(neededArg);
+        }
+    }
+
+    return finalNeededArgs;
+}
+
 function findCallback(eventArgs: {[arg: string]: any}): undefined | Function {
     for(const eventArgIndex in eventArgs) {
         const eventArgItem = eventArgs[eventArgIndex];
@@ -132,8 +147,10 @@ export default function eventDispatch(io: Server<ClientToServerEvents, ServerToC
 
         const eventArgs = filterEventArgs(event, args);
 
-        if(eventArgs.length > 0) {
-            sendCallback(callback, generateError('MISSING_ARGS', {eventArgs}));
+        const neededArgs = getNeededArgs(event, eventArgs);
+
+        if(neededArgs.length > 0) {
+            sendCallback(callback, generateError('MISSING_ARGS', {neededArgs}));
 
         } else {
             fireEvent(io, socket, event, callback, eventArgs);
