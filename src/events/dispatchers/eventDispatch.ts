@@ -5,7 +5,6 @@
 import accountEvents from 'events/account';
 import generalEvents from 'events/general';
 import noAccountEvents from 'events/noAccount';
-import { EzError } from 'ez-ratelimiter';
 import { EventExportTemplate, FronvoError } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
@@ -17,6 +16,10 @@ import utilities from 'utilities/all';
 import { generateError } from 'utilities/global';
 
 const funcs: EventExportTemplate = {...noAccountEvents, ...generalEvents, ...accountEvents};
+
+function getRemainingPoints(socket: Socket<ServerToClientEvents, ClientToServerEvents>): number {
+    return (rateLimiter.maxPoints) - (rateLimiter.getRatelimit(socket.handshake.address).points);
+}
 
 function filterEventArgs(eventName: string, eventArgs: {[key: string]: any}): {[key: string]: any} {
     // Prevent modifications to templates, just copy
@@ -83,25 +86,25 @@ async function fireEvent(io: Server<ClientToServerEvents, ServerToClientEvents, 
         // Consume event points, credited to the client's IP
         rateLimiter.consumePoints(socket.handshake.address, funcs[eventName].points)
 
-        .then(async (limit) => {
+        .then(async () => {
             // Notify other servers
             utilities.rateLimitAnnounce(io, socket, funcs[eventName].points);
 
             // Start the performance counter
             const perfId = utilities.reportStart(eventName);
 
-            sendCallback(callback, await runEventFunc(io, socket, eventName, eventArgs), perfId, limit.remainingPoints);
+            sendCallback(callback, await runEventFunc(io, socket, eventName, eventArgs), socket, perfId);
         })
 
-        .catch((reason: EzError) => {
-            // Not enough points / Out of points, give ratelimit info
-            sendCallback(callback, generateError('RATELIMITED'), undefined, reason.currentPoints);
+        .catch(() => {
+            // Not enough points
+            sendCallback(callback, generateError('RATELIMITED'), socket);
         });
     } else {
         const perfId = utilities.reportStart(eventName);
 
         // Test mode, only run
-        sendCallback(callback, await runEventFunc(io, socket, eventName, eventArgs), perfId);
+        sendCallback(callback, await runEventFunc(io, socket, eventName, eventArgs), socket, perfId);
     }
 }
 
@@ -115,7 +118,7 @@ async function runEventFunc(io: Server<ClientToServerEvents, ServerToClientEvent
     }
 }
 
-function sendCallback(callback: undefined | Function, callbackResponse: undefined | {[key: string]: any}, perfId?: string, remainingPoints?: number): void {
+function sendCallback(callback: undefined | Function, callbackResponse: undefined | {[key: string]: any}, socket: Socket<ServerToClientEvents, ClientToServerEvents>, perfId?: string): void {
     if(callback) {
         if(callbackResponse) {
             // Check if the event wasnt ratelimited
@@ -124,7 +127,9 @@ function sendCallback(callback: undefined | Function, callbackResponse: undefine
             }
 
             if(!variables.testMode) {
-                callbackResponse.extras = {remainingPoints};
+                callbackResponse.extras = {
+                    remainingPoints: getRemainingPoints(socket)
+                };
             }
             
             callback(callbackResponse);
@@ -142,7 +147,7 @@ export default function eventDispatch(io: Server<ClientToServerEvents, ServerToC
         const callback = findCallback(args);
 
         if(eventPermissionResult) {
-            sendCallback(callback, eventPermissionResult);
+            sendCallback(callback, eventPermissionResult, socket);
         }
 
         const eventArgs = filterEventArgs(event, args);
@@ -150,7 +155,7 @@ export default function eventDispatch(io: Server<ClientToServerEvents, ServerToC
         const neededArgs = getNeededArgs(event, eventArgs);
 
         if(neededArgs.length > 0) {
-            sendCallback(callback, generateError('MISSING_ARGS', {neededArgs}));
+            sendCallback(callback, generateError('MISSING_ARGS', {neededArgs}), socket);
 
         } else {
             fireEvent(io, socket, event, callback, eventArgs);
