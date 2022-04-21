@@ -13,7 +13,7 @@ import { createAdapter } from '@socket.io/cluster-adapter';
 import { setupWorker } from '@socket.io/sticky';
 
 // Ratelimiter
-import { EzRateLimiter } from 'ez-ratelimiter';
+import { EzierLimiter } from '@ezier/ratelimit';
 
 // Custom event files
 import registerEvents from 'events/main';
@@ -104,15 +104,15 @@ async function setupPrisma(): Promise<void> {
 function setupRatelimiter(): void {
     setLoading('Setting up the ratelimiter');
 
-    const ezLimiterPoints = parseInt(process.env.FRONVO_RATELIMITER_POINTS) || 40;
-    const ezLimiterDuration = parseInt(process.env.FRONVO_RATELIMITER_DURATION) || 2500;
+    const ezierLimiterPoints = parseInt(process.env.FRONVO_RATELIMITER_POINTS) || 40;
+    const ezierLimiterDuration = parseInt(process.env.FRONVO_RATELIMITER_DURATION) || 2500;
 
-    const ezLimiter = new EzRateLimiter({
-        maxPoints: ezLimiterPoints,
-        clearDelay: ezLimiterDuration
+    const ezierLimiter = new EzierLimiter({
+        maxPoints: ezierLimiterPoints,
+        clearDelay: ezierLimiterDuration
     });
 
-    variables.setRateLimiter(ezLimiter);
+    variables.setRateLimiter(ezierLimiter);
 }
 
 function setupServer(): void {

@@ -11,7 +11,7 @@ config({ path: resolve(__dirname, '..', '.env') });
 import { LoggedInSocket, PerformanceReport, RequiredStartupFile } from 'interfaces/all';
 import { PrismaClient } from '@prisma/client';
 import { existsSync } from 'fs';
-import { EzRateLimiter } from 'ez-ratelimiter';
+import { EzierLimiter } from '@ezier/ratelimit';
 
 function decideBooleanEnvValue(value: string, valueIfNull: boolean): boolean {
     return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
@@ -69,8 +69,8 @@ export const localDB: {[dbName: string]: {}[]} = localMode && localSave && exist
 // Prisma MongoDB client, filled in server.ts
 export const prismaClient = !localMode ? new PrismaClient() : null;
 
-export let rateLimiter: EzRateLimiter;
+export let rateLimiter: EzierLimiter;
 
-export function setRateLimiter(rateLimiterObject: EzRateLimiter): void {
+export function setRateLimiter(rateLimiterObject: EzierLimiter): void {
     rateLimiter = rateLimiterObject;
 }

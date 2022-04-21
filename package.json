@@ -25,6 +25,7 @@
     "test:server": "cross-env FRONVO_TEST_MODE=true FRONVO_BINARY_PARSER=false node -r @swc-node/register -r tsconfig-paths/register src/main/server.ts"
   },
   "dependencies": {
+    "@ezier/ratelimit": "^0.3.0",
     "@prisma/client": "^3.12.0",
     "@socket.io/admin-ui": "^0.2.0",
     "@socket.io/pm2": "^5.1.0",
@@ -33,7 +34,6 @@
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
-    "ez-ratelimiter": "^0.3.0",
     "gradient-string": "^1.2.0",
     "joi": "^17.6.0",
     "npm-run-all": "^4.1.5",
