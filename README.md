@@ -32,6 +32,6 @@
 
 **[Prisma](https://www.prisma.io/) for database types.**
 
-**[Ez-Ratelimiter](https://github.com/ezier-project/ratelimit) to simplify the rate-limiting process.**
+**[Ezier Ratelimiter](https://github.com/ezier-project/ratelimit) to simplify the rate-limiting process.**
 
 **[swc](https://github.com/swc-project) to make the compiling process as speedy as possible.**
