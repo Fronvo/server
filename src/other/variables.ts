@@ -12,6 +12,7 @@ import { LoggedInSocket, PerformanceReport, RequiredStartupFile } from 'interfac
 import { PrismaClient } from '@prisma/client';
 import { existsSync } from 'fs';
 import { EzierLimiter } from '@ezier/ratelimit';
+import { CollectionNames } from './types';
 
 function decideBooleanEnvValue(value: string, valueIfNull: boolean): boolean {
     return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
@@ -24,7 +25,7 @@ const localDBDirectory = resolve(generatedFilesDirectory, 'local');
 export const localDBPath = resolve(localDBDirectory, 'db.json');
 
 // File templates
-const localDBTemplate: {[dbName: string]: {}[]} = {
+const localDBTemplate: {[CollectionName in CollectionNames]: {}[]} = {
     Account: [],
     Token: [],
     Report: [],
