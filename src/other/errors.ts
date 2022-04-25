@@ -2,8 +2,10 @@
 // Used by generateError to provided error context.
 // ******************** //
 
+import { Errors } from './types'
+
 // Remember to util.format() depending on the error's symbols.
-export default {
+const errors: {[Error in Errors]} = {
     UNKNOWN: 'An unknown error has occured.',
     MUST_BE_LOGGED_IN: 'You must login first before using this event.',
     MUST_BE_LOGGED_OUT: 'You must logout first before using this event.',
@@ -21,3 +23,5 @@ export default {
     INVALID_TOKEN: 'The token is invalid.',
     PROFILE_NOT_FOUND: 'The requested profile could not be found.'
 }
+
+export default errors;
