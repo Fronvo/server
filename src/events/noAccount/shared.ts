@@ -3,81 +3,63 @@
 // ******************** //
 
 import { FronvoError } from 'interfaces/all';
-import { MinMaxEntries } from 'interfaces/noAccount/shared';
-import { joiErrorTypes } from 'other/enums';
 import { accountSchema, accountTokenSchema } from 'other/schemas';
 import { generateError } from 'utilities/global';
 
-function getMinMaxEntriesForAccounts(): MinMaxEntries {
-    const resultDict: MinMaxEntries = {
-        email: {},
-        password: {}
-    };
+export function decideAccountSchemaResult(email: string, password: string): undefined | FronvoError {
+    // Only need the first error
+    const result = accountSchema.validate({ email, password })[0];
 
-    // @ts-ignore
-    // Joi doesnt allow this but we dont care
-    for(const [key, value] of accountSchema._ids._byKey.entries()) {
-        if(!(key === 'email' || key === 'password')) continue;
-
-        for(const [_, value2] of value.schema._singleRules.entries()) {
-            if(!(value2.name === 'min' || value2.name === 'max')) continue;
-
-            resultDict[key][value2.name] = value2.args.limit;
-        }
-    };
-
-    return resultDict;
-};
-
-export function decideAccountSchemaResult(email: string, password: string): FronvoError {
-    const schemaResult = accountSchema.validate({ email, password });
-
-    if (!schemaResult.error)
+    if(!result)
         return;
 
-    const schemaDetails = schemaResult.error.details[0];
-    const schemaPath = schemaDetails.path[0];
+    const key = result.extras.key;
+    const extras: {[key: string]: any} = {for: key};
 
-    switch (schemaDetails.type) {
-        case joiErrorTypes.TYPE_REQUIRED:
-        case joiErrorTypes.TYPE_EMPTY:
-            return generateError('REQUIRED', {for: schemaPath}, [schemaPath]);
+    switch (result.name) {
+        case 'STRING_REQUIRED':
+            return generateError('REQUIRED', extras, [key]);
 
-        case joiErrorTypes.TYPE_MIN:
-        case joiErrorTypes.TYPE_MAX:
-            const limits = getMinMaxEntriesForAccounts();
-            const min = limits[schemaPath].min;
-            const max = limits[schemaPath].max;
+        case 'STRING_INVALID_LENGTH':
+            return generateError('EXACT_LENGTH', extras, [key]);
+
+        case 'STRING_INVALID_MIN_LENGTH':
+        case 'STRING_INVALID_MAX_LENGTH':
+            const min = accountSchema.schema[key].minLength;
+            const max = accountSchema.schema[key].maxLength;
             
-            return generateError('LENGTH', {for: schemaPath, min, max}, [schemaPath, min, max]);
+            return generateError('LENGTH', {...extras, min, max}, [key, min, max]);
 
-        case joiErrorTypes.TYPE_INVALID_EMAIL_FORMAT:
-            return generateError('INVALID_EMAIL_FORMAT');
+        case 'STRING_INVALID_TYPE':
+            return generateError('INVALID_EMAIL_FORMAT', extras);
 
-        case joiErrorTypes.TYPE_REGEX:
-            return generateError('INVALID_REGEX', {for: schemaPath}, [schemaPath]);
+        case 'STRING_INVALID_REGEX':
+            return generateError('INVALID_REGEX', extras, [key]);
+
+        default:
+            return generateError('UNKNOWN');
     }
-
-    return generateError('UNKNOWN');
 }
 
 export function decideAccountTokenSchemaResult(token: string): FronvoError {
-    const schemaResult = accountTokenSchema.validate({ token });
+    const result = accountTokenSchema.validate({ token })[0];
 
-    if (!schemaResult.error)
+    if (!result)
         return;
 
-    switch (schemaResult.error.details[0].type) {
-        case joiErrorTypes.TYPE_REQUIRED:
-        case joiErrorTypes.TYPE_EMPTY:
-            return generateError('REQUIRED', {for: 'token'}, ['token']);
+    const extras = {for: 'token'};
 
-        case joiErrorTypes.TYPE_LENGTH:
-            return generateError('EXACT_LENGTH', {for: 'token'}, ['token', 36]);
+    switch (result.name) {
+        case 'STRING_REQUIRED':
+            return generateError('REQUIRED', extras);
 
-        case joiErrorTypes.TYPE_REGEX:
-            return generateError('INVALID_REGEX', {for: 'token'}, ['token']);
+        case 'STRING_INVALID_LENGTH':
+            return generateError('EXACT_LENGTH', extras, ['token', accountTokenSchema.schema.token.length]);
+
+        case 'STRING_INVALID_REGEX':
+            return generateError('INVALID_REGEX', extras, ['token']);
+
+        default:
+            return generateError('UNKNOWN');
     }
-
-    return generateError('UNKNOWN');
 }

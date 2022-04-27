@@ -1,16 +1,30 @@
 // ******************** //
-// Schemas made with Joi for validating user data.
+// Schemas for validating user-provided data.
 // ******************** //
 
-import Joi from 'joi';
+import { StringSchema } from '@ezier/validate';
 
 // Register / Login
-export const accountSchema = Joi.object({
-    email: Joi.string().email().min(8).max(60).required(),
-    password: Joi.string().regex(/[a-zA-Z0-9]/).min(8).max(30).required()
+export const accountSchema = new StringSchema({
+    email: {
+        minLength: 8,
+        maxLength: 60,
+        type: 'email'
+    },
+
+    password: {
+        minLength: 8,
+        maxLength: 30,
+        regex: /^[a-zA-Z0-9]+$/
+    }
 });
 
 // Login with token
-export const accountTokenSchema = Joi.object({
-    token: Joi.string().length(36).regex(/[a-z0-9-]/).required()
+export const accountTokenSchema = new StringSchema({
+    token: {
+        // Needed for error codes
+        length: 36,
+        
+        type: 'uuid'
+    }
 });
