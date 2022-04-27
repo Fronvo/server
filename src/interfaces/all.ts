@@ -11,6 +11,7 @@ export interface FronvoError {
     err: {
         msg: string,
         code: number,
+        name: string,
         extras?: {
             for?: string;
             min?: number;

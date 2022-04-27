@@ -148,17 +148,16 @@ export function getErrorKey(errCode: number): Errors {
     return Object.keys(errors).at(errCode - 1);
 }
 
-export function generateError(errName: Errors, extras?: {[key: string]: any}, formatParams?: any[]): FronvoError {
-    let msg: string = errors[errName];
-    const code = getErrorCode(errName);
+export function generateError(name: Errors, extras?: {[key: string]: any}, formatParams?: any[]): FronvoError {
+    let msg: string = errors[name];
 
     if(formatParams) msg = format(msg, ...formatParams);
     
-
     const err: FronvoError = {
         err: {
             msg,
-            code
+            code: getErrorCode(name),
+            name
         }
     };
 
