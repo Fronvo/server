@@ -15,7 +15,7 @@ export function generateEmail(): string {
 }
 
 export function generatePassword(): string {
-    return v4().substring(0, 30);
+    return v4().replace(/-/g, '').substring(0, 30);
 }
 
 export function assertErrors(funcs: {[key: string]: (partialTestArgs: Partial<TestArguments>, callback: TestErrorCallback) => void}, testArgs: TestArguments, finalFunction: (testArgs: TestArguments, callback: TestErrorCallback) => void): void {
