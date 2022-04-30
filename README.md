@@ -18,23 +18,12 @@
 
 **The server should be running locally at port 3001.**
 
-## [Hosting](https://github.com/Fronvo/fronvo/blob/master/HOSTING.md)
-
-## [Testing](https://github.com/Fronvo/fronvo/blob/master/TESTING.md)
-
 ## Documentation
 **Coming soon.**
 
 **In the meantime, take a look at the [interfaces](https://github.com/Fronvo/fronvo/tree/master/src/interfaces) for each event.**
 
-## Tools used
 
-**[socket.io](https://socket.io/) for ease of cummunication and cross-platform ability.**
-
-**[MongoDB](https://www.mongodb.com/) for flexibility, performance and low storage plans.**
-
-**[Prisma](https://www.prisma.io/) for database types.**
-
-**[Ezier Ratelimiter](https://github.com/ezier-project/ratelimit) to simplify the rate-limiting process.**
-
-**[swc](https://github.com/swc-project) to make the compiling process as speedy as possible.**
+## [Hosting](https://github.com/Fronvo/fronvo/blob/master/HOSTING.md)
+## [Testing](https://github.com/Fronvo/fronvo/blob/master/TESTING.md)
+## [Tools used](https://github.com/Fronvo/fronvo/blob/master/TOOLS.md)
