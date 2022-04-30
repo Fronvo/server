@@ -1,6 +1,6 @@
 <p align='center'><img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/assets/logo.png' alt='Fronvo logo'></p>
-<h3 align='center'>The server of Fronvo</h3>
-<h3 align='center'>Built on socket.io for blazing-fast realtime communication</h3>
+<center>The server of Fronvo</center>
+<p align='center'>Built on socket.io for blazing-fast realtime communication</p>
 <h2 align='center'>  
 
 [![forthebadge](https://forthebadge.com/images/badges/made-with-typescript.svg)](https://forthebadge.com)

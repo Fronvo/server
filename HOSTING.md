@@ -1,8 +1,4 @@
-<h1 align='center'>Hosting Fronvo</h1>
-
-<p align='center'><b>This page provides guides on hosting the server of Fronvo on various databases.</b></p>
-
-# With MongoDB
+# Hosting on MongoDB
 
 **Create an account at the [official MongoDB site](https://account.mongodb.com/account/login).**
 
@@ -23,6 +19,6 @@
 
 **After everything is working, copy the [hosting command](https://github.com/Fronvo/server/blob/master/Procfile) to the respectable option of your hosting platform of choice.**
 
-# Demo result
+# Demo
 
 <img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/assets/demo-run-hosting.svg' alt='Fronvo demo hosted run'>

@@ -1,6 +1,4 @@
-<h1 align='center'>Testing Fronvo</h1>
-
-# Running
+# Running tests
 **First of all, install devDependencies.**
 - **``npm install``**
 
@@ -76,6 +74,6 @@ export default (testArgs: TestArguments): void => {
 
 **Otherwise, feel free to [PR](https://github.com/Fronvo/server/pulls) your creation or [suggest](https://github.com/Fronvo/server/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement) that someone make it!**
 
-# Tests demo
+# Demo
 
 <img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/assets/demo-run-tests.svg' alt='Fronvo demo tests run'>

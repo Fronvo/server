@@ -1,8 +1,4 @@
-<h1 align='center'>Running the server</h1>
-
-<p align='center'><b>This page provides a guide on running the server of Fronvo.</b></p>
-
-# Procedure
+# Running locally
 **```npm install```**
 
 **```npm start```**
