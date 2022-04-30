@@ -1,7 +1,5 @@
 <h1 align='center'>Testing Fronvo</h1>
 
-<p align='center'><b>This page provides a guide on testing the server of Fronvo.</b></p>
-
 # Running
 **First of all, install devDependencies.**
 - **``npm install``**
