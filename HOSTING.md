@@ -23,3 +23,6 @@
 
 **After everything is working, copy the [hosting command](https://github.com/Fronvo/fronvo/blob/master/Procfile) to the respectable option of your hosting platform of choice.**
 
+# Demo result
+
+<img src='https://raw.githubusercontent.com/Fronvo/fronvo/master/assets/svgs/demo-run-hosting.svg' alt='Fronvo demo hosted run'>
