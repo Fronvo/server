@@ -11,12 +11,7 @@
 </h2>
 
 ## [Running](https://github.com/Fronvo/fronvo/blob/master/RUNNING.md)
-
-## Documentation
-**Coming soon.**
-
-**In the meantime, take a look at the [interfaces](https://github.com/Fronvo/fronvo/tree/master/src/interfaces) for each event.**
-
+## [Documentation](https://github.com/Fronvo/fronvo/blob/master/DOCUMENTATION.md)
 ## [Hosting](https://github.com/Fronvo/fronvo/blob/master/HOSTING.md)
 ## [Testing](https://github.com/Fronvo/fronvo/blob/master/TESTING.md)
 ## [Tools used](https://github.com/Fronvo/fronvo/blob/master/TOOLS.md)
