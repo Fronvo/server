@@ -1,4 +1,4 @@
-<p align='center'><img src='https://i.ibb.co/88C4JbF/fronvo-logo.png' alt='Fronvo icon'></p>
+<p align='center'><img src='https://raw.githubusercontent.com/Fronvo/fronvo/master/assets/logo.png' alt='Fronvo logo'></p>
 <h3 align='center'>The server of Fronvo</h3>
 <h3 align='center'>Built on socket.io for blazing-fast realtime communication</h3>
 <h2 align='center'>  
