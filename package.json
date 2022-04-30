@@ -1,17 +1,17 @@
 {
-  "name": "fronvo",
+  "name": "fronvo-server",
   "version": "0.2.0",
   "description": "The server of the open-source free-convo chat app.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Fronvo/fronvo.git"
+    "url": "git+https://github.com/Fronvo/server.git"
   },
   "author": "Shadofer#6681",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/Fronvo/fronvo/issues"
+    "url": "https://github.com/Fronvo/server/issues"
   },
-  "homepage": "https://github.com/Fronvo/fronvo#readme",
+  "homepage": "https://github.com/Fronvo/server#readme",
   "private": true,
   "scripts": {
     "build": "swc src -d output && copyfiles -u 1 src/generated/** src/generated/**/* output",
