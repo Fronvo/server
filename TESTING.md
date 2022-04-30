@@ -77,3 +77,7 @@ export default (testArgs: TestArguments): void => {
 **Feel free to experiment with existing test files but before submitting a new test make sure to check if it exists.**
 
 **Otherwise, feel free to [PR](https://github.com/Fronvo/fronvo/pulls) your creation or [suggest](https://github.com/Fronvo/fronvo/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement) that someone make it!**
+
+# Tests demo
+
+<img src='https://raw.githubusercontent.com/Fronvo/fronvo/master/assets/svgs/demo-run-tests.svg' alt='Fronvo demo tests run'>
