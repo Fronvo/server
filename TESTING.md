@@ -78,4 +78,4 @@ export default (testArgs: TestArguments): void => {
 
 # Tests demo
 
-<img src='https://raw.githubusercontent.com/Fronvo/server/master/assets/svgs/demo-run-tests.svg' alt='Fronvo demo tests run'>
+<img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/assets/demo-run-tests.svg' alt='Fronvo demo tests run'>

@@ -11,4 +11,4 @@
 
 # Demo
 
-<img src='https://raw.githubusercontent.com/Fronvo/server/master/assets/svgs/demo-run-local.svg' alt='Fronvo demo run'>
+<img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/assets/demo-run-local.svg' alt='Fronvo demo run'>
