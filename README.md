@@ -10,19 +10,12 @@
   
 </h2>
 
-## Running locally
-
-**```npm install```**
-
-**```npm start```**
-
-**The server should be running locally at port 3001.**
+## [Running](https://github.com/Fronvo/fronvo/blob/master/RUNNING.md)
 
 ## Documentation
 **Coming soon.**
 
 **In the meantime, take a look at the [interfaces](https://github.com/Fronvo/fronvo/tree/master/src/interfaces) for each event.**
-
 
 ## [Hosting](https://github.com/Fronvo/fronvo/blob/master/HOSTING.md)
 ## [Testing](https://github.com/Fronvo/fronvo/blob/master/TESTING.md)
