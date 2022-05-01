@@ -1,4 +1,4 @@
-<h1 align='center'>Main tools used to create Fronvo</h1>
+<h1 align='center'>Main tools used to create Fronvo's server</h1>
 
 - **[socket.io](https://socket.io/) for ease of cummunication and cross-platform ability.**
 
