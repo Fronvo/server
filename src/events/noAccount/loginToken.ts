@@ -30,9 +30,6 @@ const loginTokenTemplate: EventTemplate = {
     points: 5,
     schema: new StringSchema({
         token: {
-            // TODO: Remove, support UUIDs type
-            length: 36,
-
             type: 'uuid'
         }
     })

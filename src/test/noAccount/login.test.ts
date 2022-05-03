@@ -70,7 +70,7 @@ function invalidEmailFormat({ socket }: Partial<TestArguments>, callback: TestEr
         email: generateEmail().replace(/@/, ''),
         password: generatePassword()
     }, ({ err }) => {
-        callback(assertCode(err.code, 'INVALID_EMAIL_FORMAT'));
+        callback(assertCode(err.code, 'REQUIRED_EMAIL'));
     });
 }
 

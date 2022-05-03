@@ -113,7 +113,10 @@ function validateEventSchema(eventName: string, eventArgs: {[key: string]: any})
         case 'STRING_INVALID_TYPE':
             switch(result.extras.type) {
                 case 'email':
-                    return generateError('INVALID_EMAIL_FORMAT', extras);
+                    return generateError('REQUIRED_EMAIL', extras);
+
+                case 'uuid':
+                    return generateError('REQUIRED_UUID', extras);
 
                 default:
                     return generateError('UNKNOWN');

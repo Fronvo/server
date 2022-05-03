@@ -15,11 +15,11 @@ function required({ socket }: Partial<TestArguments>, callback: TestErrorCallbac
     });
 }
 
-function exactLength({ socket }: Partial<TestArguments>, callback: TestErrorCallback): void {
+function invalidTokenType({ socket }: Partial<TestArguments>, callback: TestErrorCallback): void {
     socket.emit('loginToken', {
-        token: v4().substring(0, 35)
+        token: v4().replace(/-/, 'a')
     }, ({ err }) => {
-        callback(assertCode(err.code, 'EXACT_LENGTH')
+        callback(assertCode(err.code, 'REQUIRED_UUID')
             || assertEquals({for: err.extras.for}, 'token'));
     });
 }
@@ -45,7 +45,7 @@ function loginToken({ socket, done, shared }: TestArguments, callback: TestError
 export default (testArgs: TestArguments): void => {
     assertErrors({
         required,
-        exactLength,
+        invalidTokenType,
         invalidToken
     }, testArgs, loginToken);
 }
