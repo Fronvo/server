@@ -4,17 +4,13 @@
 
 import { AccountData } from '@prisma/client';
 import { compareSync } from 'bcrypt';
-import { decideAccountSchemaResult } from 'events/noAccount/shared';
+import { accountSchema } from 'events/noAccount/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { LoginResult, LoginServerParams } from 'interfaces/noAccount/login';
 import { testMode } from 'other/variables';
 import * as utilities from 'utilities/global';
 
 async function login({ io, socket, email, password}: LoginServerParams): Promise<LoginResult | FronvoError> {
-    // Schema validation
-    const schemaResult = decideAccountSchemaResult(email, password);
-    if(schemaResult) return schemaResult;
-
     const accounts: {accountData: AccountData}[] = await utilities.findDocuments('Account', {select: {accountData: true}});
 
     // Check if the email already exists to be able to login
@@ -46,7 +42,8 @@ async function login({ io, socket, email, password}: LoginServerParams): Promise
 const loginTemplate: EventTemplate = {
     func: login,
     template: ['email', 'password'],
-    points: 5
+    points: 5,
+    schema: accountSchema
 };
 
 export default loginTemplate;

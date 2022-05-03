@@ -2,10 +2,11 @@
 // Interfaces for all kinds of files.
 // ******************** //
 
-import { Server, Socket } from 'socket.io';
+import { StringSchema } from '@ezier/validate';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
-import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { InterServerEvents } from 'interfaces/events/inter';
+import { ServerToClientEvents } from 'interfaces/events/s2c';
+import { Server, Socket } from 'socket.io';
 
 export interface FronvoError {
     err: {
@@ -43,6 +44,7 @@ export interface EventTemplate {
     func: Function;
     template: string[];
     points: number;
+    schema?: StringSchema;
 }
 
 export interface EventExportTemplate {

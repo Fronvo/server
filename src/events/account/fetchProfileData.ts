@@ -39,7 +39,8 @@ async function fetchProfileData({ socket, profileId }: FetchProfileDataServerPar
 const fetchProfileDataTemplate: EventTemplate = {
     func: fetchProfileData,
     template: ['profileId'],
-    points: 3
+    points: 3,
+    // TODO: Regex profileId
 };
 
 export default fetchProfileDataTemplate;

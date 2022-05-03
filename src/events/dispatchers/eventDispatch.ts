@@ -81,6 +81,52 @@ function checkEventPermission(eventName: string, socket: Socket<ServerToClientEv
     }
 }
 
+function validateEventSchema(eventName: string, eventArgs: {[key: string]: any}): undefined | FronvoError {
+    const eventSchema = funcs[eventName].schema;
+
+    // Only need the first error
+    const result = eventSchema.validate(eventArgs)[0];
+
+    if(!result)
+        return;
+    
+    const key = result.extras.key;
+    const extras: {[key: string]: any} = {for: key};
+
+    switch (result.name) {
+        case 'STRING_REQUIRED':
+            return generateError('REQUIRED', extras, [key]);
+
+        case 'STRING_INVALID_LENGTH':
+            return generateError('EXACT_LENGTH', extras, [key]);
+
+        case 'STRING_INVALID_LENGTH':
+            return generateError('EXACT_LENGTH', extras, [key, eventSchema.schema[key].length]);
+
+        case 'STRING_INVALID_MIN_LENGTH':
+        case 'STRING_INVALID_MAX_LENGTH':
+            const min = eventSchema.schema[key].minLength;
+            const max = eventSchema.schema[key].maxLength;
+            
+            return generateError('LENGTH', {...extras, min, max}, [key, min, max]);
+
+        case 'STRING_INVALID_TYPE':
+            switch(result.extras.type) {
+                case 'email':
+                    return generateError('INVALID_EMAIL_FORMAT', extras);
+
+                default:
+                    return generateError('UNKNOWN');
+            }
+
+        case 'STRING_INVALID_REGEX':
+            return generateError('INVALID_REGEX', extras, [key]);
+
+        default:
+            return generateError('UNKNOWN');
+    }
+}
+
 async function fireEvent(io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>, socket: Socket<ServerToClientEvents, ClientToServerEvents>, eventName: string, callback: Function, eventArgs: {[key: string]: any}) {
     if(!variables.testMode) {
         // Consume event points, credited to the client's IP
@@ -93,7 +139,7 @@ async function fireEvent(io: Server<ClientToServerEvents, ServerToClientEvents, 
             // Start the performance counter
             const perfId = utilities.reportStart(eventName);
 
-            sendCallback(callback, await runEventFunc(io, socket, eventName, eventArgs), socket, perfId);
+            validateAndRun(perfId);
         })
 
         .catch(() => {
@@ -103,8 +149,22 @@ async function fireEvent(io: Server<ClientToServerEvents, ServerToClientEvents, 
     } else {
         const perfId = utilities.reportStart(eventName);
 
-        // Test mode, only run
-        sendCallback(callback, await runEventFunc(io, socket, eventName, eventArgs), socket, perfId);
+        validateAndRun(perfId);
+    }
+
+    async function validateAndRun(perfId: string): Promise<void> {
+        // Validate if a schema present
+        if(funcs[eventName].schema) {
+            const schemaResult = validateEventSchema(eventName, eventArgs);
+
+            if(!schemaResult) {
+                sendCallback(callback, await runEventFunc(io, socket, eventName, eventArgs), socket, perfId);
+            } else {
+                sendCallback(callback, schemaResult, socket, perfId);
+            }
+        } else {
+            sendCallback(callback, await runEventFunc(io, socket, eventName, eventArgs), socket, perfId);
+        }
     }
 }
 

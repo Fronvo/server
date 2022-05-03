@@ -4,18 +4,14 @@
 
 import { AccountData } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import { decideAccountSchemaResult } from 'events/noAccount/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { RegisterResult, RegisterServerParams } from 'interfaces/noAccount/register';
 import * as variables from 'other/variables';
 import utilities from 'utilities/all';
 import { findDocuments } from 'utilities/global';
+import { accountSchema } from './shared';
 
 async function register({ io, socket, email, password }: RegisterServerParams): Promise<RegisterResult | FronvoError> {
-    // Schema validation
-    const schemaResult = decideAccountSchemaResult(email, password);
-    if(schemaResult) return schemaResult;
-
     // Check if the email is from a dummy (blacklisted) domain, if applicable
     if(variables.blacklistedEmailDomainsEnabled) {
         if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(email)) > -1) {
@@ -56,7 +52,8 @@ async function register({ io, socket, email, password }: RegisterServerParams): 
 const registerTemplate: EventTemplate = {
     func: register,
     template: ['email', 'password'],
-    points: 5
+    points: 5,
+    schema: accountSchema
 };
 
 export default registerTemplate;
