@@ -218,7 +218,7 @@ export default function eventDispatch(io: Server<ClientToServerEvents, ServerToC
         const neededArgs = getNeededArgs(event, eventArgs);
 
         if(neededArgs.length > 0) {
-            sendCallback(callback, generateError('MISSING_ARGS', {neededArgs}), socket);
+            sendCallback(callback, generateError('MISSING_ARGUMENTS', {neededArgs}), socket);
 
         } else {
             fireEvent(io, socket, event, callback, eventArgs);
