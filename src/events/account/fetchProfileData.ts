@@ -11,7 +11,6 @@ import { findDocuments, generateError, getLoggedInSockets } from 'utilities/glob
 async function fetchProfileData({ socket, profileId }: FetchProfileDataServerParams): Promise<FetchProfileDataResult | FronvoError> {
     const accounts: {accountData: AccountData}[] = await findDocuments('Account', {select: {accountData: true}});
     
-    // TODO: check for account existance here first
     for(const account in accounts) {
         const accountData = accounts[account].accountData;
 
