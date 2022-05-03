@@ -8,6 +8,10 @@ import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server, Socket } from 'socket.io';
 
+export interface SocketIOConnectionError extends Error {
+    code: number;
+}
+
 export interface FronvoError {
     err: {
         msg: string,

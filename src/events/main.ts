@@ -3,6 +3,7 @@
 // ******************** //
 
 import dispatchers from 'events/dispatchers/all';
+import { SocketIOConnectionError } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
@@ -23,10 +24,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
         });
     });
 
-    io.engine.on('connection_error', (err: Error) => {
-        // @ts-ignore
-        // Socket.IO adds the code property
-        // TODO: Make a custom type
+    io.engine.on('connection_error', (err: SocketIOConnectionError) => {
         console.log('Connection abnormally closed:  [' + err.code + ']' +  err.message);
     });
 
