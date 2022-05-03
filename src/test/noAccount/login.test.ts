@@ -79,7 +79,7 @@ function accountDoesntExist({ socket }: Partial<TestArguments>, callback: TestEr
         email: generateEmail(),
         password: generatePassword()
     }, ({ err }) => {
-        callback(assertCode(err.code, 'ACC_DOESNT_EXIST'));
+        callback(assertCode(err.code, 'ACCOUNT_DOESNT_EXIST'));
     });
 }
 

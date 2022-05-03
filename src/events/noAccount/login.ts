@@ -36,7 +36,7 @@ async function login({ io, socket, email, password}: LoginServerParams): Promise
         }
     };
 
-    return utilities.generateError('ACC_DOESNT_EXIST');
+    return utilities.generateError('ACCOUNT_DOESNT_EXIST');
 }
 
 const loginTemplate: EventTemplate = {

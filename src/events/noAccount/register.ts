@@ -15,7 +15,7 @@ async function register({ io, socket, email, password }: RegisterServerParams): 
     // Check if the email is from a dummy (blacklisted) domain, if applicable
     if(variables.blacklistedEmailDomainsEnabled) {
         if(variables.blacklistedEmailDomains.indexOf(utilities.getEmailDomain(email)) > -1) {
-            return utilities.generateError('INVALID_EMAIL');
+            return utilities.generateError('REQUIRED_EMAIL');
         }
     }
 
@@ -26,7 +26,7 @@ async function register({ io, socket, email, password }: RegisterServerParams): 
         const accountData = accounts[account].accountData;
 
         if(accountData.email == email) {
-            return utilities.generateError('ACC_ALR_EXISTS');
+            return utilities.generateError('ACCOUNT_ALREADY_EXISTS');
         }
     }
     

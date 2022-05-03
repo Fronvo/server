@@ -89,7 +89,7 @@ function accountExists({ socket }: Partial<TestArguments>, callback: TestErrorCa
             email: existsEmail,
             password: existsPassword
         }, ({ err }) => {
-            callback(assertCode(err.code, 'ACC_ALR_EXISTS'));
+            callback(assertCode(err.code, 'ACCOUNT_ALREADY_EXISTS'));
         });
     });
 }
