@@ -2,6 +2,7 @@
 // The fetchProfileData account-only event file.
 // ******************** //
 
+import { StringSchema } from '@ezier/validate';
 import { AccountData } from '@prisma/client';
 import { FetchProfileDataResult, FetchProfileDataServerParams } from 'interfaces/account/fetchProfileData';
 import { EventTemplate, FronvoAccount, FronvoError } from 'interfaces/all';
@@ -40,7 +41,13 @@ const fetchProfileDataTemplate: EventTemplate = {
     func: fetchProfileData,
     template: ['profileId'],
     points: 3,
-    // TODO: Regex profileId
+    schema: new StringSchema({
+        profileId: {
+            minLength: 5,
+            maxLength: 14,
+            regex: /^[a-z0-9]+$/
+        }
+    })
 };
 
 export default fetchProfileDataTemplate;

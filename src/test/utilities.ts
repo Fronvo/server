@@ -18,6 +18,13 @@ export function generatePassword(): string {
     return v4().replace(/-/g, '').substring(0, 30);
 }
 
+export function generateProfileId(length?: number): string {
+    const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
+
+    const randomArray = Array.from({ length: length ? length : 10 }, () => chars[Math.floor(Math.random() * chars.length)]);
+
+    return randomArray.join('');
+}
 export function assertErrors(funcs: {[key: string]: (partialTestArgs: Partial<TestArguments>, callback: TestErrorCallback) => void}, testArgs: TestArguments, finalFunction: (testArgs: TestArguments, callback: TestErrorCallback) => void): void {
     const partialTestArgs = {...testArgs};
     delete partialTestArgs.done;
