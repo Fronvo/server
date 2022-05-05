@@ -11,11 +11,13 @@ import * as variables from 'other/variables';
 import { rateLimiter } from 'other/variables';
 import { Server } from 'socket.io';
 
-export default function entry(io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>): void {
+export default function entry(
+    io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>
+): void {
     io.on('connection', (socket): void => {
         console.log('Socket ' + socket.id + ' has connected.');
 
-        socket.onAny((event: string, ...args: {[arg: string]: any}[]) => {
+        socket.onAny((event: string, ...args: { [arg: string]: any }[]) => {
             dispatchers.eventDispatch(io, socket, event, ...args);
         });
 
@@ -25,7 +27,9 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
     });
 
     io.engine.on('connection_error', (err: SocketIOConnectionError) => {
-        console.log('Connection abnormally closed:  [' + err.code + ']' +  err.message);
+        console.log(
+            'Connection abnormally closed:  [' + err.code + ']' + err.message
+        );
     });
 
     // The following events are only called while using PM2 to be able to synchronise each server's variables
@@ -35,7 +39,7 @@ export default function entry(io: Server<ClientToServerEvents, ServerToClientEve
     });
 
     io.on('loginSocket', (socketId, accountId) => {
-        variables.loggedInSockets[socketId] = {accountId};
+        variables.loggedInSockets[socketId] = { accountId };
     });
 
     io.on('logoutSocket', (socketId) => {

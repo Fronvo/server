@@ -8,7 +8,9 @@ export interface LoginTokenParams {
     token: string;
 }
 
-export interface LoginTokenServerParams extends EventArguments, LoginTokenParams {}
+export interface LoginTokenServerParams
+    extends EventArguments,
+        LoginTokenParams {}
 
 export interface LoginTokenResult {}
 

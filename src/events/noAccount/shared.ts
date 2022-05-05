@@ -9,12 +9,12 @@ export const accountSchema = new StringSchema({
     email: {
         minLength: 8,
         maxLength: 60,
-        type: 'email'
+        type: 'email',
     },
 
     password: {
         minLength: 8,
         maxLength: 30,
-        regex: /^[a-zA-Z0-9]+$/
-    }
+        regex: /^[a-zA-Z0-9]+$/,
+    },
 });

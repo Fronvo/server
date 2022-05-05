@@ -21,18 +21,33 @@ export function generatePassword(): string {
 export function generateProfileId(length?: number): string {
     const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
 
-    const randomArray = Array.from({ length: length ? length : 10 }, () => chars[Math.floor(Math.random() * chars.length)]);
+    const randomArray = Array.from(
+        { length: length ? length : 10 },
+        () => chars[Math.floor(Math.random() * chars.length)]
+    );
 
     return randomArray.join('');
 }
-export function assertErrors(funcs: {[key: string]: (partialTestArgs: Partial<TestArguments>, callback: TestErrorCallback) => void}, testArgs: TestArguments, finalFunction: (testArgs: TestArguments, callback: TestErrorCallback) => void): void {
-    const partialTestArgs = {...testArgs};
+export function assertErrors(
+    funcs: {
+        [key: string]: (
+            partialTestArgs: Partial<TestArguments>,
+            callback: TestErrorCallback
+        ) => void;
+    },
+    testArgs: TestArguments,
+    finalFunction: (
+        testArgs: TestArguments,
+        callback: TestErrorCallback
+    ) => void
+): void {
+    const partialTestArgs = { ...testArgs };
     delete partialTestArgs.done;
 
     function checkFinalFunction(): void {
         finalFunction(testArgs, (err?) => {
             // Only check for the error, final functions may use this function to prevent further checks.
-            if(err) {
+            if (err) {
                 testArgs.done(err);
                 console.log(`\t[final] ${err}`);
                 process.exit();
@@ -44,18 +59,21 @@ export function assertErrors(funcs: {[key: string]: (partialTestArgs: Partial<Te
         const func = funcs[funcName];
 
         func(partialTestArgs, (err?) => {
-            if(err) {
+            if (err) {
                 testArgs.done(err);
                 console.log(`\t[${funcName}] ${err}`);
                 process.exit();
-            } else if((Object.keys(funcs).indexOf(funcName) + 1) == Object.keys(funcs).length) {
+            } else if (
+                Object.keys(funcs).indexOf(funcName) + 1 ==
+                Object.keys(funcs).length
+            ) {
                 checkFinalFunction();
             }
         });
     }
 
-    if(Object.keys(funcs).length > 0) {
-        for(const funcName in funcs) {
+    if (Object.keys(funcs).length > 0) {
+        for (const funcName in funcs) {
             // Run the error function with the partialTestArgs, without the done parameter
             // If it passes with no errors and it's the last one, run final callback
             checkErrorCallback(funcName);
@@ -67,48 +85,83 @@ export function assertErrors(funcs: {[key: string]: (partialTestArgs: Partial<Te
 
 // Helper functions
 export function assertError(error: FronvoError): undefined | string {
-    if(error.err) {
-        return format(testErrors.ERR, {...error});
+    if (error.err) {
+        return format(testErrors.ERR, { ...error });
     }
 }
 
-export function assertCode(errorCode: number, targetCode: Errors): undefined | string {
-    if(!(errorCode == getErrorCode(targetCode))) {
-        return format(testErrors.CODE, getErrorCode(targetCode), targetCode, errorCode, getErrorKey(errorCode));
+export function assertCode(
+    errorCode: number,
+    targetCode: Errors
+): undefined | string {
+    if (!(errorCode == getErrorCode(targetCode))) {
+        return format(
+            testErrors.CODE,
+            getErrorCode(targetCode),
+            targetCode,
+            errorCode,
+            getErrorKey(errorCode)
+        );
     }
 }
 
-export function assertType(property: {[key: string]: any}, type: TestAssertTypes): undefined | string {
+export function assertType(
+    property: { [key: string]: any },
+    type: TestAssertTypes
+): undefined | string {
     const targetPropertyName = Object.keys(property)[0];
     const targetProperty = property[targetPropertyName];
-    
-    if(!(typeof targetProperty == type)) {
-        return format(testErrors.TYPE, targetPropertyName, type, typeof targetProperty);
+
+    if (!(typeof targetProperty == type)) {
+        return format(
+            testErrors.TYPE,
+            targetPropertyName,
+            type,
+            typeof targetProperty
+        );
     }
 }
 
-export function assertEquals(errorValue: {[key: string]: any}, targetValue: any): undefined | string {
+export function assertEquals(
+    errorValue: { [key: string]: any },
+    targetValue: any
+): undefined | string {
     const targetErrorName = Object.keys(errorValue)[0];
     const targetError = errorValue[targetErrorName];
 
-    if(!(targetError == targetValue)) {
-        return format(testErrors.EQUALS, targetErrorName, String(targetValue), String(targetError));
+    if (!(targetError == targetValue)) {
+        return format(
+            testErrors.EQUALS,
+            targetErrorName,
+            String(targetValue),
+            String(targetError)
+        );
     }
 }
-export function assertNotEqual(errorValue: {[key: string]: any}, targetValue: any): undefined | string {
+export function assertNotEqual(
+    errorValue: { [key: string]: any },
+    targetValue: any
+): undefined | string {
     const targetErrorName = Object.keys(errorValue)[0];
     const targetError = errorValue[targetErrorName];
 
-    if(targetError == targetValue) {
-        return format(testErrors.NOT_EQUAL, targetErrorName, String(targetValue));
+    if (targetError == targetValue) {
+        return format(
+            testErrors.NOT_EQUAL,
+            targetErrorName,
+            String(targetValue)
+        );
     }
 }
 
-export function assertLength(errorValue: {[key: string]: string}, targetLength: number): undefined | string {
+export function assertLength(
+    errorValue: { [key: string]: string },
+    targetLength: number
+): undefined | string {
     const targetErrorName = Object.keys(errorValue)[0];
     const targetError = errorValue[targetErrorName];
 
-    if(!(targetError.length == targetLength)) {
+    if (!(targetError.length == targetLength)) {
         return format(testErrors.LENGTH, targetErrorName, targetLength);
     }
 }

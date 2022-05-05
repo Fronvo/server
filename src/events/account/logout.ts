@@ -14,7 +14,7 @@ function logout({ io, socket }: LogoutServerParams): LogoutResult {
 const logoutTemplate: EventTemplate = {
     func: logout,
     template: [],
-    points: 5
+    points: 5,
 };
 
 export default logoutTemplate;

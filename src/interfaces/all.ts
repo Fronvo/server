@@ -14,15 +14,15 @@ export interface SocketIOConnectionError extends Error {
 
 export interface FronvoError {
     err: {
-        msg: string,
-        code: number,
-        name: string,
+        msg: string;
+        code: number;
+        name: string;
         extras?: {
             for?: string;
             min?: number;
             max?: number;
-        }
-    }
+        };
+    };
 }
 
 export interface LoggedInSocket {

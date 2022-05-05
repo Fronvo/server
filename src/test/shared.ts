@@ -14,7 +14,7 @@ const shared: SharedVariables = {
     email,
     password,
     token,
-    profileId
+    profileId,
 };
 
 export default shared;

@@ -20,43 +20,45 @@ import { ClientToServerEvents } from 'interfaces/events/c2s';
 
 // Create the client
 // @ts-ignore
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`ws://localhost:${PORT}`, {
-	transports: ['websocket'],
-	path: '/fronvo',
-	reconnectionDelay: 100,
-	reconnectionDelayMax: 200,
-	reconnectionAttempts: 10,
-	randomizationFactor: 0
-});
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+    `ws://localhost:${PORT}`,
+    {
+        transports: ['websocket'],
+        path: '/fronvo',
+        reconnectionDelay: 100,
+        reconnectionDelayMax: 200,
+        reconnectionAttempts: 10,
+        randomizationFactor: 0,
+    }
+);
 
 describe('Fronvo', () => {
-	// Before the tests start
-	before((done: Mocha.Done) => {
-		// Wait for the server to come alive
-		// @ts-ignore
-		socket.on('connect', done);
-	});
+    // Before the tests start
+    before((done: Mocha.Done) => {
+        // Wait for the server to come alive
+        // @ts-ignore
+        socket.on('connect', done);
+    });
 
-	// After all of the tests are done
-	after(() => {
-		socket.disconnect();
-	});
+    // After all of the tests are done
+    after(() => {
+        socket.disconnect();
+    });
 
-	// Order: noAccount, general, account
-	const tests = {...noAccountTests, ...generalTests, ...accountTests};
+    // Order: noAccount, general, account
+    const tests = { ...noAccountTests, ...generalTests, ...accountTests };
 
-	// Done is filled in every test
-	const testArguments: Partial<TestArguments> = {
-		socket,
-		shared
-	};
+    // Done is filled in every test
+    const testArguments: Partial<TestArguments> = {
+        socket,
+        shared,
+    };
 
-	for(const test in tests) {
-		it(test, (done) => {
-			testArguments.done = done;
+    for (const test in tests) {
+        it(test, (done) => {
+            testArguments.done = done;
 
-			tests[test](testArguments);
-		});
-	}
-
+            tests[test](testArguments);
+        });
+    }
 });

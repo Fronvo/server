@@ -37,34 +37,41 @@ let loadingSpinner: Ora;
 const loadingSpinnerDefaultText = 'Starting server';
 
 function setLoading(currProcText: string): void {
-    if(!variables.silentLogging) loadingSpinner.text = loadingSpinnerDefaultText + ': ' + currProcText;
+    if (!variables.silentLogging)
+        loadingSpinner.text = loadingSpinnerDefaultText + ': ' + currProcText;
 }
 
 function preStartupChecks(): void {
     function checkSilentLogging() {
-        if(variables.silentLogging) console.log = () => {};
+        if (variables.silentLogging) console.log = () => {};
     }
 
     function checkRequiredFiles() {
         // Check directories
-        for(let directory in variables.requiredStartupDirectories) {
+        for (let directory in variables.requiredStartupDirectories) {
             directory = variables.requiredStartupDirectories[directory];
 
             // No errors thrown with recursive option
-            fs.mkdirSync(directory, {recursive: true});
+            fs.mkdirSync(directory, { recursive: true });
         }
 
         // Check individual files
-        for(const file in variables.requiredStartupFiles) {
-            const fileObj = variables.requiredStartupFiles[file][Object.keys(variables.requiredStartupFiles[file])[0]];
+        for (const file in variables.requiredStartupFiles) {
+            const fileObj =
+                variables.requiredStartupFiles[file][
+                    Object.keys(variables.requiredStartupFiles[file])[0]
+                ];
             const filePath = fileObj.path;
 
             // This is optional for non-JSON files
             const fileTemplate = fileObj.template;
 
             // Overwrite if it doesnt exist
-            if(!fs.existsSync(filePath)) {
-                fs.writeFileSync(filePath, fileTemplate ? JSON.stringify(fileTemplate) : '');
+            if (!fs.existsSync(filePath)) {
+                fs.writeFileSync(
+                    filePath,
+                    fileTemplate ? JSON.stringify(fileTemplate) : ''
+                );
             }
         }
     }
@@ -74,42 +81,47 @@ function preStartupChecks(): void {
 }
 
 async function setupPrisma(): Promise<void> {
-    if(!variables.localMode) {
+    if (!variables.localMode) {
         setLoading('Setting up Prisma');
 
         // Prepare for requests before-hand, prevent cold requests
         const tempLog = await variables.prismaClient.log.create({
             data: {
                 logData: {
-                    info: 'Temporary log, to be deleted.'
-                }
-            }
+                    info: 'Temporary log, to be deleted.',
+                },
+            },
         });
 
         // Read operations aswell
         await variables.prismaClient.log.findMany();
 
         // Update operations
-        await variables.prismaClient.log.update({where: {id: tempLog.id}, data: {
-            logData: {
-                info: 'Updated temporary log, to be deleted.'
-            }
-        }});
+        await variables.prismaClient.log.update({
+            where: { id: tempLog.id },
+            data: {
+                logData: {
+                    info: 'Updated temporary log, to be deleted.',
+                },
+            },
+        });
 
         // And delete operations
-        await variables.prismaClient.log.delete({where: {id: tempLog.id}});
+        await variables.prismaClient.log.delete({ where: { id: tempLog.id } });
     }
 }
 
 function setupRatelimiter(): void {
     setLoading('Setting up the ratelimiter');
 
-    const ezierLimiterPoints = parseInt(process.env.FRONVO_RATELIMITER_POINTS) || 40;
-    const ezierLimiterDuration = parseInt(process.env.FRONVO_RATELIMITER_DURATION) || 2500;
+    const ezierLimiterPoints =
+        parseInt(process.env.FRONVO_RATELIMITER_POINTS) || 40;
+    const ezierLimiterDuration =
+        parseInt(process.env.FRONVO_RATELIMITER_DURATION) || 2500;
 
     const ezierLimiter = new EzierLimiter({
         maxPoints: ezierLimiterPoints,
-        clearDelay: ezierLimiterDuration
+        clearDelay: ezierLimiterDuration,
     });
 
     variables.setRateLimiter(ezierLimiter);
@@ -119,19 +131,25 @@ function setupServer(): void {
     setLoading('Setting up the server process, server events and admin panel');
 
     // Setup the socket.io server with tailored options
-    io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(PORT, {
+    io = new Server<
+        ClientToServerEvents,
+        ServerToClientEvents,
+        InterServerEvents
+    >(PORT, {
         serveClient: false,
         path: '/fronvo',
-    
+
         // Admin panel
         cors: {
             origin: ['https://admin.socket.io'],
-            credentials: true
+            credentials: true,
         },
 
         // Enable / Disable binary parser
-        parser: decideBooleanEnvValue(process.env.FRONVO_BINARY_PARSER, true) ? require('socket.io-msgpack-parser') : '',
-        
+        parser: decideBooleanEnvValue(process.env.FRONVO_BINARY_PARSER, true)
+            ? require('socket.io-msgpack-parser')
+            : '',
+
         // No namespace detected, disconnect
         connectTimeout: 5000,
 
@@ -143,8 +161,8 @@ function setupServer(): void {
         pingTimeout: 5000,
 
         // Limit to websocket connections
-        transports: ['websocket']
-    })
+        transports: ['websocket'],
+    });
 }
 
 function setupServerEvents(): void {
@@ -153,7 +171,7 @@ function setupServerEvents(): void {
 
 function setupPM2(): void {
     // Mostly for hosting on production
-    if(variables.cluster) {
+    if (variables.cluster) {
         io.adapter(createAdapter());
         setupWorker(io);
     }
@@ -164,20 +182,20 @@ function setupAdminPanel(): void {
     const panelPassword = process.env.FRONVO_ADMIN_PANEL_PASSWORD;
 
     // Check environmental variables and hash the admin panel password
-    if(panelUsername && panelPassword) {
+    if (panelUsername && panelPassword) {
         instrument(io, {
             auth: {
                 type: 'basic',
                 username: panelUsername,
 
                 // hash
-                password: require('bcrypt').hashSync(panelPassword, 10)
+                password: require('bcrypt').hashSync(panelPassword, 10),
             },
 
             // preserve users who logged in with the panel before
             store: new RedisStore(null),
 
-            readonly: true
+            readonly: true,
         });
     }
 }
@@ -187,15 +205,26 @@ async function startup(): Promise<void> {
     preStartupChecks();
 
     // Gradient shenanigans
-    console.log(gradient(['#e8128f', '#e812d2', '#e412e8', '#cb12e8', '#bd12e8', '#a812e8', '#8f12e8', '#8012e8'])('Fronvo server v0.2'));
+    console.log(
+        gradient([
+            '#e8128f',
+            '#e812d2',
+            '#e412e8',
+            '#cb12e8',
+            '#bd12e8',
+            '#a812e8',
+            '#8f12e8',
+            '#8012e8',
+        ])('Fronvo server v0.2')
+    );
 
     // Special check because ora doesnt care
-    if(!variables.silentLogging) {
+    if (!variables.silentLogging) {
         loadingSpinner = ora({
             text: loadingSpinnerDefaultText,
             spinner: 'dots12', // wonky windows 10 style
             interval: 40,
-            color: 'magenta'
+            color: 'magenta',
         }).start();
     }
 
@@ -208,7 +237,8 @@ async function startup(): Promise<void> {
     setupAdminPanel();
 
     // Finally, display successful server run
-    if(!variables.silentLogging) loadingSpinner.succeed('Server running at port ' + PORT + '.');
+    if (!variables.silentLogging)
+        loadingSpinner.succeed('Server running at port ' + PORT + '.');
 }
 
 startup();

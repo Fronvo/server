@@ -4,4 +4,4 @@
 
 import isLoggedIn from 'test/general/isLoggedIn.test';
 
-export default { isLoggedIn }
+export default { isLoggedIn };

@@ -11,7 +11,7 @@ import { EventExportTemplate } from 'interfaces/all';
 const noAccountTemplate: EventExportTemplate = {
     register,
     login,
-    loginToken
-}
+    loginToken,
+};
 
 export default noAccountTemplate;

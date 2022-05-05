@@ -23,7 +23,10 @@
     "test:mocha": "mocha -r @swc-node/register -r tsconfig-paths/register src/test/main.ts",
     "test:mocha:report": "mocha -r @swc-node/register -r tsconfig-paths/register --reporter mocha-junit-reporter --reporter-options mochaFile=./src/generated/tests/test-results.xml src/test/main.ts",
     "test:server": "cross-env FRONVO_TEST_MODE=true FRONVO_BINARY_PARSER=false node -r @swc-node/register -r tsconfig-paths/register src/main/server.ts",
-    "check": "tsc"
+    "check": "tsc",
+    "format": "prettier --plugin-search-dir=. --write src/*",
+    "format:check": "prettier --check src/*",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@ezier/ratelimit": "^0.3.0",
@@ -37,8 +40,11 @@
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "gradient-string": "^1.2.0",
+    "husky": "^7.0.4",
     "npm-run-all": "^4.1.5",
     "ora": "^5.4.1",
+    "prettier": "^2.6.2",
+    "prettier-plugin-svelte": "^2.7.0",
     "socket.io": "^4.4.1",
     "socket.io-msgpack-parser": "^3.0.1",
     "ts-node": "^10.7.0",

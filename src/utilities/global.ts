@@ -18,30 +18,42 @@ import { format } from 'util';
 import { v4 } from 'uuid';
 
 export function saveLocalDB(): void {
-    if(!variables.localMode || !variables.localSave) return;
+    if (!variables.localMode || !variables.localSave) return;
 
     // Asynchronous write, boosts local development even more
-    writeFile(variables.localDBPath, JSON.stringify(localDB, null, '\t'), (err) => {
-        if(err) {
-            console.log(errorsExtra.LOCAL_DB_FAIL);
+    writeFile(
+        variables.localDBPath,
+        JSON.stringify(localDB, null, '\t'),
+        (err) => {
+            if (err) {
+                console.log(errorsExtra.LOCAL_DB_FAIL);
+            }
         }
-    });
+    );
 }
 
-export async function insertDocument(collName: CollectionNames, dict: {[key: string]: any}, recordId?: string): Promise<void> {
-    if(!variables.localMode) {
+export async function insertDocument(
+    collName: CollectionNames,
+    dict: { [key: string]: any },
+    recordId?: string
+): Promise<void> {
+    if (!variables.localMode) {
         await prismaClient[collName].create({
-            data: {...dict}
+            data: { ...dict },
         });
     } else {
         // Loop and find if a dictionary with the same _id key exists, if recordId is provided
-        if(recordId) {
-            for(const dictIndex in localDB[collName]) {
-                const dictItem: Partial<{_id: string}> = localDB[collName][dictIndex];
+        if (recordId) {
+            for (const dictIndex in localDB[collName]) {
+                const dictItem: Partial<{ _id: string }> =
+                    localDB[collName][dictIndex];
 
                 // Overwrite
-                if(dictItem._id == recordId) {
-                    localDB[collName].splice(Number(dictIndex), Number(dictIndex) + 1);
+                if (dictItem._id == recordId) {
+                    localDB[collName].splice(
+                        Number(dictIndex),
+                        Number(dictIndex) + 1
+                    );
                 }
             }
         }
@@ -49,7 +61,7 @@ export async function insertDocument(collName: CollectionNames, dict: {[key: str
         // Fallback, create a new key
 
         // No recordId provided, anonymise record
-        if(!recordId) dict._id = v4();
+        if (!recordId) dict._id = v4();
         else dict._id = recordId;
 
         localDB[collName].push(dict);
@@ -58,9 +70,14 @@ export async function insertDocument(collName: CollectionNames, dict: {[key: str
     }
 }
 
-export async function findDocuments(collName: CollectionNames, prismaFilter?: Partial<Prisma.SelectAndInclude>): Promise<any[]> {
-    if(!variables.localMode) {
-        return await prismaClient[collName].findMany(prismaFilter ? prismaFilter : {});
+export async function findDocuments(
+    collName: CollectionNames,
+    prismaFilter?: Partial<Prisma.SelectAndInclude>
+): Promise<any[]> {
+    if (!variables.localMode) {
+        return await prismaClient[collName].findMany(
+            prismaFilter ? prismaFilter : {}
+        );
     } else {
         return localDB[collName];
     }
@@ -69,73 +86,95 @@ export async function findDocuments(collName: CollectionNames, prismaFilter?: Pa
 export function insertLog(info: string): void {
     const logData: LogData = {
         info,
-        timestamp: new Date()
+        timestamp: new Date(),
     };
 
-    insertDocument('Log', {logData});
+    insertDocument('Log', { logData });
 }
 
-export function loginSocket(io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>, socket: Socket<ClientToServerEvents, ServerToClientEvents>, accountId: string): void {
-    variables.loggedInSockets[socket.id] = {accountId};
+export function loginSocket(
+    io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
+    socket: Socket<ClientToServerEvents, ServerToClientEvents>,
+    accountId: string
+): void {
+    variables.loggedInSockets[socket.id] = { accountId };
 
     // Update other servers in cluster mode
-    if(variables.cluster) io.serverSideEmit('loginSocket', socket.id, accountId);
-};
+    if (variables.cluster)
+        io.serverSideEmit('loginSocket', socket.id, accountId);
+}
 
-export function logoutSocket(io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>, socket: Socket<ClientToServerEvents, ServerToClientEvents>): void {
+export function logoutSocket(
+    io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
+    socket: Socket<ClientToServerEvents, ServerToClientEvents>
+): void {
     delete variables.loggedInSockets[socket.id];
-    
-    if(variables.cluster) io.serverSideEmit('logoutSocket', socket.id);
-};
 
-export function isSocketLoggedIn(socket: Socket<ClientToServerEvents, ServerToClientEvents>): boolean {
+    if (variables.cluster) io.serverSideEmit('logoutSocket', socket.id);
+}
+
+export function isSocketLoggedIn(
+    socket: Socket<ClientToServerEvents, ServerToClientEvents>
+): boolean {
     return socket.id in variables.loggedInSockets;
-};
+}
 
-export function getLoggedInSockets(): {[socketId: string]: LoggedInSocket} {
+export function getLoggedInSockets(): { [socketId: string]: LoggedInSocket } {
     return variables.loggedInSockets;
-};
+}
 
 export function reportStart(reportName: string): string {
-    if(!variables.performanceReportsEnabled) return;
+    if (!variables.performanceReportsEnabled) return;
 
     // Mantain uniqueness regardless of reportName
     const reportUUID = v4();
 
     variables.performanceReports[reportUUID] = {
         reportName,
-        timestamp: new Date()
+        timestamp: new Date(),
     };
 
     // Return it for reportEnd
     return reportUUID;
-};
+}
 
 export async function reportEnd(reportUUID: string): Promise<void> {
-    if(!variables.performanceReportsEnabled || !(reportUUID in variables.performanceReports)) return;
+    if (
+        !variables.performanceReportsEnabled ||
+        !(reportUUID in variables.performanceReports)
+    )
+        return;
 
     // Basically copy the dictionary
     const reportDict = variables.performanceReports[reportUUID];
 
-    const msDuration = new Date().getMilliseconds() - reportDict.timestamp.getMilliseconds();
+    const msDuration =
+        new Date().getMilliseconds() - reportDict.timestamp.getMilliseconds();
 
     const reportData: ReportData = {
         reportName: `${reportDict.reportName} took ${msDuration}ms.`,
-        timestamp: new Date()
-    }
+        timestamp: new Date(),
+    };
 
     // Check if it passes the min report MS duration (optional)
-    if(msDuration >= variables.performanceReportsMinMS) {
-        insertDocument('Report', {reportData});
+    if (msDuration >= variables.performanceReportsMinMS) {
+        insertDocument('Report', { reportData });
     }
 
     // Delete to save memory
     delete variables.performanceReports[reportUUID];
-};
+}
 
 // Duplicate of variables.js function to prevent recursive import errors
-export function decideBooleanEnvValue(value: string, valueIfNull: boolean): boolean {
-    return value == null ? valueIfNull : (value.toLowerCase() == 'true' ? true : false);
+export function decideBooleanEnvValue(
+    value: string,
+    valueIfNull: boolean
+): boolean {
+    return value == null
+        ? valueIfNull
+        : value.toLowerCase() == 'true'
+        ? true
+        : false;
 }
 
 export function getErrorCode(errName: Errors): number {
@@ -148,20 +187,24 @@ export function getErrorKey(errCode: number): Errors {
     return Object.keys(errors).at(errCode - 1);
 }
 
-export function generateError(name: Errors, extras?: {[key: string]: any}, formatParams?: any[]): FronvoError {
+export function generateError(
+    name: Errors,
+    extras?: { [key: string]: any },
+    formatParams?: any[]
+): FronvoError {
     let msg: string = errors[name];
 
-    if(formatParams) msg = format(msg, ...formatParams);
-    
+    if (formatParams) msg = format(msg, ...formatParams);
+
     const err: FronvoError = {
         err: {
             msg,
             code: getErrorCode(name),
-            name
-        }
+            name,
+        },
     };
 
-    if(extras) err.err.extras = extras;
+    if (extras) err.err.extras = extras;
 
     return err;
 }
@@ -169,26 +212,37 @@ export function generateError(name: Errors, extras?: {[key: string]: any}, forma
 export async function createToken(accountId: string): Promise<string> {
     const tokenData: TokenData = {
         accountId,
-        token: v4()
+        token: v4(),
     };
 
-    await insertDocument('Token', {tokenData}, accountId);
+    await insertDocument('Token', { tokenData }, accountId);
 
     return tokenData.token;
-};
+}
 
 export async function getToken(accountId: string): Promise<string> {
-    const tokens: {tokenData: TokenData}[] = await findDocuments('Token', {select: {tokenData: true}});
+    const tokens: { tokenData: TokenData }[] = await findDocuments('Token', {
+        select: { tokenData: true },
+    });
 
-    for(const token in tokens) {
+    for (const token in tokens) {
         const tokenData = tokens[token].tokenData;
 
-        if(tokenData.accountId === accountId) {
+        if (tokenData.accountId === accountId) {
             return tokenData.token;
         }
     }
-};
+}
 
-export function rateLimitAnnounce(io: Server<ServerToClientEvents, ClientToServerEvents, InterServerEvents>, socket: Socket<ClientToServerEvents, ServerToClientEvents>, pointsToConsume: number): void {
-    if(variables.cluster) io.serverSideEmit('updateRateLimit', socket.handshake.address, pointsToConsume);
+export function rateLimitAnnounce(
+    io: Server<ServerToClientEvents, ClientToServerEvents, InterServerEvents>,
+    socket: Socket<ClientToServerEvents, ServerToClientEvents>,
+    pointsToConsume: number
+): void {
+    if (variables.cluster)
+        io.serverSideEmit(
+            'updateRateLimit',
+            socket.handshake.address,
+            pointsToConsume
+        );
 }

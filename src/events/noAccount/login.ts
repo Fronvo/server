@@ -10,31 +10,43 @@ import { LoginResult, LoginServerParams } from 'interfaces/noAccount/login';
 import { testMode } from 'other/variables';
 import * as utilities from 'utilities/global';
 
-async function login({ io, socket, email, password}: LoginServerParams): Promise<LoginResult | FronvoError> {
-    const accounts: {accountData: AccountData}[] = await utilities.findDocuments('Account', {select: {accountData: true}});
+async function login({
+    io,
+    socket,
+    email,
+    password,
+}: LoginServerParams): Promise<LoginResult | FronvoError> {
+    const accounts: { accountData: AccountData }[] =
+        await utilities.findDocuments('Account', {
+            select: { accountData: true },
+        });
 
     // Check if the email already exists to be able to login
-    for(const account in accounts) {
+    for (const account in accounts) {
         const accountData = accounts[account].accountData;
 
-        if(accountData.email == email) {
+        if (accountData.email == email) {
             // Validate the password, synchronously
-            if(!testMode ? compareSync(password, accountData.password) : password == accountData.password) {
+            if (
+                !testMode
+                    ? compareSync(password, accountData.password)
+                    : password == accountData.password
+            ) {
                 utilities.loginSocket(io, socket, accountData.id);
 
                 // Refresh token / Use available one
                 let accountToken = await utilities.getToken(accountData.id);
-                if(!accountToken) accountToken = await utilities.createToken(accountData.id);
+                if (!accountToken)
+                    accountToken = await utilities.createToken(accountData.id);
 
                 return {
-                    token: accountToken
+                    token: accountToken,
                 };
-                
             } else {
                 return utilities.generateError('INVALID_PASSWORD');
             }
         }
-    };
+    }
 
     return utilities.generateError('ACCOUNT_DOESNT_EXIST');
 }
@@ -43,7 +55,7 @@ const loginTemplate: EventTemplate = {
     func: login,
     template: ['email', 'password'],
     points: 5,
-    schema: accountSchema
+    schema: accountSchema,
 };
 
 export default loginTemplate;

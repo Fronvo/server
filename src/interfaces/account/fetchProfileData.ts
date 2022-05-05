@@ -8,10 +8,14 @@ export interface FetchProfileDataParams {
     profileId: string;
 }
 
-export interface FetchProfileDataServerParams extends EventArguments, FetchProfileDataParams {}
+export interface FetchProfileDataServerParams
+    extends EventArguments,
+        FetchProfileDataParams {}
 
 export interface FetchProfileDataResult {
     profileData: Partial<FronvoAccount>;
 }
 
-export interface FetchProfileDataTestResult extends FronvoError, FetchProfileDataResult {}
+export interface FetchProfileDataTestResult
+    extends FronvoError,
+        FetchProfileDataResult {}

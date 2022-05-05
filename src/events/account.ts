@@ -11,7 +11,7 @@ import { EventExportTemplate } from 'interfaces/all';
 const accountTemplate: EventExportTemplate = {
     fetchProfileId,
     fetchProfileData,
-    logout
-}
+    logout,
+};
 
 export default accountTemplate;

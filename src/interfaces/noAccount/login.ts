@@ -5,7 +5,7 @@
 import { FronvoError, EventArguments } from 'interfaces/all';
 
 export interface LoginParams {
-    email: string,
+    email: string;
     password: string;
 }
 

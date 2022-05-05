@@ -1,0 +1,16 @@
+node_modules/
+.env
+
+# PM2
+*.cpuprofile
+*.heapprofile
+
+# Fronvo
+logs.txt
+src/generated/*
+
+# Local work
+testing/
+
+# TypeScript Output
+output/

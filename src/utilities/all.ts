@@ -11,5 +11,5 @@ export default {
     ...utilitiesAll,
     ...utilitiesNoAccount,
     ...utilitiesGeneral,
-    ...utilitiesAccount
+    ...utilitiesAccount,
 };

@@ -3,5 +3,5 @@
 // ******************** //
 
 export default {
-    LOCAL_DB_FAIL: 'Failed to save the local database.'
-}
+    LOCAL_DB_FAIL: 'Failed to save the local database.',
+};
