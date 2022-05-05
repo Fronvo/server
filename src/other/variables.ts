@@ -19,11 +19,7 @@ import { EzierLimiter } from '@ezier/ratelimit';
 import { CollectionNames } from './types';
 
 function decideBooleanEnvValue(value: string, valueIfNull: boolean): boolean {
-    return value == null
-        ? valueIfNull
-        : value.toLowerCase() == 'true'
-        ? true
-        : false;
+    return value == null ? valueIfNull : value.toLowerCase() == 'true';
 }
 
 const generatedFilesDirectory = resolve(__dirname, '../generated');
