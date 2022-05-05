@@ -7,7 +7,8 @@ node_modules/
 
 # Fronvo
 logs.txt
-src/generated/*
+src/generated/local
+src/generated/tests
 
 # Local work
 testing/
