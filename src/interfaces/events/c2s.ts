@@ -21,21 +21,18 @@ import {
 
 export interface ClientToServerEvents {
     register: (
-        { email, password }: RegisterParams,
+        {}: RegisterParams,
         callback?: ({}: RegisterTestResult) => void
     ) => void;
-    login: (
-        { email, password }: LoginParams,
-        callback?: ({}: LoginTestResult) => void
-    ) => void;
+    login: ({}: LoginParams, callback?: ({}: LoginTestResult) => void) => void;
     loginToken: (
-        { token }: LoginTokenParams,
+        {}: LoginTokenParams,
         callback?: ({}: LoginTokenTestResult) => void
     ) => void;
     isLoggedIn: (callback?: ({}: IsLoggedInTestResult) => void) => void;
     fetchProfileId: (callback?: ({}: FetchProfileIdTestResult) => void) => void;
     fetchProfileData: (
-        { profileId }: FetchProfileDataParams,
+        {}: FetchProfileDataParams,
         callback?: ({}: FetchProfileDataTestResult) => void
     ) => void;
     logout: (callback?: ({}: LogoutTestResult) => void) => void;
