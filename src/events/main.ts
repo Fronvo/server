@@ -7,8 +7,6 @@ import { SocketIOConnectionError } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
-import * as variables from 'other/variables';
-import { rateLimiter } from 'other/variables';
 import { Server } from 'socket.io';
 
 export default function entry(
@@ -32,17 +30,5 @@ export default function entry(
         );
     });
 
-    // The following events are only called while using PM2 to be able to synchronise each server's variables
-    // TODO: Seperate folder for inter-server events
-    io.on('updateRateLimit', (socketIP, pointsToConsume) => {
-        rateLimiter.consumePoints(socketIP, pointsToConsume).catch(() => {});
-    });
-
-    io.on('loginSocket', (socketId, accountId) => {
-        variables.loggedInSockets[socketId] = { accountId };
-    });
-
-    io.on('logoutSocket', (socketId) => {
-        delete variables.loggedInSockets[socketId];
-    });
+    dispatchers.interDispatch(io);
 }

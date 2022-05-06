@@ -3,7 +3,21 @@
 // ******************** //
 
 export interface InterServerEvents {
-    updateRateLimit: (socketIP: string, pointsToConsume: number) => void;
-    loginSocket: (socketId: string, accountId: string) => void;
-    logoutSocket: (socketId: string) => void;
+    updateRateLimit: ({}: InterUpdateRateLimit) => void;
+    loginSocket: ({}: InterLoginSocket) => void;
+    logoutSocket: ({}: InterLogoutSocket) => void;
+}
+
+export interface InterUpdateRateLimit {
+    socketIP: string;
+    pointsToConsume: number;
+}
+
+export interface InterLoginSocket {
+    socketId: string;
+    accountId: string;
+}
+
+export interface InterLogoutSocket {
+    socketId: string;
 }

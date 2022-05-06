@@ -55,6 +55,10 @@ export interface EventExportTemplate {
     [funcName: string]: EventTemplate;
 }
 
+export interface InterEventExportTemplate {
+    [funcName: string]: Function;
+}
+
 export interface FronvoAccount {
     username: string;
     email: string;

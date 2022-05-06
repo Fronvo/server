@@ -101,7 +101,10 @@ export function loginSocket(
 
     // Update other servers in cluster mode
     if (variables.cluster)
-        io.serverSideEmit('loginSocket', socket.id, accountId);
+        io.serverSideEmit('loginSocket', {
+            socketId: socket.id,
+            accountId,
+        });
 }
 
 export function logoutSocket(
@@ -110,7 +113,10 @@ export function logoutSocket(
 ): void {
     delete variables.loggedInSockets[socket.id];
 
-    if (variables.cluster) io.serverSideEmit('logoutSocket', socket.id);
+    if (variables.cluster)
+        io.serverSideEmit('logoutSocket', {
+            socketId: socket.id,
+        });
 }
 
 export function isSocketLoggedIn(
@@ -240,9 +246,8 @@ export function rateLimitAnnounce(
     pointsToConsume: number
 ): void {
     if (variables.cluster)
-        io.serverSideEmit(
-            'updateRateLimit',
-            socket.handshake.address,
-            pointsToConsume
-        );
+        io.serverSideEmit('updateRateLimit', {
+            socketIP: socket.handshake.address,
+            pointsToConsume,
+        });
 }
