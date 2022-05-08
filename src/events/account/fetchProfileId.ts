@@ -7,13 +7,13 @@ import {
     FetchProfileIdServerParams,
 } from 'interfaces/account/fetchProfileId';
 import { EventTemplate } from 'interfaces/all';
-import { getLoggedInSockets } from 'utilities/global';
+import { getSocketAccountId } from 'utilities/global';
 
 function fetchProfileId({
     socket,
 }: FetchProfileIdServerParams): FetchProfileIdResult {
     return {
-        profileId: getLoggedInSockets()[socket.id].accountId,
+        profileId: getSocketAccountId(socket.id),
     };
 }
 

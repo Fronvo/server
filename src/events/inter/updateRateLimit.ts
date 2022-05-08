@@ -6,8 +6,8 @@ import { InterUpdateRateLimit } from 'interfaces/events/inter';
 import { rateLimiter } from 'other/variables';
 
 export default function updateRateLimit({
-    socketIP,
+    accountId,
     pointsToConsume,
 }: InterUpdateRateLimit): void {
-    rateLimiter.consumePoints(socketIP, pointsToConsume).catch(() => {});
+    rateLimiter.consumePoints(accountId, pointsToConsume).catch(() => {});
 }

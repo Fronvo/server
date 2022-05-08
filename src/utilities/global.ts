@@ -99,30 +99,71 @@ export function loginSocket(
 ): void {
     variables.loggedInSockets[socket.id] = { accountId };
 
+    // Remove from unauthorised ratelimits
+    if (!variables.testMode) {
+        // Add accountId to ratelimits if not present
+        if (!variables.rateLimiter.getRateLimit(accountId)) {
+            variables.rateLimiter.createRateLimit(accountId);
+        }
+
+        variables.rateLimiterUnauthorised.clearRateLimit(
+            socket.handshake.address,
+            true
+        );
+    }
+
     // Update other servers in cluster mode
-    if (variables.cluster)
+    if (variables.cluster) {
         io.serverSideEmit('loginSocket', {
             socketId: socket.id,
+            socketIP: socket.handshake.address,
             accountId,
         });
+    }
 }
 
 export function logoutSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
     socket: Socket<ClientToServerEvents, ServerToClientEvents>
 ): void {
+    let accountId: string;
+
+    if (!variables.testMode) {
+        accountId = getSocketAccountId(socket.id);
+    }
+
     delete variables.loggedInSockets[socket.id];
 
-    if (variables.cluster)
+    // Only remove the ratelimit if noone is logged in
+    if (!isAccountLoggedIn(accountId) && !variables.testMode) {
+        variables.rateLimiter.clearRateLimit(accountId, true);
+    }
+
+    if (variables.cluster) {
         io.serverSideEmit('logoutSocket', {
             socketId: socket.id,
         });
+    }
 }
 
 export function isSocketLoggedIn(
     socket: Socket<ClientToServerEvents, ServerToClientEvents>
 ): boolean {
     return socket.id in variables.loggedInSockets;
+}
+
+export function isAccountLoggedIn(accountId: string): boolean {
+    for (const socketKeyIndex in variables.loggedInSockets) {
+        if (getSocketAccountId(socketKeyIndex) == accountId) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function getSocketAccountId(socketId: string): string {
+    return variables.loggedInSockets[socketId].accountId;
 }
 
 export function getLoggedInSockets(): { [socketId: string]: LoggedInSocket } {
@@ -245,9 +286,18 @@ export function rateLimitAnnounce(
     socket: Socket<ClientToServerEvents, ServerToClientEvents>,
     pointsToConsume: number
 ): void {
-    if (variables.cluster)
-        io.serverSideEmit('updateRateLimit', {
-            socketIP: socket.handshake.address,
-            pointsToConsume,
-        });
+    if (variables.cluster) {
+        // Detect authorisation state first, fire accordingly
+        if (isSocketLoggedIn(socket)) {
+            io.serverSideEmit('updateRateLimit', {
+                accountId: getSocketAccountId(socket.id),
+                pointsToConsume,
+            });
+        } else {
+            io.serverSideEmit('updateRateLimitUnauthorised', {
+                socketIP: socket.handshake.address,
+                pointsToConsume,
+            });
+        }
+    }
 }

@@ -29,7 +29,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@ezier/ratelimit": "^0.3.0",
+    "@ezier/ratelimit": "^0.3.2",
     "@ezier/validate": "^0.2.2",
     "@prisma/client": "^3.12.0",
     "@socket.io/admin-ui": "^0.2.0",

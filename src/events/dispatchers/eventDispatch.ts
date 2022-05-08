@@ -2,6 +2,7 @@
 // The event dispatcher file which handles event requests.
 // ******************** //
 
+import { EzierLimiter } from '@ezier/ratelimit';
 import accountEvents from 'events/account';
 import generalEvents from 'events/general';
 import noAccountEvents from 'events/noAccount';
@@ -10,10 +11,14 @@ import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import * as variables from 'other/variables';
-import { rateLimiter } from 'other/variables';
+import { rateLimiter, rateLimiterUnauthorised } from 'other/variables';
 import { Server, Socket } from 'socket.io';
 import utilities from 'utilities/all';
-import { generateError } from 'utilities/global';
+import {
+    generateError,
+    getSocketAccountId,
+    isSocketLoggedIn,
+} from 'utilities/global';
 
 const funcs: EventExportTemplate = {
     ...noAccountEvents,
@@ -21,12 +26,22 @@ const funcs: EventExportTemplate = {
     ...accountEvents,
 };
 
+function getTargetLimiter(
+    socket: Socket<ServerToClientEvents, ClientToServerEvents>
+): EzierLimiter {
+    return isSocketLoggedIn(socket) ? rateLimiter : rateLimiterUnauthorised;
+}
+
 function getRemainingPoints(
     socket: Socket<ServerToClientEvents, ClientToServerEvents>
 ): number {
+    const targetKey = isSocketLoggedIn(socket)
+        ? getSocketAccountId(socket.id)
+        : socket.handshake.address;
+
     return (
-        rateLimiter.maxPoints -
-        rateLimiter.getRatelimit(socket.handshake.address).points
+        getTargetLimiter(socket).maxPoints -
+        getTargetLimiter(socket).getRateLimit(targetKey).points
     );
 }
 
@@ -164,9 +179,34 @@ async function fireEvent(
     eventArgs: { [key: string]: any }
 ) {
     if (!variables.testMode) {
-        // Consume event points, credited to the client's IP
-        rateLimiter
-            .consumePoints(socket.handshake.address, funcs[eventName].points)
+        applyRatelimit(
+            () => {
+                validateAndRun();
+            },
+            () => {
+                sendCallback(callback, generateError('RATELIMITED'), socket);
+            }
+        );
+    } else {
+        validateAndRun();
+    }
+
+    function applyRatelimit(
+        successCallback: Function,
+        failureCallback: Function
+    ): void {
+        // Set target consumer key based on authorisation
+        let targetKey: string;
+
+        // Logged in, authorised
+        if (isSocketLoggedIn(socket)) {
+            targetKey = getSocketAccountId(socket.id);
+        } else {
+            targetKey = socket.handshake.address;
+        }
+
+        getTargetLimiter(socket)
+            .consumePoints(targetKey, funcs[eventName].points)
 
             .then(async () => {
                 // Notify other servers
@@ -176,43 +216,39 @@ async function fireEvent(
                     funcs[eventName].points
                 );
 
-                // Start the performance counter
-                const perfId = utilities.reportStart(eventName);
-
-                validateAndRun(perfId);
+                successCallback();
             })
 
             .catch(() => {
-                // Not enough points
-                sendCallback(callback, generateError('RATELIMITED'), socket);
+                failureCallback();
             });
-    } else {
-        const perfId = utilities.reportStart(eventName);
-
-        validateAndRun(perfId);
     }
 
-    async function validateAndRun(perfId: string): Promise<void> {
+    async function validateAndRun(): Promise<void> {
         // Validate if a schema present
         if (funcs[eventName].schema) {
             const schemaResult = validateEventSchema(eventName, eventArgs);
 
             if (!schemaResult) {
+                fireCallback();
+            } else {
                 sendCallback(
                     callback,
-                    await runEventFunc(io, socket, eventName, eventArgs),
+                    schemaResult,
                     socket,
-                    perfId
+                    utilities.reportStart(eventName)
                 );
-            } else {
-                sendCallback(callback, schemaResult, socket, perfId);
             }
         } else {
+            fireCallback();
+        }
+
+        async function fireCallback(): Promise<void> {
             sendCallback(
                 callback,
                 await runEventFunc(io, socket, eventName, eventArgs),
                 socket,
-                perfId
+                utilities.reportStart(eventName)
             );
         }
     }

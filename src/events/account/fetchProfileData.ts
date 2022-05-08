@@ -12,7 +12,7 @@ import { EventTemplate, FronvoAccount, FronvoError } from 'interfaces/all';
 import {
     findDocuments,
     generateError,
-    getLoggedInSockets,
+    getSocketAccountId,
 } from 'utilities/global';
 
 async function fetchProfileData({
@@ -39,7 +39,7 @@ async function fetchProfileData({
         };
 
         // If it's the user's profile, provide more details (better than having 2 seperate events)
-        if (profileId == getLoggedInSockets()[socket.id].accountId) {
+        if (profileId == getSocketAccountId(socket.id)) {
             finalAccountData.email = accountData.email;
         }
 

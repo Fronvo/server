@@ -112,10 +112,13 @@ async function setupPrisma(): Promise<void> {
 }
 
 function setupRatelimiter(): void {
+    if (variables.testMode) return;
+
     setLoading('Setting up the ratelimiter');
 
     const ezierLimiterPoints =
         parseInt(process.env.FRONVO_RATELIMITER_POINTS) || 40;
+
     const ezierLimiterDuration =
         parseInt(process.env.FRONVO_RATELIMITER_DURATION) || 2500;
 
@@ -125,6 +128,20 @@ function setupRatelimiter(): void {
     });
 
     variables.setRateLimiter(ezierLimiter);
+
+    // And for unauthorised users
+    const ezierLimiterUnauthorisedPoints =
+        parseInt(process.env.FRONVO_RATELIMITER_UNAUTHORISED_POINTS) || 10;
+
+    const ezierLimiterUnauthorisedDuration =
+        parseInt(process.env.FRONVO_RATELIMITER_UNAUTHORISED_DURATION) || 2500;
+
+    const ezierLimiterUnauthorised = new EzierLimiter({
+        maxPoints: ezierLimiterUnauthorisedPoints,
+        clearDelay: ezierLimiterUnauthorisedDuration,
+    });
+
+    variables.setUnauthorisedRateLimiter(ezierLimiterUnauthorised);
 }
 
 function setupServer(): void {
