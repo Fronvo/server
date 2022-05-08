@@ -13,23 +13,13 @@ export default function entry(
     io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>
 ): void {
     io.on('connection', (socket): void => {
-        // TODO: connectDispatch file, add to rateLimits from here for unauthorised users
-        console.log('Socket ' + socket.id + ' has connected.');
-
-        socket.onAny((event: string, ...args: { [arg: string]: any }[]) => {
-            dispatchers.eventDispatch(io, socket, event, ...args);
-        });
-
-        socket.on('disconnect', (reason): void => {
-            dispatchers.disconnectDispatch(io, socket, reason);
-        });
+        dispatchers.connectDispatch(io, socket);
     });
 
     io.engine.on('connection_error', (err: SocketIOConnectionError) => {
-        console.log(
-            'Connection abnormally closed:  [' + err.code + ']' + err.message
-        );
+        dispatchers.connectionErrorDispatch(err);
     });
 
+    // Register inter-server events
     dispatchers.interDispatch(io);
 }
