@@ -45,8 +45,11 @@ export const testMode = decideBooleanEnvValue(
     process.env.FRONVO_TEST_MODE,
     false
 );
-export const localMode =
-    testMode || decideBooleanEnvValue(process.env.FRONVO_LOCAL_MODE, true);
+export const localMode = !decideBooleanEnvValue(
+    process.env.FRONVO_PRISMA_URL,
+    false
+);
+
 export const localSave =
     decideBooleanEnvValue(process.env.FRONVO_LOCAL_SAVE, true) && !testMode;
 
