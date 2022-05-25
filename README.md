@@ -13,12 +13,12 @@
 
 ### Get started
 
-**[Running](https://github.com/Fronvo/server/blob/master/RUNNING.md)**
+**[Running](https://github.com/Fronvo/server/blob/master/.github/markdown/RUNNING.md)**
 
-**[Documentation](https://github.com/Fronvo/server/blob/master/DOCUMENTATION.md)**
+**[Documentation](https://github.com/Fronvo/server/blob/master/.github/markdown/DOCUMENTATION.md)**
 
-**[Hosting](https://github.com/Fronvo/server/blob/master/HOSTING.md)**
+**[Hosting](https://github.com/Fronvo/server/blob/master/.github/markdown/HOSTING.md)**
 
-**[Testing](https://github.com/Fronvo/server/blob/master/TESTING.md)**
+**[Testing](https://github.com/Fronvo/server/blob/master/.github/markdown/TESTING.md)**
 
-**[Tools used](https://github.com/Fronvo/server/blob/master/TOOLS.md)**
+**[Tools used](https://github.com/Fronvo/server/blob/master/.github/markdown/TOOLS.md)**
