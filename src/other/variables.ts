@@ -6,7 +6,7 @@
 import { resolve } from 'path';
 import { config } from 'dotenv';
 
-config({ path: resolve(__dirname, '..', '.env') });
+config({ path: resolve(__dirname,  '../../.env') });
 
 import {
     LoggedInSocket,
@@ -22,7 +22,7 @@ function decideBooleanEnvValue(value: string, valueIfNull: boolean): boolean {
     return value == null ? valueIfNull : value.toLowerCase() == 'true';
 }
 
-const generatedFilesDirectory = resolve(__dirname, '../generated');
+const generatedFilesDirectory = resolve(__dirname, '../../generated');
 
 // Add generated paths here
 const localDBDirectory = resolve(generatedFilesDirectory, 'local');
