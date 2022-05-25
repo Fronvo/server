@@ -6,16 +6,7 @@
 
 **After creation, fill the following variables in the [.env](https://github.com/Fronvo/server/blob/master/.env.example) file:**
 
-- **``FRONVO_PRISMA_URL``**
-- **``FRONVO_MONGODB_USERNAME``**
-- **``FRONVO_MONGODB_PASSWORD``**
-- **``FRONVO_MONGODB_PROJECT``**
-
-**And optionally:**
-
-- **``FRONVO_MONGODB_DB``**
-
-**Finally set ``FRONVO_LOCAL_MODE`` to ``false``**
+- **``FRONVO_PRISMA_URL`` ([https://pris.ly/d/connection-strings]())**
 
 **After everything is working, copy the [hosting command](https://github.com/Fronvo/server/blob/master/Procfile) to the respectable option of your hosting platform of choice.**
 
