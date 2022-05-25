@@ -3,7 +3,7 @@
 // ******************** //
 
 import { InterUpdateRateLimit } from 'interfaces/events/inter';
-import { rateLimiter } from 'other/variables';
+import { rateLimiter } from 'variables/global';
 
 export default function updateRateLimit({
     accountId,

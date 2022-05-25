@@ -3,7 +3,7 @@
 // ******************** //
 
 import { InterUpdateRateLimitUnauthorised } from 'interfaces/events/inter';
-import { rateLimiterUnauthorised } from 'other/variables';
+import { rateLimiterUnauthorised } from 'variables/global';
 
 export default function updateRateLimitUnauthorised({
     socketIP,

@@ -6,7 +6,7 @@ import dispatchers from 'events/dispatchers/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
-import * as variables from 'other/variables';
+import * as variables from 'variables/global';
 import { Server, Socket } from 'socket.io';
 
 export default function connectDispatch(

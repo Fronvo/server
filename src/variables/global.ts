@@ -16,12 +16,10 @@ import {
 import { PrismaClient } from '@prisma/client';
 import { existsSync } from 'fs';
 import { EzierLimiter } from '@ezier/ratelimit';
-import { CollectionNames } from './types';
+import { CollectionNames } from '../other/types';
+import { getEnvBoolean, getEnv } from './varUtils';
 
-function decideBooleanEnvValue(value: string, valueIfNull: boolean): boolean {
-    return value == null ? valueIfNull : value.toLowerCase() == 'true';
-}
-
+// Generic variables
 const generatedFilesDirectory = resolve(__dirname, '../../generated');
 
 // Add generated paths here
@@ -37,21 +35,15 @@ const localDBTemplate: { [CollectionName in CollectionNames]: {}[] } = {
 };
 
 // Reusable variables
-export const blacklistedEmailDomainsEnabled = decideBooleanEnvValue(
-    process.env.FRONVO_EMAIL_BLACKLISTING_ENABLED,
+export const blacklistedEmailDomainsEnabled = getEnvBoolean(
+    'EMAIL_BLACKLISTING_ENABLED',
     true
 );
-export const testMode = decideBooleanEnvValue(
-    process.env.FRONVO_TEST_MODE,
-    false
-);
-export const localMode = !decideBooleanEnvValue(
-    process.env.FRONVO_PRISMA_URL,
-    false
-);
+export const testMode = getEnvBoolean('TEST_MODE', false);
 
-export const localSave =
-    decideBooleanEnvValue(process.env.FRONVO_LOCAL_SAVE, true) && !testMode;
+export const localMode = !getEnvBoolean('PRISMA_URL', false);
+
+export const localSave = getEnvBoolean('LOCAL_SAVE', true) && !testMode;
 
 export const loggedInSockets: { [socketId: string]: LoggedInSocket } = {};
 
@@ -59,8 +51,8 @@ export const loggedInSockets: { [socketId: string]: LoggedInSocket } = {};
 export const mainBcryptHash = 12;
 
 // Performance logs for functions
-export const performanceReportsEnabled = decideBooleanEnvValue(
-    process.env.FRONVO_PERFORMANCE_REPORTS,
+export const performanceReportsEnabled = getEnvBoolean(
+    'PERFORMANCE_REPORTS',
     false
 );
 
@@ -68,14 +60,13 @@ export const performanceReportsEnabled = decideBooleanEnvValue(
 export const performanceReports: { [perfUUID: string]: PerformanceReport } = {};
 
 // Minimum performance log'd function ms duration in order to be uploaded
-export const performanceReportsMinMS =
-    parseInt(process.env.FRONVO_PERFORMANCE_REPORTS_MIN_MS) || -1;
+export const performanceReportsMinMS = getEnv(
+    'FRONVO_PERFORMANCE_REPORTS_MIN_MS',
+    -1
+) as number;
 
 // When using PM2 for production
-export const cluster = decideBooleanEnvValue(
-    process.env.FRONVO_TARGET_PM2,
-    false
-);
+export const cluster = getEnvBoolean('TARGET_PM2', false);
 
 // Directories/Files to check at startup
 export const requiredStartupDirectories = [localDBDirectory];
@@ -91,8 +82,7 @@ export const blacklistedEmailDomains: string[] =
         'disposable_email_blocklist.json'
     ));
 
-export const silentLogging =
-    testMode || decideBooleanEnvValue(process.env.FRONVO_SILENT_LOGGING, false);
+export const silentLogging = testMode || getEnvBoolean('SILENT_LOGGING', false);
 
 // The local virtualised Mongo database
 export const localDB: { [dbName: string]: {}[] } =

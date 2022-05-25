@@ -9,7 +9,7 @@ import {
     RegisterResult,
     RegisterServerParams,
 } from 'interfaces/noAccount/register';
-import * as variables from 'other/variables';
+import * as variables from 'variables/global';
 import utilities from 'utilities/all';
 import { findDocuments } from 'utilities/global';
 import { accountSchema } from './shared';

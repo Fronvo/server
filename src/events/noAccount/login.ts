@@ -7,7 +7,7 @@ import { compareSync } from 'bcrypt';
 import { accountSchema } from 'events/noAccount/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { LoginResult, LoginServerParams } from 'interfaces/noAccount/login';
-import { testMode } from 'other/variables';
+import { testMode } from 'variables/global';
 import * as utilities from 'utilities/global';
 
 async function login({

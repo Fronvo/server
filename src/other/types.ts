@@ -28,3 +28,20 @@ export type TestAssertTypes =
     | 'number'
     | 'function'
     | 'object';
+
+export type EnvValues =
+    | 'ADMIN_PANEL_USERNAME'
+    | 'ADMIN_PANEL_PASSWORD'
+    | 'PRISMA_URL'
+    | 'PERFORMANCE_REPORTS'
+    | 'FRONVO_PERFORMANCE_REPORTS_MIN_MS'
+    | 'EMAIL_BLACKLISTING_ENABLED'
+    | 'SILENT_LOGGING'
+    | 'BINARY_PARSER'
+    | 'LOCAL_SAVE'
+    | 'TEST_MODE'
+    | 'RATELIMITER_POINTS'
+    | 'RATELIMITER_DURATION'
+    | 'RATELIMITER_POINTS_UNAUTHORISED'
+    | 'RATELIMITER_DURATION_UNAUTHORISED'
+    | 'TARGET_PM2';

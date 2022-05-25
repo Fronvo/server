@@ -24,7 +24,7 @@ import gradient from 'gradient-string';
 
 // Other imports
 import fs from 'fs';
-import * as variables from 'other/variables';
+import * as variables from 'variables/global';
 import { decideBooleanEnvValue } from 'utilities/global';
 import { Server } from 'socket.io';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
@@ -232,7 +232,7 @@ async function startup(): Promise<void> {
             '#a812e8',
             '#8f12e8',
             '#8012e8',
-        ])('Fronvo server v0.2')
+        ])(`Fronvo server v0.2 ${variables.localMode ? '[LOCAL]' : ''}`)
     );
 
     // Special check because ora doesnt care

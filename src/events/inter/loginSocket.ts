@@ -3,7 +3,7 @@
 // ******************** //
 
 import { InterLoginSocket } from 'interfaces/events/inter';
-import * as variables from 'other/variables';
+import * as variables from 'variables/global';
 
 export default function loginSocket({
     socketId,

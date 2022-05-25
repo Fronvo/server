@@ -3,7 +3,7 @@
 // ******************** //
 
 import { InterLogoutSocket } from 'interfaces/events/inter';
-import * as variables from 'other/variables';
+import * as variables from 'variables/global';
 import { getSocketAccountId, isAccountLoggedIn } from 'utilities/global';
 
 export default function logoutSocket({ socketId }: InterLogoutSocket): void {
