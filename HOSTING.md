@@ -4,7 +4,7 @@
 
 **Create a new [MongoDB project](https://docs.atlas.mongodb.com/tutorial/manage-projects/#create-a-project).**
 
-**After creation, fill the following variables in the [.env](https://github.com/Fronvo/server/blob/master/.env.example) file:**
+**After creation, fill the following variable in the [.env](https://github.com/Fronvo/server/blob/master/.env.example) file:**
 
 - **``FRONVO_PRISMA_URL`` ([info](https://pris.ly/d/connection-strings))**
 
