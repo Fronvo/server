@@ -41,7 +41,7 @@ export const blacklistedEmailDomainsEnabled = getEnvBoolean(
 );
 export const testMode = getEnvBoolean('TEST_MODE', false);
 
-export const localMode = !getEnvBoolean('PRISMA_URL', false);
+export const localMode = !getEnv('PRISMA_URL', false) || testMode;
 
 export const localSave = getEnvBoolean('LOCAL_SAVE', true) && !testMode;
 
