@@ -25,11 +25,11 @@ import gradient from 'gradient-string';
 // Other imports
 import fs from 'fs';
 import * as variables from 'variables/global';
-import { decideBooleanEnvValue } from 'utilities/global';
 import { Server } from 'socket.io';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { InterServerEvents } from 'interfaces/events/inter';
+import { getEnv, getEnvBoolean } from 'variables/varUtils';
 
 // Variables
 let io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>;
@@ -117,11 +117,9 @@ function setupRatelimiter(): void {
     setLoading('Setting up the ratelimiter');
 
     // For authorised users
-    const ezierLimiterPoints =
-        parseInt(process.env.FRONVO_RATELIMITER_POINTS) || 40;
+    const ezierLimiterPoints = getEnv('RATELIMITER_POINTS', 40);
 
-    const ezierLimiterDuration =
-        parseInt(process.env.FRONVO_RATELIMITER_DURATION) || 2500;
+    const ezierLimiterDuration = getEnv('RATELIMITER_DURATION', 2500);
 
     const ezierLimiter = new EzierLimiter({
         maxPoints: ezierLimiterPoints,
@@ -131,11 +129,15 @@ function setupRatelimiter(): void {
     variables.setRateLimiter(ezierLimiter);
 
     // And for unauthorised users
-    const ezierLimiterUnauthorisedPoints =
-        parseInt(process.env.FRONVO_RATELIMITER_UNAUTHORISED_POINTS) || 10;
+    const ezierLimiterUnauthorisedPoints = getEnv(
+        'RATELIMITER_POINTS_UNAUTHORISED',
+        10
+    );
 
-    const ezierLimiterUnauthorisedDuration =
-        parseInt(process.env.FRONVO_RATELIMITER_UNAUTHORISED_DURATION) || 2500;
+    const ezierLimiterUnauthorisedDuration = getEnv(
+        'RATELIMITER_DURATION_UNAUTHORISED',
+        2500
+    );
 
     const ezierLimiterUnauthorised = new EzierLimiter({
         maxPoints: ezierLimiterUnauthorisedPoints,
@@ -164,7 +166,7 @@ function setupServer(): void {
         },
 
         // Enable / Disable binary parser
-        parser: decideBooleanEnvValue(process.env.FRONVO_BINARY_PARSER, true)
+        parser: getEnvBoolean('BINARY_PARSER', true)
             ? require('socket.io-msgpack-parser')
             : '',
 
@@ -196,8 +198,8 @@ function setupPM2(): void {
 }
 
 function setupAdminPanel(): void {
-    const panelUsername = process.env.FRONVO_ADMIN_PANEL_USERNAME;
-    const panelPassword = process.env.FRONVO_ADMIN_PANEL_PASSWORD;
+    const panelUsername = getEnv('ADMIN_PANEL_USERNAME');
+    const panelPassword = getEnv('ADMIN_PANEL_PASSWORD');
 
     // Check environmental variables and hash the admin panel password
     if (panelUsername && panelPassword) {

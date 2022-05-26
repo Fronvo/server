@@ -210,18 +210,6 @@ export async function reportEnd(reportUUID: string): Promise<void> {
     delete variables.performanceReports[reportUUID];
 }
 
-// Duplicate of variables.js function to prevent recursive import errors
-export function decideBooleanEnvValue(
-    value: string,
-    valueIfNull: boolean
-): boolean {
-    return value == null
-        ? valueIfNull
-        : value.toLowerCase() == 'true'
-        ? true
-        : false;
-}
-
 export function getErrorCode(errName: Errors): number {
     return Object.keys(errors).indexOf(errName) + 1;
 }
