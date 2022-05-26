@@ -116,6 +116,7 @@ function setupRatelimiter(): void {
 
     setLoading('Setting up the ratelimiter');
 
+    // For authorised users
     const ezierLimiterPoints =
         parseInt(process.env.FRONVO_RATELIMITER_POINTS) || 40;
 

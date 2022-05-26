@@ -29,16 +29,16 @@ async function fetchProfileData({
     for (const account in accounts) {
         const accountData = accounts[account].accountData;
 
-        // If target account id isn't what were looking for, move on
+        // Ensure this is the account we're looking for
         if (accountData.id != profileId) continue;
 
-        // Dont spread the dictionary, only provide select info
+        // Handpick returned profile data
         const finalAccountData: Partial<FronvoAccount> = {
             username: accountData.username,
             creationDate: accountData.creationDate,
         };
 
-        // If it's the user's profile, provide more details (better than having 2 seperate events)
+        // If self profile provide extra info
         if (profileId == getSocketAccountId(socket.id)) {
             finalAccountData.email = accountData.email;
         }

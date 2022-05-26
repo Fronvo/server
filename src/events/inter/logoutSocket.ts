@@ -11,7 +11,7 @@ export default function logoutSocket({ socketId }: InterLogoutSocket): void {
 
     delete variables.loggedInSockets[socketId];
 
-    // Only remove the ratelimit if noone is logged in
+    // Noone is logged in, remove ratelimit
     if (!isAccountLoggedIn(accountId)) {
         variables.rateLimiter.clearRateLimit(accountId, true);
     }
