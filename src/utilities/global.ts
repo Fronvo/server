@@ -126,17 +126,15 @@ export function logoutSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
     socket: Socket<ClientToServerEvents, ServerToClientEvents>
 ): void {
-    let accountId: string;
-
-    if (!variables.testMode) {
-        accountId = getSocketAccountId(socket.id);
-    }
-
     delete variables.loggedInSockets[socket.id];
 
-    // Only remove the ratelimit if noone is logged in
-    if (!isAccountLoggedIn(accountId) && !variables.testMode) {
-        variables.rateLimiter.clearRateLimit(accountId, true);
+    if (!variables.testMode) {
+        const accountId = getSocketAccountId(socket.id);
+
+        // Noone is logged in, remove ratelimit
+        if (!isAccountLoggedIn(accountId)) {
+            variables.rateLimiter.clearRateLimit(accountId, true);
+        }
     }
 
     if (variables.cluster) {
