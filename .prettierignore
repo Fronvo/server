@@ -1,4 +1,9 @@
+# Node
 node_modules/
+package-lock.json
+package.json
+
+# DotEnv
 .env
 
 # PM2
@@ -7,10 +12,16 @@ node_modules/
 
 # Fronvo
 logs.txt
-src/generated/*
+generated/*
 
 # Local work
 testing/
 
 # TypeScript Output
 output/
+
+# CircleCI
+.circleci/
+
+# Github
+.github/
