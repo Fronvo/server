@@ -2,11 +2,11 @@
 <p align='center'><b>The server of Fronvo</b></p>
 <p align='center'><b>Built on socket.io for blazing-fast realtime communication</b></p>
 
-<h2 align='center'>  
+<h2 align='center'>
 
 [![forthebadge](https://forthebadge.com/images/badges/made-with-typescript.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
-  
+
 <img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/assets/demo-run-local.svg' alt='Fronvo demo run'>
   
 </h2>

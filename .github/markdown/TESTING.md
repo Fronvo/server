@@ -1,9 +1,12 @@
 # Running tests
+
 **First of all, install devDependencies.**
-- **``npm install``**
+
+-   **`npm install`**
 
 **Then, simply let mocha do what it does best.**
-- **``npm test``**
+
+-   **`npm test`**
 
 # Creating your own tests
 
@@ -24,7 +27,7 @@
 **If we examine it, we can see it returns a boolean within the loggedIn key which indicates the logged in state.**
 
 ```ts
-return {loggedIn: isSocketLoggedIn(socket)};
+return { loggedIn: isSocketLoggedIn(socket) };
 ```
 
 ## Create the test file
@@ -45,11 +48,14 @@ return {loggedIn: isSocketLoggedIn(socket)};
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
 import { assertEquals, assertError, assertErrors } from 'test/utilities';
 
-function isLoggedIn({ socket, done }: TestArguments, callback: TestErrorCallback): void {
+function isLoggedIn(
+    { socket, done }: TestArguments,
+    callback: TestErrorCallback
+): void {
     socket.emit('isLoggedIn', ({ err, loggedIn }) => {
-        callback(assertError({err}));
+        callback(assertError({ err }));
 
-        callback(assertEquals({loggedIn}, true));
+        callback(assertEquals({ loggedIn }, true));
 
         done();
     });
@@ -60,10 +66,8 @@ function isLoggedIn({ socket, done }: TestArguments, callback: TestErrorCallback
 
 ```ts
 export default (testArgs: TestArguments): void => {
-    assertErrors({
-        
-    }, testArgs, isLoggedIn);
-}
+    assertErrors({}, testArgs, isLoggedIn);
+};
 ```
 
 **We don't need any additional error-checking functions so we just pass the given test arguments alongside the final function.**

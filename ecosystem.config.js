@@ -7,8 +7,9 @@ module.exports = {
             exec_mode: 'cluster',
             autorestart: true,
             max_restarts: 5,
-            env: {"FRONVO_TARGET_PM2": true},
-            node_args: "--nouse-idle-notification -r ts-node/register/transpile-only -r tsconfig-paths/register"
-        }
-    ]
-}
+            env: { FRONVO_TARGET_PM2: true },
+            node_args:
+                '--nouse-idle-notification -r ts-node/register/transpile-only -r tsconfig-paths/register',
+        },
+    ],
+};

@@ -1,7 +1,8 @@
 # Running locally
-**```npm install```**
 
-**```npm start```**
+**`npm install`**
+
+**`npm start`**
 
 **The server should be running locally at port 3001.**
 
