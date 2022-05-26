@@ -14,7 +14,7 @@
   "homepage": "https://github.com/Fronvo/server#readme",
   "private": true,
   "scripts": {
-    "build": "swc src -d output && copyfiles -u 1 src/generated/** src/generated/**/* output",
+    "build": "swc src -d output && copyfiles generated/** generated/**/* output",
     "start": "run-s build start:cached",
     "start:cached": "node -r @swc-node/register -r tsconfig-paths/register output/main/server.js",
     "start:dev": "tsnd --ignore-watch src/generated --transpile-only --respawn --exit-child --clear -r tsconfig-paths/register src/main/server.ts",
