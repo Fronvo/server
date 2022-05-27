@@ -1,4 +1,4 @@
-<h1 align='center'>Documenation for the server</h1>
+# Documenation for the server
 
 Documenation is planned for a later release.
 
