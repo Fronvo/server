@@ -1,6 +1,6 @@
-# Documenation for the server
+# Documentation for the server
 
-Documenation is planned for a later release.
+Documentation is planned for a later release.
 
 In the meantime, take a look at the [interfaces](https://github.com/Fronvo/server/tree/master/src/interfaces) for each event.
 
