@@ -69,7 +69,7 @@ export default (testArgs: TestArguments): void => {
 
 We don't need any additional error-checking functions so we just pass the given test arguments alongside the final function.
 
-**__And that's it!__**
+**_And that's it!_**
 
 Feel free to experiment with existing test files but before submitting a new test make sure to check if it exists.
 
