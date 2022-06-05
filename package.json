@@ -17,7 +17,7 @@
     "build": "swc src -d output && copyfiles generated/* generated/local/** output",
     "start": "run-s build start:cached",
     "start:cached": "node -r @swc-node/register -r tsconfig-paths/register output/main/server.js",
-    "start:dev": "tsnd --transpile-only --respawn --exit-child --clear -r tsconfig-paths/register src/main/server.ts",
+    "start:dev": "tsnd --ignore-watch generated/ --transpile-only --respawn --exit-child --clear -r tsconfig-paths/register src/main/server.ts",
     "test": "run-p test:server test:mocha",
     "test:report": "run-p test:server test:mocha:report",
     "test:mocha": "mocha -r @swc-node/register -r tsconfig-paths/register src/test/main.ts",
