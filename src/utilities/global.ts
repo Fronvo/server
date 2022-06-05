@@ -126,8 +126,6 @@ export function logoutSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
     socket: Socket<ClientToServerEvents, ServerToClientEvents>
 ): void {
-    delete variables.loggedInSockets[socket.id];
-
     if (!variables.testMode) {
         const accountId = getSocketAccountId(socket.id);
 
@@ -142,6 +140,8 @@ export function logoutSocket(
             socketId: socket.id,
         });
     }
+
+    delete variables.loggedInSockets[socket.id];
 }
 
 export function isSocketLoggedIn(
