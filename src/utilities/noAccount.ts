@@ -27,6 +27,5 @@ export async function createAccount(
 }
 
 export function getEmailDomain(email: string): string {
-    // Will fail Joi schema checks if the email doesnt comply with this format
     return email.split('@')[1];
 }
