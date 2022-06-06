@@ -39,6 +39,7 @@
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
+    "gmail-send": "^1.8.14",
     "gradient-string": "^1.2.0",
     "npm-run-all": "^4.1.5",
     "ora": "^5.4.1",

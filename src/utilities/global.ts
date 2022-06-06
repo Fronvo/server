@@ -16,6 +16,7 @@ import { localDB, prismaClient } from 'variables/global';
 import { Server, Socket } from 'socket.io';
 import { format } from 'util';
 import { v4 } from 'uuid';
+import gmail from 'gmail-send';
 
 export function saveLocalDB(): void {
     if (!variables.localMode || !variables.localSave) return;
@@ -286,4 +287,40 @@ export function rateLimitAnnounce(
             });
         }
     }
+}
+
+export function generateNumbers(
+    from: number,
+    to: number,
+    times: number
+): string {
+    let generatedNumbers = '';
+
+    for (let i = 0; i < times; i++) {
+        generatedNumbers += Math.floor(Math.random() * (to - from + 1)) + from;
+    }
+
+    return generatedNumbers;
+}
+
+export async function sendEmail(
+    to: string,
+    subject: string,
+    content: string
+): Promise<void> {
+    if (!variables.emailUsername || !variables.emailPassword) {
+        console.log(errorsExtra.EMAIL_NOT_SETUP);
+        return;
+    }
+
+    const send = gmail({
+        user: variables.emailUsername,
+        pass: variables.emailPassword,
+        to,
+        subject,
+    });
+
+    await send({
+        text: content,
+    });
 }

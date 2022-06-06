@@ -20,7 +20,8 @@ export type Errors =
     | 'ACCOUNT_DOESNT_EXIST'
     | 'INVALID_REGEX'
     | 'INVALID_TOKEN'
-    | 'PROFILE_NOT_FOUND';
+    | 'PROFILE_NOT_FOUND'
+    | 'INVALID_VERIFICATION_CODE';
 
 export type TestAssertTypes =
     | 'string'
@@ -44,4 +45,6 @@ export type EnvValues =
     | 'RATELIMITER_DURATION'
     | 'RATELIMITER_POINTS_UNAUTHORISED'
     | 'RATELIMITER_DURATION_UNAUTHORISED'
-    | 'TARGET_PM2';
+    | 'TARGET_PM2'
+    | 'EMAIL_USERNAME'
+    | 'EMAIL_PASSWORD';

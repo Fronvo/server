@@ -9,9 +9,8 @@ import {
     RegisterResult,
     RegisterServerParams,
 } from 'interfaces/noAccount/register';
-import * as variables from 'variables/global';
 import utilities from 'utilities/all';
-import { findDocuments } from 'utilities/global';
+import * as variables from 'variables/global';
 import { accountSchema } from './shared';
 
 async function register({
@@ -31,10 +30,10 @@ async function register({
         }
     }
 
-    const accounts: { accountData: AccountData }[] = await findDocuments(
-        'Account',
-        { select: { accountData: true } }
-    );
+    const accounts: { accountData: AccountData }[] =
+        await utilities.findDocuments('Account', {
+            select: { accountData: true },
+        });
 
     // Check if the email is already registered by another user
     for (const account in accounts) {
@@ -45,27 +44,61 @@ async function register({
         }
     }
 
-    // Generate the account once all checks have passed
-    const username =
-        'Fronvo user ' +
-        (accounts != null ? Object.keys(accounts).length + 1 : '1');
-    const id = utilities.convertToId(username);
+    let sentCode: string;
 
-    await utilities.createAccount({
-        id,
-        email,
-        username,
-        password: !variables.testMode
-            ? bcrypt.hashSync(password, variables.mainBcryptHash)
-            : password,
+    if (!variables.testMode) {
+        // 6 digits [0-9]
+        sentCode = utilities.generateNumbers(0, 9, 6);
+
+        // Send the code
+        utilities.sendEmail(
+            email,
+            'Fronvo email verification code',
+            `Your verification code is ${sentCode}`
+        );
+    } else {
+        sentCode = '123456';
+    }
+
+    // Attach registerVerify now, will be detached after verification / discarded
+    socket.on('registerVerify', async ({ code }, callback) => {
+        let finalError: FronvoError;
+        let token: string;
+
+        if (code != sentCode) {
+            finalError = utilities.generateError('INVALID_VERIFICATION_CODE');
+        } else {
+            // Detach listener
+            socket.removeAllListeners('registerVerify');
+
+            // Generate the account once all checks have passed
+            const username =
+                'Fronvo user ' +
+                (accounts != null ? Object.keys(accounts).length + 1 : '1');
+
+            const id = utilities.convertToId(username);
+
+            await utilities.createAccount({
+                id,
+                email,
+                username,
+                password: !variables.testMode
+                    ? bcrypt.hashSync(password, variables.mainBcryptHash)
+                    : password,
+            });
+
+            token = await utilities.createToken(id);
+
+            utilities.loginSocket(io, socket, id);
+        }
+
+        callback({
+            token: !finalError ? token : undefined,
+            err: finalError ? { ...finalError.err } : undefined,
+        });
     });
 
-    // Also login to the account
-    utilities.loginSocket(io, socket, id);
-
-    return {
-        token: await utilities.createToken(id),
-    };
+    return {};
 }
 
 const registerTemplate: EventTemplate = {

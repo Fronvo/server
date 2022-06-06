@@ -4,4 +4,6 @@
 
 export default {
     LOCAL_DB_FAIL: 'Failed to save the local database.',
+    EMAIL_NOT_SETUP:
+        'Emailing capabilities are unavailable, aborting operation.',
 };

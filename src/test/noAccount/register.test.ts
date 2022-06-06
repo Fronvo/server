@@ -159,18 +159,22 @@ function accountExists(
             password: existsPassword,
         },
         () => {
-            socket.emit('logout');
+            socket.emit('registerVerify', { code: '123456' }, ({}) => {
+                socket.emit('logout');
 
-            socket.emit(
-                'register',
-                {
-                    email: existsEmail,
-                    password: existsPassword,
-                },
-                ({ err }) => {
-                    callback(assertCode(err.code, 'ACCOUNT_ALREADY_EXISTS'));
-                }
-            );
+                socket.emit(
+                    'register',
+                    {
+                        email: existsEmail,
+                        password: existsPassword,
+                    },
+                    ({ err }) => {
+                        callback(
+                            assertCode(err.code, 'ACCOUNT_ALREADY_EXISTS')
+                        );
+                    }
+                );
+            });
         }
     );
 }
@@ -187,16 +191,25 @@ function register(
             email: shared.email,
             password: shared.password,
         },
-        ({ err, token }): void => {
+        ({ err }): void => {
             callback(assertError({ err }));
 
-            callback(
-                assertType({ token }, 'string') || assertLength({ token }, 36)
-            );
+            socket.emit(
+                'registerVerify',
+                { code: '123456' },
+                ({ err, token }) => {
+                    callback(assertError({ err }));
 
-            sharedVars.token = token;
-            socket.emit('logout');
-            done();
+                    callback(
+                        assertType({ token }, 'string') ||
+                            assertLength({ token }, 36)
+                    );
+
+                    sharedVars.token = token;
+                    socket.emit('logout');
+                    done();
+                }
+            );
         }
     );
 }

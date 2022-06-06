@@ -105,3 +105,7 @@ export function setUnauthorisedRateLimiter(
 ): void {
     rateLimiterUnauthorised = rateLimiterObject;
 }
+
+// Email-related
+export let emailUsername = getEnv('EMAIL_USERNAME');
+export let emailPassword = getEnv('EMAIL_PASSWORD');

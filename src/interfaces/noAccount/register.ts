@@ -11,8 +11,6 @@ export interface RegisterParams {
 
 export interface RegisterServerParams extends EventArguments, RegisterParams {}
 
-export interface RegisterResult {
-    token: string;
-}
+export interface RegisterResult {}
 
 export interface RegisterTestResult extends FronvoError, RegisterResult {}

@@ -18,11 +18,19 @@ import {
     RegisterParams,
     RegisterTestResult,
 } from 'interfaces/noAccount/register';
+import {
+    RegisterVerifyParams,
+    RegisterVerifyTestResult,
+} from 'interfaces/noAccount/registerVerify';
 
 export interface ClientToServerEvents {
     register: (
         {}: RegisterParams,
         callback?: ({}: RegisterTestResult) => void
+    ) => void;
+    registerVerify: (
+        {}: RegisterVerifyParams,
+        callback?: ({}: RegisterVerifyTestResult) => void
     ) => void;
     login: ({}: LoginParams, callback?: ({}: LoginTestResult) => void) => void;
     loginToken: (

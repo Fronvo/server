@@ -2,7 +2,14 @@
 // Interfaces for the server to client events of Socket.IO
 // ******************** //
 
+import {
+    RegisterVerifyParams,
+    RegisterVerifyTestResult,
+} from 'interfaces/noAccount/registerVerify';
+
 export interface ServerToClientEvents {
-    // Add events which are called on their own here
-    // with io.emit(...), not callback-able
+    registerVerify: (
+        {}: RegisterVerifyParams,
+        callback?: ({}: RegisterVerifyTestResult) => void
+    ) => void;
 }
