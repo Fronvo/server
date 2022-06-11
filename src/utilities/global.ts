@@ -318,9 +318,18 @@ export async function sendEmail(
         pass: variables.emailPassword,
         to,
         subject,
+        html:
+            `
+<p align='center'>
+    <a href='https://fronvo.herokuapp.com'><img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/email/fronvo-embed-icon.png'></a>
+</p>
+
+<h1 align='center' style='color: rgb(140, 0, 255)'>
+` +
+            content +
+            `
+</h1>`,
     });
 
-    await send({
-        text: content,
-    });
+    await send();
 }
