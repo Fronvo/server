@@ -74,6 +74,8 @@ function loginToken(
         ({ err }): void => {
             callback(assertError({ err }));
 
+            socket.emit('logout');
+
             done();
         }
     );

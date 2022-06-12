@@ -2,8 +2,16 @@
 // Reusable functions for all kinds of events to avoid repetition.
 // ******************** //
 
-import { LogData, Prisma, ReportData, TokenData } from '@prisma/client';
+import { StringSchema } from '@ezier/validate';
+import {
+    AccountData,
+    LogData,
+    Prisma,
+    ReportData,
+    TokenData,
+} from '@prisma/client';
 import { writeFile } from 'fs';
+import gmail from 'gmail-send';
 import { FronvoError, LoggedInSocket } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
@@ -11,12 +19,11 @@ import { ServerToClientEvents } from 'interfaces/events/s2c';
 import errors from 'other/errors';
 import errorsExtra from 'other/errorsExtra';
 import { CollectionNames, Errors } from 'other/types';
-import * as variables from 'variables/global';
-import { localDB, prismaClient } from 'variables/global';
 import { Server, Socket } from 'socket.io';
 import { format } from 'util';
 import { v4 } from 'uuid';
-import gmail from 'gmail-send';
+import * as variables from 'variables/global';
+import { localDB, prismaClient } from 'variables/global';
 
 export function saveLocalDB(): void {
     if (!variables.localMode || !variables.localSave) return;
@@ -68,6 +75,64 @@ export async function insertDocument(
         localDB[collName].push(dict);
 
         saveLocalDB();
+    }
+}
+
+export async function updateAccount(
+    updateDict: { [key: string]: any },
+    filterDict: { [key: string]: string }
+): Promise<void> {
+    const filterKey = Object.keys(filterDict)[0];
+    const filterValue = filterDict[Object.keys(filterDict)[0]];
+
+    if (!variables.localMode) {
+        // Get the account OID (MongoDB object id) in order to update it
+        // Super sketchy but it works, i think
+        const accountsRaw = await prismaClient.account.findRaw();
+
+        for (const account in accountsRaw) {
+            const accountObj = accountsRaw[account];
+
+            // @ts-ignore
+            // Check if it's the target account
+            // Filter not fulfilled, next iteration
+            if (!(accountObj.accountData[filterKey] == filterValue)) continue;
+
+            // @ts-ignore
+            // Get the OID somehow
+            const accountOID = accountObj._id.$oid;
+
+            await prismaClient.account.update({
+                where: { id: accountOID },
+                data: {
+                    accountData: {
+                        update: updateDict,
+                    },
+                },
+            });
+        }
+    } else {
+        const accounts: { accountData: AccountData }[] = await findDocuments(
+            'Account',
+            { select: { accountData: true } }
+        );
+
+        for (const account in accounts) {
+            const accountData = accounts[account].accountData;
+
+            // Next iteration if it doesnt fulfill the filter
+            if (!(accountData[filterKey] == filterValue)) continue;
+
+            // Update finally
+            localDB['Account'][account] = {
+                accountData: {
+                    ...accountData,
+                    ...updateDict,
+                },
+            };
+
+            saveLocalDB();
+        }
     }
 }
 
@@ -332,4 +397,60 @@ export async function sendEmail(
     });
 
     await send();
+}
+
+export function validateSchema(
+    schema: StringSchema,
+    schemaArgs: { [key: string]: any }
+): FronvoError | undefined {
+    // Only need the first error
+    const result = schema.validate(schemaArgs)[0];
+
+    if (!result) return;
+
+    const key = result.extras.key;
+    const extras: { [key: string]: any } = { for: key };
+
+    switch (result.name) {
+        case 'STRING_REQUIRED':
+            return generateError('REQUIRED', extras, [key]);
+
+        case 'STRING_INVALID_LENGTH':
+            return generateError('EXACT_LENGTH', extras, [key]);
+
+        case 'STRING_INVALID_LENGTH':
+            return generateError('EXACT_LENGTH', extras, [
+                key,
+                schema.schema[key].length,
+            ]);
+
+        case 'STRING_INVALID_MIN_LENGTH':
+        case 'STRING_INVALID_MAX_LENGTH':
+            const min = schema.schema[key].minLength;
+            const max = schema.schema[key].maxLength;
+
+            return generateError('LENGTH', { ...extras, min, max }, [
+                key,
+                min,
+                max,
+            ]);
+
+        case 'STRING_INVALID_TYPE':
+            switch (result.extras.type) {
+                case 'email':
+                    return generateError('REQUIRED_EMAIL', extras);
+
+                case 'uuid':
+                    return generateError('REQUIRED_UUID', extras);
+
+                default:
+                    return generateError('UNKNOWN');
+            }
+
+        case 'STRING_INVALID_REGEX':
+            return generateError('INVALID_REGEX', extras, [key]);
+
+        default:
+            return generateError('UNKNOWN');
+    }
 }

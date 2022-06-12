@@ -113,64 +113,6 @@ function checkEventPermission(
     }
 }
 
-function validateEventSchema(
-    eventName: string,
-    eventArgs: { [key: string]: any }
-): undefined | FronvoError {
-    const eventSchema = funcs[eventName].schema;
-
-    // Only need the first error
-    const result = eventSchema.validate(eventArgs)[0];
-
-    if (!result) return;
-
-    const key = result.extras.key;
-    const extras: { [key: string]: any } = { for: key };
-
-    switch (result.name) {
-        case 'STRING_REQUIRED':
-            return generateError('REQUIRED', extras, [key]);
-
-        case 'STRING_INVALID_LENGTH':
-            return generateError('EXACT_LENGTH', extras, [key]);
-
-        case 'STRING_INVALID_LENGTH':
-            return generateError('EXACT_LENGTH', extras, [
-                key,
-                eventSchema.schema[key].length,
-            ]);
-
-        case 'STRING_INVALID_MIN_LENGTH':
-        case 'STRING_INVALID_MAX_LENGTH':
-            const min = eventSchema.schema[key].minLength;
-            const max = eventSchema.schema[key].maxLength;
-
-            return generateError('LENGTH', { ...extras, min, max }, [
-                key,
-                min,
-                max,
-            ]);
-
-        case 'STRING_INVALID_TYPE':
-            switch (result.extras.type) {
-                case 'email':
-                    return generateError('REQUIRED_EMAIL', extras);
-
-                case 'uuid':
-                    return generateError('REQUIRED_UUID', extras);
-
-                default:
-                    return generateError('UNKNOWN');
-            }
-
-        case 'STRING_INVALID_REGEX':
-            return generateError('INVALID_REGEX', extras, [key]);
-
-        default:
-            return generateError('UNKNOWN');
-    }
-}
-
 async function fireEvent(
     io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>,
@@ -227,7 +169,10 @@ async function fireEvent(
     async function validateAndRun(): Promise<void> {
         // Validate if a schema present
         if (funcs[eventName].schema) {
-            const schemaResult = validateEventSchema(eventName, eventArgs);
+            const schemaResult = utilities.validateSchema(
+                funcs[eventName].schema,
+                eventArgs
+            );
 
             if (!schemaResult) {
                 fireCallback();

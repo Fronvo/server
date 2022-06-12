@@ -6,5 +6,6 @@
 import register from 'test/noAccount/register.test';
 import login from 'test/noAccount/login.test';
 import loginToken from 'test/noAccount/loginToken.test';
+import resetPassword from 'test/noAccount/resetPassword.test';
 
-export default { register, login, loginToken };
+export default { register, login, loginToken, resetPassword };

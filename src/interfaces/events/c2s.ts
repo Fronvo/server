@@ -22,6 +22,18 @@ import {
     RegisterVerifyParams,
     RegisterVerifyTestResult,
 } from 'interfaces/noAccount/registerVerify';
+import {
+    ResetPasswordParams,
+    ResetPasswordTestResult,
+} from 'interfaces/noAccount/resetPassword';
+import {
+    ResetPasswordFinalParams,
+    ResetPasswordFinalTestResult,
+} from 'interfaces/noAccount/resetPasswordFinal';
+import {
+    ResetPasswordVerifyParams,
+    ResetPasswordVerifyTestResult,
+} from 'interfaces/noAccount/resetPasswordVerify';
 
 export interface ClientToServerEvents {
     register: (
@@ -44,4 +56,17 @@ export interface ClientToServerEvents {
         callback?: ({}: FetchProfileDataTestResult) => void
     ) => void;
     logout: (callback?: ({}: LogoutTestResult) => void) => void;
+    resetPassword: (
+        {}: ResetPasswordParams,
+        callback?: ({}: ResetPasswordTestResult) => void
+    ) => void;
+    resetPasswordVerify: (
+        {}: ResetPasswordVerifyParams,
+        callback?: ({}: ResetPasswordVerifyTestResult) => void
+    ) => void;
+
+    resetPasswordFinal: (
+        {}: ResetPasswordFinalParams,
+        callback?: ({}: ResetPasswordFinalTestResult) => void
+    ) => void;
 }
