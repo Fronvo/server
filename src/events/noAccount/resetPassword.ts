@@ -59,9 +59,7 @@ async function resetPassword({
             let finalError: FronvoError;
 
             if (code != sentCode) {
-                finalError = utilities.generateError(
-                    'INVALID_VERIFICATION_CODE'
-                );
+                finalError = utilities.generateError('INVALID_CODE');
             } else {
                 // Detach listener
                 socket.removeAllListeners('resetPasswordVerify');

@@ -21,7 +21,7 @@ export type Errors =
     | 'INVALID_REGEX'
     | 'INVALID_TOKEN'
     | 'PROFILE_NOT_FOUND'
-    | 'INVALID_VERIFICATION_CODE';
+    | 'INVALID_CODE';
 
 export type TestAssertTypes =
     | 'string'

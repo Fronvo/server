@@ -24,7 +24,7 @@ const errors: { [Error in Errors] } = {
         'The %s does not consist of the expected regular expression.',
     INVALID_TOKEN: 'The token is invalid.',
     PROFILE_NOT_FOUND: 'The requested profile could not be found.',
-    INVALID_VERIFICATION_CODE: 'The verification code provided is invalid.',
+    INVALID_CODE: 'The provided code is invalid.',
 };
 
 export default errors;
