@@ -77,7 +77,8 @@ function fetchProfileData(
             callback(assertError({ err }));
 
             callback(
-                assertType({ email: profileData.email }, 'string') ||
+                assertType({ id: profileData.id }, 'string') ||
+                    assertType({ email: profileData.email }, 'string') ||
                     assertType({ username: profileData.username }, 'string') ||
                     assertNotEqual(
                         { creationDate: new Date(profileData.creationDate) },

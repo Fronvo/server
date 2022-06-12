@@ -60,6 +60,7 @@ export interface InterEventExportTemplate {
 }
 
 export interface FronvoAccount {
+    id: string;
     username: string;
     email: string;
     password: string;

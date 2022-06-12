@@ -35,6 +35,7 @@ async function fetchProfileData({
 
         // Handpick returned profile data
         const finalAccountData: Partial<FronvoAccount> = {
+            id: accountData.id,
             username: accountData.username,
             creationDate: accountData.creationDate,
         };
