@@ -389,7 +389,7 @@ export async function sendEmail(
     <a href='https://fronvo.herokuapp.com'><img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/email/fronvo-embed-icon.png'></a>
 </p>
 
-<h1 align='center' style='color: rgb(140, 0, 255)'>
+<h1 align='center'>
 ` +
             content +
             `
