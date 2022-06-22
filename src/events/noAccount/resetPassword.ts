@@ -11,6 +11,7 @@ import {
     ResetPasswordServerParams,
 } from 'interfaces/noAccount/resetPassword';
 import utilities from 'utilities/all';
+import { sendEmail } from 'utilities/global';
 import * as variables from 'variables/global';
 
 async function resetPassword({
@@ -40,11 +41,9 @@ async function resetPassword({
                 sentCode = utilities.generateNumbers(0, 9, 6);
 
                 // Send the code
-                utilities.sendEmail(
-                    email,
-                    'Fronvo password reset code',
-                    `Your password reset code is ${sentCode}`
-                );
+                utilities.sendEmail(email, 'Fronvo password reset code', [
+                    `Your password reset code is ${sentCode}`,
+                ]);
             } else {
                 sentCode = '123456';
             }
@@ -105,6 +104,12 @@ async function resetPassword({
                     },
                     { email }
                 );
+
+                // Notify user about password change
+                sendEmail(email, 'Fronvo password reset', [
+                    'Your password on Fronvo has been reset',
+                    'You may need to re-login to your account on all associated devices',
+                ]);
 
                 // Detach listener
                 socket.removeAllListeners('resetPasswordFinal');

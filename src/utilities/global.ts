@@ -371,11 +371,21 @@ export function generateNumbers(
 export async function sendEmail(
     to: string,
     subject: string,
-    content: string
+    content: string[]
 ): Promise<void> {
     if (!variables.emailUsername || !variables.emailPassword) {
         console.log(errorsExtra.EMAIL_NOT_SETUP);
         return;
+    }
+
+    let finalHtml = '';
+
+    for (const contentStrIndex in content) {
+        finalHtml += `
+<h1 align='center'>
+    ${content[contentStrIndex]}
+</h1>
+`;
     }
 
     const send = gmail({
@@ -383,17 +393,16 @@ export async function sendEmail(
         pass: variables.emailPassword,
         to,
         subject,
-        html:
-            `
-<p align='center'>
-    <a href='https://fronvo.herokuapp.com'><img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/email/fronvo-logo-large.png'></a>
-</p>
+        html: `
+<div>
+    <p align='center'>
+        <a href='https://fronvo.herokuapp.com'><img src='https://i.ibb.co/5RW7Kv4/logo-large.png'></a>
+    </p>
 
-<h1 align='center'>
-` +
-            content +
-            `
-</h1>`,
+    ${finalHtml}
+
+</div>
+`,
     });
 
     await send();
