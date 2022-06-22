@@ -11,7 +11,7 @@ import {
     ResetPasswordServerParams,
 } from 'interfaces/noAccount/resetPassword';
 import utilities from 'utilities/all';
-import { sendEmail } from 'utilities/global';
+import { getEmailAccountId, revokeToken, sendEmail } from 'utilities/global';
 import * as variables from 'variables/global';
 
 async function resetPassword({
@@ -104,6 +104,9 @@ async function resetPassword({
                     },
                     { email }
                 );
+
+                // Revoke token (will be regenerated when someone logs in to the account)
+                await revokeToken(await getEmailAccountId(email));
 
                 // Notify user about password change
                 sendEmail(email, 'Fronvo password reset', [

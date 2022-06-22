@@ -9,6 +9,7 @@ import { config } from 'dotenv';
 config({ path: resolve(__dirname, '../../.env') });
 
 import {
+    LocalDict,
     LoggedInSocket,
     PerformanceReport,
     RequiredStartupFile,
@@ -85,7 +86,7 @@ export const blacklistedEmailDomains: string[] =
 export const silentLogging = testMode || getEnvBoolean('SILENT_LOGGING', false);
 
 // The local virtualised Mongo database
-export const localDB: { [dbName: string]: {}[] } =
+export const localDB: { [Collection in CollectionNames]: LocalDict[] } =
     localMode && localSave && existsSync(localDBPath)
         ? require(localDBPath)
         : localDBTemplate;

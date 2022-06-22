@@ -132,8 +132,11 @@ function resetPassword(
                                     email: shared.email,
                                     password: shared.password,
                                 },
-                                ({ err }) => {
+                                ({ err, token }) => {
                                     callback(assertError({ err }));
+
+                                    // Token is revoked, update
+                                    shared.token = token;
 
                                     done();
                                 }

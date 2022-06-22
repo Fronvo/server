@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { AccountData, LogData, ReportData, TokenData } from '@prisma/client';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
@@ -65,4 +66,12 @@ export interface FronvoAccount {
     email: string;
     password: string;
     creationDate: Date;
+}
+
+export interface LocalDict {
+    _id?: string;
+    accountData?: AccountData;
+    tokenData?: TokenData;
+    reportData?: ReportData;
+    logData?: LogData;
 }

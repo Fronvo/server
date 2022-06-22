@@ -78,6 +78,24 @@ export async function insertDocument(
     }
 }
 
+export function deleteDocumentLocal(
+    collName: CollectionNames,
+    recordId: string
+): void {
+    if (!variables.localMode) return;
+
+    const localColl = localDB[collName];
+
+    for (const itemIndex in localColl) {
+        const itemData = localColl[itemIndex];
+
+        if (itemData._id == recordId) {
+            // @ts-ignore
+            localDB[collName].splice(itemIndex, 1);
+        }
+    }
+}
+
 export async function updateAccount(
     updateDict: { [key: string]: any },
     filterDict: { [key: string]: string }
@@ -226,6 +244,35 @@ export function isAccountLoggedIn(accountId: string): boolean {
     return false;
 }
 
+export async function getEmailAccountId(email: string): Promise<string> {
+    if (!variables.localMode) {
+        const accountsRaw = await prismaClient.account.findRaw();
+
+        for (const account in accountsRaw) {
+            const accountObj = accountsRaw[account];
+
+            // @ts-ignore
+            if (!(accountObj.accountData.email == email)) return;
+
+            // @ts-ignore
+            return accountObj.accountData.id;
+        }
+    } else {
+        const accounts: { accountData: AccountData }[] = await findDocuments(
+            'Account',
+            { select: { accountData: true } }
+        );
+
+        for (const account in accounts) {
+            const accountData = accounts[account].accountData;
+
+            if (accountData.email == email) {
+                return accountData.id;
+            }
+        }
+    }
+}
+
 export function getSocketAccountId(socketId: string): string {
     return variables.loggedInSockets[socketId].accountId;
 }
@@ -330,6 +377,28 @@ export async function getToken(accountId: string): Promise<string> {
         if (tokenData.accountId === accountId) {
             return tokenData.token;
         }
+    }
+}
+
+export async function revokeToken(accountId: string): Promise<void> {
+    if (!variables.localMode) {
+        const tokensRaw = await prismaClient.token.findRaw();
+
+        for (const token in tokensRaw) {
+            const tokenObj = tokensRaw[token];
+
+            // @ts-ignore
+            if (!(tokenObj.tokenData.accountId == accountId)) return;
+
+            // @ts-ignore
+            const tokenOID = tokenObj._id.$oid;
+
+            await prismaClient.token.delete({
+                where: { id: tokenOID },
+            });
+        }
+    } else {
+        deleteDocumentLocal('Token', accountId);
     }
 }
 
