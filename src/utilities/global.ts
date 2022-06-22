@@ -386,7 +386,7 @@ export async function sendEmail(
         html:
             `
 <p align='center'>
-    <a href='https://fronvo.herokuapp.com'><img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/email/fronvo-embed-icon.png'></a>
+    <a href='https://fronvo.herokuapp.com'><img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/email/fronvo-logo-large.png'></a>
 </p>
 
 <h1 align='center'>
