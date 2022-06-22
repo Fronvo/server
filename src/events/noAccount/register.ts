@@ -51,11 +51,9 @@ async function register({
         sentCode = utilities.generateNumbers(0, 9, 6);
 
         // Send the code
-        utilities.sendEmail(
-            email,
-            'Fronvo email verification code',
-            `Your verification code is ${sentCode}`
-        );
+        utilities.sendEmail(email, 'Fronvo email verification code', [
+            `Your verification code is ${sentCode}`,
+        ]);
     } else {
         sentCode = '123456';
     }
