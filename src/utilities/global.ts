@@ -252,7 +252,7 @@ export async function getEmailAccountId(email: string): Promise<string> {
             const accountObj = accountsRaw[account];
 
             // @ts-ignore
-            if (!(accountObj.accountData.email == email)) return;
+            if (!(accountObj.accountData.email == email)) continue;
 
             // @ts-ignore
             return accountObj.accountData.id;
@@ -388,7 +388,7 @@ export async function revokeToken(accountId: string): Promise<void> {
             const tokenObj = tokensRaw[token];
 
             // @ts-ignore
-            if (!(tokenObj.tokenData.accountId == accountId)) return;
+            if (!(tokenObj.tokenData.accountId == accountId)) continue;
 
             // @ts-ignore
             const tokenOID = tokenObj._id.$oid;
