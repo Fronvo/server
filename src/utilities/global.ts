@@ -183,19 +183,6 @@ export function loginSocket(
 ): void {
     variables.loggedInSockets[socket.id] = { accountId };
 
-    // Remove from unauthorised ratelimits
-    if (!variables.testMode) {
-        // Add accountId to ratelimits if not present
-        if (!variables.rateLimiter.getRateLimit(accountId)) {
-            variables.rateLimiter.createRateLimit(accountId);
-        }
-
-        variables.rateLimiterUnauthorised.clearRateLimit(
-            socket.handshake.address,
-            true
-        );
-    }
-
     // Update other servers in cluster mode
     if (variables.cluster) {
         io.serverSideEmit('loginSocket', {
@@ -210,15 +197,6 @@ export function logoutSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
     socket: Socket<ClientToServerEvents, ServerToClientEvents>
 ): void {
-    if (!variables.testMode) {
-        const accountId = getSocketAccountId(socket.id);
-
-        // Noone is logged in, remove ratelimit
-        if (!isAccountLoggedIn(accountId)) {
-            variables.rateLimiter.clearRateLimit(accountId, true);
-        }
-    }
-
     if (variables.cluster) {
         io.serverSideEmit('logoutSocket', {
             socketId: socket.id,
@@ -399,27 +377,6 @@ export async function revokeToken(accountId: string): Promise<void> {
         }
     } else {
         deleteDocumentLocal('Token', accountId);
-    }
-}
-
-export function rateLimitAnnounce(
-    io: Server<ServerToClientEvents, ClientToServerEvents, InterServerEvents>,
-    socket: Socket<ClientToServerEvents, ServerToClientEvents>,
-    pointsToConsume: number
-): void {
-    if (variables.cluster) {
-        // Detect authorisation state first, fire accordingly
-        if (isSocketLoggedIn(socket)) {
-            io.serverSideEmit('updateRateLimit', {
-                accountId: getSocketAccountId(socket.id),
-                pointsToConsume,
-            });
-        } else {
-            io.serverSideEmit('updateRateLimitUnauthorised', {
-                socketIP: socket.handshake.address,
-                pointsToConsume,
-            });
-        }
     }
 }
 

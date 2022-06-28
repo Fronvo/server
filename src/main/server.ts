@@ -116,7 +116,6 @@ function setupRatelimiter(): void {
 
     setLoading('Setting up the ratelimiter');
 
-    // For authorised users
     const ezierLimiterPoints = getEnv('RATELIMITER_POINTS', 40);
 
     const ezierLimiterDuration = getEnv('RATELIMITER_DURATION', 2500);
@@ -127,24 +126,6 @@ function setupRatelimiter(): void {
     });
 
     variables.setRateLimiter(ezierLimiter);
-
-    // And for unauthorised users
-    const ezierLimiterUnauthorisedPoints = getEnv(
-        'RATELIMITER_POINTS_UNAUTHORISED',
-        10
-    );
-
-    const ezierLimiterUnauthorisedDuration = getEnv(
-        'RATELIMITER_DURATION_UNAUTHORISED',
-        2500
-    );
-
-    const ezierLimiterUnauthorised = new EzierLimiter({
-        maxPoints: ezierLimiterUnauthorisedPoints,
-        clearDelay: ezierLimiterUnauthorisedDuration,
-    });
-
-    variables.setUnauthorisedRateLimiter(ezierLimiterUnauthorised);
 }
 
 function setupServer(): void {

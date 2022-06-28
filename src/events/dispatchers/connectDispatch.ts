@@ -6,7 +6,6 @@ import dispatchers from 'events/dispatchers/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
-import * as variables from 'variables/global';
 import { Server, Socket } from 'socket.io';
 
 export default function connectDispatch(
@@ -14,11 +13,6 @@ export default function connectDispatch(
     socket: Socket<ServerToClientEvents, ClientToServerEvents>
 ): void {
     console.log('Socket ' + socket.id + ' has connected.');
-
-    // Add to unauthorised ratelimits
-    if (!variables.testMode) {
-        variables.rateLimiterUnauthorised.createRateLimit(socket.id);
-    }
 
     socket.onAny((event: string, ...args: { [arg: string]: any }[]) => {
         dispatchers.eventDispatch(io, socket, event, ...args);

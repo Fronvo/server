@@ -95,16 +95,9 @@ export const localDB: { [Collection in CollectionNames]: LocalDict[] } =
 export const prismaClient = !localMode ? new PrismaClient() : null;
 
 export let rateLimiter: EzierLimiter;
-export let rateLimiterUnauthorised: EzierLimiter;
 
 export function setRateLimiter(rateLimiterObject: EzierLimiter): void {
     rateLimiter = rateLimiterObject;
-}
-
-export function setUnauthorisedRateLimiter(
-    rateLimiterObject: EzierLimiter
-): void {
-    rateLimiterUnauthorised = rateLimiterObject;
 }
 
 // Email-related

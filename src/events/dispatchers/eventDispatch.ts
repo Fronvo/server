@@ -2,7 +2,6 @@
 // The event dispatcher file which handles event requests.
 // ******************** //
 
-import { EzierLimiter } from '@ezier/ratelimit';
 import accountEvents from 'events/account';
 import generalEvents from 'events/general';
 import noAccountEvents from 'events/noAccount';
@@ -10,40 +9,15 @@ import { EventExportTemplate, FronvoError } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
-import * as variables from 'variables/global';
-import { rateLimiter, rateLimiterUnauthorised } from 'variables/global';
 import { Server, Socket } from 'socket.io';
 import utilities from 'utilities/all';
-import {
-    generateError,
-    getSocketAccountId,
-    isSocketLoggedIn,
-} from 'utilities/global';
+import { generateError } from 'utilities/global';
 
 const funcs: EventExportTemplate = {
     ...noAccountEvents,
     ...generalEvents,
     ...accountEvents,
 };
-
-function getTargetLimiter(
-    socket: Socket<ServerToClientEvents, ClientToServerEvents>
-): EzierLimiter {
-    return isSocketLoggedIn(socket) ? rateLimiter : rateLimiterUnauthorised;
-}
-
-function getRemainingPoints(
-    socket: Socket<ServerToClientEvents, ClientToServerEvents>
-): number {
-    const targetKey = isSocketLoggedIn(socket)
-        ? getSocketAccountId(socket.id)
-        : socket.handshake.address;
-
-    return (
-        getTargetLimiter(socket).maxPoints -
-        getTargetLimiter(socket).getRateLimit(targetKey).points
-    );
-}
 
 function filterEventArgs(
     eventName: string,
@@ -120,51 +94,7 @@ async function fireEvent(
     callback: Function,
     eventArgs: { [key: string]: any }
 ) {
-    if (!variables.testMode) {
-        applyRatelimit(
-            () => {
-                validateAndRun();
-            },
-            () => {
-                sendCallback(callback, generateError('RATELIMITED'), socket);
-            }
-        );
-    } else {
-        validateAndRun();
-    }
-
-    function applyRatelimit(
-        successCallback: Function,
-        failureCallback: Function
-    ): void {
-        // Set target consumer key based on authorisation
-        let targetKey: string;
-
-        // Logged in, authorised
-        if (isSocketLoggedIn(socket)) {
-            targetKey = getSocketAccountId(socket.id);
-        } else {
-            targetKey = socket.handshake.address;
-        }
-
-        getTargetLimiter(socket)
-            .consumePoints(targetKey, funcs[eventName].points)
-
-            .then(async () => {
-                // Notify other servers
-                utilities.rateLimitAnnounce(
-                    io,
-                    socket,
-                    funcs[eventName].points
-                );
-
-                successCallback();
-            })
-
-            .catch(() => {
-                failureCallback();
-            });
-    }
+    validateAndRun();
 
     async function validateAndRun(): Promise<void> {
         // Validate if a schema present
@@ -222,16 +152,7 @@ function sendCallback(
 ): void {
     if (callback) {
         if (callbackResponse) {
-            // Check if the event wasnt ratelimited
-            if (perfId) {
-                utilities.reportEnd(perfId);
-            }
-
-            if (!variables.testMode) {
-                callbackResponse.extras = {
-                    remainingPoints: getRemainingPoints(socket),
-                };
-            }
+            utilities.reportEnd(perfId);
 
             callback(callbackResponse);
         } else {

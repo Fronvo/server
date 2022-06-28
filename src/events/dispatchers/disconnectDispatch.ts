@@ -17,14 +17,6 @@ export default function disconnectDispatch(
     // Logout if logged in
     if (utilities.isSocketLoggedIn(socket)) {
         utilities.logoutSocket(io, socket);
-    } else {
-        // If not logged in, remove the unauthorised socket id from the ratelimits
-        if (!variables.testMode) {
-            variables.rateLimiterUnauthorised.clearRateLimit(
-                socket.handshake.address,
-                true
-            );
-        }
     }
 
     console.log('Socket ' + socket.id + ' has disconnected.');
