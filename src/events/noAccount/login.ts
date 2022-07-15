@@ -39,6 +39,16 @@ async function login({
                 if (!accountToken)
                     accountToken = await utilities.createToken(accountData.id);
 
+                // Inform the email owner that someone has logged in, no extra info (unlike other platforms which give out your whole personal info)
+                utilities.sendEmail(
+                    email,
+                    'New login to your account on Fronvo',
+                    [
+                        'Someone has logged in to your account on Fronvo',
+                        'You may want to take extra action incase you believe that your account has been compromised',
+                    ]
+                );
+
                 return {
                     token: accountToken,
                 };
