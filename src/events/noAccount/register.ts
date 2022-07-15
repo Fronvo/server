@@ -87,6 +87,14 @@ async function register({
 
             token = await utilities.createToken(id);
 
+            // Welcome the user :)
+            if (!variables.testMode) {
+                utilities.sendEmail(email, 'Welcome to Fronvo!', [
+                    "We're so glad to have you on our platform!",
+                    'Enjoy your stay on the safest social media!',
+                ]);
+            }
+
             utilities.loginSocket(io, socket, id);
         }
 
