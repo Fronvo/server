@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -22,6 +22,9 @@ type AccountData {
   username     String
   password     String
   creationDate DateTime @default(now())
+  following    Json[]
+  followers    Json[]
+  posts        Json[]
 }
 
 // Tokens

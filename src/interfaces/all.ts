@@ -3,7 +3,13 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { AccountData, LogData, ReportData, TokenData } from '@prisma/client';
+import {
+    AccountData,
+    LogData,
+    Prisma,
+    ReportData,
+    TokenData,
+} from '@prisma/client';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
@@ -66,6 +72,9 @@ export interface FronvoAccount {
     email: string;
     password: string;
     creationDate: Date;
+    following: Prisma.JsonValue[];
+    followers: Prisma.JsonValue[];
+    posts: Prisma.JsonValue[];
 }
 
 export interface LocalDict {

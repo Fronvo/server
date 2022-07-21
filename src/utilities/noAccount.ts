@@ -19,6 +19,9 @@ export async function createAccount(
         username: accountDataPartial.username,
         password: accountDataPartial.password,
         creationDate: new Date() || accountDataPartial.creationDate,
+        following: [],
+        followers: [],
+        posts: [],
     };
 
     await insertDocument('Account', { accountData }, accountDataPartial.id);

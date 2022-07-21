@@ -38,6 +38,9 @@ async function fetchProfileData({
             id: accountData.id,
             username: accountData.username,
             creationDate: accountData.creationDate,
+            following: accountData.following || [],
+            followers: accountData.following || [],
+            posts: accountData.posts || [],
         };
 
         // If self profile provide extra info
