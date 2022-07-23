@@ -71,6 +71,7 @@ export interface FronvoAccount {
     username: string;
     email: string;
     password: string;
+    avatar: string;
     creationDate: Date;
     following: Prisma.JsonValue[];
     followers: Prisma.JsonValue[];

@@ -37,6 +37,7 @@ async function fetchProfileData({
         const finalAccountData: Partial<FronvoAccount> = {
             id: accountData.id,
             username: accountData.username,
+            avatar: accountData.avatar || '',
             creationDate: accountData.creationDate,
             following: accountData.following || [],
             followers: accountData.following || [],

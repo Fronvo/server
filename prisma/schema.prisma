@@ -21,6 +21,7 @@ type AccountData {
   email        String
   username     String
   password     String
+  avatar       String?
   creationDate DateTime @default(now())
   following    Json[]
   followers    Json[]
