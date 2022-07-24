@@ -20,11 +20,11 @@ const errors: { [Error in Errors] } = {
     ACCOUNT_ALREADY_EXISTS: 'An account with that email already exists.',
     ACCOUNT_DOESNT_EXIST:
         'The account with the specified email could not be found.',
-    INVALID_REGEX:
-        'The %s does not consist of the expected regular expression.',
+    INVALID_REGEX: 'The %s contains invalid characters.',
     INVALID_TOKEN: 'The token is invalid.',
     PROFILE_NOT_FOUND: 'The requested profile could not be found.',
     INVALID_CODE: 'The provided code is invalid.',
+    INVALID_IMAGE_URL: 'The provided %s URL is invalid.',
 };
 
 export default errors;

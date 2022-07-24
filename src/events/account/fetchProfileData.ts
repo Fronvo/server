@@ -64,7 +64,7 @@ const fetchProfileDataTemplate: EventTemplate = {
     schema: new StringSchema({
         profileId: {
             minLength: 5,
-            maxLength: 14,
+            maxLength: 30,
             regex: /^[a-z0-9]+$/,
         },
     }),
