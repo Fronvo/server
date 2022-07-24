@@ -45,6 +45,7 @@ const updateProfileDataTemplate: EventTemplate = {
         avatar: {
             // Ensure https
             regex: /^(https:\/\/).+$/,
+            maxLength: 512,
         },
     }),
 };
