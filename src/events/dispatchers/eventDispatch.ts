@@ -62,7 +62,11 @@ function getNeededArgs(
     for (const neededArgIndex in eventTemplate) {
         const neededArg = eventTemplate[neededArgIndex];
 
-        if (!(neededArg in givenArgs)) {
+        // Check for optional params aswell
+        if (
+            !(neededArg in givenArgs) &&
+            !funcs[eventName].schema.schema[neededArg].optional
+        ) {
             finalNeededArgs.push(neededArg);
         }
     }
