@@ -34,8 +34,15 @@ function filterEventArgs(
             for (const eventArg in eventArgItem) {
                 // Must be a needed argument, prevent invalid ones
                 if (funcs[eventName].template.includes(eventArg)) {
-                    // Add to final arguments
-                    finalEventArgs[eventArg] = eventArgItem[eventArg];
+                    // Add to final arguments, length checks if not null
+
+                    if (eventArgItem[eventArg] != undefined) {
+                        finalEventArgs[eventArg] = (
+                            eventArgItem[eventArg] as string
+                        ).trim();
+                    } else {
+                        finalEventArgs[eventArg] = eventArgItem[eventArg];
+                    }
                 }
             }
             // Can combine dictionaries, dont return here
