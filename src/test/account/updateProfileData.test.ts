@@ -54,7 +54,7 @@ function lengthAvatarMax(
     socket.emit(
         'updateProfileData',
         {
-            avatar: generateChars(513),
+            avatar: `https://${generateChars(513)}`,
         },
         ({ err }) => {
             callback(

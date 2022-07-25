@@ -8,13 +8,12 @@ import { StringSchema } from '@ezier/validate';
 export const accountSchema = new StringSchema({
     email: {
         minLength: 8,
-        maxLength: 60,
+        maxLength: 120,
         type: 'email',
     },
 
     password: {
         minLength: 8,
-        maxLength: 30,
-        regex: /^[a-zA-Z0-9]+$/,
+        maxLength: 90,
     },
 });

@@ -10,6 +10,7 @@ import {
     assertErrors,
     assertLength,
     assertType,
+    generateChars,
     generateEmail,
     generatePassword,
 } from 'test/utilities';
@@ -78,7 +79,7 @@ function lengthEmailMax(
     socket.emit(
         'login',
         {
-            email: generateEmail().replace(/@gmail.com/, '') + generateEmail(),
+            email: generateChars(120) + '@gmail.com',
             password: generatePassword(),
         },
         ({ err }) => {
@@ -117,7 +118,7 @@ function lengthPasswordMax(
         'login',
         {
             email: generateEmail(),
-            password: generatePassword() + generatePassword(),
+            password: generateChars(91),
         },
         ({ err }) => {
             callback(

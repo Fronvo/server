@@ -82,8 +82,7 @@ async function resetPassword({
                 new StringSchema({
                     newPassword: {
                         minLength: 8,
-                        maxLength: 30,
-                        regex: /^[a-zA-Z0-9]+$/,
+                        maxLength: 90,
                     },
                 }),
                 { newPassword }
@@ -138,7 +137,7 @@ const resetPasswordTemplate: EventTemplate = {
     schema: new StringSchema({
         email: {
             minLength: 8,
-            maxLength: 60,
+            maxLength: 120,
             type: 'email',
         },
     }),

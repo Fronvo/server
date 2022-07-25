@@ -8,6 +8,7 @@ import {
     assertEquals,
     assertError,
     assertErrors,
+    generateChars,
     generateEmail,
     generatePassword,
 } from 'test/utilities';
@@ -53,10 +54,9 @@ function lengthEmailMax(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'login',
+        'resetPassword',
         {
-            email: generateEmail().replace(/@gmail.com/, '') + generateEmail(),
-            password: generatePassword(),
+            email: generateChars(120) + '@gmail.com',
         },
         ({ err }) => {
             callback(
