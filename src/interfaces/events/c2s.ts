@@ -8,6 +8,10 @@ import {
 } from 'interfaces/account/fetchProfileData';
 import { FetchProfileIdTestResult } from 'interfaces/account/fetchProfileId';
 import { LogoutTestResult } from 'interfaces/account/logout';
+import {
+    UpdateProfileDataParams,
+    UpdateProfileDataTestResult,
+} from 'interfaces/account/updateProfileData';
 import { IsLoggedInTestResult } from 'interfaces/general/isLoggedIn';
 import { LoginParams, LoginTestResult } from 'interfaces/noAccount/login';
 import {
@@ -68,5 +72,9 @@ export interface ClientToServerEvents {
     resetPasswordFinal: (
         {}: ResetPasswordFinalParams,
         callback?: ({}: ResetPasswordFinalTestResult) => void
+    ) => void;
+    updateProfileData: (
+        {}: UpdateProfileDataParams,
+        callback?: ({}: UpdateProfileDataTestResult) => void
     ) => void;
 }

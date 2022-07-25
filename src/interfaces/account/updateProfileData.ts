@@ -15,6 +15,6 @@ export interface UpdateProfileDataServerParams
 
 export interface UpdateProfileDataResult {}
 
-export interface FetchProfileDataTestResult
+export interface UpdateProfileDataTestResult
     extends FronvoError,
         UpdateProfileDataResult {}

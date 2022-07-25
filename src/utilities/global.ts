@@ -448,7 +448,11 @@ export function validateSchema(
 
     switch (result.name) {
         case 'STRING_REQUIRED':
-            return generateError('REQUIRED', extras, [key]);
+            // Allow optional parameters to be empty
+            return (
+                !schema.schema[key].optional &&
+                generateError('REQUIRED', extras, [key])
+            );
 
         case 'STRING_INVALID_LENGTH':
             return generateError('EXACT_LENGTH', extras, [key]);

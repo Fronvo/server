@@ -18,7 +18,7 @@ export function generatePassword(): string {
     return v4().replace(/-/g, '').substring(0, 30);
 }
 
-export function generateProfileId(length?: number): string {
+export function generateChars(length?: number): string {
     const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
 
     const randomArray = Array.from(

@@ -10,7 +10,7 @@ import {
     assertErrors,
     assertNotEqual,
     assertType,
-    generateProfileId,
+    generateChars,
 } from 'test/utilities';
 
 function lengthProfileIdMin(
@@ -20,7 +20,7 @@ function lengthProfileIdMin(
     socket.emit(
         'fetchProfileData',
         {
-            profileId: generateProfileId(4),
+            profileId: generateChars(4),
         },
         ({ err }) => {
             callback(
@@ -38,7 +38,7 @@ function lengthProfileIdMax(
     socket.emit(
         'fetchProfileData',
         {
-            profileId: generateProfileId(31),
+            profileId: generateChars(31),
         },
         ({ err }) => {
             callback(
@@ -56,7 +56,7 @@ function profileNotFound(
     socket.emit(
         'fetchProfileData',
         {
-            profileId: generateProfileId(),
+            profileId: generateChars(),
         },
         ({ err }) => {
             callback(assertCode(err.code, 'PROFILE_NOT_FOUND'));

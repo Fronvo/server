@@ -40,12 +40,14 @@ const updateProfileDataTemplate: EventTemplate = {
         username: {
             minLength: 5,
             maxLength: 30,
+            optional: true,
         },
 
         avatar: {
             // Ensure https
             regex: /^(https:\/\/).+$/,
             maxLength: 512,
+            optional: true,
         },
     }),
 };
