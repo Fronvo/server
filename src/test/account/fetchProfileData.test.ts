@@ -38,7 +38,7 @@ function lengthProfileIdMax(
     socket.emit(
         'fetchProfileData',
         {
-            profileId: generateProfileId(15),
+            profileId: generateProfileId(31),
         },
         ({ err }) => {
             callback(
