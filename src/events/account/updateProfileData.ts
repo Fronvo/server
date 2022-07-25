@@ -21,13 +21,16 @@ async function updateProfileData({
     // Nor avatar, may need for content-type and extension if applicable (|| ?)
 
     // Proceed to update info
-    await updateAccount(
-        {
-            username,
-            avatar,
-        },
-        { id: getSocketAccountId(socket.id) }
-    );
+    // Create update dict, some parameters shouldn't be updated if empty
+    const updateDict = {
+        avatar,
+    };
+
+    if (username) {
+        updateDict['username'] = username;
+    }
+
+    await updateAccount(updateDict, { id: getSocketAccountId(socket.id) });
 
     return {};
 }

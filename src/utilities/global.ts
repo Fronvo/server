@@ -445,51 +445,92 @@ export function validateSchema(
 
     const key = result.extras.key;
     const extras: { [key: string]: any } = { for: key };
+    const optional = schema.schema[key].optional;
 
-    switch (result.name) {
-        case 'STRING_REQUIRED':
-            // Allow optional parameters to be empty
-            return (
-                !schema.schema[key].optional &&
-                generateError('REQUIRED', extras, [key])
-            );
+    // Different checks for optional arguments (still checked if not empty, change to normal arguments checking)
+    // For example an optional avatar key which is '' will NOT be returning a REQUIRED error
+    // But if that key is 'a', it WILL return the above error
+    // Basically allow the events themselves to handle empty optional arguments / validate if needed
+    if (!optional || (optional && key.length > 0)) {
+        switch (result.name) {
+            case 'STRING_REQUIRED':
+                // Allow optional parameters to be empty
+                return (
+                    !schema.schema[key].optional &&
+                    generateError('REQUIRED', extras, [key])
+                );
 
-        case 'STRING_INVALID_LENGTH':
-            return generateError('EXACT_LENGTH', extras, [key]);
+            case 'STRING_INVALID_LENGTH':
+                return generateError('EXACT_LENGTH', extras, [
+                    key,
+                    schema.schema[key].length,
+                ]);
 
-        case 'STRING_INVALID_LENGTH':
-            return generateError('EXACT_LENGTH', extras, [
-                key,
-                schema.schema[key].length,
-            ]);
+            case 'STRING_INVALID_MIN_LENGTH':
+            case 'STRING_INVALID_MAX_LENGTH':
+                const min = schema.schema[key].minLength;
+                const max = schema.schema[key].maxLength;
 
-        case 'STRING_INVALID_MIN_LENGTH':
-        case 'STRING_INVALID_MAX_LENGTH':
-            const min = schema.schema[key].minLength;
-            const max = schema.schema[key].maxLength;
+                return generateError('LENGTH', { ...extras, min, max }, [
+                    key,
+                    min,
+                    max,
+                ]);
 
-            return generateError('LENGTH', { ...extras, min, max }, [
-                key,
-                min,
-                max,
-            ]);
+            case 'STRING_INVALID_TYPE':
+                switch (result.extras.type) {
+                    case 'email':
+                        return generateError('REQUIRED_EMAIL', extras);
 
-        case 'STRING_INVALID_TYPE':
-            switch (result.extras.type) {
-                case 'email':
-                    return generateError('REQUIRED_EMAIL', extras);
+                    case 'uuid':
+                        return generateError('REQUIRED_UUID', extras);
 
-                case 'uuid':
-                    return generateError('REQUIRED_UUID', extras);
+                    default:
+                        return generateError('UNKNOWN');
+                }
 
-                default:
-                    return generateError('UNKNOWN');
-            }
+            case 'STRING_INVALID_REGEX':
+                return generateError('INVALID_REGEX', extras, [key]);
 
-        case 'STRING_INVALID_REGEX':
-            return generateError('INVALID_REGEX', extras, [key]);
+            default:
+                return generateError('UNKNOWN');
+        }
+    } else {
+        switch (result.name) {
+            case 'STRING_INVALID_LENGTH':
+                return generateError('EXACT_LENGTH', extras, [
+                    key,
+                    schema.schema[key].length,
+                ]);
 
-        default:
-            return generateError('UNKNOWN');
+            case 'STRING_INVALID_MIN_LENGTH':
+            case 'STRING_INVALID_MAX_LENGTH':
+                const min = schema.schema[key].minLength;
+                const max = schema.schema[key].maxLength;
+
+                return generateError('LENGTH', { ...extras, min, max }, [
+                    key,
+                    min,
+                    max,
+                ]);
+
+            case 'STRING_INVALID_TYPE':
+                switch (result.extras.type) {
+                    case 'email':
+                        return generateError('REQUIRED_EMAIL', extras);
+
+                    case 'uuid':
+                        return generateError('REQUIRED_UUID', extras);
+
+                    default:
+                        return generateError('UNKNOWN');
+                }
+
+            case 'STRING_INVALID_REGEX':
+                return generateError('INVALID_REGEX', extras, [key]);
+
+            default:
+                return generateError('UNKNOWN');
+        }
     }
 }
