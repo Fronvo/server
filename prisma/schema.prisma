@@ -20,6 +20,7 @@ type AccountData {
   id           String
   email        String
   username     String
+  bio          String?
   password     String
   avatar       String?
   creationDate DateTime @default(now())

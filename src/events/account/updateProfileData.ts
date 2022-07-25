@@ -13,6 +13,7 @@ import { getSocketAccountId, updateAccount } from 'utilities/global';
 async function updateProfileData({
     socket,
     username,
+    bio,
     avatar,
 }: UpdateProfileDataServerParams): Promise<
     UpdateProfileDataResult | FronvoError
@@ -23,6 +24,7 @@ async function updateProfileData({
     // Proceed to update info
     // Create update dict, some parameters shouldn't be updated if empty
     const updateDict = {
+        bio,
         avatar,
     };
 
@@ -37,12 +39,17 @@ async function updateProfileData({
 
 const updateProfileDataTemplate: EventTemplate = {
     func: updateProfileData,
-    template: ['username', 'avatar'],
+    template: ['username', 'bio', 'avatar'],
     points: 3,
     schema: new StringSchema({
         username: {
             minLength: 5,
             maxLength: 30,
+            optional: true,
+        },
+
+        bio: {
+            maxLength: 128,
             optional: true,
         },
 

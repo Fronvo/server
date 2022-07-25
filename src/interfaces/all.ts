@@ -69,6 +69,7 @@ export interface InterEventExportTemplate {
 export interface FronvoAccount {
     id: string;
     username: string;
+    bio: string;
     email: string;
     password: string;
     avatar: string;

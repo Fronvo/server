@@ -6,6 +6,7 @@ import { EventArguments, FronvoError } from 'interfaces/all';
 
 export interface UpdateProfileDataParams {
     username?: string;
+    bio?: string;
     avatar?: string;
 }
 

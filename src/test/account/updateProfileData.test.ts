@@ -47,6 +47,24 @@ function lengthUsernameMax(
     );
 }
 
+function lengthBioMax(
+    { socket }: Partial<TestArguments>,
+    callback: TestErrorCallback
+): void {
+    socket.emit(
+        'updateProfileData',
+        {
+            bio: generateChars(129),
+        },
+        ({ err }) => {
+            callback(
+                assertCode(err.code, 'LENGTH') ||
+                    assertEquals({ for: err.extras.for }, 'bio')
+            );
+        }
+    );
+}
+
 function lengthAvatarMax(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
@@ -73,6 +91,7 @@ function updateProfileData(
         'updateProfileData',
         {
             username: generateChars(),
+            bio: generateChars(),
             avatar: `https://${generateChars()}`,
         },
         ({ err }): void => {
@@ -88,6 +107,7 @@ export default (testArgs: TestArguments): void => {
         {
             lengthUsernameMin,
             lengthUsernameMax,
+            lengthBioMax,
             lengthAvatarMax,
         },
         testArgs,

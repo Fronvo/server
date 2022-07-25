@@ -80,10 +80,21 @@ function fetchProfileData(
                 assertType({ id: profileData.id }, 'string') ||
                     assertType({ email: profileData.email }, 'string') ||
                     assertType({ username: profileData.username }, 'string') ||
+                    assertType({ bio: profileData.bio }, 'string') ||
                     assertNotEqual(
                         { creationDate: new Date(profileData.creationDate) },
                         'Invalid Date'
-                    )
+                    ) ||
+                    assertType({ posts: profileData.posts }, 'object') ||
+                    assertType(
+                        { following: profileData.following },
+                        'object'
+                    ) ||
+                    assertType(
+                        { followers: profileData.followers },
+                        'object'
+                    ) ||
+                    assertType({ avatar: profileData.avatar }, 'string')
             );
 
             done();
