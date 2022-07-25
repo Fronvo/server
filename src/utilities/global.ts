@@ -2,7 +2,7 @@
 // Reusable functions for all kinds of events to avoid repetition.
 // ******************** //
 
-import { StringSchema } from '@ezier/validate';
+import { EzierValidatorError, StringSchema } from '@ezier/validate';
 import {
     AccountData,
     LogData,
@@ -439,64 +439,40 @@ export function validateSchema(
     schemaArgs: { [key: string]: any }
 ): FronvoError | undefined {
     // Only need the first error
-    const result = schema.validate(schemaArgs)[0];
+    const schemaResults = schema.validate(schemaArgs);
+    let result: EzierValidatorError;
 
+    // Find the FIRST needed error, mustn't be an empty optional param result
+    for (const errorResultIndex in schemaResults) {
+        const optionalParam =
+            schema.schema[schemaResults[errorResultIndex].extras.key].optional;
+
+        if (optionalParam) {
+            if (!(schemaResults[errorResultIndex].name == 'STRING_REQUIRED')) {
+                result = schemaResults[errorResultIndex];
+            }
+        } else {
+            // Not optional, legit error
+            result = schemaResults[errorResultIndex];
+        }
+    }
+
+    // None found, success
     if (!result) return;
 
     const key = result.extras.key;
     const extras: { [key: string]: any } = { for: key };
     const optional = schema.schema[key].optional;
 
-    // Different checks for optional arguments (still checked if not empty, change to normal arguments checking)
-    // For example an optional avatar key which is '' will NOT be returning a REQUIRED error
+    // Different checks explained
+    // For example an optional avatar key which is '' will NOT be returning a REQUIRED error and will be skipped above
     // But if that key is 'a', it WILL return the above error
     // Basically allow the events themselves to handle empty optional arguments / validate if needed
     if (!optional || (optional && key.length > 0)) {
         switch (result.name) {
             case 'STRING_REQUIRED':
-                // Allow optional parameters to be empty
-                return (
-                    !schema.schema[key].optional &&
-                    generateError('REQUIRED', extras, [key])
-                );
+                return generateError('REQUIRED', extras, [key]);
 
-            case 'STRING_INVALID_LENGTH':
-                return generateError('EXACT_LENGTH', extras, [
-                    key,
-                    schema.schema[key].length,
-                ]);
-
-            case 'STRING_INVALID_MIN_LENGTH':
-            case 'STRING_INVALID_MAX_LENGTH':
-                const min = schema.schema[key].minLength;
-                const max = schema.schema[key].maxLength;
-
-                return generateError('LENGTH', { ...extras, min, max }, [
-                    key,
-                    min,
-                    max,
-                ]);
-
-            case 'STRING_INVALID_TYPE':
-                switch (result.extras.type) {
-                    case 'email':
-                        return generateError('REQUIRED_EMAIL', extras);
-
-                    case 'uuid':
-                        return generateError('REQUIRED_UUID', extras);
-
-                    default:
-                        return generateError('UNKNOWN');
-                }
-
-            case 'STRING_INVALID_REGEX':
-                return generateError('INVALID_REGEX', extras, [key]);
-
-            default:
-                return generateError('UNKNOWN');
-        }
-    } else {
-        switch (result.name) {
             case 'STRING_INVALID_LENGTH':
                 return generateError('EXACT_LENGTH', extras, [
                     key,
