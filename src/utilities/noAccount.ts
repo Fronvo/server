@@ -17,6 +17,7 @@ export async function createAccount(
         id: accountDataPartial.id,
         email: accountDataPartial.email,
         username: accountDataPartial.username,
+        bio: '',
         password: accountDataPartial.password,
         avatar: '',
         creationDate: new Date() || accountDataPartial.creationDate,
