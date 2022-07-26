@@ -27,7 +27,6 @@ async function fetchProfileData({
     );
 
     for (const account in accounts) {
-        // TODO: Create a utility global function to get a key from a dict with a fallback option for non existant keys
         const accountData = accounts[account].accountData;
 
         // Ensure this is the account we're looking for
