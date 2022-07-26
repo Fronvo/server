@@ -98,7 +98,8 @@ export function deleteDocumentLocal(
 
 export async function updateAccount(
     updateDict: { [key: string]: any },
-    filterDict: { [key: string]: string }
+    filterDict: { [key: string]: string },
+    extend?: boolean
 ): Promise<void> {
     const filterKey = Object.keys(filterDict)[0];
     const filterValue = filterDict[Object.keys(filterDict)[0]];
@@ -120,11 +121,35 @@ export async function updateAccount(
             // Get the OID somehow
             const accountOID = accountObj._id.$oid;
 
+            const updateDictKey = Object.keys(updateDict)[0];
+            let updateDictFinal = {};
+
+            // Offer to extend the current value
+            if (
+                // @ts-ignore
+                typeof accountObj.accountData[updateDictKey] == 'object' &&
+                extend
+            ) {
+                // First of all, set the target key to the existing value
+                updateDictFinal[updateDictKey] =
+                    // @ts-ignore
+                    accountObj.accountData[updateDictKey];
+
+                // Finally, add the new key to the list
+                (updateDictFinal[updateDictKey] as Array<{}>).push(
+                    updateDict[updateDictKey]
+                );
+            }
+
             await prismaClient.account.update({
                 where: { id: accountOID },
                 data: {
                     accountData: {
-                        update: updateDict,
+                        // Check if its an extended value or not
+                        update:
+                            Object.keys(updateDictFinal).length > 0
+                                ? updateDictFinal
+                                : updateDict,
                     },
                 },
             });
@@ -455,6 +480,9 @@ export function validateSchema(
             // Not optional, legit error
             result = schemaResults[errorResultIndex];
         }
+
+        // Continue with first valid error
+        if (result) break;
     }
 
     // None found, success
