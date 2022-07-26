@@ -21,6 +21,9 @@ async function createPost({
         creationDate: new Date(),
     };
 
+    postDict['title'] = title.replace(/\n\n/g, '\n');
+    postDict['content'] = content.replace(/\n\n/g, '\n');
+
     await updateAccount(
         {
             posts: postDict,
