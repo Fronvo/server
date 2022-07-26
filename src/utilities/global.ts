@@ -135,8 +135,10 @@ export async function updateAccount(
                     // @ts-ignore
                     accountObj.accountData[updateDictKey];
 
-                // Finally, add the new key to the list
-                (updateDictFinal[updateDictKey] as Array<{}>).push(
+                // Finally, add the new key at the start of the array
+                (updateDictFinal[updateDictKey] as Array<{}>).splice(
+                    0,
+                    0,
                     updateDict[updateDictKey]
                 );
             }
