@@ -7,6 +7,7 @@ import { EventArguments, FronvoError } from 'interfaces/all';
 export interface CreatePostParams {
     title: string;
     content: string;
+    attachment?: string;
 }
 
 export interface CreatePostServerParams
@@ -16,6 +17,7 @@ export interface CreatePostServerParams
 export interface CreatePostResult {
     title: string;
     content: string;
+    attachment?: string;
     creationDate: Date;
 }
 

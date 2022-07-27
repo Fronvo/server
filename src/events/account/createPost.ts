@@ -13,11 +13,13 @@ import { getSocketAccountId, updateAccount } from 'utilities/global';
 async function createPost({
     socket,
     title,
+    attachment,
     content,
 }: CreatePostServerParams): Promise<CreatePostResult | FronvoError> {
     const postDict = {
         title,
         content,
+        attachment,
         creationDate: new Date(),
     };
 
@@ -37,7 +39,7 @@ async function createPost({
 
 const updateProfileDataTemplate: EventTemplate = {
     func: createPost,
-    template: ['title', 'content'],
+    template: ['title', 'content', 'attachment'],
     points: 5,
     schema: new StringSchema({
         title: {
@@ -48,6 +50,12 @@ const updateProfileDataTemplate: EventTemplate = {
         content: {
             minLength: 5,
             maxLength: 256,
+        },
+
+        attachment: {
+            maxLength: 512,
+            regex: /^(https:\/\/).+$/,
+            optional: true,
         },
     }),
 };

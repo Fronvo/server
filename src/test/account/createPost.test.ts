@@ -87,6 +87,26 @@ function lengthContentMax(
     );
 }
 
+function lengthAttachmentMax(
+    { socket }: Partial<TestArguments>,
+    callback: TestErrorCallback
+): void {
+    socket.emit(
+        'createPost',
+        {
+            title: generateChars(3),
+            content: generateChars(5),
+            attachment: `https://${generateChars(513)}`,
+        },
+        ({ err }) => {
+            callback(
+                assertCode(err.code, 'LENGTH') ||
+                    assertEquals({ for: err.extras.for }, 'attachment')
+            );
+        }
+    );
+}
+
 function createPost(
     { socket, done }: TestArguments,
     callback: TestErrorCallback
@@ -96,6 +116,7 @@ function createPost(
         {
             title: generateChars(3),
             content: generateChars(5),
+            attachment: `https://${generateChars(10)}`,
         },
         ({ err }): void => {
             callback(assertError({ err }));
@@ -112,6 +133,7 @@ export default (testArgs: TestArguments): void => {
             lengthTitleMax,
             lengthContentMin,
             lengthContentMax,
+            lengthAttachmentMax,
         },
         testArgs,
         createPost
