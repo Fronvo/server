@@ -24,16 +24,12 @@ async function updateProfileData({
     // Proceed to update info
     // Create update dict, some parameters shouldn't be updated if empty
     const updateDict = {
+        bio: bio.replace(/\n\n/g, '\n'),
         avatar,
     };
 
     if (username) {
         updateDict['username'] = username;
-    }
-
-    // Sanitise bio ourselves
-    if (bio) {
-        updateDict['bio'] = bio.replace(/\n\n/g, '\n');
     }
 
     await updateAccount(updateDict, { id: getSocketAccountId(socket.id) });
