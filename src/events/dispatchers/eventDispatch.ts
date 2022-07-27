@@ -185,6 +185,7 @@ export default function eventDispatch(
 
         if (eventPermissionResult) {
             sendCallback(callback, eventPermissionResult, socket);
+            return;
         }
 
         const eventArgs = filterEventArgs(event, args);
