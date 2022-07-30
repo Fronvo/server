@@ -18,8 +18,8 @@ function lengthTitleMin(
     socket.emit(
         'createPost',
         {
-            title: generateChars(2),
-            content: generateChars(5),
+            title: generateChars(4),
+            content: generateChars(10),
         },
         ({ err }) => {
             callback(
@@ -37,8 +37,8 @@ function lengthTitleMax(
     socket.emit(
         'createPost',
         {
-            title: generateChars(51),
-            content: generateChars(5),
+            title: generateChars(31),
+            content: generateChars(10),
         },
         ({ err }) => {
             callback(
@@ -56,8 +56,8 @@ function lengthContentMin(
     socket.emit(
         'createPost',
         {
-            title: generateChars(3),
-            content: generateChars(4),
+            title: generateChars(5),
+            content: generateChars(9),
         },
         ({ err }) => {
             callback(
@@ -75,8 +75,8 @@ function lengthContentMax(
     socket.emit(
         'createPost',
         {
-            title: generateChars(3),
-            content: generateChars(257),
+            title: generateChars(5),
+            content: generateChars(129),
         },
         ({ err }) => {
             callback(
@@ -94,9 +94,9 @@ function lengthAttachmentMax(
     socket.emit(
         'createPost',
         {
-            title: generateChars(3),
-            content: generateChars(5),
-            attachment: `https://${generateChars(513)}`,
+            title: generateChars(5),
+            content: generateChars(10),
+            attachment: `https://${generateChars(257)}`,
         },
         ({ err }) => {
             callback(
@@ -114,8 +114,8 @@ function createPost(
     socket.emit(
         'createPost',
         {
-            title: generateChars(3),
-            content: generateChars(5),
+            title: generateChars(5),
+            content: generateChars(10),
             attachment: `https://${generateChars(10)}`,
         },
         ({ err }): void => {

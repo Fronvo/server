@@ -43,17 +43,17 @@ const updateProfileDataTemplate: EventTemplate = {
     points: 5,
     schema: new StringSchema({
         title: {
-            minLength: 3,
-            maxLength: 50,
+            minLength: 5,
+            maxLength: 30,
         },
 
         content: {
-            minLength: 5,
-            maxLength: 256,
+            minLength: 10,
+            maxLength: 128,
         },
 
         attachment: {
-            maxLength: 512,
+            maxLength: 256,
             regex: /^(https:\/\/).+$/,
             optional: true,
         },
