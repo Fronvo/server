@@ -5,10 +5,11 @@
 import { StringSchema } from '@ezier/validate';
 import { AccountData } from '@prisma/client';
 import {
+    FetchedFronvoAccount,
     FetchProfileDataResult,
     FetchProfileDataServerParams,
 } from 'interfaces/account/fetchProfileData';
-import { EventTemplate, FronvoAccount, FronvoError } from 'interfaces/all';
+import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     findDocuments,
     generateError,
@@ -33,7 +34,7 @@ async function fetchProfileData({
         if (accountData.id != profileId) continue;
 
         // Handpick returned profile data
-        const finalAccountData: Partial<FronvoAccount> = {
+        const finalAccountData: FetchedFronvoAccount = {
             id: accountData.id,
             username: accountData.username,
             bio: accountData.bio || '',
@@ -42,10 +43,11 @@ async function fetchProfileData({
             following: accountData.following || [],
             followers: accountData.following || [],
             posts: accountData.posts || [],
+            isSelf: profileId == getSocketAccountId(socket.id),
         };
 
         // If self profile provide extra info
-        if (profileId == getSocketAccountId(socket.id)) {
+        if (finalAccountData.isSelf) {
             finalAccountData.email = accountData.email;
         }
 

@@ -94,7 +94,8 @@ function fetchProfileData(
                         { followers: profileData.followers },
                         'object'
                     ) ||
-                    assertType({ avatar: profileData.avatar }, 'string')
+                    assertType({ avatar: profileData.avatar }, 'string') ||
+                    assertEquals({ isSelf: profileData.isSelf }, true)
             );
 
             done();

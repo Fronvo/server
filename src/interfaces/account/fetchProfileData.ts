@@ -12,8 +12,12 @@ export interface FetchProfileDataServerParams
     extends EventArguments,
         FetchProfileDataParams {}
 
+export interface FetchedFronvoAccount extends Partial<FronvoAccount> {
+    isSelf: boolean;
+}
+
 export interface FetchProfileDataResult {
-    profileData: Partial<FronvoAccount>;
+    profileData: FetchedFronvoAccount;
 }
 
 export interface FetchProfileDataTestResult
