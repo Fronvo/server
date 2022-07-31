@@ -38,7 +38,7 @@ async function createPost({
     return { postData };
 }
 
-const updateProfileDataTemplate: EventTemplate = {
+const createPostTemplate: EventTemplate = {
     func: createPost,
     template: ['title', 'content', 'attachment'],
     points: 5,
@@ -61,4 +61,4 @@ const updateProfileDataTemplate: EventTemplate = {
     }),
 };
 
-export default updateProfileDataTemplate;
+export default createPostTemplate;

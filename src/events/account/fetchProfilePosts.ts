@@ -41,6 +41,7 @@ async function fetchProfilePosts({
         skip: -Number(from),
         take: -Number(to),
         select: {
+            postId: true,
             author: true,
             title: true,
             content: true,

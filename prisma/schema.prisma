@@ -25,6 +25,7 @@ model Account {
 
 model Post {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId       String   @unique @default(uuid())
   author       String
   title        String
   content      String
