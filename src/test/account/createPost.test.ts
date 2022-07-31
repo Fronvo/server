@@ -3,6 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import shared from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -124,7 +125,8 @@ function createPost(
             callback(assertError({ err }));
 
             callback(
-                assertType({ author: postData.author }, 'string') ||
+                assertType({ postId: postData.postId }, 'string') ||
+                    assertType({ author: postData.author }, 'string') ||
                     assertType({ title: postData.title }, 'string') ||
                     assertType({ content: postData.content }, 'string') ||
                     assertType({ attachment: postData.attachment }, 'string') ||
@@ -133,6 +135,8 @@ function createPost(
                         'Invalid Date'
                     )
             );
+
+            shared.sharedPostId = postData.postId;
 
             done();
         }

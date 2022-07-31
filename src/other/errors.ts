@@ -25,6 +25,7 @@ const errors: { [Error in Errors] } = {
     PROFILE_NOT_FOUND: 'The requested profile could not be found.',
     INVALID_CODE: 'The provided code is invalid.',
     INVALID_IMAGE_URL: 'The provided %s URL is invalid.',
+    INVALID_POST: 'The requested post was not found.',
 };
 
 export default errors;

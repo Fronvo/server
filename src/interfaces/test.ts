@@ -17,6 +17,7 @@ export interface SharedVariables {
     password: string;
     token: string;
     profileId: string;
+    sharedPostId: string;
 }
 
 export interface TestErrorCallback {

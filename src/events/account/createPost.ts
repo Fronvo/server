@@ -28,6 +28,8 @@ async function createPost({
             attachment,
         },
         select: {
+            postId: true,
+            author: true,
             title: true,
             content: true,
             attachment: true,

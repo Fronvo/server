@@ -20,7 +20,8 @@ export type Errors =
     | 'INVALID_TOKEN'
     | 'PROFILE_NOT_FOUND'
     | 'INVALID_CODE'
-    | 'INVALID_IMAGE_URL';
+    | 'INVALID_IMAGE_URL'
+    | 'INVALID_POST';
 
 export type TestAssertTypes =
     | 'string'

@@ -9,12 +9,14 @@ const email = generateEmail();
 const password = generatePassword();
 let token: string;
 let profileId: string;
+let sharedPostId: string;
 
 const shared: SharedVariables = {
     email,
     password,
     token,
     profileId,
+    sharedPostId,
 };
 
 export default shared;

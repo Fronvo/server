@@ -7,6 +7,10 @@ import {
     CreatePostTestResult,
 } from 'interfaces/account/createPost';
 import {
+    DeletePostParams,
+    DeletePostTestResult,
+} from 'interfaces/account/deletePost';
+import {
     FetchProfileDataParams,
     FetchProfileDataTestResult,
 } from 'interfaces/account/fetchProfileData';
@@ -92,5 +96,9 @@ export interface ClientToServerEvents {
     fetchProfilePosts: (
         {}: FetchProfilePostsParams,
         callback?: ({}: FetchProfilePostsTestResult) => void
+    ) => void;
+    deletePost: (
+        {}: DeletePostParams,
+        callback?: ({}: DeletePostTestResult) => void
     ) => void;
 }

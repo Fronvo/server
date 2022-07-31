@@ -7,6 +7,7 @@ import fetchProfileData from 'test/account/fetchProfileData.test';
 import updateProfileData from 'test/account/updateProfileData.test';
 import createPost from 'test/account/createPost.test';
 import fetchProfilePosts from 'test/account/fetchProfilePosts.test';
+import deletePost from 'test/account/deletePost.test';
 import logout from 'test/account/logout.test';
 
 export default {
@@ -15,5 +16,6 @@ export default {
     updateProfileData,
     createPost,
     fetchProfilePosts,
+    deletePost,
     logout,
 };
