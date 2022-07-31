@@ -20,16 +20,22 @@ async function createPost({
     title = title.replace(/\n\n/g, '\n');
     content = content.replace(/\n\n/g, '\n');
 
-    await prismaClient.post.create({
+    const postData = await prismaClient.post.create({
         data: {
             author: getSocketAccountId(socket.id),
             title,
             content,
             attachment,
         },
+        select: {
+            title: true,
+            content: true,
+            attachment: true,
+            creationDate: true,
+        },
     });
 
-    return {};
+    return { postData };
 }
 
 const updateProfileDataTemplate: EventTemplate = {

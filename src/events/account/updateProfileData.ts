@@ -34,14 +34,19 @@ async function updateProfileData({
         updateDict['username'] = username;
     }
 
-    await prismaClient.account.update({
+    const profileData = await prismaClient.account.update({
         data: updateDict,
         where: {
             profileId: getSocketAccountId(socket.id),
         },
+        select: {
+            username: true,
+            bio: true,
+            avatar: true,
+        },
     });
 
-    return {};
+    return { profileData };
 }
 
 const updateProfileDataTemplate: EventTemplate = {

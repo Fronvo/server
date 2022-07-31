@@ -8,6 +8,7 @@ import {
     assertEquals,
     assertError,
     assertErrors,
+    assertType,
     generateChars,
 } from 'test/utilities';
 
@@ -94,8 +95,14 @@ function updateProfileData(
             bio: generateChars(),
             avatar: `https://${generateChars()}`,
         },
-        ({ err }): void => {
+        ({ err, profileData }): void => {
             callback(assertError({ err }));
+
+            callback(
+                assertType({ username: profileData.username }, 'string') ||
+                    assertType({ bio: profileData.bio }, 'string') ||
+                    assertType({ avatar: profileData.avatar }, 'string')
+            );
 
             done();
         }

@@ -8,6 +8,8 @@ import {
     assertEquals,
     assertError,
     assertErrors,
+    assertNotEqual,
+    assertType,
     generateChars,
 } from 'test/utilities';
 
@@ -118,8 +120,19 @@ function createPost(
             content: generateChars(10),
             attachment: `https://${generateChars(10)}`,
         },
-        ({ err }): void => {
+        ({ err, postData }): void => {
             callback(assertError({ err }));
+
+            callback(
+                assertType({ author: postData.author }, 'string') ||
+                    assertType({ title: postData.title }, 'string') ||
+                    assertType({ content: postData.content }, 'string') ||
+                    assertType({ attachment: postData.attachment }, 'string') ||
+                    assertNotEqual(
+                        { creationDate: new Date(postData.creationDate) },
+                        'Invalid Date'
+                    )
+            );
 
             done();
         }
