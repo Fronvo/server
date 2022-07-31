@@ -7,6 +7,7 @@ import fetchProfileData from 'events/account/fetchProfileData';
 import logout from 'events/account/logout';
 import updateProfileData from 'events/account/updateProfileData';
 import createPost from 'events/account/createPost';
+import fetchProfilePosts from 'events/account/fetchProfilePosts';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -16,6 +17,7 @@ const accountTemplate: EventExportTemplate = {
     logout,
     updateProfileData,
     createPost,
+    fetchProfilePosts,
 };
 
 export default accountTemplate;

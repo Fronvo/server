@@ -36,7 +36,7 @@ function filterEventArgs(
                 if (funcs[eventName].template.includes(eventArg)) {
                     // Add to final arguments, length checks if not null
 
-                    if (eventArgItem[eventArg] != undefined) {
+                    if (typeof eventArgIndex[eventArg] == 'string') {
                         finalEventArgs[eventArg] = (
                             eventArgItem[eventArg] as string
                         ).trim();

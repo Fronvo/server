@@ -14,11 +14,6 @@ export interface CreatePostServerParams
     extends EventArguments,
         CreatePostParams {}
 
-export interface CreatePostResult {
-    title: string;
-    content: string;
-    attachment?: string;
-    creationDate: Date;
-}
+export interface CreatePostResult {}
 
 export interface CreatePostTestResult extends FronvoError, CreatePostResult {}

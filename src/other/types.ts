@@ -2,8 +2,6 @@
 // Types for all kinds of files.
 // ******************** //
 
-export type CollectionNames = 'Account' | 'Token' | 'Report' | 'Log';
-
 export type Errors =
     | 'UNKNOWN'
     | 'MUST_BE_LOGGED_IN'

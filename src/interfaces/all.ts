@@ -3,13 +3,6 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import {
-    AccountData,
-    LogData,
-    Prisma,
-    ReportData,
-    TokenData,
-} from '@prisma/client';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
@@ -41,11 +34,6 @@ export interface PerformanceReport {
     timestamp: Date;
 }
 
-export interface RequiredStartupFile {
-    path: string;
-    template?: {};
-}
-
 export interface EventArguments {
     io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>;
     socket: Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -64,25 +52,4 @@ export interface EventExportTemplate {
 
 export interface InterEventExportTemplate {
     [funcName: string]: Function;
-}
-
-export interface FronvoAccount {
-    id: string;
-    username: string;
-    bio: string;
-    email: string;
-    password: string;
-    avatar: string;
-    creationDate: Date;
-    following: Prisma.JsonValue[];
-    followers: Prisma.JsonValue[];
-    posts: Prisma.JsonValue[];
-}
-
-export interface LocalDict {
-    _id?: string;
-    accountData?: AccountData;
-    tokenData?: TokenData;
-    reportData?: ReportData;
-    logData?: LogData;
 }

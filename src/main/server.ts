@@ -19,16 +19,15 @@ import { EzierLimiter } from '@ezier/ratelimit';
 import registerEvents from 'events/main';
 
 // Cool-ish styling
-import ora, { Ora } from 'ora';
 import gradient from 'gradient-string';
+import ora, { Ora } from 'ora';
 
 // Other imports
-import fs from 'fs';
-import * as variables from 'variables/global';
-import { Server } from 'socket.io';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
-import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { InterServerEvents } from 'interfaces/events/inter';
+import { ServerToClientEvents } from 'interfaces/events/s2c';
+import { Server } from 'socket.io';
+import * as variables from 'variables/global';
 import { getEnv, getEnvBoolean } from 'variables/varUtils';
 
 // Variables
@@ -46,69 +45,32 @@ function preStartupChecks(): void {
         if (variables.silentLogging) console.log = () => {};
     }
 
-    function checkRequiredFiles() {
-        // Check directories
-        for (let directory in variables.requiredStartupDirectories) {
-            directory = variables.requiredStartupDirectories[directory];
-
-            // No errors thrown with recursive option
-            fs.mkdirSync(directory, { recursive: true });
-        }
-
-        // Check individual files
-        for (const file in variables.requiredStartupFiles) {
-            const fileObj =
-                variables.requiredStartupFiles[file][
-                    Object.keys(variables.requiredStartupFiles[file])[0]
-                ];
-            const filePath = fileObj.path;
-
-            // This is optional for non-JSON files
-            const fileTemplate = fileObj.template;
-
-            // Overwrite if it doesnt exist
-            if (!fs.existsSync(filePath)) {
-                fs.writeFileSync(
-                    filePath,
-                    fileTemplate ? JSON.stringify(fileTemplate) : ''
-                );
-            }
-        }
-    }
-
     checkSilentLogging();
-    checkRequiredFiles();
 }
 
 async function setupPrisma(): Promise<void> {
-    if (!variables.localMode) {
-        setLoading('Setting up Prisma');
+    setLoading('Setting up Prisma');
 
-        // Prepare for requests before-hand, prevent cold requests
-        const tempLog = await variables.prismaClient.log.create({
-            data: {
-                logData: {
-                    info: 'Temporary log, to be deleted.',
-                },
-            },
-        });
+    // Prepare for requests before-hand, prevent cold requests
+    const tempLog = await variables.prismaClient.log.create({
+        data: {
+            info: 'Temporary log, to be deleted.',
+        },
+    });
 
-        // Read operations aswell
-        await variables.prismaClient.log.findMany();
+    // Read operations aswell
+    await variables.prismaClient.log.findMany();
 
-        // Update operations
-        await variables.prismaClient.log.update({
-            where: { id: tempLog.id },
-            data: {
-                logData: {
-                    info: 'Updated temporary log, to be deleted.',
-                },
-            },
-        });
+    // Update operations
+    await variables.prismaClient.log.update({
+        where: { id: tempLog.id },
+        data: {
+            info: 'Updated temporary log, to be deleted.',
+        },
+    });
 
-        // And delete operations
-        await variables.prismaClient.log.delete({ where: { id: tempLog.id } });
-    }
+    // And delete operations
+    await variables.prismaClient.log.delete({ where: { id: tempLog.id } });
 }
 
 function setupRatelimiter(): void {
@@ -216,7 +178,7 @@ async function startup(): Promise<void> {
             '#a812e8',
             '#8f12e8',
             '#8012e8',
-        ])(`Fronvo server v0.2 ${variables.localMode ? '[LOCAL]' : ''}`)
+        ])(`Fronvo server v0.2`)
     );
 
     // Special check because ora doesnt care

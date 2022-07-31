@@ -3,18 +3,14 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { AccountData } from '@prisma/client';
 import {
     FetchedFronvoAccount,
     FetchProfileDataResult,
     FetchProfileDataServerParams,
 } from 'interfaces/account/fetchProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    findDocuments,
-    generateError,
-    getSocketAccountId,
-} from 'utilities/global';
+import { generateError, getSocketAccountId } from 'utilities/global';
+import { prismaClient } from 'variables/global';
 
 async function fetchProfileData({
     socket,
@@ -22,41 +18,34 @@ async function fetchProfileData({
 }: FetchProfileDataServerParams): Promise<
     FetchProfileDataResult | FronvoError
 > {
-    const accounts: { accountData: AccountData }[] = await findDocuments(
-        'Account',
-        { select: { accountData: true } }
-    );
+    const account = await prismaClient.account.findFirst({
+        where: {
+            profileId,
+        },
+    });
 
-    for (const account in accounts) {
-        const accountData = accounts[account].accountData;
-
-        // Ensure this is the account we're looking for
-        if (accountData.id != profileId) continue;
-
-        // Handpick returned profile data
-        const finalAccountData: FetchedFronvoAccount = {
-            id: accountData.id,
-            username: accountData.username,
-            bio: accountData.bio || '',
-            avatar: accountData.avatar || '',
-            creationDate: accountData.creationDate,
-            following: accountData.following || [],
-            followers: accountData.following || [],
-            posts: accountData.posts || [],
-            isSelf: profileId == getSocketAccountId(socket.id),
-        };
-
-        // If self profile provide extra info
-        if (finalAccountData.isSelf) {
-            finalAccountData.email = accountData.email;
-        }
-
-        return {
-            profileData: finalAccountData,
-        };
+    if (!account) {
+        return generateError('PROFILE_NOT_FOUND');
     }
 
-    return generateError('PROFILE_NOT_FOUND');
+    // TODO: Check if private, if so, return even fewer items
+    const profileData: FetchedFronvoAccount = {
+        isSelf: getSocketAccountId(socket.id) == profileId,
+        profileId: account.profileId,
+        username: account.username,
+        bio: account.bio,
+        creationDate: account.creationDate,
+        avatar: account.avatar,
+        following: account.following,
+        followers: account.followers,
+    };
+
+    // More data if our profile
+    if (profileData.isSelf) {
+        profileData.email = account.email;
+    }
+
+    return { profileData };
 }
 
 const fetchProfileDataTemplate: EventTemplate = {

@@ -3,7 +3,6 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { AccountData } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
@@ -11,73 +10,61 @@ import {
     ResetPasswordServerParams,
 } from 'interfaces/noAccount/resetPassword';
 import utilities from 'utilities/all';
-import { getEmailAccountId, revokeToken, sendEmail } from 'utilities/global';
+import { generateError, revokeToken, sendEmail } from 'utilities/global';
 import * as variables from 'variables/global';
+import { prismaClient } from 'variables/global';
 
 async function resetPassword({
     socket,
     email,
 }: ResetPasswordServerParams): Promise<ResetPasswordResult | FronvoError> {
-    // Check if the email exists
-    let emailFound = false;
+    const account = await prismaClient.account.findFirst({
+        where: {
+            email,
+        },
+    });
 
-    const accounts: { accountData: AccountData }[] =
-        await utilities.findDocuments('Account', {
-            select: { accountData: true },
-        });
-
-    for (const account in accounts) {
-        const accountData = accounts[account].accountData;
-
-        if (accountData.email === email) {
-            // Remove default error
-            emailFound = true;
-
-            // Send a password reset code email
-            let sentCode: string;
-
-            if (!variables.testMode) {
-                // 6 digits [0-9]
-                sentCode = utilities.generateNumbers(0, 9, 6);
-
-                // Send the code
-                utilities.sendEmail(email, 'Fronvo password reset code', [
-                    `Your password reset code is ${sentCode}`,
-                ]);
-            } else {
-                sentCode = '123456';
-            }
-
-            attachCodeListener(sentCode);
-        }
+    if (!account) {
+        return generateError('ACCOUNT_DOESNT_EXIST');
     }
+
+    let sentCode: string;
+
+    if (!variables.testMode) {
+        // 6 digits [0-9]
+        sentCode = utilities.generateNumbers(0, 9, 6);
+    } else {
+        sentCode = '123456';
+    }
+
+    utilities.sendEmail(email, 'Fronvo password reset code', [
+        `Your password reset code is ${sentCode}`,
+    ]);
+
+    attachCodeListener(sentCode);
 
     // Here for better readability
     function attachCodeListener(sentCode: string): void {
         socket.on('resetPasswordVerify', ({ code }, callback) => {
-            let finalError: FronvoError;
-
             if (code != sentCode) {
-                finalError = utilities.generateError('INVALID_CODE');
-            } else {
-                // Detach listener
-                socket.removeAllListeners('resetPasswordVerify');
-
-                // Attach last listener
-                attachChangeListener();
+                callback({
+                    err: { ...utilities.generateError('INVALID_CODE').err },
+                });
+                return;
             }
 
-            callback({
-                err: finalError ? { ...finalError.err } : undefined,
-            });
+            // Detach listener
+            socket.removeAllListeners('resetPasswordVerify');
+
+            // Attach last listener
+            attachChangeListener();
+
+            callback({ err: undefined });
         });
     }
 
     function attachChangeListener(): void {
         socket.on('resetPasswordFinal', async ({ newPassword }, callback) => {
-            // Validate password
-            let finalError: FronvoError;
-
             const passwordCheck = utilities.validateSchema(
                 new StringSchema({
                     newPassword: {
@@ -89,45 +76,38 @@ async function resetPassword({
             );
 
             if (passwordCheck) {
-                finalError = passwordCheck;
-            } else {
-                // Update password
-                await utilities.updateAccount(
-                    {
-                        password: !variables.testMode
-                            ? bcrypt.hashSync(
-                                  newPassword,
-                                  variables.mainBcryptHash
-                              )
-                            : newPassword,
-                    },
-                    { email }
-                );
-
-                // Revoke token (will be regenerated when someone logs in to the account)
-                await revokeToken(await getEmailAccountId(email));
-
-                // Notify user about password change
-                sendEmail(email, 'Fronvo password reset', [
-                    'Your password on Fronvo has been reset',
-                    'You may need to re-login to your account on all associated devices',
-                ]);
-
-                // Detach listener
-                socket.removeAllListeners('resetPasswordFinal');
+                callback({ err: { ...passwordCheck.err } });
+                return;
             }
 
-            callback({
-                err: finalError ? { ...finalError.err } : undefined,
+            await prismaClient.account.update({
+                where: {
+                    email,
+                },
+                data: {
+                    password: !variables.testMode
+                        ? bcrypt.hashSync(newPassword, variables.mainBcryptHash)
+                        : newPassword,
+                },
             });
+
+            // Revoke token (will be regenerated when someone logs in to the account)
+            await revokeToken(account.profileId);
+
+            // Notify user about password change
+            sendEmail(email, 'Fronvo password reset', [
+                'Your password on Fronvo has been reset',
+                'You may need to re-login to your account on all associated devices',
+            ]);
+
+            // Detach listener
+            socket.removeAllListeners('resetPasswordFinal');
+
+            callback({ err: undefined });
         });
     }
 
-    if (!emailFound) {
-        return utilities.generateError('ACCOUNT_DOESNT_EXIST');
-    } else {
-        return {};
-    }
+    return {};
 }
 
 const resetPasswordTemplate: EventTemplate = {

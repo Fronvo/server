@@ -2,7 +2,6 @@
 // The register no-account-only event file.
 // ******************** //
 
-import { AccountData } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
@@ -11,6 +10,7 @@ import {
 } from 'interfaces/noAccount/register';
 import utilities from 'utilities/all';
 import * as variables from 'variables/global';
+import { prismaClient } from 'variables/global';
 import { accountSchema } from './shared';
 
 async function register({
@@ -30,18 +30,15 @@ async function register({
         }
     }
 
-    const accounts: { accountData: AccountData }[] =
-        await utilities.findDocuments('Account', {
-            select: { accountData: true },
-        });
+    const account = await prismaClient.account.findFirst({
+        where: {
+            email,
+        },
+    });
 
     // Check if the email is already registered by another user
-    for (const account in accounts) {
-        const accountData = accounts[account].accountData;
-
-        if (accountData.email == email) {
-            return utilities.generateError('ACCOUNT_ALREADY_EXISTS');
-        }
+    if (account) {
+        return utilities.generateError('ACCOUNT_ALREADY_EXISTS');
     }
 
     let sentCode: string;
@@ -49,14 +46,13 @@ async function register({
     if (!variables.testMode) {
         // 6 digits [0-9]
         sentCode = utilities.generateNumbers(0, 9, 6);
-
-        // Send the code
-        utilities.sendEmail(email, 'Fronvo email verification code', [
-            `Your verification code is ${sentCode}`,
-        ]);
     } else {
         sentCode = '123456';
     }
+
+    utilities.sendEmail(email, 'Fronvo email verification code', [
+        `Your verification code is ${sentCode}`,
+    ]);
 
     // Attach registerVerify now, will be detached after verification / discarded
     socket.on('registerVerify', async ({ code }, callback) => {
@@ -69,33 +65,31 @@ async function register({
             // Detach listener
             socket.removeAllListeners('registerVerify');
 
-            // Generate the account once all checks have passed
-            const username =
-                'Fronvo user ' +
-                (accounts != null ? Object.keys(accounts).length + 1 : '1');
+            const username = `Fronvo user ${
+                (await prismaClient.account.count()) + 1
+            }`;
 
-            const id = utilities.convertToId(username);
+            const profileId = utilities.convertToId(username);
 
-            await utilities.createAccount({
-                id,
-                email,
-                username,
-                password: !variables.testMode
-                    ? bcrypt.hashSync(password, variables.mainBcryptHash)
-                    : password,
+            await prismaClient.account.create({
+                data: {
+                    profileId,
+                    email,
+                    password: !variables.testMode
+                        ? bcrypt.hashSync(password, variables.mainBcryptHash)
+                        : password,
+                    username,
+                },
             });
 
-            token = await utilities.createToken(id);
+            token = await utilities.getToken(profileId);
 
-            // Welcome the user :)
-            if (!variables.testMode) {
-                utilities.sendEmail(email, 'Welcome to Fronvo!', [
-                    "We're so glad to have you on our platform!",
-                    'Enjoy your stay on the safest social media!',
-                ]);
-            }
+            utilities.sendEmail(email, 'Welcome to Fronvo!', [
+                "We're so glad to have you on our platform!",
+                'Enjoy your stay on the safest social media!',
+            ]);
 
-            utilities.loginSocket(io, socket, id);
+            utilities.loginSocket(io, socket, profileId);
         }
 
         callback({

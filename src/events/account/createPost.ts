@@ -8,7 +8,8 @@ import {
     CreatePostServerParams,
 } from 'interfaces/account/createPost';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { getSocketAccountId, updateAccount } from 'utilities/global';
+import { getSocketAccountId } from 'utilities/global';
+import { prismaClient } from 'variables/global';
 
 async function createPost({
     socket,
@@ -16,25 +17,19 @@ async function createPost({
     attachment,
     content,
 }: CreatePostServerParams): Promise<CreatePostResult | FronvoError> {
-    const postDict = {
-        title,
-        content,
-        attachment,
-        creationDate: new Date(),
-    };
+    title = title.replace(/\n\n/g, '\n');
+    content = content.replace(/\n\n/g, '\n');
 
-    postDict['title'] = title.replace(/\n\n/g, '\n');
-    postDict['content'] = content.replace(/\n\n/g, '\n');
-
-    await updateAccount(
-        {
-            posts: postDict,
+    await prismaClient.post.create({
+        data: {
+            author: getSocketAccountId(socket.id),
+            title,
+            content,
+            attachment,
         },
-        { id: getSocketAccountId(socket.id) },
-        true
-    );
+    });
 
-    return postDict;
+    return {};
 }
 
 const updateProfileDataTemplate: EventTemplate = {

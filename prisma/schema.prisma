@@ -10,54 +10,42 @@ datasource db {
   url      = env("FRONVO_PRISMA_URL")
 }
 
-// Accounts
 model Account {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  accountData AccountData
-}
-
-type AccountData {
-  id           String
-  email        String
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  profileId    String   @unique
+  email        String   @unique
   username     String
-  bio          String?
+  bio          String   @default("")
   password     String
-  avatar       String?
+  avatar       String   @default("")
   creationDate DateTime @default(now())
   following    Json[]
   followers    Json[]
-  posts        Json[]
 }
 
-// Tokens
+model Post {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  author       String   @unique
+  title        String
+  content      String
+  attachment   String   @default("")
+  creationDate DateTime @default(now())
+}
+
 model Token {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  tokenData TokenData
-}
-
-type TokenData {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
   token     String
-  accountId String
+  profileId String @unique
 }
 
-// Logs
 model Log {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  logData LogData
-}
-
-type LogData {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   info      String
   timestamp DateTime @default(now())
 }
 
-// Reports
 model Report {
-  id         String     @id @default(auto()) @map("_id") @db.ObjectId
-  reportData ReportData
-}
-
-type ReportData {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   reportName String
   timestamp  DateTime @default(now())
 }

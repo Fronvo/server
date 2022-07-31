@@ -3,205 +3,18 @@
 // ******************** //
 
 import { EzierValidatorError, StringSchema } from '@ezier/validate';
-import {
-    AccountData,
-    LogData,
-    Prisma,
-    ReportData,
-    TokenData,
-} from '@prisma/client';
-import { writeFile } from 'fs';
 import gmail from 'gmail-send';
 import { FronvoError, LoggedInSocket } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import errors from 'other/errors';
-import errorsExtra from 'other/errorsExtra';
-import { CollectionNames, Errors } from 'other/types';
+import { Errors } from 'other/types';
 import { Server, Socket } from 'socket.io';
 import { format } from 'util';
 import { v4 } from 'uuid';
 import * as variables from 'variables/global';
-import { localDB, prismaClient } from 'variables/global';
-
-export function saveLocalDB(): void {
-    if (!variables.localMode || !variables.localSave) return;
-
-    // Asynchronous write, boosts local development even more
-    writeFile(
-        variables.localDBPath,
-        JSON.stringify(localDB, null, '\t'),
-        (err) => {
-            if (err) {
-                console.log(errorsExtra.LOCAL_DB_FAIL);
-            }
-        }
-    );
-}
-
-export async function insertDocument(
-    collName: CollectionNames,
-    dict: { [key: string]: any },
-    recordId?: string
-): Promise<void> {
-    if (!variables.localMode) {
-        await prismaClient[collName].create({
-            data: { ...dict },
-        });
-    } else {
-        // Loop and find if a dictionary with the same _id key exists, if recordId is provided
-        if (recordId) {
-            for (const dictIndex in localDB[collName]) {
-                const dictItem: Partial<{ _id: string }> =
-                    localDB[collName][dictIndex];
-
-                // Overwrite
-                if (dictItem._id == recordId) {
-                    localDB[collName].splice(
-                        Number(dictIndex),
-                        Number(dictIndex) + 1
-                    );
-                }
-            }
-        }
-
-        // Fallback, create a new key
-
-        // No recordId provided, anonymise record
-        if (!recordId) dict._id = v4();
-        else dict._id = recordId;
-
-        localDB[collName].push(dict);
-
-        saveLocalDB();
-    }
-}
-
-export function deleteDocumentLocal(
-    collName: CollectionNames,
-    recordId: string
-): void {
-    if (!variables.localMode) return;
-
-    const localColl = localDB[collName];
-
-    for (const itemIndex in localColl) {
-        const itemData = localColl[itemIndex];
-
-        if (itemData._id == recordId) {
-            // @ts-ignore
-            localDB[collName].splice(itemIndex, 1);
-        }
-    }
-}
-
-export async function updateAccount(
-    updateDict: { [key: string]: any },
-    filterDict: { [key: string]: string },
-    extend?: boolean
-): Promise<void> {
-    const filterKey = Object.keys(filterDict)[0];
-    const filterValue = filterDict[Object.keys(filterDict)[0]];
-
-    if (!variables.localMode) {
-        // Get the account OID (MongoDB object id) in order to update it
-        // Super sketchy but it works, i think
-        const accountsRaw = await prismaClient.account.findRaw();
-
-        for (const account in accountsRaw) {
-            const accountObj = accountsRaw[account];
-
-            // @ts-ignore
-            // Check if it's the target account
-            // Filter not fulfilled, next iteration
-            if (!(accountObj.accountData[filterKey] == filterValue)) continue;
-
-            // @ts-ignore
-            // Get the OID somehow
-            const accountOID = accountObj._id.$oid;
-
-            const updateDictKey = Object.keys(updateDict)[0];
-            let updateDictFinal = {};
-
-            // Offer to extend the current value
-            if (
-                // @ts-ignore
-                typeof accountObj.accountData[updateDictKey] == 'object' &&
-                extend
-            ) {
-                // First of all, set the target key to the existing value
-                updateDictFinal[updateDictKey] =
-                    // @ts-ignore
-                    accountObj.accountData[updateDictKey];
-
-                // Finally, add the new key at the start of the array
-                (updateDictFinal[updateDictKey] as Array<{}>).splice(
-                    0,
-                    0,
-                    updateDict[updateDictKey]
-                );
-            }
-
-            await prismaClient.account.update({
-                where: { id: accountOID },
-                data: {
-                    accountData: {
-                        // Check if its an extended value or not
-                        update:
-                            Object.keys(updateDictFinal).length > 0
-                                ? updateDictFinal
-                                : updateDict,
-                    },
-                },
-            });
-        }
-    } else {
-        const accounts: { accountData: AccountData }[] = await findDocuments(
-            'Account',
-            { select: { accountData: true } }
-        );
-
-        for (const account in accounts) {
-            const accountData = accounts[account].accountData;
-
-            // Next iteration if it doesnt fulfill the filter
-            if (!(accountData[filterKey] == filterValue)) continue;
-
-            // Update finally
-            localDB['Account'][account] = {
-                accountData: {
-                    ...accountData,
-                    ...updateDict,
-                },
-            };
-
-            saveLocalDB();
-        }
-    }
-}
-
-export async function findDocuments(
-    collName: CollectionNames,
-    prismaFilter?: Partial<Prisma.SelectAndInclude>
-): Promise<any[]> {
-    if (!variables.localMode) {
-        return await prismaClient[collName].findMany(
-            prismaFilter ? prismaFilter : {}
-        );
-    } else {
-        return localDB[collName];
-    }
-}
-
-export function insertLog(info: string): void {
-    const logData: LogData = {
-        info,
-        timestamp: new Date(),
-    };
-
-    insertDocument('Log', { logData });
-}
+import { prismaClient } from 'variables/global';
 
 export function loginSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
@@ -249,35 +62,6 @@ export function isAccountLoggedIn(accountId: string): boolean {
     return false;
 }
 
-export async function getEmailAccountId(email: string): Promise<string> {
-    if (!variables.localMode) {
-        const accountsRaw = await prismaClient.account.findRaw();
-
-        for (const account in accountsRaw) {
-            const accountObj = accountsRaw[account];
-
-            // @ts-ignore
-            if (!(accountObj.accountData.email == email)) continue;
-
-            // @ts-ignore
-            return accountObj.accountData.id;
-        }
-    } else {
-        const accounts: { accountData: AccountData }[] = await findDocuments(
-            'Account',
-            { select: { accountData: true } }
-        );
-
-        for (const account in accounts) {
-            const accountData = accounts[account].accountData;
-
-            if (accountData.email == email) {
-                return accountData.id;
-            }
-        }
-    }
-}
-
 export function getSocketAccountId(socketId: string): string {
     return variables.loggedInSockets[socketId].accountId;
 }
@@ -314,14 +98,13 @@ export async function reportEnd(reportUUID: string): Promise<void> {
     const msDuration =
         new Date().getMilliseconds() - reportDict.timestamp.getMilliseconds();
 
-    const reportData: ReportData = {
-        reportName: `${reportDict.reportName} took ${msDuration}ms.`,
-        timestamp: new Date(),
-    };
-
     // Check if it passes the min report MS duration (optional)
     if (msDuration >= variables.performanceReportsMinMS) {
-        insertDocument('Report', { reportData });
+        prismaClient.report.create({
+            data: {
+                reportName: `${reportDict.reportName} took ${msDuration}ms.`,
+            },
+        });
     }
 
     // Delete to save memory
@@ -360,51 +143,35 @@ export function generateError(
     return err;
 }
 
-export async function createToken(accountId: string): Promise<string> {
-    const tokenData: TokenData = {
-        accountId,
-        token: v4(),
-    };
-
-    await insertDocument('Token', { tokenData }, accountId);
-
-    return tokenData.token;
-}
-
-export async function getToken(accountId: string): Promise<string> {
-    const tokens: { tokenData: TokenData }[] = await findDocuments('Token', {
-        select: { tokenData: true },
+export async function getToken(profileId: string): Promise<string> {
+    const tokenItem = await prismaClient.token.findFirst({
+        where: {
+            profileId,
+        },
     });
 
-    for (const token in tokens) {
-        const tokenData = tokens[token].tokenData;
-
-        if (tokenData.accountId === accountId) {
-            return tokenData.token;
-        }
+    if (tokenItem) {
+        return tokenItem.token;
     }
+
+    const token = v4();
+
+    await prismaClient.token.create({
+        data: {
+            profileId,
+            token,
+        },
+    });
+
+    return token;
 }
 
-export async function revokeToken(accountId: string): Promise<void> {
-    if (!variables.localMode) {
-        const tokensRaw = await prismaClient.token.findRaw();
-
-        for (const token in tokensRaw) {
-            const tokenObj = tokensRaw[token];
-
-            // @ts-ignore
-            if (!(tokenObj.tokenData.accountId == accountId)) continue;
-
-            // @ts-ignore
-            const tokenOID = tokenObj._id.$oid;
-
-            await prismaClient.token.delete({
-                where: { id: tokenOID },
-            });
-        }
-    } else {
-        deleteDocumentLocal('Token', accountId);
-    }
+export async function revokeToken(profileId: string): Promise<void> {
+    await prismaClient.token.delete({
+        where: {
+            profileId,
+        },
+    });
 }
 
 export function generateNumbers(
@@ -426,8 +193,11 @@ export async function sendEmail(
     subject: string,
     content: string[]
 ): Promise<void> {
-    if (!variables.emailUsername || !variables.emailPassword) {
-        console.log(errorsExtra.EMAIL_NOT_SETUP);
+    if (
+        !variables.emailUsername ||
+        !variables.emailPassword ||
+        variables.testMode
+    ) {
         return;
     }
 

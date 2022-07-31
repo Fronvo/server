@@ -2,13 +2,12 @@
 // The login no-account-only event file.
 // ******************** //
 
-import { AccountData } from '@prisma/client';
 import { compareSync } from 'bcrypt';
 import { accountSchema } from 'events/noAccount/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { LoginResult, LoginServerParams } from 'interfaces/noAccount/login';
-import { testMode } from 'variables/global';
 import * as utilities from 'utilities/global';
+import { prismaClient, testMode } from 'variables/global';
 
 async function login({
     io,
@@ -16,49 +15,36 @@ async function login({
     email,
     password,
 }: LoginServerParams): Promise<LoginResult | FronvoError> {
-    const accounts: { accountData: AccountData }[] =
-        await utilities.findDocuments('Account', {
-            select: { accountData: true },
-        });
+    const account = await prismaClient.account.findFirst({
+        where: {
+            email,
+        },
+    });
 
-    // Check if the email already exists to be able to login
-    for (const account in accounts) {
-        const accountData = accounts[account].accountData;
-
-        if (accountData.email == email) {
-            // Validate the password, synchronously
-            if (
-                !testMode
-                    ? compareSync(password, accountData.password)
-                    : password == accountData.password
-            ) {
-                utilities.loginSocket(io, socket, accountData.id);
-
-                // Refresh token / Use available one
-                let accountToken = await utilities.getToken(accountData.id);
-                if (!accountToken)
-                    accountToken = await utilities.createToken(accountData.id);
-
-                // Inform the email owner that someone has logged in, no extra info (unlike other platforms which give out your whole personal info)
-                utilities.sendEmail(
-                    email,
-                    'New login to your account on Fronvo',
-                    [
-                        'Someone has logged in to your account on Fronvo',
-                        'You may want to take extra action incase you believe that your account has been compromised',
-                    ]
-                );
-
-                return {
-                    token: accountToken,
-                };
-            } else {
-                return utilities.generateError('INVALID_PASSWORD');
-            }
-        }
+    if (!account) {
+        return utilities.generateError('ACCOUNT_DOESNT_EXIST');
     }
 
-    return utilities.generateError('ACCOUNT_DOESNT_EXIST');
+    // Validate the password, synchronously
+    if (
+        !testMode
+            ? compareSync(password, account.password)
+            : password == account.password
+    ) {
+        utilities.loginSocket(io, socket, account.profileId);
+
+        const token = await utilities.getToken(account.profileId);
+
+        // Inform the email owner that someone has logged in, no extra info (unlike other platforms which give out your whole personal info)
+        utilities.sendEmail(email, 'New login to your account on Fronvo', [
+            'Someone has logged in to your account on Fronvo',
+            'You may want to take extra action incase you believe that your account has been compromised',
+        ]);
+
+        return { token };
+    } else {
+        return utilities.generateError('INVALID_PASSWORD');
+    }
 }
 
 const loginTemplate: EventTemplate = {

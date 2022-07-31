@@ -4,6 +4,19 @@ First of all, install devDependencies.
 
 -   `npm install`
 
+After that, install MongoDB on your system from [here](https://www.mongodb.com/try/download/community)
+
+## First time setup
+
+Once installed, run the following command in the terminal of your choice
+
+-   `mongod --replSet rs0 --port 27017`
+
+And in another terminal
+
+-   `mongosh`
+-   `rs.initiate()`
+
 Then, simply let mocha do what it does best.
 
 -   `npm test`

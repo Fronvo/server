@@ -8,7 +8,8 @@ import {
     UpdateProfileDataServerParams,
 } from 'interfaces/account/updateProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { getSocketAccountId, updateAccount } from 'utilities/global';
+import { getSocketAccountId } from 'utilities/global';
+import { prismaClient } from 'variables/global';
 
 async function updateProfileData({
     socket,
@@ -28,11 +29,17 @@ async function updateProfileData({
         avatar,
     };
 
+    // Refuse to remove
     if (username) {
         updateDict['username'] = username;
     }
 
-    await updateAccount(updateDict, { id: getSocketAccountId(socket.id) });
+    await prismaClient.account.update({
+        data: updateDict,
+        where: {
+            profileId: getSocketAccountId(socket.id),
+        },
+    });
 
     return {};
 }

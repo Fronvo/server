@@ -3,37 +3,18 @@
 // ******************** //
 
 // Load environmental variables from this file, most needed here
-import { resolve } from 'path';
 import { config } from 'dotenv';
+import { resolve } from 'path';
 
 config({ path: resolve(__dirname, '../../.env') });
 
-import {
-    LocalDict,
-    LoggedInSocket,
-    PerformanceReport,
-    RequiredStartupFile,
-} from 'interfaces/all';
-import { PrismaClient } from '@prisma/client';
-import { existsSync } from 'fs';
 import { EzierLimiter } from '@ezier/ratelimit';
-import { CollectionNames } from '../other/types';
-import { getEnvBoolean, getEnv } from './varUtils';
+import { PrismaClient } from '@prisma/client';
+import { LoggedInSocket, PerformanceReport } from 'interfaces/all';
+import { getEnv, getEnvBoolean } from './varUtils';
 
 // Generic variables
 const generatedFilesDirectory = resolve(__dirname, '../../generated');
-
-// Add generated paths here
-const localDBDirectory = resolve(generatedFilesDirectory, 'local');
-export const localDBPath = resolve(localDBDirectory, 'db.json');
-
-// File templates
-const localDBTemplate: { [CollectionName in CollectionNames]: {}[] } = {
-    Account: [],
-    Token: [],
-    Report: [],
-    Log: [],
-};
 
 // Reusable variables
 export const blacklistedEmailDomainsEnabled = getEnvBoolean(
@@ -41,10 +22,6 @@ export const blacklistedEmailDomainsEnabled = getEnvBoolean(
     true
 );
 export const testMode = getEnvBoolean('TEST_MODE', false);
-
-export const localMode = !getEnv('PRISMA_URL', false) || testMode;
-
-export const localSave = getEnvBoolean('LOCAL_SAVE', true) && !testMode;
 
 export const loggedInSockets: { [socketId: string]: LoggedInSocket } = {};
 
@@ -69,12 +46,6 @@ export const performanceReportsMinMS = getEnv(
 // When using PM2 for production
 export const cluster = getEnvBoolean('TARGET_PM2', false);
 
-// Directories/Files to check at startup
-export const requiredStartupDirectories = [localDBDirectory];
-export const requiredStartupFiles: [{ [file: string]: RequiredStartupFile }] = [
-    { localDBItem: { path: localDBPath, template: localDBTemplate } },
-];
-
 // Blacklisted emails: https://github.com/disposable-email-domains/disposable-email-domains
 export const blacklistedEmailDomains: string[] =
     blacklistedEmailDomainsEnabled &&
@@ -85,14 +56,16 @@ export const blacklistedEmailDomains: string[] =
 
 export const silentLogging = testMode || getEnvBoolean('SILENT_LOGGING', false);
 
-// The local virtualised Mongo database
-export const localDB: { [Collection in CollectionNames]: LocalDict[] } =
-    localMode && localSave && existsSync(localDBPath)
-        ? require(localDBPath)
-        : localDBTemplate;
-
 // Prisma MongoDB client, filled in server.ts
-export const prismaClient = !localMode ? new PrismaClient() : null;
+export const prismaClient = new PrismaClient({
+    datasources: {
+        db: {
+            url: !testMode
+                ? getEnv('PRISMA_URL')
+                : 'mongodb://localhost:27017/fronvo',
+        },
+    },
+});
 
 export let rateLimiter: EzierLimiter;
 

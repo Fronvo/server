@@ -3,35 +3,31 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { TokenData } from '@prisma/client';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     LoginTokenResult,
     LoginTokenServerParams,
 } from 'interfaces/noAccount/loginToken';
-import * as utilities from 'utilities/global';
+import { generateError, loginSocket } from 'utilities/global';
+import { prismaClient } from 'variables/global';
 
 async function loginToken({
     io,
     socket,
     token,
 }: LoginTokenServerParams): Promise<LoginTokenResult | FronvoError> {
-    const tokens: { tokenData: TokenData }[] = await utilities.findDocuments(
-        'Token',
-        { select: { tokenData: true } }
-    );
+    const tokenItem = await prismaClient.token.findFirst({
+        where: {
+            token,
+        },
+    });
 
-    for (const tokenIndex in tokens) {
-        const tokenData = tokens[tokenIndex].tokenData;
-
-        if (tokenData.token == token) {
-            // Just login to the account
-            utilities.loginSocket(io, socket, tokenData.accountId);
-            return {};
-        }
+    if (!tokenItem) {
+        return generateError('INVALID_TOKEN');
     }
 
-    return utilities.generateError('INVALID_TOKEN');
+    loginSocket(io, socket, tokenItem.profileId);
+    return {};
 }
 
 const loginTokenTemplate: EventTemplate = {

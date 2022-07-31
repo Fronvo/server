@@ -77,7 +77,7 @@ function fetchProfileData(
             callback(assertError({ err }));
 
             callback(
-                assertType({ id: profileData.id }, 'string') ||
+                assertType({ id: profileData.profileId }, 'string') ||
                     assertType({ email: profileData.email }, 'string') ||
                     assertType({ username: profileData.username }, 'string') ||
                     assertType({ bio: profileData.bio }, 'string') ||
@@ -85,7 +85,6 @@ function fetchProfileData(
                         { creationDate: new Date(profileData.creationDate) },
                         'Invalid Date'
                     ) ||
-                    assertType({ posts: profileData.posts }, 'object') ||
                     assertType(
                         { following: profileData.following },
                         'object'
