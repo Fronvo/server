@@ -19,7 +19,15 @@ import {
     FetchProfilePostsParams,
     FetchProfilePostsTestResult,
 } from 'interfaces/account/fetchProfilePosts';
+import {
+    FollowProfileParams,
+    FollowProfileTestResult,
+} from 'interfaces/account/followProfile';
 import { LogoutTestResult } from 'interfaces/account/logout';
+import {
+    UnfollowProfileParams,
+    UnfollowProfileTestResult,
+} from 'interfaces/account/unfollowProfile';
 import {
     UpdateProfileDataParams,
     UpdateProfileDataTestResult,
@@ -100,5 +108,13 @@ export interface ClientToServerEvents {
     deletePost: (
         {}: DeletePostParams,
         callback?: ({}: DeletePostTestResult) => void
+    ) => void;
+    followProfile: (
+        {}: FollowProfileParams,
+        callback?: ({}: FollowProfileTestResult) => void
+    ) => void;
+    unfollowProfile: (
+        {}: UnfollowProfileParams,
+        callback?: ({}: UnfollowProfileTestResult) => void
     ) => void;
 }

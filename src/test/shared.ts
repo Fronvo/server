@@ -9,6 +9,7 @@ const email = generateEmail();
 const password = generatePassword();
 let token: string;
 let profileId: string;
+let secondaryProfileId: string;
 let sharedPostId: string;
 
 const shared: SharedVariables = {
@@ -16,6 +17,7 @@ const shared: SharedVariables = {
     password,
     token,
     profileId,
+    secondaryProfileId,
     sharedPostId,
 };
 

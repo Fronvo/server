@@ -17,6 +17,7 @@ export interface SharedVariables {
     password: string;
     token: string;
     profileId: string;
+    secondaryProfileId: string;
     sharedPostId: string;
 }
 

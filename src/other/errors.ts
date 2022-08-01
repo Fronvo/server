@@ -27,6 +27,10 @@ const errors: { [Error in Errors] } = {
     INVALID_IMAGE_URL: 'The provided %s URL is invalid.',
     INVALID_POST: 'The requested post was not found.',
     INVALID_PROFILE_ID: 'An account with the given ID already exists.',
+    FOLLOW_SELF: 'You can"t follow yourself.',
+    ALREADY_FOLLOWING: 'You are already following this user.',
+    UNFOLLOW_SELF: 'You can"t unfollow yourself.',
+    ALREADY_UNFOLLOWING: 'You are not following this user.',
 };
 
 export default errors;

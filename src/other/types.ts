@@ -22,7 +22,11 @@ export type Errors =
     | 'INVALID_CODE'
     | 'INVALID_IMAGE_URL'
     | 'INVALID_POST'
-    | 'INVALID_PROFILE_ID';
+    | 'INVALID_PROFILE_ID'
+    | 'FOLLOW_SELF'
+    | 'ALREADY_FOLLOWING'
+    | 'UNFOLLOW_SELF'
+    | 'ALREADY_UNFOLLOWING';
 
 export type TestAssertTypes =
     | 'string'

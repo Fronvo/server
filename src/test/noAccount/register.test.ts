@@ -3,6 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import shared from 'test/shared';
 import sharedVars from 'test/shared';
 import {
     assertCode,
@@ -161,20 +162,24 @@ function accountExists(
         },
         () => {
             socket.emit('registerVerify', { code: '123456' }, ({}) => {
-                socket.emit('logout');
+                socket.emit('fetchProfileId', ({ profileId }) => {
+                    shared.secondaryProfileId = profileId;
 
-                socket.emit(
-                    'register',
-                    {
-                        email: existsEmail,
-                        password: existsPassword,
-                    },
-                    ({ err }) => {
-                        callback(
-                            assertCode(err.code, 'ACCOUNT_ALREADY_EXISTS')
-                        );
-                    }
-                );
+                    socket.emit('logout');
+
+                    socket.emit(
+                        'register',
+                        {
+                            email: existsEmail,
+                            password: existsPassword,
+                        },
+                        ({ err }) => {
+                            callback(
+                                assertCode(err.code, 'ACCOUNT_ALREADY_EXISTS')
+                            );
+                        }
+                    );
+                });
             });
         }
     );

@@ -9,6 +9,8 @@ import updateProfileData from 'events/account/updateProfileData';
 import createPost from 'events/account/createPost';
 import fetchProfilePosts from 'events/account/fetchProfilePosts';
 import deletePost from 'events/account/deletePost';
+import followProfile from 'events/account/followProfile';
+import unfollowProfile from 'events/account/unfollowProfile';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -20,6 +22,8 @@ const accountTemplate: EventExportTemplate = {
     createPost,
     fetchProfilePosts,
     deletePost,
+    followProfile,
+    unfollowProfile,
 };
 
 export default accountTemplate;
