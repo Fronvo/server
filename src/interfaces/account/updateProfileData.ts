@@ -6,6 +6,7 @@ import { Account } from '@prisma/client';
 import { EventArguments, FronvoError } from 'interfaces/all';
 
 export interface UpdateProfileDataParams {
+    profileId?: string;
     username?: string;
     bio?: string;
     avatar?: string;

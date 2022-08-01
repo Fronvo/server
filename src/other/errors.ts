@@ -26,6 +26,7 @@ const errors: { [Error in Errors] } = {
     INVALID_CODE: 'The provided code is invalid.',
     INVALID_IMAGE_URL: 'The provided %s URL is invalid.',
     INVALID_POST: 'The requested post was not found.',
+    INVALID_PROFILE_ID: 'An account with the given ID already exists.',
 };
 
 export default errors;

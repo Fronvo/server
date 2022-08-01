@@ -8,52 +8,110 @@ import {
     UpdateProfileDataServerParams,
 } from 'interfaces/account/updateProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { getSocketAccountId } from 'utilities/global';
-import { prismaClient } from 'variables/global';
+import { generateError, getSocketAccountId } from 'utilities/global';
+import { loggedInSockets, prismaClient } from 'variables/global';
 
 async function updateProfileData({
     socket,
+    profileId,
     username,
     bio,
     avatar,
 }: UpdateProfileDataServerParams): Promise<
     UpdateProfileDataResult | FronvoError
 > {
+    // If none provided, return immediately
+    if (
+        !profileId &&
+        !username &&
+        !bio &&
+        bio != '' &&
+        !avatar &&
+        avatar != ''
+    ) {
+        return {
+            err: undefined,
+        };
+    }
+
     // Username validation not needed here, see schema below
     // Nor avatar, may need for content-type and extension if applicable (|| ?)
 
-    // Proceed to update info
-    // Create update dict, some parameters shouldn't be updated if empty
-    const updateDict = {
-        bio: bio.replace(/\n\n/g, '\n'),
-        avatar,
-    };
+    // Check profile id availability
+    if (profileId) {
+        const profileIdData = await prismaClient.account.findFirst({
+            where: {
+                profileId,
+            },
+        });
 
-    // Refuse to remove
-    if (username) {
-        updateDict['username'] = username;
+        if (profileIdData) {
+            return generateError('INVALID_PROFILE_ID');
+        }
     }
 
     const profileData = await prismaClient.account.update({
-        data: updateDict,
+        data: {
+            profileId,
+            username,
+            bio,
+            avatar,
+        },
         where: {
             profileId: getSocketAccountId(socket.id),
         },
         select: {
+            profileId: true,
             username: true,
             bio: true,
             avatar: true,
         },
     });
 
+    if (profileId) {
+        // Update related entries
+
+        // Update posts
+        await prismaClient.post.updateMany({
+            where: {
+                author: getSocketAccountId(socket.id),
+            },
+
+            data: {
+                author: profileId,
+            },
+        });
+
+        // Update token
+        await prismaClient.token.update({
+            where: {
+                profileId: getSocketAccountId(socket.id),
+            },
+
+            data: {
+                profileId,
+            },
+        });
+
+        // Finally update socket link
+        loggedInSockets[socket.id].accountId = profileId;
+    }
+
     return { profileData };
 }
 
 const updateProfileDataTemplate: EventTemplate = {
     func: updateProfileData,
-    template: ['username', 'bio', 'avatar'],
+    template: ['profileId', 'username', 'bio', 'avatar'],
     points: 3,
     schema: new StringSchema({
+        profileId: {
+            minLength: 5,
+            maxLength: 30,
+            regex: /^[a-z0-9]+$/,
+            optional: true,
+        },
+
         username: {
             minLength: 5,
             maxLength: 30,

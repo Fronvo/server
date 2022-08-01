@@ -3,6 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import shared from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -11,6 +12,42 @@ import {
     assertType,
     generateChars,
 } from 'test/utilities';
+
+function lengthProfileIdMin(
+    { socket }: Partial<TestArguments>,
+    callback: TestErrorCallback
+): void {
+    socket.emit(
+        'updateProfileData',
+        {
+            profileId: generateChars(4),
+        },
+        ({ err }) => {
+            callback(
+                assertCode(err.code, 'LENGTH') ||
+                    assertEquals({ for: err.extras.for }, 'profileId')
+            );
+        }
+    );
+}
+
+function lengthProfileIdMax(
+    { socket }: Partial<TestArguments>,
+    callback: TestErrorCallback
+): void {
+    socket.emit(
+        'updateProfileData',
+        {
+            profileId: generateChars(31),
+        },
+        ({ err }) => {
+            callback(
+                assertCode(err.code, 'LENGTH') ||
+                    assertEquals({ for: err.extras.for }, 'profileId')
+            );
+        }
+    );
+}
 
 function lengthUsernameMin(
     { socket }: Partial<TestArguments>,
@@ -84,6 +121,21 @@ function lengthAvatarMax(
     );
 }
 
+function invalidProfileId(
+    { socket }: Partial<TestArguments>,
+    callback: TestErrorCallback
+): void {
+    socket.emit(
+        'updateProfileData',
+        {
+            profileId: shared.profileId,
+        },
+        ({ err }) => {
+            callback(assertCode(err.code, 'INVALID_PROFILE_ID'));
+        }
+    );
+}
+
 function updateProfileData(
     { socket, done }: TestArguments,
     callback: TestErrorCallback
@@ -91,6 +143,7 @@ function updateProfileData(
     socket.emit(
         'updateProfileData',
         {
+            profileId: generateChars(),
             username: generateChars(),
             bio: generateChars(),
             avatar: `https://${generateChars()}`,
@@ -99,10 +152,13 @@ function updateProfileData(
             callback(assertError({ err }));
 
             callback(
-                assertType({ username: profileData.username }, 'string') ||
+                assertType({ profileId: profileData.profileId }, 'string') ||
+                    assertType({ username: profileData.username }, 'string') ||
                     assertType({ bio: profileData.bio }, 'string') ||
                     assertType({ avatar: profileData.avatar }, 'string')
             );
+
+            shared.profileId = profileData.profileId;
 
             done();
         }
@@ -112,10 +168,13 @@ function updateProfileData(
 export default (testArgs: TestArguments): void => {
     assertErrors(
         {
+            lengthProfileIdMin,
+            lengthProfileIdMax,
             lengthUsernameMin,
             lengthUsernameMax,
             lengthBioMax,
             lengthAvatarMax,
+            invalidProfileId,
         },
         testArgs,
         updateProfileData
