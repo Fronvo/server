@@ -56,7 +56,7 @@ const fetchProfileDataTemplate: EventTemplate = {
         profileId: {
             minLength: 5,
             maxLength: 30,
-            regex: /^[a-z0-9]+$/,
+            regex: /^[a-z0-9.]+$/,
         },
     }),
 };
