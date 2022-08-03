@@ -8,10 +8,11 @@ import {
     FetchProfilePostsServerParams,
 } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchProfilePosts({
+    socket,
     profileId,
     from,
     to,
@@ -28,7 +29,16 @@ async function fetchProfilePosts({
         return generateError('PROFILE_NOT_FOUND');
     }
 
-    // TODO: Check if private
+    const isSelf = getSocketAccountId(socket.id) == profileId;
+    const isFollower =
+        !isSelf && account.following.includes(getSocketAccountId(socket.id));
+    const isPrivate = account.isPrivate;
+    const isAccessible = isSelf || !isPrivate || isFollower;
+
+    if (!isAccessible) {
+        return generateError('PROFILE_PRIVATE');
+    }
+
     const profilePosts = await prismaClient.post.findMany({
         where: {
             author: profileId,

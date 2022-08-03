@@ -28,16 +28,24 @@ async function fetchProfileData({
         return generateError('PROFILE_NOT_FOUND');
     }
 
-    // TODO: Check if private, if so, return even fewer items
+    const isSelf = getSocketAccountId(socket.id) == profileId;
+    const isFollower =
+        !isSelf && account.following.includes(getSocketAccountId(socket.id));
+    const isPrivate = account.isPrivate;
+    const isAccessible = isSelf || !isPrivate || isFollower;
+
+    // Block access to most info if private
     const profileData: FetchedFronvoAccount = {
-        isSelf: getSocketAccountId(socket.id) == profileId,
+        isSelf,
         profileId: account.profileId,
         username: account.username,
-        bio: account.bio,
-        creationDate: account.creationDate,
+        bio: isAccessible && account.bio,
+        creationDate: isAccessible && account.creationDate,
         avatar: account.avatar,
-        following: account.following,
-        followers: account.followers,
+        following: isAccessible && account.following,
+        followers: isAccessible && account.followers,
+        isPrivate,
+        isFollower,
     };
 
     // More data if our profile

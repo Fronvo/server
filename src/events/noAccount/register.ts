@@ -79,6 +79,7 @@ async function register({
                         ? bcrypt.hashSync(password, variables.mainBcryptHash)
                         : password,
                     username,
+                    isPrivate: false,
                 },
             });
 

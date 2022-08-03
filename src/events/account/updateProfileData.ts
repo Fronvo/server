@@ -17,6 +17,7 @@ async function updateProfileData({
     username,
     bio,
     avatar,
+    isPrivate,
 }: UpdateProfileDataServerParams): Promise<
     UpdateProfileDataResult | FronvoError
 > {
@@ -27,7 +28,8 @@ async function updateProfileData({
         !bio &&
         bio != '' &&
         !avatar &&
-        avatar != ''
+        avatar != '' &&
+        isPrivate == undefined
     ) {
         return {
             err: undefined,
@@ -50,12 +52,19 @@ async function updateProfileData({
         }
     }
 
+    if (isPrivate) {
+        if (typeof isPrivate != 'boolean') {
+            return generateError('NOT_BOOLEAN');
+        }
+    }
+
     const profileData = await prismaClient.account.update({
         data: {
             profileId,
             username,
             bio,
             avatar,
+            isPrivate,
         },
         where: {
             profileId: getSocketAccountId(socket.id),
@@ -65,6 +74,7 @@ async function updateProfileData({
             username: true,
             bio: true,
             avatar: true,
+            isPrivate: true,
         },
     });
 
@@ -182,7 +192,7 @@ async function updateProfileData({
 
 const updateProfileDataTemplate: EventTemplate = {
     func: updateProfileData,
-    template: ['profileId', 'username', 'bio', 'avatar'],
+    template: ['profileId', 'username', 'bio', 'avatar', 'isPrivate'],
     points: 3,
     schema: new StringSchema({
         profileId: {
@@ -207,6 +217,10 @@ const updateProfileDataTemplate: EventTemplate = {
             // Ensure https
             regex: /^(https:\/\/).+$/,
             maxLength: 512,
+            optional: true,
+        },
+
+        isPrivate: {
             optional: true,
         },
     }),

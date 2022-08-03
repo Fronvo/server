@@ -13,6 +13,7 @@ export type Errors =
     | 'REQUIRED_UUID'
     | 'LENGTH'
     | 'EXACT_LENGTH'
+    | 'NOT_BOOLEAN'
     | 'INVALID_PASSWORD'
     | 'ACCOUNT_ALREADY_EXISTS'
     | 'ACCOUNT_DOESNT_EXIST'
@@ -26,7 +27,8 @@ export type Errors =
     | 'FOLLOW_SELF'
     | 'ALREADY_FOLLOWING'
     | 'UNFOLLOW_SELF'
-    | 'ALREADY_UNFOLLOWING';
+    | 'ALREADY_UNFOLLOWING'
+    | 'PROFILE_PRIVATE';
 
 export type TestAssertTypes =
     | 'string'

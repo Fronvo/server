@@ -21,6 +21,7 @@ model Account {
   creationDate DateTime @default(now())
   following    Json[]
   followers    Json[]
+  isPrivate    Boolean?
 }
 
 model Post {

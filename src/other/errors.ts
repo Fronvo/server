@@ -16,6 +16,7 @@ const errors: { [Error in Errors] } = {
     REQUIRED_UUID: 'A UUID is required.',
     LENGTH: 'The %s must contain %i to %i characters.',
     EXACT_LENGTH: 'The %s must consist of exactly %i characters.',
+    NOT_BOOLEAN: 'The provided value must be a boolean',
     INVALID_PASSWORD: 'The password is invalid.',
     ACCOUNT_ALREADY_EXISTS: 'An account with that email already exists.',
     ACCOUNT_DOESNT_EXIST:
@@ -31,6 +32,7 @@ const errors: { [Error in Errors] } = {
     ALREADY_FOLLOWING: 'You are already following this user.',
     UNFOLLOW_SELF: 'You can"t unfollow yourself.',
     ALREADY_UNFOLLOWING: 'You are not following this user.',
+    PROFILE_PRIVATE: 'The requested profile is private.',
 };
 
 export default errors;
