@@ -77,22 +77,6 @@ function unfollowSelf(
     );
 }
 
-// TODO
-// function alreadyFollowing(
-//     { socket }: Partial<TestArguments>,
-//     callback: TestErrorCallback
-// ): void {
-//     socket.emit(
-//         'followProfile',
-//         {
-//             profileId: generateChars(),
-//         },
-//         ({ err }) => {
-//             callback(assertCode(err.code, 'ALREADY_FOLLOWING'));
-//         }
-//     );
-// }
-
 function unfollowProfile(
     { socket, done, shared }: TestArguments,
     callback: TestErrorCallback

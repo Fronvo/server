@@ -77,21 +77,36 @@ function followSelf(
     );
 }
 
-// TODO
-// function alreadyFollowing(
-//     { socket }: Partial<TestArguments>,
-//     callback: TestErrorCallback
-// ): void {
-//     socket.emit(
-//         'followProfile',
-//         {
-//             profileId: generateChars(),
-//         },
-//         ({ err }) => {
-//             callback(assertCode(err.code, 'ALREADY_FOLLOWING'));
-//         }
-//     );
-// }
+function alreadyFollowing(
+    { socket, shared }: Partial<TestArguments>,
+    callback: TestErrorCallback
+): void {
+    socket.emit(
+        'followProfile',
+        {
+            profileId: shared.secondaryProfileId,
+        },
+        () => {
+            socket.emit(
+                'followProfile',
+                {
+                    profileId: shared.secondaryProfileId,
+                },
+                ({ err }) => {
+                    socket.emit(
+                        'unfollowProfile',
+                        {
+                            profileId: shared.secondaryProfileId,
+                        },
+                        () => {
+                            callback(assertCode(err.code, 'ALREADY_FOLLOWING'));
+                        }
+                    );
+                }
+            );
+        }
+    );
+}
 
 function followProfile(
     { socket, done, shared }: TestArguments,
@@ -117,6 +132,7 @@ export default (testArgs: TestArguments): void => {
             lengthProfileIdMax,
             profileNotFound,
             followSelf,
+            alreadyFollowing,
         },
         testArgs,
         followProfile
