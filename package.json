@@ -20,7 +20,7 @@
     "start:dev": "tsnd --ignore-watch generated/ --transpile-only --respawn --exit-child --clear -r tsconfig-paths/register src/main/server.ts",
     "test": "run-p test:server test:mocha",
     "test:report": "run-p test:server test:mocha:report",
-    "test:mocha": "mocha -r @swc-node/register -r tsconfig-paths/register src/test/main.ts",
+    "test:mocha": "mocha -r @swc-node/register -r tsconfig-paths/register src/test/main.ts --reporter nyan",
     "test:mocha:report": "mocha -r @swc-node/register -r tsconfig-paths/register --reporter mocha-junit-reporter --reporter-options mochaFile=./generated/tests/test-results.xml src/test/main.ts",
     "test:server": "cross-env FRONVO_TEST_MODE=true FRONVO_BINARY_PARSER=false node -r @swc-node/register -r tsconfig-paths/register src/main/server.ts",
     "check": "tsc",
