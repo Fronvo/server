@@ -20,6 +20,10 @@ import {
     FetchProfilePostsTestResult,
 } from 'interfaces/account/fetchProfilePosts';
 import {
+    FindProfilesParams,
+    FindProfilesTestResult,
+} from 'interfaces/account/findProfiles';
+import {
     FollowProfileParams,
     FollowProfileTestResult,
 } from 'interfaces/account/followProfile';
@@ -116,5 +120,9 @@ export interface ClientToServerEvents {
     unfollowProfile: (
         {}: UnfollowProfileParams,
         callback?: ({}: UnfollowProfileTestResult) => void
+    ) => void;
+    findProfiles: (
+        {}: FindProfilesParams,
+        callback?: ({}: FindProfilesTestResult) => void
     ) => void;
 }

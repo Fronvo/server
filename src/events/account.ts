@@ -11,6 +11,7 @@ import fetchProfilePosts from 'events/account/fetchProfilePosts';
 import deletePost from 'events/account/deletePost';
 import followProfile from 'events/account/followProfile';
 import unfollowProfile from 'events/account/unfollowProfile';
+import findProfiles from 'events/account/findProfiles';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -24,6 +25,7 @@ const accountTemplate: EventExportTemplate = {
     deletePost,
     followProfile,
     unfollowProfile,
+    findProfiles,
 };
 
 export default accountTemplate;
