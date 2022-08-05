@@ -8,6 +8,7 @@ import {
     RegisterResult,
     RegisterServerParams,
 } from 'interfaces/noAccount/register';
+import { generateChars } from 'test/utilities';
 import utilities from 'utilities/all';
 import * as variables from 'variables/global';
 import { prismaClient } from 'variables/global';
@@ -69,7 +70,8 @@ async function register({
                 (await prismaClient.account.count()) + 1
             }`;
 
-            const profileId = utilities.convertToId(username);
+            // abcdef12345
+            const profileId = generateChars(10);
 
             await prismaClient.account.create({
                 data: {
