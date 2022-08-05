@@ -104,8 +104,20 @@ async function updateProfileData({
         });
 
         // Update follow relations
+        function normalizeList(targetList: Array<string>): Array<string> {
+            const resultList = targetList;
 
-        // Ipdate following first
+            const targetIndex = resultList.indexOf(
+                getSocketAccountId(socket.id)
+            );
+
+            // Replace with new one
+            resultList[targetIndex] = profileId;
+
+            return resultList;
+        }
+
+        // Update following first
         const targetFollowingAccounts = await prismaClient.account.findMany({
             where: {
                 followers: {
@@ -115,19 +127,6 @@ async function updateProfileData({
         });
 
         for (const accountIndex in targetFollowingAccounts) {
-            function normalizeList(targetList: Array<string>): Array<string> {
-                const resultList = targetList;
-
-                const targetIndex = resultList.indexOf(
-                    getSocketAccountId(socket.id)
-                );
-
-                // Replace with new one
-                resultList[targetIndex] = profileId;
-
-                return resultList;
-            }
-
             await prismaClient.account.update({
                 where: {
                     profileId: targetFollowingAccounts[accountIndex].profileId,
@@ -136,10 +135,6 @@ async function updateProfileData({
                     followers: normalizeList(
                         targetFollowingAccounts[accountIndex]
                             .followers as string[]
-                    ),
-                    following: normalizeList(
-                        targetFollowingAccounts[accountIndex]
-                            .following as string[]
                     ),
                 },
             });
@@ -155,27 +150,11 @@ async function updateProfileData({
         });
 
         for (const accountIndex in targetFollowers) {
-            function normalizeList(targetList: Array<string>): Array<string> {
-                const resultList = targetList;
-
-                const targetIndex = resultList.indexOf(
-                    getSocketAccountId(socket.id)
-                );
-
-                // Replace with new one
-                resultList[targetIndex] = profileId;
-
-                return resultList;
-            }
-
             await prismaClient.account.update({
                 where: {
                     profileId: targetFollowers[accountIndex].profileId,
                 },
                 data: {
-                    followers: normalizeList(
-                        targetFollowers[accountIndex].followers as string[]
-                    ),
                     following: normalizeList(
                         targetFollowers[accountIndex].following as string[]
                     ),
