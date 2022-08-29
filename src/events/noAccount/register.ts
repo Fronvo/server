@@ -82,6 +82,8 @@ async function register({
                         : password,
                     username,
                     isPrivate: false,
+                    following: [],
+                    followers: [],
                 },
             });
 
