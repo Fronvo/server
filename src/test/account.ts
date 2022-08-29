@@ -11,6 +11,7 @@ import deletePost from 'test/account/deletePost.test';
 import followProfile from 'test/account/followProfile.test';
 import unfollowProfile from 'test/account/unfollowProfile.test';
 import findProfiles from 'test/account/findProfiles.test';
+import fetchHomePosts from 'test/account/fetchHomePosts.test';
 import logout from 'test/account/logout.test';
 
 export default {
@@ -23,5 +24,6 @@ export default {
     followProfile,
     unfollowProfile,
     findProfiles,
+    fetchHomePosts,
     logout,
 };

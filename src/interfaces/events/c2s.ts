@@ -10,6 +10,7 @@ import {
     DeletePostParams,
     DeletePostTestResult,
 } from 'interfaces/account/deletePost';
+import { FetchHomePostsTestResult } from 'interfaces/account/fetchHomePosts';
 import {
     FetchProfileDataParams,
     FetchProfileDataTestResult,
@@ -125,4 +126,5 @@ export interface ClientToServerEvents {
         {}: FindProfilesParams,
         callback?: ({}: FindProfilesTestResult) => void
     ) => void;
+    fetchHomePosts: (callback?: ({}: FetchHomePostsTestResult) => void) => void;
 }

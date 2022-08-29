@@ -6,6 +6,7 @@
 const PORT = process.env.PORT || 3001;
 
 // Test files
+import preTests from 'test/other/preTests';
 import generalTests from 'test/general';
 import accountTests from 'test/account';
 import noAccountTests from 'test/noAccount';
@@ -53,6 +54,13 @@ describe('Fronvo', () => {
         socket,
         shared,
     };
+
+    // Pre-Tests
+    it('preTest', (done) => {
+        testArguments.done = done;
+
+        preTests(testArguments as TestArguments);
+    });
 
     for (const test in tests) {
         it(test, (done) => {
