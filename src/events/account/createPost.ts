@@ -51,8 +51,8 @@ const createPostTemplate: EventTemplate = {
         },
 
         content: {
-            minLength: 10,
-            maxLength: 128,
+            minLength: 15,
+            maxLength: 256,
         },
 
         attachment: {

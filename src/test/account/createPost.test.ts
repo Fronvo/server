@@ -60,7 +60,7 @@ function lengthContentMin(
         'createPost',
         {
             title: generateChars(5),
-            content: generateChars(9),
+            content: generateChars(14),
         },
         ({ err }) => {
             callback(
@@ -79,7 +79,7 @@ function lengthContentMax(
         'createPost',
         {
             title: generateChars(5),
-            content: generateChars(129),
+            content: generateChars(257),
         },
         ({ err }) => {
             callback(
@@ -98,7 +98,7 @@ function lengthAttachmentMax(
         'createPost',
         {
             title: generateChars(5),
-            content: generateChars(10),
+            content: generateChars(15),
             attachment: `https://${generateChars(257)}`,
         },
         ({ err }) => {
@@ -118,7 +118,7 @@ function createPost(
         'createPost',
         {
             title: generateChars(5),
-            content: generateChars(10),
+            content: generateChars(15),
             attachment: `https://${generateChars(10)}`,
         },
         ({ err, postData }): void => {
