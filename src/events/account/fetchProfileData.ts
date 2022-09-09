@@ -46,6 +46,8 @@ async function fetchProfileData({
         followers: isAccessible && account.followers,
         isPrivate,
         isFollower,
+        isInCommunity: isAccessible && account.isInCommunity,
+        communityId: isAccessible && account.communityId,
     };
 
     // More data if our profile

@@ -8,39 +8,80 @@ import {
     generatePassword,
 } from 'test/utilities';
 
-function preTests(
-    { socket, done }: TestArguments,
+async function createOfficialAccount(
+    { socket }: TestArguments,
     callback: TestErrorCallback
-): void {
-    socket.emit(
-        'register',
-        { email: generateEmail(), password: generatePassword() },
-        ({ err }) => {
-            callback(assertError({ err }));
+): Promise<void> {
+    return new Promise((resolve) => {
+        socket.emit(
+            'register',
+            { email: generateEmail(), password: generatePassword() },
+            ({ err }) => {
+                callback(assertError({ err }));
 
-            socket.emit('registerVerify', { code: '123456' }, ({ err }) => {
+                socket.emit('registerVerify', { code: '123456' }, ({ err }) => {
+                    callback(assertError({ err }));
+
+                    socket.emit(
+                        'updateProfileData',
+                        {
+                            profileId: 'fronvo',
+                            username: 'Fronvo',
+                            bio: 'The official account of Fronvo',
+                        },
+                        ({ err }) => {
+                            callback(assertError({ err }));
+
+                            resolve();
+                        }
+                    );
+                });
+            }
+        );
+    });
+}
+
+async function createOfficialCommunity(
+    { socket }: TestArguments,
+    callback: TestErrorCallback
+): Promise<void> {
+    return new Promise((resolve) => {
+        socket.emit(
+            'createCommunity',
+            {
+                name: 'Fronvo',
+                description: 'The official community of Fronvo.',
+                icon: 'https://i.ibb.co/QFT7SNj/logo.png',
+            },
+            ({ err }) => {
                 callback(assertError({ err }));
 
                 socket.emit(
-                    'updateProfileData',
+                    'updateCommunityData',
                     {
-                        profileId: 'fronvo',
-                        username: 'Fronvo',
-                        bio: 'The official account of Fronvo',
+                        communityId: 'fronvo',
                     },
                     ({ err }) => {
                         callback(assertError({ err }));
 
-                        socket.emit('logout', ({ err }) => {
-                            callback(assertError({ err }));
-
-                            done();
-                        });
+                        resolve();
                     }
                 );
-            });
-        }
-    );
+            }
+        );
+    });
+}
+
+async function preTests(
+    testArgs: TestArguments,
+    callback: TestErrorCallback
+): Promise<void> {
+    await createOfficialAccount(testArgs, callback);
+    await createOfficialCommunity(testArgs, callback);
+
+    testArgs.socket.emit('logout', () => {
+        testArgs.done();
+    });
 }
 
 export default (testArgs: TestArguments): void => {

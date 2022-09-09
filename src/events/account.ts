@@ -13,6 +13,12 @@ import followProfile from 'events/account/followProfile';
 import unfollowProfile from 'events/account/unfollowProfile';
 import findProfiles from 'events/account/findProfiles';
 import fetchHomePosts from 'events/account/fetchHomePosts';
+import createCommunity from 'events/account/createCommunity';
+import joinCommunity from 'events/account/joinCommunity';
+import fetchCommunityData from 'events/account/fetchCommunityData';
+import findCommunities from 'events/account/findCommunities';
+import updateCommunityData from 'events/account/updateCommunityData';
+import leaveCommunity from 'events/account/leaveCommunity';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -28,6 +34,12 @@ const accountTemplate: EventExportTemplate = {
     unfollowProfile,
     findProfiles,
     fetchHomePosts,
+    createCommunity,
+    joinCommunity,
+    fetchCommunityData,
+    findCommunities,
+    updateCommunityData,
+    leaveCommunity,
 };
 
 export default accountTemplate;

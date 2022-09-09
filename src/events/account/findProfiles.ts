@@ -16,14 +16,26 @@ async function findProfiles({
 }: FindProfilesServerParams): Promise<FindProfilesResult | FronvoError> {
     const fetchedFindResults = await prismaClient.account.findMany({
         where: {
-            profileId: {
-                startsWith: profileId,
+            OR: {
+                profileId: {
+                    contains: profileId,
+                    mode: 'insensitive',
+                },
+
+                username: {
+                    contains: profileId,
+                    mode: 'insensitive',
+                },
             },
         },
         // Default to 10
         take: Number(maxResults) || 10,
         select: {
             profileId: true,
+            followers: true,
+        },
+        orderBy: {
+            followers: 'desc',
         },
     });
 

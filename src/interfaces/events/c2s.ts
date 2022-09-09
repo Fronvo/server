@@ -3,6 +3,10 @@
 // ******************** //
 
 import {
+    CreateCommunityParams,
+    CreateCommunityTestResult,
+} from 'interfaces/account/createCommunity';
+import {
     CreatePostParams,
     CreatePostTestResult,
 } from 'interfaces/account/createPost';
@@ -10,6 +14,10 @@ import {
     DeletePostParams,
     DeletePostTestResult,
 } from 'interfaces/account/deletePost';
+import {
+    FetchCommunityDataParams,
+    FetchCommunityDataTestResult,
+} from 'interfaces/account/fetchCommunityData';
 import { FetchHomePostsTestResult } from 'interfaces/account/fetchHomePosts';
 import {
     FetchProfileDataParams,
@@ -21,6 +29,10 @@ import {
     FetchProfilePostsTestResult,
 } from 'interfaces/account/fetchProfilePosts';
 import {
+    FindCommunitiesParams,
+    FindCommunitiesTestResult,
+} from 'interfaces/account/findCommunities';
+import {
     FindProfilesParams,
     FindProfilesTestResult,
 } from 'interfaces/account/findProfiles';
@@ -28,11 +40,20 @@ import {
     FollowProfileParams,
     FollowProfileTestResult,
 } from 'interfaces/account/followProfile';
+import {
+    JoinCommunityParams,
+    JoinCommunityTestResult,
+} from 'interfaces/account/joinCommunity';
+import { LeaveCommunityTestResult } from 'interfaces/account/leaveCommunity';
 import { LogoutTestResult } from 'interfaces/account/logout';
 import {
     UnfollowProfileParams,
     UnfollowProfileTestResult,
 } from 'interfaces/account/unfollowProfile';
+import {
+    UpdateCommunityDataParams,
+    UpdateCommunityDataTestResult,
+} from 'interfaces/account/updateCommunityData';
 import {
     UpdateProfileDataParams,
     UpdateProfileDataTestResult,
@@ -93,7 +114,6 @@ export interface ClientToServerEvents {
         {}: ResetPasswordVerifyParams,
         callback?: ({}: ResetPasswordVerifyTestResult) => void
     ) => void;
-
     resetPasswordFinal: (
         {}: ResetPasswordFinalParams,
         callback?: ({}: ResetPasswordFinalTestResult) => void
@@ -127,4 +147,25 @@ export interface ClientToServerEvents {
         callback?: ({}: FindProfilesTestResult) => void
     ) => void;
     fetchHomePosts: (callback?: ({}: FetchHomePostsTestResult) => void) => void;
+    createCommunity: (
+        {}: CreateCommunityParams,
+        callback?: ({}: CreateCommunityTestResult) => void
+    ) => void;
+    joinCommunity: (
+        {}: JoinCommunityParams,
+        callback?: ({}: JoinCommunityTestResult) => void
+    ) => void;
+    fetchCommunityData: (
+        {}: FetchCommunityDataParams,
+        callback?: ({}: FetchCommunityDataTestResult) => void
+    ) => void;
+    findCommunities: (
+        {}: FindCommunitiesParams,
+        callback?: ({}: FindCommunitiesTestResult) => void
+    ) => void;
+    updateCommunityData: (
+        {}: UpdateCommunityDataParams,
+        callback?: ({}: UpdateCommunityDataTestResult) => void
+    ) => void;
+    leaveCommunity: (callback?: ({}: LeaveCommunityTestResult) => void) => void;
 }

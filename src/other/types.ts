@@ -28,7 +28,11 @@ export type Errors =
     | 'ALREADY_FOLLOWING'
     | 'UNFOLLOW_SELF'
     | 'ALREADY_UNFOLLOWING'
-    | 'PROFILE_PRIVATE';
+    | 'PROFILE_PRIVATE'
+    | 'COMMUNITY_NOT_FOUND'
+    | 'ALREADY_IN_COMMUNITY'
+    | 'NOT_IN_COMMUNITY'
+    | 'INVALID_COMMUNITY_ID';
 
 export type TestAssertTypes =
     | 'string'

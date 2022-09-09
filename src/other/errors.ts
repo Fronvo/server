@@ -33,6 +33,10 @@ const errors: { [Error in Errors] } = {
     UNFOLLOW_SELF: 'You can"t unfollow yourself.',
     ALREADY_UNFOLLOWING: 'You are not following this user.',
     PROFILE_PRIVATE: 'The requested profile is private.',
+    COMMUNITY_NOT_FOUND: 'The requested community could not be found.',
+    ALREADY_IN_COMMUNITY: 'You have already joined a community!',
+    NOT_IN_COMMUNITY: 'You aren"t in a community!',
+    INVALID_COMMUNITY_ID: 'A community with the given ID already exists.',
 };
 
 export default errors;

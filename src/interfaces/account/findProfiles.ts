@@ -1,5 +1,5 @@
 // ******************** //
-// Interfaces for the createPost event file.
+// Interfaces for the findProfiles event file.
 // ******************** //
 
 import { EventArguments, FronvoError } from 'interfaces/all';

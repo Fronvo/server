@@ -19,6 +19,8 @@ export interface SharedVariables {
     profileId: string;
     secondaryProfileId: string;
     sharedPostId: string;
+    createdCommunityId: string;
+    createdCommunityName: string;
 }
 
 export interface TestErrorCallback {

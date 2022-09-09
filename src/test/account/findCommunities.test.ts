@@ -1,5 +1,5 @@
 // ******************** //
-// The test file for the findProfiles event.
+// The test file for the findCommunities event.
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
@@ -12,19 +12,19 @@ import {
     generateChars,
 } from 'test/utilities';
 
-function lengthProfileIdMax(
+function lengthCommunityNameMax(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'findProfiles',
+        'findCommunities',
         {
-            profileId: generateChars(31),
+            name: generateChars(16),
         },
         ({ err }) => {
             callback(
                 assertCode(err.code, 'LENGTH') ||
-                    assertEquals({ for: err.extras.for }, 'profileId')
+                    assertEquals({ for: err.extras.for }, 'name')
             );
         }
     );
@@ -35,9 +35,9 @@ function lengthMaxResultsMax(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'findProfiles',
+        'findCommunities',
         {
-            profileId: generateChars(),
+            name: generateChars(),
             maxResults: '1233',
         },
         ({ err }) => {
@@ -49,14 +49,14 @@ function lengthMaxResultsMax(
     );
 }
 
-function findProfiles(
+function findCommunities(
     { socket, done, shared }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'findProfiles',
+        'findCommunities',
         {
-            profileId: shared.secondaryProfileId,
+            name: shared.createdCommunityName.substring(0, 3),
         },
         ({ err, findResults }): void => {
             callback(assertError({ err }));
@@ -69,7 +69,9 @@ function findProfiles(
                 );
             }
 
-            done();
+            socket.emit('leaveCommunity', () => {
+                done();
+            });
         }
     );
 }
@@ -77,10 +79,10 @@ function findProfiles(
 export default (testArgs: TestArguments): void => {
     assertErrors(
         {
-            lengthProfileIdMax,
+            lengthCommunityNameMax,
             lengthMaxResultsMax,
         },
         testArgs,
-        findProfiles
+        findCommunities
     );
 };

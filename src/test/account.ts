@@ -12,6 +12,12 @@ import followProfile from 'test/account/followProfile.test';
 import unfollowProfile from 'test/account/unfollowProfile.test';
 import findProfiles from 'test/account/findProfiles.test';
 import fetchHomePosts from 'test/account/fetchHomePosts.test';
+import createCommunity from 'test/account/createCommunity.test';
+import fetchCommunityData from 'test/account/fetchCommunityData.test';
+import updateCommunityData from 'test/account/updateCommunityData.test';
+import findCommunities from 'test/account/findCommunities.test';
+import joinCommunity from 'test/account/joinCommunity.test';
+import leaveCommunity from 'test/account/leaveCommunity.test';
 import logout from 'test/account/logout.test';
 
 export default {
@@ -25,5 +31,11 @@ export default {
     unfollowProfile,
     findProfiles,
     fetchHomePosts,
+    createCommunity,
+    fetchCommunityData,
+    updateCommunityData,
+    findCommunities,
+    joinCommunity,
+    leaveCommunity,
     logout,
 };

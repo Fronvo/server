@@ -11,17 +11,19 @@ datasource db {
 }
 
 model Account {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  profileId    String   @unique
-  email        String   @unique
-  username     String
-  bio          String   @default("")
-  password     String
-  avatar       String   @default("")
-  creationDate DateTime @default(now())
-  following    Json[]
-  followers    Json[]
-  isPrivate    Boolean?
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  profileId     String   @unique
+  email         String   @unique
+  username      String
+  bio           String   @default("")
+  password      String
+  avatar        String   @default("")
+  creationDate  DateTime @default(now())
+  following     Json[]
+  followers     Json[]
+  isPrivate     Boolean?
+  isInCommunity Boolean  @default(false)
+  communityId   String   @default("")
 }
 
 model Post {
@@ -32,6 +34,17 @@ model Post {
   content      String
   attachment   String   @default("")
   creationDate DateTime @default(now())
+}
+
+model Community {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId      String
+  communityId  String   @unique
+  name         String
+  description  String
+  creationDate DateTime @default(now())
+  icon         String   @default("")
+  members      Json[]
 }
 
 model Token {
