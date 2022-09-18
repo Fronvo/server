@@ -76,11 +76,7 @@ async function leaveCommunity({
             },
 
             data: {
-                members: {
-                    set: {
-                        newMembers,
-                    },
-                },
+                members: newMembers,
             },
         });
     }
