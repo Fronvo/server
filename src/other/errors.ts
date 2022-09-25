@@ -5,7 +5,6 @@
 import { Errors } from './types';
 
 // Remember to util.format() depending on the error's symbols.
-// TODO: All " to '
 const errors: { [Error in Errors] } = {
     UNKNOWN: 'An unknown error has occured.',
     MUST_BE_LOGGED_IN: 'You must login first before using this event.',
@@ -29,16 +28,16 @@ const errors: { [Error in Errors] } = {
     INVALID_IMAGE_URL: 'The provided %s URL is invalid.',
     INVALID_POST: 'The requested post was not found.',
     INVALID_PROFILE_ID: 'An account with the given ID already exists.',
-    FOLLOW_SELF: 'You can"t follow yourself.',
+    FOLLOW_SELF: "You can't follow yourself.",
     ALREADY_FOLLOWING: 'You are already following this user.',
-    UNFOLLOW_SELF: 'You can"t unfollow yourself.',
+    UNFOLLOW_SELF: "You can't unfollow yourself.",
     ALREADY_UNFOLLOWING: 'You are not following this user.',
     PROFILE_PRIVATE: 'The requested profile is private.',
     COMMUNITY_NOT_FOUND: 'The requested community could not be found.',
     ALREADY_IN_COMMUNITY: 'You have already joined a community!',
-    NOT_IN_COMMUNITY: 'You aren"t in a community!',
+    NOT_IN_COMMUNITY: "You aren't in a community!",
     INVALID_COMMUNITY_ID: 'A community with the given ID already exists.',
-    NOT_COMMUNITY_OWNER: 'You don"t own this community!',
+    NOT_COMMUNITY_OWNER: "You don't own this community!",
     INVALID_MESSAGE: 'The requested message was not found.',
 };
 
