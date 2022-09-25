@@ -5,6 +5,7 @@
 import { Errors } from './types';
 
 // Remember to util.format() depending on the error's symbols.
+// TODO: All " to '
 const errors: { [Error in Errors] } = {
     UNKNOWN: 'An unknown error has occured.',
     MUST_BE_LOGGED_IN: 'You must login first before using this event.',
@@ -37,6 +38,8 @@ const errors: { [Error in Errors] } = {
     ALREADY_IN_COMMUNITY: 'You have already joined a community!',
     NOT_IN_COMMUNITY: 'You aren"t in a community!',
     INVALID_COMMUNITY_ID: 'A community with the given ID already exists.',
+    NOT_COMMUNITY_OWNER: 'You don"t own this community!',
+    INVALID_MESSAGE: 'The requested message was not found.',
 };
 
 export default errors;

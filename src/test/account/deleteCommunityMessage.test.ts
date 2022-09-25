@@ -1,5 +1,5 @@
 // ******************** //
-// The test file for the loginToken event.
+// The test file for the deleteCommunityMessage event.
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
@@ -11,84 +11,68 @@ import {
 } from 'test/utilities';
 import { v4 } from 'uuid';
 
-function required(
+function invalidMessageIdType(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'loginToken',
+        'deleteCommunityMessage',
         {
-            token: '',
-        },
-        ({ err }) => {
-            callback(
-                assertCode(err.code, 'REQUIRED') ||
-                    assertEquals({ for: err.extras.for }, 'token')
-            );
-        }
-    );
-}
-
-function invalidTokenType(
-    { socket }: Partial<TestArguments>,
-    callback: TestErrorCallback
-): void {
-    socket.emit(
-        'loginToken',
-        {
-            token: v4().replace(/-/, 'a'),
+            messageId: v4().replace(/-/, 'a'),
         },
         ({ err }) => {
             callback(
                 assertCode(err.code, 'REQUIRED_UUID') ||
-                    assertEquals({ for: err.extras.for }, 'token')
+                    assertEquals({ for: err.extras.for }, 'messageId')
             );
         }
     );
 }
 
-function invalidToken(
+function invalidMessage(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'loginToken',
+        'deleteCommunityMessage',
         {
-            token: v4(),
+            messageId: v4(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'INVALID_TOKEN'));
+            callback(assertCode(err.code, 'INVALID_MESSAGE'));
         }
     );
 }
 
-function loginToken(
+function deleteCommunityMessage(
     { socket, done, shared }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'loginToken',
+        'deleteCommunityMessage',
         {
-            token: shared.token,
+            messageId: shared.sharedMessageId,
         },
         ({ err }): void => {
             callback(assertError({ err }));
-
-            socket.emit('logout', () => {
-                done();
-            });
         }
     );
+
+    // Attach asynchronously
+    socket.on('communityMessageDeleted', ({ messageId }) => {
+        callback(assertEquals({ messageId }, shared.sharedMessageId));
+
+        done();
+    });
 }
 
 export default (testArgs: TestArguments): void => {
     assertErrors(
         {
-            required,
-            invalidTokenType,
-            invalidToken,
+            invalidMessageIdType,
+            invalidMessage,
         },
         testArgs,
-        loginToken
+        deleteCommunityMessage
     );
 };

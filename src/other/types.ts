@@ -32,7 +32,9 @@ export type Errors =
     | 'COMMUNITY_NOT_FOUND'
     | 'ALREADY_IN_COMMUNITY'
     | 'NOT_IN_COMMUNITY'
-    | 'INVALID_COMMUNITY_ID';
+    | 'INVALID_COMMUNITY_ID'
+    | 'NOT_COMMUNITY_OWNER'
+    | 'INVALID_MESSAGE';
 
 export type TestAssertTypes =
     | 'string'

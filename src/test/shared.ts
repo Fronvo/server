@@ -13,6 +13,7 @@ let secondaryProfileId: string;
 let sharedPostId: string;
 let createdCommunityId: string;
 let createdCommunityName: string;
+let sharedMessageId: string;
 
 const shared: SharedVariables = {
     email,
@@ -23,6 +24,7 @@ const shared: SharedVariables = {
     sharedPostId,
     createdCommunityId,
     createdCommunityName,
+    sharedMessageId,
 };
 
 export default shared;

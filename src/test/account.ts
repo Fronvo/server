@@ -17,6 +17,9 @@ import fetchCommunityData from 'test/account/fetchCommunityData.test';
 import updateCommunityData from 'test/account/updateCommunityData.test';
 import findCommunities from 'test/account/findCommunities.test';
 import joinCommunity from 'test/account/joinCommunity.test';
+import sendCommunityMessage from 'test/account/sendCommunityMessage.test';
+import fetchCommunityMessages from 'test/account/fetchCommunityMessages.test';
+import deleteCommunityMessage from 'test/account/deleteCommunityMessage.test';
 import leaveCommunity from 'test/account/leaveCommunity.test';
 import logout from 'test/account/logout.test';
 
@@ -36,6 +39,9 @@ export default {
     updateCommunityData,
     findCommunities,
     joinCommunity,
+    sendCommunityMessage,
+    fetchCommunityMessages,
+    deleteCommunityMessage,
     leaveCommunity,
     logout,
 };

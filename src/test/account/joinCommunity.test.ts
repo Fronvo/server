@@ -104,19 +104,32 @@ function joinCommunity(
                 );
             }
 
-            done();
+            socket.emit('leaveCommunity', () => {
+                socket.emit(
+                    'createCommunity',
+                    {
+                        name: generateChars(5),
+                        description: generateChars(15),
+                    },
+                    () => {
+                        done();
+                    }
+                );
+            });
         }
     );
 }
 
 export default (testArgs: TestArguments): void => {
-    assertErrors(
-        {
-            lengthCommunityIdMin,
-            lengthCommunityIdMax,
-            communityNotFound,
-        },
-        testArgs,
-        joinCommunity
-    );
+    testArgs.socket.emit('leaveCommunity', () => {
+        assertErrors(
+            {
+                lengthCommunityIdMin,
+                lengthCommunityIdMax,
+                communityNotFound,
+            },
+            testArgs,
+            joinCommunity
+        );
+    });
 };

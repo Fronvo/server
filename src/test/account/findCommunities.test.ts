@@ -69,9 +69,7 @@ function findCommunities(
                 );
             }
 
-            socket.emit('leaveCommunity', () => {
-                done();
-            });
+            done();
         }
     );
 }

@@ -27,6 +27,7 @@ export default async function disconnectDispatch(
         await variables.prismaClient.account.deleteMany({});
         await variables.prismaClient.post.deleteMany({});
         await variables.prismaClient.community.deleteMany({});
+        await variables.prismaClient.communityMessage.deleteMany({});
         await variables.prismaClient.token.deleteMany({});
         await variables.prismaClient.log.deleteMany({});
         await variables.prismaClient.report.deleteMany({});

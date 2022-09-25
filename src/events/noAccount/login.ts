@@ -41,6 +41,11 @@ async function login({
             'You may want to take extra action incase you believe that your account has been compromised',
         ]);
 
+        // Enter the community room, if joined one, for messages
+        if (account.isInCommunity) {
+            await socket.join(account.communityId);
+        }
+
         return { token };
     } else {
         return utilities.generateError('INVALID_PASSWORD');

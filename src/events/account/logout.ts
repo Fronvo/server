@@ -4,10 +4,25 @@
 
 import { LogoutResult, LogoutServerParams } from 'interfaces/account/logout';
 import { EventTemplate } from 'interfaces/all';
-import { logoutSocket } from 'utilities/global';
+import { getSocketAccountId, logoutSocket } from 'utilities/global';
+import { prismaClient } from 'variables/global';
 
-function logout({ io, socket }: LogoutServerParams): LogoutResult {
+async function logout({
+    io,
+    socket,
+}: LogoutServerParams): Promise<LogoutResult> {
+    const account = await prismaClient.account.findFirst({
+        where: {
+            profileId: getSocketAccountId(socket.id),
+        },
+    });
+
+    if (account.isInCommunity) {
+        await socket.leave(account.communityId);
+    }
+
     logoutSocket(io, socket);
+
     return {};
 }
 

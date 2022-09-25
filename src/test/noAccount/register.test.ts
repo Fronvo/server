@@ -165,20 +165,23 @@ function accountExists(
                 socket.emit('fetchProfileId', ({ profileId }) => {
                     shared.secondaryProfileId = profileId;
 
-                    socket.emit('logout');
-
-                    socket.emit(
-                        'register',
-                        {
-                            email: existsEmail,
-                            password: existsPassword,
-                        },
-                        ({ err }) => {
-                            callback(
-                                assertCode(err.code, 'ACCOUNT_ALREADY_EXISTS')
-                            );
-                        }
-                    );
+                    socket.emit('logout', () => {
+                        socket.emit(
+                            'register',
+                            {
+                                email: existsEmail,
+                                password: existsPassword,
+                            },
+                            ({ err }) => {
+                                callback(
+                                    assertCode(
+                                        err.code,
+                                        'ACCOUNT_ALREADY_EXISTS'
+                                    )
+                                );
+                            }
+                        );
+                    });
                 });
             });
         }
@@ -189,35 +192,36 @@ function register(
     { socket, done, shared }: TestArguments,
     callback: TestErrorCallback
 ): void {
-    socket.emit('logout');
+    socket.emit('logout', () => {
+        socket.emit(
+            'register',
+            {
+                email: shared.email,
+                password: shared.password,
+            },
+            ({ err }): void => {
+                callback(assertError({ err }));
 
-    socket.emit(
-        'register',
-        {
-            email: shared.email,
-            password: shared.password,
-        },
-        ({ err }): void => {
-            callback(assertError({ err }));
+                socket.emit(
+                    'registerVerify',
+                    { code: '123456' },
+                    ({ err, token }) => {
+                        callback(assertError({ err }));
 
-            socket.emit(
-                'registerVerify',
-                { code: '123456' },
-                ({ err, token }) => {
-                    callback(assertError({ err }));
+                        callback(
+                            assertType({ token }, 'string') ||
+                                assertLength({ token }, 36)
+                        );
 
-                    callback(
-                        assertType({ token }, 'string') ||
-                            assertLength({ token }, 36)
-                    );
-
-                    sharedVars.token = token;
-                    socket.emit('logout');
-                    done();
-                }
-            );
-        }
-    );
+                        sharedVars.token = token;
+                        socket.emit('logout', () => {
+                            done();
+                        });
+                    }
+                );
+            }
+        );
+    });
 }
 
 export default (testArgs: TestArguments): void => {

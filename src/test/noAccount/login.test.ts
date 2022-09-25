@@ -194,8 +194,9 @@ function login(
                 assertType({ token }, 'string') || assertLength({ token }, 36)
             );
 
-            socket.emit('logout');
-            done();
+            socket.emit('logout', () => {
+                done();
+            });
         }
     );
 }

@@ -11,6 +11,7 @@ import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function leaveCommunity({
+    io,
     socket,
 }: LeaveCommunityServerParams): Promise<LeaveCommunityParams | FronvoError> {
     const accountData = await prismaClient.account.findFirst({
@@ -49,6 +50,15 @@ async function leaveCommunity({
                 communityId: accountData.communityId,
             },
         });
+
+        // Finally, remove all messages
+        await prismaClient.communityMessage.deleteMany({
+            where: {
+                communityId: accountData.communityId,
+            },
+        });
+
+        io.to(community.communityId).emit('communityDeleted');
     } else {
         // First, remove references to this community from the member's account
         await prismaClient.account.update({

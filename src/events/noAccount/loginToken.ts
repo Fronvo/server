@@ -27,6 +27,18 @@ async function loginToken({
     }
 
     loginSocket(io, socket, tokenItem.profileId);
+
+    const account = await prismaClient.account.findFirst({
+        where: {
+            profileId: tokenItem.profileId,
+        },
+    });
+
+    // Enter the community room, if joined one, for messages
+    if (account.isInCommunity) {
+        await socket.join(account.communityId);
+    }
+
     return {};
 }
 

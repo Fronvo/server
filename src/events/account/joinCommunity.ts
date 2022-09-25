@@ -70,6 +70,8 @@ async function joinCommunity({
         members: community.members,
     };
 
+    await socket.join(communityId);
+
     return { communityData };
 }
 

@@ -64,6 +64,8 @@ async function createCommunity({
         },
     });
 
+    await socket.join(communityId);
+
     return { communityData };
 }
 

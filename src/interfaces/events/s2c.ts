@@ -2,6 +2,8 @@
 // Interfaces for the server to client events of Socket.IO
 // ******************** //
 
+import { CommunityMessageDeletedParams } from 'interfaces/account/communityMessageDeleted';
+import { NewCommunityMessageParams } from 'interfaces/account/newCommunityMessage';
 import {
     RegisterVerifyParams,
     RegisterVerifyTestResult,
@@ -29,4 +31,10 @@ export interface ServerToClientEvents {
         {}: ResetPasswordFinalParams,
         callback?: ({}: ResetPasswordFinalTestResult) => void
     ) => void;
+
+    newCommunityMessage: ({}: NewCommunityMessageParams) => void;
+
+    communityMessageDeleted: ({}: CommunityMessageDeletedParams) => void;
+
+    communityDeleted: () => void;
 }

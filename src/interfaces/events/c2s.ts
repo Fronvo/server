@@ -11,6 +11,10 @@ import {
     CreatePostTestResult,
 } from 'interfaces/account/createPost';
 import {
+    DeleteCommunityMessageParams,
+    DeleteCommunityMessageTestResult,
+} from 'interfaces/account/deleteCommunityMessage';
+import {
     DeletePostParams,
     DeletePostTestResult,
 } from 'interfaces/account/deletePost';
@@ -18,6 +22,10 @@ import {
     FetchCommunityDataParams,
     FetchCommunityDataTestResult,
 } from 'interfaces/account/fetchCommunityData';
+import {
+    FetchCommunityMessagesParams,
+    FetchCommunityMessagesTestResult,
+} from 'interfaces/account/fetchCommunityMessages';
 import { FetchHomePostsTestResult } from 'interfaces/account/fetchHomePosts';
 import {
     FetchProfileDataParams,
@@ -46,6 +54,10 @@ import {
 } from 'interfaces/account/joinCommunity';
 import { LeaveCommunityTestResult } from 'interfaces/account/leaveCommunity';
 import { LogoutTestResult } from 'interfaces/account/logout';
+import {
+    SendCommunityMessageParams,
+    SendCommunityMessageTestResult,
+} from 'interfaces/account/sendCommunityMessage';
 import {
     UnfollowProfileParams,
     UnfollowProfileTestResult,
@@ -168,4 +180,15 @@ export interface ClientToServerEvents {
         callback?: ({}: UpdateCommunityDataTestResult) => void
     ) => void;
     leaveCommunity: (callback?: ({}: LeaveCommunityTestResult) => void) => void;
+    sendCommunityMessage: (
+        {}: SendCommunityMessageParams,
+        callback?: ({}: SendCommunityMessageTestResult) => void
+    ) => void;
+    fetchCommunityMessages: (
+        callback?: ({}: FetchCommunityMessagesTestResult) => void
+    ) => void;
+    deleteCommunityMessage: (
+        {}: DeleteCommunityMessageParams,
+        callback?: ({}: DeleteCommunityMessageTestResult) => void
+    ) => void;
 }

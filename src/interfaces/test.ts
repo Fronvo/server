@@ -21,6 +21,7 @@ export interface SharedVariables {
     sharedPostId: string;
     createdCommunityId: string;
     createdCommunityName: string;
+    sharedMessageId: string;
 }
 
 export interface TestErrorCallback {

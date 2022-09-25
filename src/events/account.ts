@@ -19,6 +19,9 @@ import fetchCommunityData from 'events/account/fetchCommunityData';
 import findCommunities from 'events/account/findCommunities';
 import updateCommunityData from 'events/account/updateCommunityData';
 import leaveCommunity from 'events/account/leaveCommunity';
+import sendCommunityMessage from 'events/account/sendCommunityMessage';
+import fetchCommunityMessages from 'events/account/fetchCommunityMessages';
+import deleteCommunityMessage from 'events/account/deleteCommunityMessage';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -40,6 +43,9 @@ const accountTemplate: EventExportTemplate = {
     findCommunities,
     updateCommunityData,
     leaveCommunity,
+    sendCommunityMessage,
+    fetchCommunityMessages,
+    deleteCommunityMessage,
 };
 
 export default accountTemplate;
