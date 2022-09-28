@@ -45,6 +45,7 @@ model Community {
   creationDate DateTime @default(now())
   icon         String   @default("")
   members      Json[]
+  inviteOnly   Boolean  @default(false)
 }
 
 model CommunityMessage {

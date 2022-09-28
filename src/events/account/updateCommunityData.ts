@@ -17,6 +17,7 @@ async function updateCommunityData({
     name,
     description,
     icon,
+    inviteOnly,
 }: UpdateCommunityDataServerParams): Promise<
     UpdateCommunityDataResult | FronvoError
 > {
@@ -27,17 +28,18 @@ async function updateCommunityData({
         !description &&
         description != '' &&
         !icon &&
-        icon != ''
+        icon != '' &&
+        inviteOnly == undefined
     ) {
         return {
             err: undefined,
         };
     }
 
-    // Username validation not needed here, see schema below
-    // Nor avatar, may need for content-type and extension if applicable (|| ?)
+    // Name validation not needed here, see schema below
+    // Nor icon, may need for content-type and extension if applicable (|| ?)
 
-    // Check profile id availability
+    // Check community id availability
     if (communityId) {
         const communityIdData = await prismaClient.community.findFirst({
             where: {
@@ -47,6 +49,12 @@ async function updateCommunityData({
 
         if (communityIdData) {
             return generateError('INVALID_COMMUNITY_ID');
+        }
+    }
+
+    if (inviteOnly) {
+        if (typeof inviteOnly != 'boolean') {
+            return generateError('NOT_BOOLEAN');
         }
     }
 
@@ -73,6 +81,7 @@ async function updateCommunityData({
             name,
             description,
             icon,
+            inviteOnly,
         },
 
         where: {
@@ -84,6 +93,7 @@ async function updateCommunityData({
             name: true,
             description: true,
             icon: true,
+            inviteOnly: true,
         },
     });
 
@@ -100,6 +110,17 @@ async function updateCommunityData({
                 communityId,
             },
         });
+
+        // Update messages
+        await prismaClient.communityMessage.updateMany({
+            where: {
+                communityId: previousCommunity.communityId,
+            },
+
+            data: {
+                communityId,
+            },
+        });
     }
 
     return { communityData };
@@ -107,7 +128,7 @@ async function updateCommunityData({
 
 const updateCommunityDataTemplate: EventTemplate = {
     func: updateCommunityData,
-    template: ['communityId', 'name', 'description', 'icon'],
+    template: ['communityId', 'name', 'description', 'icon', 'inviteOnly'],
     points: 10,
     schema: new StringSchema({
         communityId: {
@@ -133,6 +154,10 @@ const updateCommunityDataTemplate: EventTemplate = {
             // Ensure https
             regex: /^(https:\/\/).+$/,
             maxLength: 512,
+            optional: true,
+        },
+
+        inviteOnly: {
             optional: true,
         },
     }),

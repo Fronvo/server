@@ -10,6 +10,7 @@ export interface UpdateCommunityDataParams {
     name?: string;
     description?: string;
     icon?: string;
+    inviteOnly?: boolean;
 }
 
 export interface UpdateCommunityDataServerParams

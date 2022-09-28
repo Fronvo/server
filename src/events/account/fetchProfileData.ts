@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { Community } from '@prisma/client';
 import {
     FetchedFronvoAccount,
     FetchProfileDataResult,
@@ -23,6 +24,16 @@ async function fetchProfileData({
             profileId,
         },
     });
+
+    let community: Community;
+
+    if (account.isInCommunity) {
+        community = await prismaClient.community.findFirst({
+            where: {
+                communityId: account.communityId,
+            },
+        });
+    }
 
     if (!account) {
         return generateError('PROFILE_NOT_FOUND');
@@ -46,8 +57,14 @@ async function fetchProfileData({
         followers: isAccessible && account.followers,
         isPrivate,
         isFollower,
-        isInCommunity: isAccessible && account.isInCommunity,
-        communityId: isAccessible && account.communityId,
+        isInCommunity:
+            isAccessible &&
+            (!community?.inviteOnly || isSelf) &&
+            account.isInCommunity,
+        communityId:
+            isAccessible &&
+            (!community?.inviteOnly || isSelf) &&
+            account.communityId,
     };
 
     // More data if our profile

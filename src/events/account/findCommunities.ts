@@ -16,9 +16,15 @@ async function findCommunities({
 }: FindCommunitiesServerParams): Promise<FindCommunitiesResult | FronvoError> {
     const fetchedFindResults = await prismaClient.community.findMany({
         where: {
-            name: {
-                contains: name,
-                mode: 'insensitive',
+            AND: {
+                name: {
+                    contains: name,
+                    mode: 'insensitive',
+                },
+
+                inviteOnly: {
+                    equals: false,
+                },
             },
         },
         // Default to 10

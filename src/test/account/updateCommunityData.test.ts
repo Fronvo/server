@@ -121,6 +121,22 @@ function lengthIconMax(
     );
 }
 
+function invalidInviteOnly(
+    { socket }: Partial<TestArguments>,
+    callback: TestErrorCallback
+): void {
+    socket.emit(
+        'updateCommunityData',
+        {
+            // @ts-ignore
+            inviteOnly: '123',
+        },
+        ({ err }) => {
+            callback(assertCode(err.code, 'NOT_BOOLEAN'));
+        }
+    );
+}
+
 function invalidCommunityId(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
@@ -180,6 +196,7 @@ export default (testArgs: TestArguments): void => {
             lengthNameMax,
             lengthDescriptionMax,
             lengthIconMax,
+            invalidInviteOnly,
             invalidCommunityId,
         },
         testArgs,
