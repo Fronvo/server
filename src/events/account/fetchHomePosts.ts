@@ -82,7 +82,7 @@ async function fetchProfilePosts({
 
         // Newest posts first
         orderBy: {
-            creationDate: 'desc',
+            creationDate: 'asc',
         },
     });
 
