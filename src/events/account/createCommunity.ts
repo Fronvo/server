@@ -41,6 +41,7 @@ async function createCommunity({
             description,
             icon,
             members: [accountData.profileId],
+            acceptedChatRequests: [accountData.profileId],
         },
         select: {
             communityId: true,
@@ -50,6 +51,7 @@ async function createCommunity({
             creationDate: true,
             icon: true,
             members: true,
+            acceptedChatRequests: true,
         },
     });
 

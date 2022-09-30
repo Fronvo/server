@@ -39,6 +39,9 @@ const errors: { [Error in Errors] } = {
     INVALID_COMMUNITY_ID: 'A community with the given ID already exists.',
     NOT_COMMUNITY_OWNER: "You don't own this community!",
     INVALID_MESSAGE: 'The requested message was not found.',
+    NO_CHAT_PERMISSION:
+        "The community owner hasn't accepted your chat request.",
+    NOT_IN_THIS_COMMUNITY: "The target profile isn't in this community.",
 };
 
 export default errors;

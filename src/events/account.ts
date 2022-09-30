@@ -22,6 +22,7 @@ import leaveCommunity from 'events/account/leaveCommunity';
 import sendCommunityMessage from 'events/account/sendCommunityMessage';
 import fetchCommunityMessages from 'events/account/fetchCommunityMessages';
 import deleteCommunityMessage from 'events/account/deleteCommunityMessage';
+import updateChatRequest from 'events/account/updateChatRequest';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -46,6 +47,7 @@ const accountTemplate: EventExportTemplate = {
     sendCommunityMessage,
     fetchCommunityMessages,
     deleteCommunityMessage,
+    updateChatRequest,
 };
 
 export default accountTemplate;

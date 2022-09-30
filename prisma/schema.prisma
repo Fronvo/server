@@ -37,15 +37,16 @@ model Post {
 }
 
 model Community {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  ownerId      String
-  communityId  String   @unique
-  name         String
-  description  String
-  creationDate DateTime @default(now())
-  icon         String   @default("")
-  members      Json[]
-  inviteOnly   Boolean  @default(false)
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId              String
+  communityId          String   @unique
+  name                 String
+  description          String
+  creationDate         DateTime @default(now())
+  icon                 String   @default("")
+  members              Json[]
+  inviteOnly           Boolean  @default(false)
+  acceptedChatRequests Json[]
 }
 
 model CommunityMessage {

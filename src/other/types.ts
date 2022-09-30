@@ -34,7 +34,9 @@ export type Errors =
     | 'NOT_IN_COMMUNITY'
     | 'INVALID_COMMUNITY_ID'
     | 'NOT_COMMUNITY_OWNER'
-    | 'INVALID_MESSAGE';
+    | 'INVALID_MESSAGE'
+    | 'NO_CHAT_PERMISSION'
+    | 'NOT_IN_THIS_COMMUNITY';
 
 export type TestAssertTypes =
     | 'string'

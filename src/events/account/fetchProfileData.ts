@@ -27,16 +27,16 @@ async function fetchProfileData({
 
     let community: Community;
 
+    if (!account) {
+        return generateError('PROFILE_NOT_FOUND');
+    }
+
     if (account.isInCommunity) {
         community = await prismaClient.community.findFirst({
             where: {
                 communityId: account.communityId,
             },
         });
-    }
-
-    if (!account) {
-        return generateError('PROFILE_NOT_FOUND');
     }
 
     const isSelf = getSocketAccountId(socket.id) == profileId;
@@ -58,9 +58,10 @@ async function fetchProfileData({
         isPrivate,
         isFollower,
         isInCommunity:
-            isAccessible &&
-            (!community?.inviteOnly || isSelf) &&
-            account.isInCommunity,
+            (isAccessible &&
+                (!community?.inviteOnly || isSelf) &&
+                account.isInCommunity) ||
+            false,
         communityId:
             isAccessible &&
             (!community?.inviteOnly || isSelf) &&

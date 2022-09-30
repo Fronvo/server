@@ -36,6 +36,7 @@ async function fetchCommunityData({
         icon: community.icon,
         members: community.members,
         inviteOnly: community.inviteOnly || false,
+        acceptedChatRequests: community.acceptedChatRequests || [],
     };
 
     return { communityData };

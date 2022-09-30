@@ -52,6 +52,21 @@ async function sendCommunityMessage({
         return newSchemaResult;
     }
 
+    // Check if were allowed to chat in this community
+    const community = await prismaClient.community.findFirst({
+        where: {
+            communityId: account.communityId,
+        },
+
+        select: {
+            acceptedChatRequests: true,
+        },
+    });
+
+    if (!community.acceptedChatRequests.includes(account.profileId)) {
+        return generateError('NO_CHAT_PERMISSION');
+    }
+
     const newMessageData = await prismaClient.communityMessage.create({
         data: {
             ownerId: account.profileId,

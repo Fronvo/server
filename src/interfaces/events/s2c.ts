@@ -2,6 +2,7 @@
 // Interfaces for the server to client events of Socket.IO
 // ******************** //
 
+import { ChatRequestUpdatedParams } from 'interfaces/account/chatRequestUpdated';
 import { CommunityMessageDeletedParams } from 'interfaces/account/communityMessageDeleted';
 import { NewCommunityMessageParams } from 'interfaces/account/newCommunityMessage';
 import {
@@ -37,4 +38,6 @@ export interface ServerToClientEvents {
     communityMessageDeleted: ({}: CommunityMessageDeletedParams) => void;
 
     communityDeleted: () => void;
+
+    chatRequestUpdated: ({}: ChatRequestUpdatedParams) => void;
 }
