@@ -78,42 +78,38 @@ async function sendCommunityMessage({
 
     io.to(account.communityId).emit('newCommunityMessage', { newMessageData });
 
-    // Delete older messages asynchronously
-    prismaClient.communityMessage
-        .count({
+    // Delete older messages synchronously
+    const totalMessages = await prismaClient.communityMessage.count({
+        where: {
+            communityId: account.communityId,
+        },
+    });
+
+    if (totalMessages > 50) {
+        const groupedMessages = await prismaClient.communityMessage.groupBy({
             where: {
                 communityId: account.communityId,
             },
-        })
-        .then((number) => {
-            if (number > 100) {
-                prismaClient.communityMessage
-                    .groupBy({
-                        where: {
-                            communityId: account.communityId,
-                        },
 
-                        by: ['creationDate'],
-                    })
-                    .then((arr) => {
-                        const dateArr = [];
-
-                        for (const dateIndex in arr) {
-                            dateArr.push(arr[dateIndex].creationDate);
-                        }
-
-                        // Sort by creation date, get oldest
-                        dateArr.sort((a, b) => a.getTime() - b.getTime());
-
-                        prismaClient.communityMessage.deleteMany({
-                            where: {
-                                communityId: account.communityId,
-                                creationDate: new Date(dateArr[0]),
-                            },
-                        });
-                    });
-            }
+            by: ['creationDate'],
         });
+
+        const dateArr = [];
+
+        for (const dateIndex in groupedMessages) {
+            dateArr.push(groupedMessages[dateIndex].creationDate);
+        }
+
+        // Sort by creation date, get oldest
+        dateArr.sort((a, b) => a.getTime() - b.getTime());
+
+        await prismaClient.communityMessage.deleteMany({
+            where: {
+                communityId: account.communityId,
+                creationDate: new Date(dateArr[0]),
+            },
+        });
+    }
 
     return {};
 }
