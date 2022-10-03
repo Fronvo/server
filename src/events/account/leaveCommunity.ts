@@ -101,6 +101,10 @@ async function leaveCommunity({
         });
     }
 
+    io.to(community.communityId).emit('memberLeft', {
+        profileId: accountData.profileId,
+    });
+
     return {};
 }
 

@@ -13,6 +13,7 @@ import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function joinCommunity({
+    io,
     socket,
     communityId,
 }: FetchCommunityDataServerParams): Promise<
@@ -69,6 +70,10 @@ async function joinCommunity({
         icon: community.icon,
         members: community.members,
     };
+
+    io.to(communityId).emit('memberJoined', {
+        profileId: accountData.profileId,
+    });
 
     await socket.join(communityId);
 

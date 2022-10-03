@@ -4,6 +4,8 @@
 
 import { ChatRequestUpdatedParams } from 'interfaces/account/chatRequestUpdated';
 import { CommunityMessageDeletedParams } from 'interfaces/account/communityMessageDeleted';
+import { MemberJoinedParams } from 'interfaces/account/memberJoined';
+import { MemberLeftParams } from 'interfaces/account/memberLeft';
 import { NewCommunityMessageParams } from 'interfaces/account/newCommunityMessage';
 import {
     RegisterVerifyParams,
@@ -40,4 +42,8 @@ export interface ServerToClientEvents {
     communityDeleted: () => void;
 
     chatRequestUpdated: ({}: ChatRequestUpdatedParams) => void;
+
+    memberJoined: ({}: MemberJoinedParams) => void;
+
+    memberLeft: ({}: MemberLeftParams) => void;
 }
