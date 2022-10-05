@@ -4,7 +4,6 @@
 
 import { StringSchema } from '@ezier/validate';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
-import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server, Socket } from 'socket.io';
 
@@ -35,7 +34,7 @@ export interface PerformanceReport {
 }
 
 export interface EventArguments {
-    io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>;
+    io: Server<ClientToServerEvents, ServerToClientEvents>;
     socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 }
 

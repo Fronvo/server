@@ -6,10 +6,6 @@ package.json
 # DotEnv
 .env
 
-# PM2
-*.cpuprofile
-*.heapprofile
-
 # Fronvo
 logs.txt
 generated/*

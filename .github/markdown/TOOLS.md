@@ -10,8 +10,6 @@
 
 -   [Ezier Validator](https://github.com/ezier-project/validate) to simplify the data-validation process.
 
--   [PM2](https://pm2.keymetrics.io/) to achieve maximum performance in production.
-
 -   [Husky](https://typicode.github.io/husky/) for easy setup of Git hooks.
 
 -   [Prettier](https://prettier.io/) for consistent code formatting.

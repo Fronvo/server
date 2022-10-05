@@ -6,7 +6,6 @@ import { EzierValidatorError, StringSchema } from '@ezier/validate';
 import gmail from 'gmail-send';
 import { FronvoError, LoggedInSocket } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
-import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import errors from 'other/errors';
 import { Errors } from 'other/types';
@@ -17,32 +16,17 @@ import * as variables from 'variables/global';
 import { prismaClient } from 'variables/global';
 
 export function loginSocket(
-    io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
+    io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ClientToServerEvents, ServerToClientEvents>,
     accountId: string
 ): void {
     variables.loggedInSockets[socket.id] = { accountId };
-
-    // Update other servers in cluster mode
-    if (variables.cluster) {
-        io.serverSideEmit('loginSocket', {
-            socketId: socket.id,
-            socketIP: socket.handshake.address,
-            accountId,
-        });
-    }
 }
 
 export function logoutSocket(
-    io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
+    io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ClientToServerEvents, ServerToClientEvents>
 ): void {
-    if (variables.cluster) {
-        io.serverSideEmit('logoutSocket', {
-            socketId: socket.id,
-        });
-    }
-
     delete variables.loggedInSockets[socket.id];
 }
 

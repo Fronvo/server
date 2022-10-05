@@ -7,7 +7,6 @@ import generalEvents from 'events/general';
 import noAccountEvents from 'events/noAccount';
 import { EventExportTemplate, FronvoError } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
-import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server, Socket } from 'socket.io';
 import utilities from 'utilities/all';
@@ -99,7 +98,7 @@ function checkEventPermission(
 }
 
 async function fireEvent(
-    io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
+    io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>,
     eventName: string,
     callback: Function,
@@ -141,7 +140,7 @@ async function fireEvent(
 }
 
 async function runEventFunc(
-    io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
+    io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>,
     event: string,
     args: { [arg: string]: any } = {}
@@ -173,7 +172,7 @@ function sendCallback(
 }
 
 export default function eventDispatch(
-    io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
+    io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>,
     event: string,
     ...args: { [arg: string]: any }[]

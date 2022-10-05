@@ -4,12 +4,11 @@
 
 import dispatchers from 'events/dispatchers/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
-import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server, Socket } from 'socket.io';
 
 export default function connectDispatch(
-    io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>,
+    io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>
 ): void {
     console.log('Socket ' + socket.id + ' has connected.');

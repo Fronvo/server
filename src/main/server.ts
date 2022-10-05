@@ -8,10 +8,6 @@ const PORT = parseInt(process.env.PORT) || 3001;
 // Admin panel
 import { instrument, RedisStore } from '@socket.io/admin-ui';
 
-// PM2
-import { createAdapter } from '@socket.io/cluster-adapter';
-import { setupWorker } from '@socket.io/sticky';
-
 // Custom event files
 import registerEvents from 'events/main';
 
@@ -21,14 +17,13 @@ import ora, { Ora } from 'ora';
 
 // Other imports
 import { ClientToServerEvents } from 'interfaces/events/c2s';
-import { InterServerEvents } from 'interfaces/events/inter';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server } from 'socket.io';
 import * as variables from 'variables/global';
 import { getEnv, getEnvBoolean } from 'variables/varUtils';
 
 // Variables
-let io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>;
+let io: Server<ClientToServerEvents, ServerToClientEvents>;
 let loadingSpinner: Ora;
 const loadingSpinnerDefaultText = 'Starting server';
 
@@ -74,11 +69,7 @@ function setupServer(): void {
     setLoading('Setting up the server process, server events and admin panel');
 
     // Setup the socket.io server with tailored options
-    io = new Server<
-        ClientToServerEvents,
-        ServerToClientEvents,
-        InterServerEvents
-    >(PORT, {
+    io = new Server<ClientToServerEvents, ServerToClientEvents>(PORT, {
         serveClient: false,
         path: '/fronvo',
 
@@ -110,14 +101,6 @@ function setupServer(): void {
 
 function setupServerEvents(): void {
     registerEvents(io);
-}
-
-function setupPM2(): void {
-    // Mostly for hosting on production
-    if (variables.cluster) {
-        io.adapter(createAdapter());
-        setupWorker(io);
-    }
 }
 
 function setupAdminPanel(): void {
@@ -175,7 +158,6 @@ async function startup(): Promise<void> {
     await setupPrisma();
     setupServer();
     setupServerEvents();
-    setupPM2();
     setupAdminPanel();
 
     // Finally, display successful server run

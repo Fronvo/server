@@ -4,10 +4,6 @@ node_modules/
 # DotEnv
 .env
 
-# PM2
-*.cpuprofile
-*.heapprofile
-
 # Fronvo
 logs.txt
 generated/*

@@ -42,9 +42,6 @@ export const performanceReportsMinMS = getEnv(
     -1
 ) as number;
 
-// When using PM2 for production
-export const cluster = getEnvBoolean('TARGET_PM2', false);
-
 // Blacklisted emails: https://github.com/disposable-email-domains/disposable-email-domains
 export const blacklistedEmailDomains: string[] =
     blacklistedEmailDomainsEnabled &&
