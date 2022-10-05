@@ -20,7 +20,6 @@ function fetchProfileId({
 const fetchProfileIdTemplate: EventTemplate = {
     func: fetchProfileId,
     template: [],
-    points: 1,
 };
 
 export default fetchProfileIdTemplate;

@@ -66,7 +66,6 @@ async function fetchProfilePosts({
 const fetchProfileDataTemplate: EventTemplate = {
     func: fetchProfilePosts,
     template: ['profileId', 'from', 'to'],
-    points: 3,
     schema: new StringSchema({
         profileId: {
             minLength: 5,

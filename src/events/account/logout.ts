@@ -29,7 +29,6 @@ async function logout({
 const logoutTemplate: EventTemplate = {
     func: logout,
     template: [],
-    points: 5,
 };
 
 export default logoutTemplate;

@@ -12,9 +12,6 @@ import { instrument, RedisStore } from '@socket.io/admin-ui';
 import { createAdapter } from '@socket.io/cluster-adapter';
 import { setupWorker } from '@socket.io/sticky';
 
-// Ratelimiter
-import { EzierLimiter } from '@ezier/ratelimit';
-
 // Custom event files
 import registerEvents from 'events/main';
 
@@ -71,23 +68,6 @@ async function setupPrisma(): Promise<void> {
 
     // And delete operations
     await variables.prismaClient.log.delete({ where: { id: tempLog.id } });
-}
-
-function setupRatelimiter(): void {
-    if (variables.testMode) return;
-
-    setLoading('Setting up the ratelimiter');
-
-    const ezierLimiterPoints = getEnv('RATELIMITER_POINTS', 40);
-
-    const ezierLimiterDuration = getEnv('RATELIMITER_DURATION', 2500);
-
-    const ezierLimiter = new EzierLimiter({
-        maxPoints: ezierLimiterPoints,
-        clearDelay: ezierLimiterDuration,
-    });
-
-    variables.setRateLimiter(ezierLimiter);
 }
 
 function setupServer(): void {
@@ -193,7 +173,6 @@ async function startup(): Promise<void> {
 
     // Attempt to run each check one-by-one
     await setupPrisma();
-    setupRatelimiter();
     setupServer();
     setupServerEvents();
     setupPM2();

@@ -56,7 +56,6 @@ async function deleteCommunityMessage({
 const deleteCommunityMessageTemplate: EventTemplate = {
     func: deleteCommunityMessage,
     template: ['messageId'],
-    points: 1,
     schema: new StringSchema({
         messageId: {
             type: 'uuid',

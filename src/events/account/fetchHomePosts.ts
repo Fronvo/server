@@ -102,7 +102,6 @@ async function fetchProfilePosts({
 const fetchProfileDataTemplate: EventTemplate = {
     func: fetchProfilePosts,
     template: [],
-    points: 15,
 };
 
 export default fetchProfileDataTemplate;

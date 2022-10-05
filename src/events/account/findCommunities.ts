@@ -51,7 +51,6 @@ async function findCommunities({
 const findCommunitiesTemplate: EventTemplate = {
     func: findCommunities,
     template: ['name', 'maxResults'],
-    points: 5,
     schema: new StringSchema({
         name: {
             minLength: 1,

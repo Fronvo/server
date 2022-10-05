@@ -8,7 +8,6 @@ import { resolve } from 'path';
 
 config({ path: resolve(__dirname, '../../.env') });
 
-import { EzierLimiter } from '@ezier/ratelimit';
 import { PrismaClient } from '@prisma/client';
 import { LoggedInSocket, PerformanceReport } from 'interfaces/all';
 import { getEnv, getEnvBoolean } from './varUtils';
@@ -66,12 +65,6 @@ export const prismaClient = new PrismaClient({
         },
     },
 });
-
-export let rateLimiter: EzierLimiter;
-
-export function setRateLimiter(rateLimiterObject: EzierLimiter): void {
-    rateLimiter = rateLimiterObject;
-}
 
 // Email-related
 export let emailUsername = getEnv('EMAIL_USERNAME');

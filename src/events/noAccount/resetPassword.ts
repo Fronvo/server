@@ -113,7 +113,6 @@ async function resetPassword({
 const resetPasswordTemplate: EventTemplate = {
     func: resetPassword,
     template: ['email'],
-    points: 5,
     schema: new StringSchema({
         email: {
             minLength: 8,

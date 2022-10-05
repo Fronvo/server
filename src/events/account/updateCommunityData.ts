@@ -129,7 +129,6 @@ async function updateCommunityData({
 const updateCommunityDataTemplate: EventTemplate = {
     func: updateCommunityData,
     template: ['communityId', 'name', 'description', 'icon', 'inviteOnly'],
-    points: 10,
     schema: new StringSchema({
         communityId: {
             minLength: 5,

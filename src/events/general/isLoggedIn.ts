@@ -18,7 +18,6 @@ function isLoggedIn({ socket }: isLoggedInServerParams): IsLoggedInResult {
 const isLoggedInTemplate: EventTemplate = {
     func: isLoggedIn,
     template: [],
-    points: 1,
 };
 
 export default isLoggedInTemplate;

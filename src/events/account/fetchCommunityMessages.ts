@@ -49,7 +49,6 @@ async function fetchCommunityMessages({
 const fetchCommunityMessagesTemplate: EventTemplate = {
     func: fetchCommunityMessages,
     template: [],
-    points: 5,
 };
 
 export default fetchCommunityMessagesTemplate;

@@ -42,7 +42,6 @@ export interface EventArguments {
 export interface EventTemplate {
     func: Function;
     template: string[];
-    points: number;
     schema?: StringSchema;
 }
 

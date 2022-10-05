@@ -74,7 +74,6 @@ async function followProfile({
 const fetchProfileIdTemplate: EventTemplate = {
     func: followProfile,
     template: ['profileId'],
-    points: 2,
     schema: new StringSchema({
         profileId: {
             minLength: 5,

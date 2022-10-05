@@ -111,7 +111,6 @@ async function leaveCommunity({
 const leavecommunityTemplate: EventTemplate = {
     func: leaveCommunity,
     template: [],
-    points: 5,
 };
 
 export default leavecommunityTemplate;

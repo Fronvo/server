@@ -53,7 +53,6 @@ async function findProfiles({
 const fetchProfileDataTemplate: EventTemplate = {
     func: findProfiles,
     template: ['profileId', 'maxResults'],
-    points: 5,
     schema: new StringSchema({
         profileId: {
             minLength: 1,

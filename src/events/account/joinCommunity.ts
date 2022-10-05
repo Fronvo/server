@@ -83,7 +83,6 @@ async function joinCommunity({
 const joinCommunityTemplate: EventTemplate = {
     func: joinCommunity,
     template: ['communityId'],
-    points: 3,
     schema: new StringSchema({
         communityId: {
             minLength: 5,

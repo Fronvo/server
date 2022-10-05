@@ -7,7 +7,6 @@ export type Errors =
     | 'MUST_BE_LOGGED_IN'
     | 'MUST_BE_LOGGED_OUT'
     | 'MISSING_ARGUMENTS'
-    | 'RATELIMITED'
     | 'REQUIRED'
     | 'REQUIRED_EMAIL'
     | 'REQUIRED_UUID'

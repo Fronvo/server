@@ -10,7 +10,6 @@ const errors: { [Error in Errors] } = {
     MUST_BE_LOGGED_IN: 'You must login first before using this event.',
     MUST_BE_LOGGED_OUT: 'You must logout first before using this event.',
     MISSING_ARGUMENTS: 'Some event arguments are missing.',
-    RATELIMITED: 'You are ratelimited.',
     REQUIRED: 'The %s is required.',
     REQUIRED_EMAIL: 'An email is required.',
     REQUIRED_UUID: 'A UUID is required.',

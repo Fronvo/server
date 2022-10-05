@@ -55,7 +55,6 @@ async function login({
 const loginTemplate: EventTemplate = {
     func: login,
     template: ['email', 'password'],
-    points: 5,
     schema: accountSchema,
 };
 

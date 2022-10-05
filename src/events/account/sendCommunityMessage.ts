@@ -117,7 +117,6 @@ async function sendCommunityMessage({
 const sendCommunityMessageTemplate: EventTemplate = {
     func: sendCommunityMessage,
     template: ['message'],
-    points: 5,
     schema: new StringSchema({
         message: {
             minLength: 1,

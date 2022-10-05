@@ -77,7 +77,6 @@ async function unfollowProfile({
 const fetchProfileIdTemplate: EventTemplate = {
     func: unfollowProfile,
     template: ['profileId'],
-    points: 2,
     schema: new StringSchema({
         profileId: {
             minLength: 5,

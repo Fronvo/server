@@ -43,7 +43,6 @@ async function createPost({
 const createPostTemplate: EventTemplate = {
     func: createPost,
     template: ['title', 'content', 'attachment'],
-    points: 5,
     schema: new StringSchema({
         title: {
             minLength: 5,

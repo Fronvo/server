@@ -74,7 +74,6 @@ async function createCommunity({
 const createCommunityTemplate: EventTemplate = {
     func: createCommunity,
     template: ['name', 'description', 'icon'],
-    points: 5,
     schema: new StringSchema({
         name: {
             minLength: 5,

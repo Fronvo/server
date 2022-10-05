@@ -45,7 +45,6 @@ async function loginToken({
 const loginTokenTemplate: EventTemplate = {
     func: loginToken,
     template: ['token'],
-    points: 5,
     schema: new StringSchema({
         token: {
             type: 'uuid',

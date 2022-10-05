@@ -45,7 +45,6 @@ async function fetchCommunityData({
 const fetchCommunityDataTemplate: EventTemplate = {
     func: fetchCommunityData,
     template: ['communityId'],
-    points: 3,
     schema: new StringSchema({
         communityId: {
             minLength: 5,

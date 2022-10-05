@@ -6,8 +6,6 @@
 
 -   [Prisma](https://www.prisma.io/) for database types.
 
--   [Ezier Ratelimiter](https://github.com/ezier-project/ratelimit) to simplify the rate-limiting process.
-
 -   [swc](https://github.com/swc-project) to make the compiling process as speedy as possible.
 
 -   [Ezier Validator](https://github.com/ezier-project/validate) to simplify the data-validation process.

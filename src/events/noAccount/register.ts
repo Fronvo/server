@@ -109,7 +109,6 @@ async function register({
 const registerTemplate: EventTemplate = {
     func: register,
     template: ['email', 'password'],
-    points: 5,
     schema: accountSchema,
 };
 

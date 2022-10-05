@@ -130,7 +130,6 @@ const updateChatRequestTemplate: EventTemplate = {
             optional: true,
         },
     }),
-    points: 1,
 };
 
 export default updateChatRequestTemplate;

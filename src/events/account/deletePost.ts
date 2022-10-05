@@ -38,7 +38,6 @@ async function deletePost({
 const deletePostTemplate: EventTemplate = {
     func: deletePost,
     template: ['postId'],
-    points: 5,
     schema: new StringSchema({
         postId: {
             type: 'uuid',

@@ -172,7 +172,6 @@ async function updateProfileData({
 const updateProfileDataTemplate: EventTemplate = {
     func: updateProfileData,
     template: ['profileId', 'username', 'bio', 'avatar', 'isPrivate'],
-    points: 3,
     schema: new StringSchema({
         profileId: {
             minLength: 5,
