@@ -77,9 +77,13 @@ async function register({
                 data: {
                     profileId,
                     email,
-                    password: !variables.testMode
-                        ? bcrypt.hashSync(password, variables.mainBcryptHash)
-                        : password,
+                    password:
+                        !variables.testMode || variables.setupMode
+                            ? bcrypt.hashSync(
+                                  password,
+                                  variables.mainBcryptHash
+                              )
+                            : password,
                     username,
                     isPrivate: false,
                     following: [],

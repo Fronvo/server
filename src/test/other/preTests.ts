@@ -16,9 +16,7 @@ async function createOfficialAccount(
         socket.emit(
             'register',
             { email: generateEmail(), password: generatePassword() },
-            ({ err }) => {
-                callback(assertError({ err }));
-
+            () => {
                 socket.emit('registerVerify', { code: '123456' }, ({ err }) => {
                     callback(assertError({ err }));
 
@@ -29,9 +27,8 @@ async function createOfficialAccount(
                             username: 'Fronvo',
                             bio: 'The official account of Fronvo',
                         },
-                        ({ err }) => {
-                            callback(assertError({ err }));
-
+                        () => {
+                            // Ignore if it already exists
                             resolve();
                         }
                     );

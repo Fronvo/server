@@ -26,7 +26,8 @@
     "check": "tsc",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "setup": "cross-env FRONVO_SETUP_MODE=true FRONVO_TEST_MODE=true FRONVO_BINARY_PARSER=false node -r @swc-node/register -r tsconfig-paths/register src/extra/setupDB.ts"
   },
   "dependencies": {
     "@ezier/validate": "^0.2.3",

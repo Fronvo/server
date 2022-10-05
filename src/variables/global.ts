@@ -22,6 +22,8 @@ export const blacklistedEmailDomainsEnabled = getEnvBoolean(
 );
 export const testMode = getEnvBoolean('TEST_MODE', false);
 
+export const setupMode = getEnvBoolean('SETUP_MODE', false);
+
 export const loggedInSockets: { [socketId: string]: LoggedInSocket } = {};
 
 // Passwords
