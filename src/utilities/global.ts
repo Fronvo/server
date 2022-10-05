@@ -84,7 +84,7 @@ export async function reportEnd(reportUUID: string): Promise<void> {
 
     // Check if it passes the min report MS duration (optional)
     if (msDuration >= variables.performanceReportsMinMS) {
-        prismaClient.report.create({
+        await prismaClient.report.create({
             data: {
                 reportName: `${reportDict.reportName} took ${msDuration}ms.`,
             },
