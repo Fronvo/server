@@ -9,20 +9,18 @@ import { ServerToClientEvents } from 'interfaces/events/s2c';
 export interface TestArguments {
     socket: Socket<ServerToClientEvents, ClientToServerEvents>;
     done: Mocha.Done;
-    shared: SharedVariables;
 }
 
-export interface SharedVariables {
-    email: string;
-    password: string;
-    token: string;
-    profileId: string;
-    secondaryProfileId: string;
-    sharedPostId: string;
-    createdCommunityId: string;
-    createdCommunityName: string;
-    sharedMessageId: string;
-}
+export type SharedTestVariablesType =
+    | 'email'
+    | 'password'
+    | 'token'
+    | 'profileId'
+    | 'secondaryProfileId'
+    | 'sharedPostId'
+    | 'createdCommunityId'
+    | 'createdCommunityName'
+    | 'sharedMessageId';
 
 export interface TestErrorCallback {
     (err?: string);

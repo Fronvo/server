@@ -3,6 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import shared from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -63,7 +64,7 @@ function profileNotFound(
 }
 
 function followSelf(
-    { socket, shared }: Partial<TestArguments>,
+    { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
@@ -78,7 +79,7 @@ function followSelf(
 }
 
 function alreadyFollowing(
-    { socket, shared }: Partial<TestArguments>,
+    { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
@@ -109,7 +110,7 @@ function alreadyFollowing(
 }
 
 function followProfile(
-    { socket, done, shared }: TestArguments,
+    { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(

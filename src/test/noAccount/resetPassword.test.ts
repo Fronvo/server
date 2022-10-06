@@ -3,6 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import shared, { setTestVariable } from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -98,7 +99,7 @@ function accountDoesntExist(
 }
 
 function resetPassword(
-    { socket, done, shared }: TestArguments,
+    { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(
@@ -124,7 +125,7 @@ function resetPassword(
                             callback(assertError({ err }));
 
                             // Relogin with updated shared variable
-                            shared.password = newPassword;
+                            setTestVariable('password', newPassword);
 
                             socket.emit(
                                 'login',
@@ -136,7 +137,7 @@ function resetPassword(
                                     callback(assertError({ err }));
 
                                     // Token is revoked, update
-                                    shared.token = token;
+                                    setTestVariable('token', token);
 
                                     done();
                                 }

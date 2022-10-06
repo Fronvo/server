@@ -2,29 +2,26 @@
 // Shared variables for the test files.
 // ******************** //
 
-import { SharedVariables } from 'interfaces/test';
+import { SharedTestVariablesType } from 'interfaces/test';
 import { generateEmail, generatePassword } from 'test/utilities';
 
-const email = generateEmail();
-const password = generatePassword();
-let token: string;
-let profileId: string;
-let secondaryProfileId: string;
-let sharedPostId: string;
-let createdCommunityId: string;
-let createdCommunityName: string;
-let sharedMessageId: string;
+export function setTestVariable(
+    variable: SharedTestVariablesType,
+    value: any
+): void {
+    sharedVariables[variable as string] = value;
+}
 
-const shared: SharedVariables = {
-    email,
-    password,
-    token,
-    profileId,
-    secondaryProfileId,
-    sharedPostId,
-    createdCommunityId,
-    createdCommunityName,
-    sharedMessageId,
+const sharedVariables: { [TestVariable in SharedTestVariablesType] } = {
+    email: generateEmail(),
+    password: generatePassword(),
+    token: '',
+    profileId: '',
+    secondaryProfileId: '',
+    sharedPostId: '',
+    createdCommunityId: '',
+    createdCommunityName: '',
+    sharedMessageId: '',
 };
 
-export default shared;
+export default sharedVariables;

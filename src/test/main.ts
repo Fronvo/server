@@ -6,18 +6,18 @@
 const PORT = process.env.PORT || 3001;
 
 // Test files
-import preTests from 'test/other/preTests';
-import generalTests from 'test/general';
 import accountTests from 'test/account';
+import generalTests from 'test/general';
 import noAccountTests from 'test/noAccount';
+import preTests from 'test/other/preTests';
 
 // Other
-import { io } from 'socket.io-client';
-import shared from 'test/shared';
+import { ClientToServerEvents } from 'interfaces/events/c2s';
+import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { TestArguments } from 'interfaces/test';
 import { Socket } from 'socket.io';
-import { ServerToClientEvents } from 'interfaces/events/s2c';
-import { ClientToServerEvents } from 'interfaces/events/c2s';
+import { io } from 'socket.io-client';
+import postTests from './other/postTests';
 
 // Create the client
 // @ts-ignore
@@ -52,21 +52,23 @@ describe('Fronvo', () => {
     // Done is filled in every test
     const testArguments: Partial<TestArguments> = {
         socket,
-        shared,
     };
 
-    // Pre-Tests
-    it('preTest', (done) => {
-        testArguments.done = done;
-
-        preTests(testArguments as TestArguments);
-    });
+    // Pre-test checking
+    preTests();
 
     for (const test in tests) {
         it(test, (done) => {
             testArguments.done = done;
 
             tests[test](testArguments);
+
+            if (
+                Object.keys(tests).length - 1 ==
+                Object.keys(tests).indexOf(test)
+            ) {
+                postTests();
+            }
         });
     }
 });

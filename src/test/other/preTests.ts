@@ -1,86 +1,36 @@
-// The file preceding any tests, for possible prod changes.
+// The file preceding any tests, for setup checks.
 
-import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import {
-    assertError,
-    assertErrors,
-    generateEmail,
-    generatePassword,
-} from 'test/utilities';
+import { prismaClient } from 'variables/global';
 
-async function createOfficialAccount(
-    { socket }: TestArguments,
-    callback: TestErrorCallback
-): Promise<void> {
-    return new Promise((resolve) => {
-        socket.emit(
-            'register',
-            { email: generateEmail(), password: generatePassword() },
-            () => {
-                socket.emit('registerVerify', { code: '123456' }, ({ err }) => {
-                    callback(assertError({ err }));
-
-                    socket.emit(
-                        'updateProfileData',
-                        {
-                            profileId: 'fronvo',
-                            username: 'Fronvo',
-                            bio: 'The official account of Fronvo',
-                        },
-                        () => {
-                            // Ignore if it already exists
-                            resolve();
-                        }
-                    );
-                });
-            }
-        );
+async function checkOfficialAccount(): Promise<void> {
+    const officialAccount = await prismaClient.account.findFirst({
+        where: {
+            profileId: 'fronvo',
+        },
     });
+
+    if (!officialAccount) {
+        // Warn if it doesnt exist
+        console.log(`Run \'npm run setup\' before \'npm test\'!`);
+        process.exit(1);
+    }
 }
 
-async function createOfficialCommunity(
-    { socket }: TestArguments,
-    callback: TestErrorCallback
-): Promise<void> {
-    return new Promise((resolve) => {
-        socket.emit(
-            'createCommunity',
-            {
-                name: 'Fronvo',
-                description: 'The official community of Fronvo.',
-                icon: 'https://i.ibb.co/QFT7SNj/logo.png',
-            },
-            ({ err }) => {
-                callback(assertError({ err }));
-
-                socket.emit(
-                    'updateCommunityData',
-                    {
-                        communityId: 'fronvo',
-                    },
-                    ({ err }) => {
-                        callback(assertError({ err }));
-
-                        resolve();
-                    }
-                );
-            }
-        );
+async function checkOfficialCommunity(): Promise<void> {
+    const officialCommunity = await prismaClient.community.findFirst({
+        where: {
+            communityId: 'fronvo',
+        },
     });
+
+    if (!officialCommunity) {
+        // Warn if it doesnt exist
+        console.log(`Run \'npm run setup\' before \'npm test\'!`);
+        process.exit(1);
+    }
 }
 
-async function preTests(
-    testArgs: TestArguments,
-    callback: TestErrorCallback
-): Promise<void> {
-    await createOfficialAccount(testArgs, callback);
-    await createOfficialCommunity(testArgs, callback);
-
-    testArgs.socket.emit('logout', () => {
-        testArgs.done();
-    });
+export default async function preTests(): Promise<void> {
+    await checkOfficialAccount();
+    await checkOfficialCommunity();
 }
-
-export default (testArgs: TestArguments): void => {
-    assertErrors({}, testArgs, preTests);
-};

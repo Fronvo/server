@@ -3,6 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import shared from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -45,7 +46,7 @@ function invalidMessage(
 }
 
 function deleteCommunityMessage(
-    { socket, done, shared }: TestArguments,
+    { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(

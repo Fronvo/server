@@ -3,7 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import shared from 'test/shared';
+import * as shared from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -143,8 +143,11 @@ function createCommunity(
                     assertType({ members: communityData.members }, 'object')
             );
 
-            shared.createdCommunityId = communityData.communityId;
-            shared.createdCommunityName = communityData.name;
+            shared.setTestVariable(
+                'createdCommunityId',
+                communityData.communityId
+            );
+            shared.setTestVariable('createdCommunityName', communityData.name);
 
             done();
         }

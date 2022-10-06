@@ -3,7 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import shared from 'test/shared';
+import * as shared from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -48,7 +48,7 @@ function sendCommunityMessage(
                 )
         );
 
-        shared.sharedMessageId = newMessageData.messageId;
+        shared.setTestVariable('sharedMessageId', newMessageData.messageId);
 
         done();
     });

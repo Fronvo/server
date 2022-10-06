@@ -17,6 +17,10 @@ And in another terminal
 -   `mongosh`
 -   `rs.initiate()`
 
+Setup your database instance
+
+-   `npm run setup`
+
 Then, simply let mocha do what it does best.
 
 -   `npm test`

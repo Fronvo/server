@@ -3,6 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import shared from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -162,7 +163,7 @@ function accountDoesntExist(
 }
 
 function invalidPassword(
-    { socket, shared }: Partial<TestArguments>,
+    { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
@@ -178,7 +179,7 @@ function invalidPassword(
 }
 
 function login(
-    { socket, done, shared }: TestArguments,
+    { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(

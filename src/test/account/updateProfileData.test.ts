@@ -3,7 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import shared from 'test/shared';
+import shared, { setTestVariable } from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -175,7 +175,7 @@ function updateProfileData(
                     assertType({ avatar: profileData.avatar }, 'string')
             );
 
-            shared.profileId = profileData.profileId;
+            setTestVariable('profileId', profileData.profileId);
 
             done();
         }

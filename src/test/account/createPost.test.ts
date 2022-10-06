@@ -3,7 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import shared from 'test/shared';
+import * as shared from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -136,7 +136,7 @@ function createPost(
                     )
             );
 
-            shared.sharedPostId = postData.postId;
+            shared.setTestVariable('sharedPostId', postData.postId);
 
             done();
         }

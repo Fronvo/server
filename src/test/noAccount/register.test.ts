@@ -3,8 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import shared from 'test/shared';
-import sharedVars from 'test/shared';
+import shared, { setTestVariable } from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -163,7 +162,7 @@ function accountExists(
         () => {
             socket.emit('registerVerify', { code: '123456' }, ({}) => {
                 socket.emit('fetchProfileId', ({ profileId }) => {
-                    shared.secondaryProfileId = profileId;
+                    setTestVariable('secondaryProfileId', profileId);
 
                     socket.emit('logout', () => {
                         socket.emit(
@@ -189,7 +188,7 @@ function accountExists(
 }
 
 function register(
-    { socket, done, shared }: TestArguments,
+    { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit('logout', () => {
@@ -213,7 +212,8 @@ function register(
                                 assertLength({ token }, 36)
                         );
 
-                        sharedVars.token = token;
+                        setTestVariable('token', token);
+
                         socket.emit('logout', () => {
                             done();
                         });

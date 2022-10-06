@@ -3,7 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import shared from 'test/shared';
+import shared, { setTestVariable } from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -180,7 +180,7 @@ function updateCommunityData(
                     assertType({ icon: communityData.icon }, 'string')
             );
 
-            shared.createdCommunityId = communityData.communityId;
+            setTestVariable('createdCommunityId', communityData.communityId);
 
             done();
         }

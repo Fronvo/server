@@ -3,7 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
-import shared from 'test/shared';
+import * as shared from 'test/shared';
 import { assertError, assertErrors, assertType } from 'test/utilities';
 
 function fetchProfileId(
@@ -15,7 +15,7 @@ function fetchProfileId(
 
         callback(assertType({ profileId }, 'string'));
 
-        shared.profileId = profileId;
+        shared.setTestVariable('profileId', profileId);
         done();
     });
 }
