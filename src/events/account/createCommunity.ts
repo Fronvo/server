@@ -76,12 +76,12 @@ const createCommunityTemplate: EventTemplate = {
     template: ['name', 'description', 'icon'],
     schema: new StringSchema({
         name: {
-            minLength: 5,
+            minLength: 3,
             maxLength: 15,
         },
 
         description: {
-            minLength: 15,
+            minLength: 5,
             maxLength: 50,
         },
 

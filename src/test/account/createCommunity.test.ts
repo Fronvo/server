@@ -21,7 +21,7 @@ function lengthNameMin(
     socket.emit(
         'createCommunity',
         {
-            name: generateChars(4),
+            name: generateChars(2),
             description: generateChars(15),
         },
         ({ err }) => {
@@ -60,7 +60,7 @@ function lengthDescriptionMin(
         'createCommunity',
         {
             name: generateChars(5),
-            description: generateChars(14),
+            description: generateChars(4),
         },
         ({ err }) => {
             callback(
