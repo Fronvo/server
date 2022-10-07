@@ -79,7 +79,7 @@ async function updateCommunityData({
         data: {
             communityId,
             name,
-            description,
+            description: description || previousCommunity.description,
             icon,
             inviteOnly,
         },
@@ -131,20 +131,20 @@ const updateCommunityDataTemplate: EventTemplate = {
     template: ['communityId', 'name', 'description', 'icon', 'inviteOnly'],
     schema: new StringSchema({
         communityId: {
-            minLength: 5,
+            minLength: 3,
             maxLength: 15,
             regex: /^[a-z0-9]+$/,
             optional: true,
         },
 
         name: {
-            minLength: 5,
+            minLength: 3,
             maxLength: 15,
             optional: true,
         },
 
         description: {
-            minLength: 15,
+            minLength: 5,
             maxLength: 50,
             optional: true,
         },
