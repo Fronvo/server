@@ -33,8 +33,6 @@ async function sendCommunityMessage({
         return generateError('NOT_IN_COMMUNITY');
     }
 
-    // TODO: Message request accepted requirement
-
     // Remove unnecessary whitespace, dont allow 3 new lines in a row
     message = message.trim().replace(/\n\n\n/g, '');
 
