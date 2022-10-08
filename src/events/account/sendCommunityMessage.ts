@@ -83,7 +83,7 @@ async function sendCommunityMessage({
         },
     });
 
-    if (totalMessages > 50) {
+    if (totalMessages > 100) {
         const groupedMessages = await prismaClient.communityMessage.groupBy({
             where: {
                 communityId: account.communityId,
