@@ -41,6 +41,8 @@ const errors: { [Error in Errors] } = {
     NO_CHAT_PERMISSION:
         "The community owner hasn't accepted your chat request.",
     NOT_IN_THIS_COMMUNITY: "The target profile isn't in this community.",
+    ACCOUNT_DISABLED: 'This account has been disabled.',
+    NOT_ADMIN: "You aren't an admin.",
 };
 
 export default errors;

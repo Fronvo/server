@@ -88,6 +88,7 @@ async function register({
                     isPrivate: false,
                     following: [],
                     followers: [],
+                    isAdmin: profileId == 'fronvo',
                 },
             });
 

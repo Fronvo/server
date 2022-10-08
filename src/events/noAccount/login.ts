@@ -25,6 +25,10 @@ async function login({
         return utilities.generateError('ACCOUNT_DOESNT_EXIST');
     }
 
+    if (account.isDisabled) {
+        return utilities.generateError('ACCOUNT_DISABLED');
+    }
+
     // Validate the password, synchronously
     if (
         !testMode

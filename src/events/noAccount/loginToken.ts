@@ -26,13 +26,17 @@ async function loginToken({
         return generateError('INVALID_TOKEN');
     }
 
-    loginSocket(io, socket, tokenItem.profileId);
-
     const account = await prismaClient.account.findFirst({
         where: {
             profileId: tokenItem.profileId,
         },
     });
+
+    if (account.isDisabled) {
+        return generateError('ACCOUNT_DISABLED');
+    }
+
+    loginSocket(io, socket, tokenItem.profileId);
 
     // Enter the community room, if joined one, for messages
     if (account.isInCommunity) {

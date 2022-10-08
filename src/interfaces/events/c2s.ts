@@ -96,6 +96,10 @@ import {
     ResetPasswordVerifyParams,
     ResetPasswordVerifyTestResult,
 } from 'interfaces/noAccount/resetPasswordVerify';
+import {
+    ToggleDisableAccountParams,
+    ToggleDisableAccountTestResult,
+} from 'interfaces/account/toggleDisableAccount';
 
 export interface ClientToServerEvents {
     register: (
@@ -190,5 +194,9 @@ export interface ClientToServerEvents {
     deleteCommunityMessage: (
         {}: DeleteCommunityMessageParams,
         callback?: ({}: DeleteCommunityMessageTestResult) => void
+    ) => void;
+    toggleDisableAccount: (
+        {}: ToggleDisableAccountParams,
+        callback?: ({}: ToggleDisableAccountTestResult) => void
     ) => void;
 }

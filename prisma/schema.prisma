@@ -24,6 +24,8 @@ model Account {
   isPrivate     Boolean?
   isInCommunity Boolean  @default(false)
   communityId   String   @default("")
+  isAdmin       Boolean  @default(false)
+  isDisabled    Boolean  @default(false)
 }
 
 model Post {

@@ -66,6 +66,8 @@ async function fetchProfileData({
             isAccessible &&
             (!community?.inviteOnly || isSelf) &&
             account.communityId,
+        isAdmin: account.isAdmin || account.profileId == 'fronvo' || false,
+        isDisabled: account.isDisabled || false,
     };
 
     // More data if our profile
