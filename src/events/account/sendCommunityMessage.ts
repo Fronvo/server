@@ -20,6 +20,7 @@ async function sendCommunityMessage({
     io,
     socket,
     message,
+    replyId,
 }: SendCommunityMessageServerParams): Promise<
     SendCommunityMessageResult | FronvoError
 > {
@@ -71,6 +72,8 @@ async function sendCommunityMessage({
             communityId: account.communityId,
             messageId: v4(),
             content: message,
+            isReply: Boolean(replyId),
+            replyId: replyId || '',
         },
     });
 
@@ -114,11 +117,16 @@ async function sendCommunityMessage({
 
 const sendCommunityMessageTemplate: EventTemplate = {
     func: sendCommunityMessage,
-    template: ['message'],
+    template: ['message', 'replyId'],
     schema: new StringSchema({
         message: {
             minLength: 1,
             maxLength: 256,
+        },
+
+        replyId: {
+            type: 'uuid',
+            optional: true,
         },
     }),
 };

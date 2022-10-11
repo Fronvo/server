@@ -54,10 +54,12 @@ model Community {
 model CommunityMessage {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   ownerId      String
-  communityId  String   @unique
+  communityId  String
   messageId    String   @unique
   content      String
   creationDate DateTime @default(now())
+  isReply      Boolean  @default(false)
+  replyId      String   @default("")
 }
 
 model Token {

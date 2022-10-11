@@ -35,12 +35,6 @@ async function fetchCommunityMessages({
         // Will consider in the future
         // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination
         take: -50,
-        select: {
-            content: true,
-            creationDate: true,
-            messageId: true,
-            ownerId: true,
-        },
     });
 
     return { communityMessages };
