@@ -162,6 +162,17 @@ async function updateProfileData({
             });
         }
 
+        // Update community messages
+        await prismaClient.communityMessage.updateMany({
+            where: {
+                ownerId: getSocketAccountId(socket.id),
+            },
+
+            data: {
+                ownerId: profileId,
+            },
+        });
+
         // Finally update socket link
         loggedInSockets[socket.id].accountId = profileId;
     }
