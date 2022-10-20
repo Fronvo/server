@@ -41,7 +41,7 @@ async function sendCommunityMessage({
         new StringSchema({
             message: {
                 minLength: 1,
-                maxLength: 256,
+                maxLength: 500,
             },
         }),
         { message }
@@ -121,7 +121,7 @@ const sendCommunityMessageTemplate: EventTemplate = {
     schema: new StringSchema({
         message: {
             minLength: 1,
-            maxLength: 256,
+            maxLength: 500,
         },
 
         replyId: {

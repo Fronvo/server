@@ -21,7 +21,7 @@ function lengthMessageMax(
     socket.emit(
         'sendCommunityMessage',
         {
-            message: generateChars(257),
+            message: generateChars(501),
         },
         ({ err }) => {
             callback(
