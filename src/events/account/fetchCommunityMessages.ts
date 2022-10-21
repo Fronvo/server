@@ -34,7 +34,7 @@ async function fetchCommunityMessages({
         // Cursor-based pagination is much more efficient but that would require dictionaries for each socket
         // Will consider in the future
         // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination
-        take: -50,
+        take: -200,
     });
 
     return { communityMessages };
