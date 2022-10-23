@@ -32,9 +32,10 @@
   "dependencies": {
     "@ezier/validate": "^0.2.3",
     "@prisma/client": "^3.12.0",
-    "@socket.io/admin-ui": "^0.2.0",
+    "@socket.io/admin-ui": "^0.5.1",
     "@swc-node/register": "^1.4.2",
     "@swc/cli": "^0.1.57",
+    "bcrypt": "^5.1.0",
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
