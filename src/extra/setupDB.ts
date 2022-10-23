@@ -55,7 +55,7 @@ function setupServer(): void {
         },
 
         // Enable / Disable binary parser
-        parser: getEnvBoolean('BINARY_PARSER', true)
+        parser: getEnvBoolean('BINARY_PARSER', false)
             ? require('socket.io-msgpack-parser')
             : '',
 
