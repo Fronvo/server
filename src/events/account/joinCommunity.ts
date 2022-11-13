@@ -85,7 +85,7 @@ const joinCommunityTemplate: EventTemplate = {
     template: ['communityId'],
     schema: new StringSchema({
         communityId: {
-            minLength: 5,
+            minLength: 3,
             maxLength: 15,
             regex: /^[a-z0-9]+$/,
         },

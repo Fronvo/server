@@ -21,7 +21,7 @@ function lengthCommunityIdMin(
     socket.emit(
         'fetchCommunityData',
         {
-            communityId: generateChars(4),
+            communityId: generateChars(2),
         },
         ({ err }) => {
             callback(
