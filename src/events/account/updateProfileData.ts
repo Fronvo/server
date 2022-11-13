@@ -75,6 +75,8 @@ async function updateProfileData({
             bio: true,
             avatar: true,
             isPrivate: true,
+            isInCommunity: true,
+            communityId: true,
         },
     });
 
@@ -158,6 +160,44 @@ async function updateProfileData({
                     following: normalizeList(
                         targetFollowers[accountIndex].following as string[]
                     ),
+                },
+            });
+        }
+
+        // If currently in community, update members and chat requests
+        if (profileData.isInCommunity) {
+            const community = await prismaClient.community.findFirst({
+                where: {
+                    communityId: profileData.communityId,
+                },
+                select: {
+                    members: true,
+                    acceptedChatRequests: true,
+                },
+            });
+
+            const newMembers = community.members;
+            const chatRequests = community.acceptedChatRequests;
+
+            newMembers.splice(
+                newMembers.indexOf(getSocketAccountId(socket.id)),
+                1
+            );
+            newMembers.push(profileId);
+
+            chatRequests.splice(
+                chatRequests.indexOf(getSocketAccountId(socket.id)),
+                1
+            );
+            chatRequests.push(profileId);
+
+            await prismaClient.community.update({
+                where: {
+                    communityId: profileData.communityId,
+                },
+                data: {
+                    members: newMembers,
+                    acceptedChatRequests: chatRequests,
                 },
             });
         }
