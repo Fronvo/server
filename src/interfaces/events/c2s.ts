@@ -100,6 +100,18 @@ import {
     ToggleDisableAccountParams,
     ToggleDisableAccountTestResult,
 } from 'interfaces/account/toggleDisableAccount';
+import {
+    AcceptJoinRequestParams,
+    AcceptJoinRequestTestResult,
+} from 'interfaces/account/acceptJoinRequest';
+import {
+    ListJoinRequestsParams,
+    ListJoinRequestsTestResult,
+} from 'interfaces/account/listJoinRequests';
+import {
+    RejectJoinRequestParams,
+    RejectJoinRequestTestResult,
+} from 'interfaces/account/rejectJoinRequest';
 
 export interface ClientToServerEvents {
     register: (
@@ -198,5 +210,17 @@ export interface ClientToServerEvents {
     toggleDisableAccount: (
         {}: ToggleDisableAccountParams,
         callback?: ({}: ToggleDisableAccountTestResult) => void
+    ) => void;
+    acceptJoinRequest: (
+        {}: AcceptJoinRequestParams,
+        callback?: ({}: AcceptJoinRequestTestResult) => void
+    ) => void;
+    listJoinRequests: (
+        {}: ListJoinRequestsParams,
+        callback?: ({}: ListJoinRequestsTestResult) => void
+    ) => void;
+    rejectJoinRequest: (
+        {}: RejectJoinRequestParams,
+        callback?: ({}: RejectJoinRequestTestResult) => void
     ) => void;
 }

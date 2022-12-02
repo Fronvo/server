@@ -24,6 +24,9 @@ import fetchCommunityMessages from 'events/account/fetchCommunityMessages';
 import deleteCommunityMessage from 'events/account/deleteCommunityMessage';
 import updateChatRequest from 'events/account/updateChatRequest';
 import toggleDisableAccount from 'events/account/toggleDisableAccount';
+import acceptJoinRequest from 'events/account/acceptJoinRequest';
+import listJoinRequests from 'events/account/listJoinRequests';
+import rejectJoinRequest from 'events/account/rejectJoinRequest';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -50,6 +53,9 @@ const accountTemplate: EventExportTemplate = {
     deleteCommunityMessage,
     updateChatRequest,
     toggleDisableAccount,
+    acceptJoinRequest,
+    listJoinRequests,
+    rejectJoinRequest,
 };
 
 export default accountTemplate;

@@ -37,8 +37,14 @@ async function register({
         },
     });
 
-    // Check if the email is already registered by another user
-    if (account) {
+    const account2 = await prismaClient.joinRequests.findFirst({
+        where: {
+            email,
+        },
+    });
+
+    // Check if the email is already registered by another user / requested
+    if (account || account2) {
         return utilities.generateError('ACCOUNT_ALREADY_EXISTS');
     }
 
@@ -63,47 +69,74 @@ async function register({
         if (code != sentCode) {
             finalError = utilities.generateError('INVALID_CODE');
         } else {
-            // Detach listener
-            socket.removeAllListeners('registerVerify');
-
-            const username = `Fronvo user ${
-                (await prismaClient.account.count()) + 1
-            }`;
-
-            // abcdef12345
-            const profileId = generateChars(10);
-
-            await prismaClient.account.create({
-                data: {
-                    profileId,
+            // Double-check if someone else registered this during verification
+            const account = await prismaClient.joinRequests.findFirst({
+                where: {
                     email,
-                    password:
-                        !variables.testMode || variables.setupMode
-                            ? bcrypt.hashSync(
-                                  password,
-                                  variables.mainBcryptHash
-                              )
-                            : password,
-                    username,
-                    isPrivate: false,
-                    following: [],
-                    followers: [],
-                    isAdmin: profileId == 'fronvo',
                 },
             });
 
-            token = await utilities.getToken(profileId);
+            if (account) {
+                finalError = utilities.generateError('ACCOUNT_ALREADY_EXISTS');
+            } else {
+                // Detach listener
+                socket.removeAllListeners('registerVerify');
 
-            utilities.sendEmail(email, 'Welcome to Fronvo!', [
-                "We're so glad to have you on our platform!",
-                'Enjoy your stay on the safest social media!',
-            ]);
+                if (!variables.testMode && !variables.setupMode) {
+                    await prismaClient.joinRequests.create({
+                        data: {
+                            email,
+                            password:
+                                !variables.testMode || variables.setupMode
+                                    ? bcrypt.hashSync(
+                                          password,
+                                          variables.mainBcryptHash
+                                      )
+                                    : password,
+                        },
+                    });
+                } else {
+                    const username = `Fronvo user ${
+                        (await prismaClient.account.count()) + 1
+                    }`;
 
-            utilities.loginSocket(io, socket, profileId);
+                    // abcdef12345
+                    const profileId = generateChars(10);
+
+                    await prismaClient.account.create({
+                        data: {
+                            profileId,
+                            email,
+                            password:
+                                !variables.testMode || variables.setupMode
+                                    ? bcrypt.hashSync(
+                                          password,
+                                          variables.mainBcryptHash
+                                      )
+                                    : password,
+                            username,
+                            isPrivate: false,
+                            following: [],
+                            followers: [],
+                            isAdmin: profileId == 'fronvo',
+                        },
+                    });
+
+                    token = await utilities.getToken(profileId);
+
+                    utilities.sendEmail(email, 'Welcome to Fronvo!', [
+                        "We're so glad to have you on our platform!",
+                        'Enjoy your stay on the safest social media!',
+                    ]);
+
+                    utilities.loginSocket(io, socket, profileId);
+                }
+            }
         }
 
         callback({
-            token: !finalError ? token : undefined,
+            // May be undefined if not in test / setup
+            token,
             err: finalError ? { ...finalError.err } : undefined,
         });
     });

@@ -151,11 +151,13 @@ export async function getToken(profileId: string): Promise<string> {
 }
 
 export async function revokeToken(profileId: string): Promise<void> {
-    await prismaClient.token.delete({
-        where: {
-            profileId,
-        },
-    });
+    try {
+        await prismaClient.token.delete({
+            where: {
+                profileId,
+            },
+        });
+    } catch (e) {}
 }
 
 export function generateNumbers(
