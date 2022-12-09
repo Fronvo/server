@@ -95,6 +95,7 @@ function fetchProfileData(
                         'object'
                     ) ||
                     assertType({ avatar: profileData.avatar }, 'string') ||
+                    assertType({ banner: profileData.banner }, 'string') ||
                     assertEquals({ isSelf: profileData.isSelf }, true)
             );
 

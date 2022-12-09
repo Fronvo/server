@@ -17,6 +17,7 @@ async function updateProfileData({
     username,
     bio,
     avatar,
+    banner,
     isPrivate,
 }: UpdateProfileDataServerParams): Promise<
     UpdateProfileDataResult | FronvoError
@@ -29,6 +30,8 @@ async function updateProfileData({
         bio != '' &&
         !avatar &&
         avatar != '' &&
+        !banner &&
+        banner != '' &&
         isPrivate == undefined
     ) {
         return {
@@ -64,6 +67,7 @@ async function updateProfileData({
             username,
             bio,
             avatar,
+            banner,
             isPrivate,
         },
         where: {
@@ -74,6 +78,7 @@ async function updateProfileData({
             username: true,
             bio: true,
             avatar: true,
+            banner: true,
             isPrivate: true,
             isInCommunity: true,
             communityId: true,
@@ -222,7 +227,7 @@ async function updateProfileData({
 
 const updateProfileDataTemplate: EventTemplate = {
     func: updateProfileData,
-    template: ['profileId', 'username', 'bio', 'avatar', 'isPrivate'],
+    template: ['profileId', 'username', 'bio', 'avatar', 'banner', 'isPrivate'],
     schema: new StringSchema({
         profileId: {
             minLength: 5,
@@ -243,6 +248,13 @@ const updateProfileDataTemplate: EventTemplate = {
         },
 
         avatar: {
+            // Ensure https
+            regex: /^(https:\/\/).+$/,
+            maxLength: 512,
+            optional: true,
+        },
+
+        banner: {
             // Ensure https
             regex: /^(https:\/\/).+$/,
             maxLength: 512,

@@ -10,6 +10,7 @@ export interface UpdateProfileDataParams {
     username?: string;
     bio?: string;
     avatar?: string;
+    banner?: string;
     isPrivate?: boolean;
 }
 

@@ -53,6 +53,7 @@ async function fetchProfileData({
         bio: isAccessible && account.bio,
         creationDate: isAccessible && account.creationDate,
         avatar: account.avatar,
+        banner: account.banner,
         following: isAccessible && account.following,
         followers: isAccessible && account.followers,
         isPrivate,

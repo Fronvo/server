@@ -18,6 +18,7 @@ model Account {
   bio           String   @default("")
   password      String
   avatar        String   @default("")
+  banner        String   @default("")
   creationDate  DateTime @default(now())
   following     Json[]
   followers     Json[]

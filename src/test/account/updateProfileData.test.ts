@@ -121,6 +121,24 @@ function lengthAvatarMax(
     );
 }
 
+function lengthBannerMax(
+    { socket }: Partial<TestArguments>,
+    callback: TestErrorCallback
+): void {
+    socket.emit(
+        'updateProfileData',
+        {
+            banner: `https://${generateChars(513)}`,
+        },
+        ({ err }) => {
+            callback(
+                assertCode(err.code, 'LENGTH') ||
+                    assertEquals({ for: err.extras.for }, 'banner')
+            );
+        }
+    );
+}
+
 function invalidIsPrivate(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
@@ -163,6 +181,7 @@ function updateProfileData(
             username: generateChars(),
             bio: generateChars(),
             avatar: `https://${generateChars()}`,
+            banner: `https://${generateChars()}`,
             isPrivate: false,
         },
         ({ err, profileData }): void => {
@@ -172,7 +191,8 @@ function updateProfileData(
                 assertType({ profileId: profileData.profileId }, 'string') ||
                     assertType({ username: profileData.username }, 'string') ||
                     assertType({ bio: profileData.bio }, 'string') ||
-                    assertType({ avatar: profileData.avatar }, 'string')
+                    assertType({ avatar: profileData.avatar }, 'string') ||
+                    assertType({ banner: profileData.banner }, 'string')
             );
 
             setTestVariable('profileId', profileData.profileId);
@@ -191,6 +211,7 @@ export default (testArgs: TestArguments): void => {
             lengthUsernameMax,
             lengthBioMax,
             lengthAvatarMax,
+            lengthBannerMax,
             invalidIsPrivate,
             invalidProfileId,
         },
