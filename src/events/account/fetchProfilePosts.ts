@@ -39,6 +39,17 @@ async function fetchProfilePosts({
         return generateError('PROFILE_PRIVATE');
     }
 
+    const fromNumber = Number(from);
+    const toNumber = Number(to);
+
+    if (fromNumber > toNumber) {
+        return generateError(
+            'NOT_HIGHER_NUMBER',
+            { to: toNumber, from: fromNumber },
+            ['to', 'from']
+        );
+    }
+
     const profilePosts = await prismaClient.post.findMany({
         where: {
             author: profileId,
@@ -48,8 +59,10 @@ async function fetchProfilePosts({
         // Cursor-based pagination is much more efficient but that would require dictionaries for each socket
         // Will consider in the future
         // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination
-        skip: -Number(from),
-        take: -Number(to),
+        skip: Number(from),
+
+        // from: 5, to: 10 = 10 - 5 = 5 posts fetched after from pos
+        take: -(Number(to) - Number(from)),
         select: {
             postId: true,
             author: true,
@@ -75,13 +88,13 @@ const fetchProfileDataTemplate: EventTemplate = {
 
         from: {
             minLength: 1,
-            maxLength: 3,
+            maxLength: 2,
             regex: /^[0-9]+$/,
         },
 
         to: {
             minLength: 1,
-            maxLength: 3,
+            maxLength: 2,
             regex: /^[0-9]+$/,
         },
     }),

@@ -39,7 +39,8 @@ export type Errors =
     | 'ACCOUNT_DISABLED'
     | 'NOT_ADMIN'
     | 'ACCOUNT_NOT_ACCEPTED'
-    | 'REQUEST_DOESNT_EXIST';
+    | 'REQUEST_DOESNT_EXIST'
+    | 'NOT_HIGHER_NUMBER';
 
 export type TestAssertTypes =
     | 'string'

@@ -45,6 +45,16 @@ async function fetchProfileData({
     const isPrivate = account.isPrivate;
     const isAccessible = isSelf || !isPrivate || isFollower;
 
+    let totalPosts: number = 0;
+
+    if (isAccessible) {
+        totalPosts = await prismaClient.post.count({
+            where: {
+                author: profileId,
+            },
+        });
+    }
+
     // Block access to most info if private
     const profileData: FetchedFronvoAccount = {
         isSelf,
@@ -56,6 +66,7 @@ async function fetchProfileData({
         banner: account.banner,
         following: isAccessible && account.following,
         followers: isAccessible && account.followers,
+        totalPosts,
         isPrivate,
         isFollower,
         isInCommunity:

@@ -46,6 +46,8 @@ const errors: { [Error in Errors] } = {
     ACCOUNT_NOT_ACCEPTED:
         "This account hasn't yet been accepted to join Fronvo.",
     REQUEST_DOESNT_EXIST: "The target request couldn't be found.",
+    NOT_HIGHER_NUMBER:
+        "The '%s' parameter must be a higher number than parameter '%s'.",
 };
 
 export default errors;
