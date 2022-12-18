@@ -47,7 +47,7 @@ export function isAccountLoggedIn(accountId: string): boolean {
 }
 
 export function getSocketAccountId(socketId: string): string {
-    return variables.loggedInSockets[socketId].accountId;
+    return variables.loggedInSockets[socketId]?.accountId;
 }
 
 export function getLoggedInSockets(): { [socketId: string]: LoggedInSocket } {
