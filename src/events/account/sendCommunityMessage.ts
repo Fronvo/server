@@ -79,39 +79,6 @@ async function sendCommunityMessage({
 
     io.to(account.communityId).emit('newCommunityMessage', { newMessageData });
 
-    // Delete older messages synchronously
-    const totalMessages = await prismaClient.communityMessage.count({
-        where: {
-            communityId: account.communityId,
-        },
-    });
-
-    if (totalMessages > 200) {
-        const groupedMessages = await prismaClient.communityMessage.groupBy({
-            where: {
-                communityId: account.communityId,
-            },
-
-            by: ['creationDate'],
-        });
-
-        const dateArr = [];
-
-        for (const dateIndex in groupedMessages) {
-            dateArr.push(groupedMessages[dateIndex].creationDate);
-        }
-
-        // Sort by creation date, get oldest
-        dateArr.sort((a, b) => a.getTime() - b.getTime());
-
-        await prismaClient.communityMessage.deleteMany({
-            where: {
-                communityId: account.communityId,
-                creationDate: new Date(dateArr[0]),
-            },
-        });
-    }
-
     return {};
 }
 

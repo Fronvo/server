@@ -3,10 +3,10 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Community } from '@prisma/client';
 import {
     FetchCommunityDataResult,
     FetchCommunityDataServerParams,
+    FetchedFronvoCommunity,
 } from 'interfaces/account/fetchCommunityData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError } from 'utilities/global';
@@ -27,7 +27,7 @@ async function fetchCommunityData({
         return generateError('COMMUNITY_NOT_FOUND');
     }
 
-    const communityData: Partial<Community> = {
+    const communityData: FetchedFronvoCommunity = {
         communityId,
         ownerId: community.ownerId,
         name: community.name,
@@ -37,6 +37,11 @@ async function fetchCommunityData({
         members: community.members,
         inviteOnly: community.inviteOnly || false,
         acceptedChatRequests: community.acceptedChatRequests || [],
+        totalMessages: await prismaClient.communityMessage.count({
+            where: {
+                communityId: community.communityId,
+            },
+        }),
     };
 
     return { communityData };

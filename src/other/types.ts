@@ -40,7 +40,8 @@ export type Errors =
     | 'NOT_ADMIN'
     | 'ACCOUNT_NOT_ACCEPTED'
     | 'REQUEST_DOESNT_EXIST'
-    | 'NOT_HIGHER_NUMBER';
+    | 'NOT_HIGHER_NUMBER'
+    | 'TOO_MUCH_LOAD';
 
 export type TestAssertTypes =
     | 'string'

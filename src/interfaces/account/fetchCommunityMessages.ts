@@ -5,7 +5,10 @@
 import { CommunityMessage } from '@prisma/client';
 import { EventArguments, FronvoError } from 'interfaces/all';
 
-export interface FetchCommunityMessagesParams {}
+export interface FetchCommunityMessagesParams {
+    from: string;
+    to: string;
+}
 
 export interface FetchCommunityMessagesServerParams
     extends EventArguments,

@@ -62,7 +62,7 @@ function lengthFromMax(
         'fetchProfilePosts',
         {
             profileId: generateChars(),
-            from: '100',
+            from: '10000000',
             to: '10',
         },
         ({ err }) => {
@@ -83,7 +83,7 @@ function lengthToMax(
         {
             profileId: generateChars(),
             from: '10',
-            to: '100',
+            to: '10000000',
         },
         ({ err }) => {
             callback(
@@ -124,6 +124,23 @@ function fromIsHigher(
         },
         ({ err }) => {
             callback(assertCode(err.code, 'NOT_HIGHER_NUMBER'));
+        }
+    );
+}
+
+function loadMore20(
+    { socket }: Partial<TestArguments>,
+    callback: TestErrorCallback
+): void {
+    socket.emit(
+        'fetchProfilePosts',
+        {
+            profileId: shared.profileId,
+            from: '0',
+            to: '21',
+        },
+        ({ err }) => {
+            callback(assertCode(err.code, 'TOO_MUCH_LOAD'));
         }
     );
 }
@@ -172,6 +189,7 @@ export default (testArgs: TestArguments): void => {
             lengthToMax,
             profileNotFound,
             fromIsHigher,
+            loadMore20,
         },
         testArgs,
         fetchProfilePosts

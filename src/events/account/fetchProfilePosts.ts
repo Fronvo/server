@@ -50,6 +50,14 @@ async function fetchProfilePosts({
         );
     }
 
+    if (toNumber - fromNumber > 20) {
+        return generateError(
+            'TOO_MUCH_LOAD',
+            { to: toNumber, from: fromNumber },
+            [20, 'posts']
+        );
+    }
+
     const profilePosts = await prismaClient.post.findMany({
         where: {
             author: profileId,
@@ -88,13 +96,13 @@ const fetchProfileDataTemplate: EventTemplate = {
 
         from: {
             minLength: 1,
-            maxLength: 2,
+            maxLength: 7,
             regex: /^[0-9]+$/,
         },
 
         to: {
             minLength: 1,
-            maxLength: 2,
+            maxLength: 7,
             regex: /^[0-9]+$/,
         },
     }),

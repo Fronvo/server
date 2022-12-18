@@ -13,8 +13,12 @@ export interface FetchCommunityDataServerParams
     extends EventArguments,
         FetchCommunityDataParams {}
 
+export interface FetchedFronvoCommunity extends Partial<Community> {
+    totalMessages: number;
+}
+
 export interface FetchCommunityDataResult {
-    communityData: Partial<Community>;
+    communityData: FetchedFronvoCommunity;
 }
 
 export interface FetchCommunityDataTestResult

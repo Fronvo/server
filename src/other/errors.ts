@@ -48,6 +48,7 @@ const errors: { [Error in Errors] } = {
     REQUEST_DOESNT_EXIST: "The target request couldn't be found.",
     NOT_HIGHER_NUMBER:
         "The '%s' parameter must be a higher number than parameter '%s'.",
+    TOO_MUCH_LOAD: "You can't load more than %i %s.",
 };
 
 export default errors;

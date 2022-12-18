@@ -93,7 +93,11 @@ function fetchCommunityData(
                         { creationDate: new Date(communityData.creationDate) },
                         'Invalid Date'
                     ) ||
-                    assertType({ members: communityData.members }, 'object')
+                    assertType({ members: communityData.members }, 'object') ||
+                    assertType(
+                        { totalMessages: communityData.totalMessages },
+                        'number'
+                    )
             );
 
             for (const memberIndex in communityData.members) {

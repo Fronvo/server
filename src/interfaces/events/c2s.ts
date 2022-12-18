@@ -201,6 +201,7 @@ export interface ClientToServerEvents {
         callback?: ({}: SendCommunityMessageTestResult) => void
     ) => void;
     fetchCommunityMessages: (
+        {}: FetchCommunityMessagesParams,
         callback?: ({}: FetchCommunityMessagesTestResult) => void
     ) => void;
     deleteCommunityMessage: (
