@@ -96,7 +96,9 @@ async function fetchProfilePosts({
         });
     }
 
-    return { homePosts };
+    return { homePosts: homePosts.reverse() };
+
+    // TODO: from, to, totalPosts
 }
 
 const fetchProfileDataTemplate: EventTemplate = {
