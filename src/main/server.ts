@@ -172,7 +172,7 @@ async function startup(): Promise<void> {
             );
 
             variables.resetTotalRequests();
-        }, 60 * 60 * 12);
+        }, 60 * 60 * 12 * 1000);
     }
 }
 
