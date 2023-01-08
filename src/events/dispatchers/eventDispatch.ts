@@ -11,6 +11,7 @@ import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server, Socket } from 'socket.io';
 import utilities from 'utilities/all';
 import { generateError } from 'utilities/global';
+import { incrementTotalRequests } from 'variables/global';
 
 const funcs: EventExportTemplate = {
     ...noAccountEvents,
@@ -198,6 +199,9 @@ export default function eventDispatch(
                 socket
             );
         } else {
+            // Only count valid requests
+            incrementTotalRequests();
+
             fireEvent(io, socket, event, callback, eventArgs);
         }
     }

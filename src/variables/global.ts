@@ -68,3 +68,18 @@ export const prismaClient = new PrismaClient({
 // Email-related
 export let emailUsername = getEnv('EMAIL_USERNAME');
 export let emailPassword = getEnv('EMAIL_PASSWORD');
+
+// Logging requests for simple telemetry
+export function incrementTotalRequests(): void {
+    totalRequests += 1;
+}
+
+export function resetTotalRequests(): void {
+    totalRequests = 0;
+}
+
+export function getTotalRequests(): number {
+    return totalRequests;
+}
+
+export let totalRequests = 0;

@@ -161,8 +161,19 @@ async function startup(): Promise<void> {
     setupAdminPanel();
 
     // Finally, display successful server run
-    if (!variables.silentLogging)
+    if (!variables.silentLogging) {
         loadingSpinner.succeed('Server running at port ' + PORT + '.');
+
+        // No silent logging
+        // Log request number and reset it every *12* hours
+        setInterval(() => {
+            console.log(
+                `Total requests in 12 hours: ${variables.getTotalRequests()}`
+            );
+
+            variables.resetTotalRequests();
+        }, 60 * 60 * 12);
+    }
 }
 
 startup();

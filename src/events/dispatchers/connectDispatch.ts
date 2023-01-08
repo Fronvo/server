@@ -11,8 +11,6 @@ export default function connectDispatch(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>
 ): void {
-    console.log('Socket ' + socket.id + ' has connected.');
-
     socket.onAny((event: string, ...args: { [arg: string]: any }[]) => {
         dispatchers.eventDispatch(io, socket, event, ...args);
     });
