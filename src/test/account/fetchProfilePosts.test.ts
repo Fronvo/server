@@ -162,7 +162,8 @@ function fetchProfilePosts(
             const targetPost = profilePosts[0];
 
             callback(
-                assertType({ author: targetPost.author }, 'string') ||
+                assertType({ postId: targetPost.postId }, 'string') ||
+                    assertType({ author: targetPost.author }, 'string') ||
                     assertType({ title: targetPost.title }, 'string') ||
                     assertType({ content: targetPost.content }, 'string') ||
                     assertType(

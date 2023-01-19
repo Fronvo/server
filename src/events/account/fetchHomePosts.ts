@@ -46,6 +46,7 @@ async function fetchProfilePosts({
             },
             select: {
                 avatar: true,
+                banner: true,
                 bio: true,
                 creationDate: true,
                 followers: true,
@@ -53,6 +54,10 @@ async function fetchProfilePosts({
                 isPrivate: true,
                 profileId: true,
                 username: true,
+                isAdmin: true,
+                isDisabled: true,
+                isInCommunity: true,
+                communityId: true,
             },
         });
 
@@ -65,7 +70,8 @@ async function fetchProfilePosts({
         }
     }
 
-    const homePosts: { post: Post; profileData: Partial<Account> }[] = [];
+    const homePosts: { post: Partial<Post>; profileData: Partial<Account> }[] =
+        [];
 
     // Gather posts by available accounts ordered by date
     const posts = await prismaClient.post.findMany({
@@ -83,6 +89,15 @@ async function fetchProfilePosts({
         // Newest posts first
         orderBy: {
             creationDate: 'asc',
+        },
+
+        select: {
+            postId: true,
+            title: true,
+            content: true,
+            author: true,
+            attachment: true,
+            creationDate: true,
         },
     });
 

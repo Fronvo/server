@@ -78,14 +78,19 @@ function fetchProfileData(
             callback(assertError({ err }));
 
             callback(
-                assertType({ id: profileData.profileId }, 'string') ||
-                    assertType({ email: profileData.email }, 'string') ||
+                assertEquals({ isSelf: profileData.isSelf }, true) ||
+                    assertType(
+                        { profileId: profileData.profileId },
+                        'string'
+                    ) ||
                     assertType({ username: profileData.username }, 'string') ||
                     assertType({ bio: profileData.bio }, 'string') ||
                     assertNotEqual(
                         { creationDate: new Date(profileData.creationDate) },
                         'Invalid Date'
                     ) ||
+                    assertType({ avatar: profileData.avatar }, 'string') ||
+                    assertType({ banner: profileData.banner }, 'string') ||
                     assertType(
                         { following: profileData.following },
                         'object'
@@ -94,9 +99,31 @@ function fetchProfileData(
                         { followers: profileData.followers },
                         'object'
                     ) ||
-                    assertType({ avatar: profileData.avatar }, 'string') ||
-                    assertType({ banner: profileData.banner }, 'string') ||
-                    assertEquals({ isSelf: profileData.isSelf }, true)
+                    assertType(
+                        { totalPosts: profileData.totalPosts },
+                        'number'
+                    ) ||
+                    assertType(
+                        { isPrivate: profileData.isPrivate },
+                        'boolean'
+                    ) ||
+                    assertType(
+                        { isFollower: profileData.isFollower },
+                        'boolean'
+                    ) ||
+                    assertType(
+                        { isInCommunity: profileData.isInCommunity },
+                        'boolean'
+                    ) ||
+                    assertType(
+                        { communityId: profileData.communityId },
+                        'string'
+                    ) ||
+                    assertType({ isAdmin: profileData.isAdmin }, 'boolean') ||
+                    assertType(
+                        { isDisabled: profileData.isDisabled },
+                        'boolean'
+                    )
             );
 
             done();
