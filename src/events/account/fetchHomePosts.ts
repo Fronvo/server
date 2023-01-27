@@ -2,18 +2,40 @@
 // The fetchProfilePosts account-only event file.
 // ******************** //
 
+import { StringSchema } from '@ezier/validate';
 import { Account, Post } from '@prisma/client';
 import {
     FetchHomePostsResult,
     FetchHomePostsServerParams,
 } from 'interfaces/account/fetchHomePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { getSocketAccountId } from 'utilities/global';
+import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchProfilePosts({
     socket,
+    from,
+    to,
 }: FetchHomePostsServerParams): Promise<FetchHomePostsResult | FronvoError> {
+    const fromNumber = Number(from);
+    const toNumber = Number(to);
+
+    if (fromNumber > toNumber) {
+        return generateError(
+            'NOT_HIGHER_NUMBER',
+            { to: toNumber, from: fromNumber },
+            ['to', 'from']
+        );
+    }
+
+    if (toNumber - fromNumber > 30) {
+        return generateError(
+            'TOO_MUCH_LOAD',
+            { to: toNumber, from: fromNumber },
+            [30, 'posts']
+        );
+    }
+
     const account = await prismaClient.account.findFirst({
         where: {
             profileId: getSocketAccountId(socket.id),
@@ -44,6 +66,7 @@ async function fetchProfilePosts({
             where: {
                 profileId: account.following[followingIndex] as string,
             },
+
             select: {
                 avatar: true,
                 banner: true,
@@ -73,6 +96,15 @@ async function fetchProfilePosts({
     const homePosts: { post: Partial<Post>; profileData: Partial<Account> }[] =
         [];
 
+    // Get totalPosts
+    const totalPosts = await prismaClient.post.count({
+        where: {
+            author: {
+                in: postAccounts,
+            },
+        },
+    });
+
     // Gather posts by available accounts ordered by date
     const posts = await prismaClient.post.findMany({
         where: {
@@ -81,10 +113,14 @@ async function fetchProfilePosts({
             },
         },
 
-        skip: 0,
+        // Last shown first
+        // Cursor-based pagination is much more efficient but that would require dictionaries for each socket
+        // Will consider in the future
+        // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination
+        skip: fromNumber,
 
-        // Max 50, then touch grass
-        take: -50,
+        // from: 5, to: 10 = 10 - 5 = 5 posts fetched after from pos
+        take: -(toNumber - fromNumber),
 
         // Newest posts first
         orderBy: {
@@ -111,14 +147,25 @@ async function fetchProfilePosts({
         });
     }
 
-    return { homePosts: homePosts.reverse() };
-
-    // TODO: from, to, totalPosts
+    return { homePosts: homePosts.reverse(), totalPosts };
 }
 
 const fetchProfileDataTemplate: EventTemplate = {
     func: fetchProfilePosts,
-    template: [],
+    template: ['from', 'to'],
+    schema: new StringSchema({
+        from: {
+            minLength: 1,
+            maxLength: 7,
+            regex: /^[0-9]+$/,
+        },
+
+        to: {
+            minLength: 1,
+            maxLength: 7,
+            regex: /^[0-9]+$/,
+        },
+    }),
 };
 
 export default fetchProfileDataTemplate;

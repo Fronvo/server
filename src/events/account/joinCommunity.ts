@@ -5,9 +5,9 @@
 import { StringSchema } from '@ezier/validate';
 import { Community } from '@prisma/client';
 import {
-    FetchCommunityDataResult,
-    FetchCommunityDataServerParams,
-} from 'interfaces/account/fetchCommunityData';
+    JoinCommunityResult,
+    JoinCommunityServerParams,
+} from 'interfaces/account/joinCommunity';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
@@ -16,9 +16,7 @@ async function joinCommunity({
     io,
     socket,
     communityId,
-}: FetchCommunityDataServerParams): Promise<
-    FetchCommunityDataResult | FronvoError
-> {
+}: JoinCommunityServerParams): Promise<JoinCommunityResult | FronvoError> {
     const accountData = await prismaClient.account.findFirst({
         where: {
             profileId: getSocketAccountId(socket.id),

@@ -67,10 +67,10 @@ async function fetchProfilePosts({
         // Cursor-based pagination is much more efficient but that would require dictionaries for each socket
         // Will consider in the future
         // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination
-        skip: Number(from),
+        skip: fromNumber,
 
         // from: 5, to: 10 = 10 - 5 = 5 posts fetched after from pos
-        take: -(Number(to) - Number(from)),
+        take: -(toNumber - fromNumber),
         select: {
             postId: true,
             author: true,
