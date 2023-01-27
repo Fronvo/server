@@ -115,6 +115,10 @@ import {
     RejectJoinRequestParams,
     RejectJoinRequestTestResult,
 } from 'interfaces/account/rejectJoinRequest';
+import {
+    FetchHomePostsGuestParams,
+    FetchHomePostsGuestTestResult,
+} from 'interfaces/noAccount/fetchHomePostsGuest';
 
 export interface ClientToServerEvents {
     register: (
@@ -229,5 +233,9 @@ export interface ClientToServerEvents {
     rejectJoinRequest: (
         {}: RejectJoinRequestParams,
         callback?: ({}: RejectJoinRequestTestResult) => void
+    ) => void;
+    fetchHomePostsGuest: (
+        {}: FetchHomePostsGuestParams,
+        callback?: ({}: FetchHomePostsGuestTestResult) => void
     ) => void;
 }
