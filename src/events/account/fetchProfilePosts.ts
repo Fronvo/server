@@ -81,7 +81,7 @@ async function fetchProfilePosts({
         },
     });
 
-    return { profilePosts };
+    return { profilePosts: profilePosts.reverse() };
 }
 
 const fetchProfileDataTemplate: EventTemplate = {
