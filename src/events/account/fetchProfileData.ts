@@ -60,7 +60,7 @@ async function fetchProfileData({
         isSelf,
         profileId: account.profileId,
         username: account.username,
-        bio: isAccessible && account.bio,
+        bio: account.bio,
         creationDate: isAccessible && account.creationDate,
         avatar: account.avatar,
         banner: account.banner,
