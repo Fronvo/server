@@ -45,7 +45,9 @@ async function fetchProfileData({
     const isPrivate = account.isPrivate;
     const isAccessible = isSelf || !isPrivate || isFollower;
 
-    let totalPosts: number = 0;
+    let totalPosts = 0;
+    let isInCommunity = false;
+    let communityId = '';
 
     if (isAccessible) {
         totalPosts = await prismaClient.post.count({
@@ -55,30 +57,54 @@ async function fetchProfileData({
         });
     }
 
+    // Get community info
+    if (account.isInCommunity) {
+        const ourAccount = await prismaClient.account.findFirst({
+            where: {
+                profileId: getSocketAccountId(socket.id),
+            },
+
+            select: {
+                isInCommunity: true,
+                communityId: true,
+            },
+        });
+
+        // Public account, see further down
+        if (isAccessible) {
+            // Invite only can't be seen on the profile
+            // Unless it's us
+            if (!community.inviteOnly || isSelf) {
+                isInCommunity = true;
+                communityId = account.communityId;
+            }
+        } else {
+            // Now, we can only get info if we are in the same community
+            if (account.communityId == ourAccount.communityId) {
+                isInCommunity = true;
+                communityId = account.communityId;
+            }
+        }
+    }
+
     // Block access to most info if private
     const profileData: FetchedFronvoAccount = {
         isSelf,
         profileId: account.profileId,
         username: account.username,
         bio: account.bio,
-        creationDate: isAccessible && account.creationDate,
+        creationDate: (isAccessible && account.creationDate) || new Date(),
         avatar: account.avatar,
         banner: account.banner,
-        following: isAccessible && account.following,
-        followers: isAccessible && account.followers,
+        following: (isAccessible && account.following) || [],
+        followers: (isAccessible && account.followers) || [],
         totalPosts,
         isPrivate,
         isFollower,
-        isInCommunity:
-            (isAccessible &&
-                (!community?.inviteOnly || isSelf) &&
-                account.isInCommunity) ||
-            false,
-        communityId:
-            isAccessible &&
-            (!community?.inviteOnly || isSelf) &&
-            account.communityId,
-        isAdmin: account.isAdmin || account.profileId == 'fronvo' || false,
+        isInCommunity,
+        communityId,
+
+        isAdmin: account.isAdmin || account.profileId == 'fronvo',
         isDisabled: account.isDisabled || false,
     };
 
