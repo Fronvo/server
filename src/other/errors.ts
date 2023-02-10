@@ -9,7 +9,7 @@ const errors: { [Error in Errors] } = {
     UNKNOWN: 'An unknown error has occured.',
     MUST_BE_LOGGED_IN: 'You must login first before using this event.',
     MUST_BE_LOGGED_OUT: 'You must logout first before using this event.',
-    MISSING_ARGUMENTS: 'Some event arguments are missing.',
+    MISSING_ARGUMENTS: 'Some arguments are missing.',
     REQUIRED: 'The %s is required.',
     REQUIRED_EMAIL: 'An email is required.',
     REQUIRED_UUID: 'A UUID is required.',
