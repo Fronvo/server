@@ -70,20 +70,17 @@ async function fetchProfileData({
             },
         });
 
-        // Public account, see further down
-        if (isAccessible) {
-            // Invite only can't be seen on the profile
-            // Unless it's us
-            if (!community.inviteOnly || isSelf) {
-                isInCommunity = true;
-                communityId = account.communityId;
-            }
-        } else {
-            // Now, we can only get info if we are in the same community
-            if (account.communityId == ourAccount.communityId) {
-                isInCommunity = true;
-                communityId = account.communityId;
-            }
+        // We can only get info if we are in the same community
+        // Or if its a public profile & public community
+        if (account.communityId == ourAccount.communityId) {
+            setCommunityInfo();
+        } else if (isAccessible && !community.inviteOnly) {
+            setCommunityInfo();
+        }
+
+        function setCommunityInfo(): void {
+            isInCommunity = true;
+            communityId = account.communityId;
         }
     }
 
