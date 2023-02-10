@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { Account, CommunityMessage } from '@prisma/client';
 import {
     FetchCommunityMessagesResult,
     FetchCommunityMessagesServerParams,
@@ -47,7 +48,21 @@ async function fetchCommunityMessages({
         );
     }
 
-    const communityMessages = await prismaClient.communityMessage.findMany({
+    // Gather available account data (not private, or followed back)
+    const messageAccounts = [];
+    const messageProfileData: Partial<Account>[] = [];
+
+    function getProfileData(author: string): Partial<Account> {
+        for (const profileIndex in messageProfileData) {
+            const targetProfile = messageProfileData[profileIndex];
+
+            if (targetProfile.profileId == author) {
+                return targetProfile;
+            }
+        }
+    }
+
+    const messages = await prismaClient.communityMessage.findMany({
         where: {
             communityId: account.communityId,
         },
@@ -70,6 +85,53 @@ async function fetchCommunityMessages({
             replyId: true,
         },
     });
+
+    // Add all profile IDs to the list
+    for (const messageIndex in messages) {
+        const message = messages[messageIndex];
+
+        if (!messageAccounts.includes(message.ownerId)) {
+            const profileData = await prismaClient.account.findFirst({
+                where: {
+                    profileId: message.ownerId,
+                },
+
+                select: {
+                    avatar: true,
+                    banner: true,
+                    bio: true,
+                    creationDate: true,
+                    followers: true,
+                    following: true,
+                    isPrivate: true,
+                    profileId: true,
+                    username: true,
+                    isAdmin: true,
+                    isDisabled: true,
+                    isInCommunity: true,
+                    communityId: true,
+                },
+            });
+
+            messageAccounts.push(message.ownerId);
+            messageProfileData.push(profileData);
+        }
+    }
+
+    const communityMessages: {
+        message: Partial<CommunityMessage>;
+        profileData: Partial<Account>;
+    }[] = [];
+
+    // Push post data with profile data
+    for (const messageIndex in messages) {
+        const message = messages[messageIndex];
+
+        communityMessages.push({
+            message,
+            profileData: getProfileData(message.ownerId),
+        });
+    }
 
     return { communityMessages: communityMessages.reverse() };
 }

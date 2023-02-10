@@ -37,18 +37,20 @@ function sendCommunityMessage(
     callback: TestErrorCallback
 ): void {
     socket.on('newCommunityMessage', ({ newMessageData }) => {
+        const newMessage = newMessageData.message;
+
         callback(
-            assertType({ communityId: newMessageData.communityId }, 'string') ||
-                assertType({ ownerId: newMessageData.ownerId }, 'string') ||
-                assertType({ messageId: newMessageData.messageId }, 'string') ||
-                assertType({ description: newMessageData.content }, 'string') ||
+            assertType({ communityId: newMessage.communityId }, 'string') ||
+                assertType({ ownerId: newMessage.ownerId }, 'string') ||
+                assertType({ messageId: newMessage.messageId }, 'string') ||
+                assertType({ description: newMessage.content }, 'string') ||
                 assertNotEqual(
-                    { creationDate: new Date(newMessageData.creationDate) },
+                    { creationDate: new Date(newMessage.creationDate) },
                     'Invalid Date'
                 )
         );
 
-        shared.setTestVariable('sharedMessageId', newMessageData.messageId);
+        shared.setTestVariable('sharedMessageId', newMessage.messageId);
 
         done();
     });

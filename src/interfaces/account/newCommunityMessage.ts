@@ -2,8 +2,11 @@
 // Interfaces for the newCommunityMessage event file.
 // ******************** //
 
-import { CommunityMessage } from '@prisma/client';
+import { Account, CommunityMessage } from '@prisma/client';
 
 export interface NewCommunityMessageParams {
-    newMessageData: CommunityMessage;
+    newMessageData: {
+        message: Partial<CommunityMessage>;
+        profileData: Partial<Account>;
+    };
 }

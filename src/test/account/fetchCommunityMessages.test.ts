@@ -79,7 +79,7 @@ function fetchCommunityMessages(
         ({ err, communityMessages }): void => {
             callback(assertError({ err }));
 
-            const targetMessage = communityMessages[0];
+            const targetMessage = communityMessages[0].message;
 
             callback(
                 assertType(

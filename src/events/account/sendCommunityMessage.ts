@@ -28,6 +28,22 @@ async function sendCommunityMessage({
         where: {
             profileId: getSocketAccountId(socket.id),
         },
+
+        select: {
+            avatar: true,
+            banner: true,
+            bio: true,
+            creationDate: true,
+            followers: true,
+            following: true,
+            isPrivate: true,
+            profileId: true,
+            username: true,
+            isAdmin: true,
+            isDisabled: true,
+            isInCommunity: true,
+            communityId: true,
+        },
     });
 
     if (!account.isInCommunity) {
@@ -75,9 +91,24 @@ async function sendCommunityMessage({
             isReply: Boolean(replyId),
             replyId: replyId || '',
         },
+
+        select: {
+            ownerId: true,
+            communityId: true,
+            content: true,
+            creationDate: true,
+            isReply: true,
+            messageId: true,
+            replyId: true,
+        },
     });
 
-    io.to(account.communityId).emit('newCommunityMessage', { newMessageData });
+    io.to(account.communityId).emit('newCommunityMessage', {
+        newMessageData: {
+            message: newMessageData,
+            profileData: account,
+        },
+    });
 
     return {};
 }
