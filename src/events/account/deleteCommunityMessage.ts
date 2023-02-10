@@ -34,7 +34,17 @@ async function deleteCommunityMessage({
         },
     });
 
-    if (account.profileId != community.ownerId) {
+    const targetMessage = await prismaClient.communityMessage.findFirst({
+        where: {
+            messageId,
+        },
+    });
+
+    // Must be the message author / community owner
+    if (
+        account.profileId != community.ownerId &&
+        account.profileId != targetMessage.ownerId
+    ) {
         return generateError('NOT_COMMUNITY_OWNER');
     }
 
