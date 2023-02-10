@@ -82,7 +82,7 @@ async function fetchCommunityMessages({
             creationDate: true,
             isReply: true,
             messageId: true,
-            replyId: true,
+            replyContent: true,
         },
     });
 

@@ -82,6 +82,26 @@ async function sendCommunityMessage({
         return generateError('NO_CHAT_PERMISSION');
     }
 
+    let replyContent = '';
+
+    if (replyId) {
+        const replyMessage = await prismaClient.communityMessage.findFirst({
+            where: {
+                messageId: replyId,
+            },
+
+            select: {
+                content: true,
+            },
+        });
+
+        if (!replyMessage) {
+            return generateError('INVALID_MESSAGE');
+        }
+
+        replyContent = replyMessage.content;
+    }
+
     const newMessageData = await prismaClient.communityMessage.create({
         data: {
             ownerId: account.profileId,
@@ -89,7 +109,7 @@ async function sendCommunityMessage({
             messageId: v4(),
             content: message,
             isReply: Boolean(replyId),
-            replyId: replyId || '',
+            replyContent,
         },
 
         select: {
@@ -99,7 +119,7 @@ async function sendCommunityMessage({
             creationDate: true,
             isReply: true,
             messageId: true,
-            replyId: true,
+            replyContent: true,
         },
     });
 

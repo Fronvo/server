@@ -96,7 +96,10 @@ function fetchCommunityMessages(
                         { creationDate: new Date(targetMessage.creationDate) },
                         'Invalid Date'
                     ) ||
-                    assertType({ replyId: targetMessage.replyId }, 'string') ||
+                    assertType(
+                        { replyContent: targetMessage.replyContent },
+                        'string'
+                    ) ||
                     assertType({ isReply: targetMessage.isReply }, 'boolean')
             );
 

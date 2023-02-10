@@ -60,7 +60,7 @@ model CommunityMessage {
   content      String
   creationDate DateTime @default(now())
   isReply      Boolean  @default(false)
-  replyId      String   @default("")
+  replyContent String   @default("")
 }
 
 model Token {
