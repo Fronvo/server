@@ -97,6 +97,21 @@ function fetchCommunityData(
                     assertType(
                         { totalMessages: communityData.totalMessages },
                         'number'
+                    ) ||
+                    assertType(
+                        { inviteOnly: communityData.inviteOnly },
+                        'boolean'
+                    ) ||
+                    assertType(
+                        {
+                            acceptedChatRequests:
+                                communityData.acceptedChatRequests,
+                        },
+                        'object'
+                    ) ||
+                    assertType(
+                        { bannedMembers: communityData.bannedMembers },
+                        'object'
                     )
             );
 

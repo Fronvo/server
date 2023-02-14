@@ -17,6 +17,7 @@ const sharedVariables: { [TestVariable in SharedTestVariablesType] } = {
     password: generatePassword(),
     token: '',
     profileId: '',
+    secondaryProfileToken: '',
     secondaryProfileId: '',
     sharedPostId: '',
     createdCommunityId: '',

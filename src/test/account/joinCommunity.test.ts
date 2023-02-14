@@ -3,6 +3,7 @@
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
+import sharedVariables, { setTestVariable } from 'test/shared';
 import {
     assertCode,
     assertEquals,
@@ -111,8 +112,44 @@ function joinCommunity(
                         name: generateChars(5),
                         description: generateChars(15),
                     },
-                    () => {
-                        done();
+                    ({ communityData }) => {
+                        // Add second profile to this community aswell, (kick ban etc.)
+                        socket.emit('logout', () => {
+                            socket.emit(
+                                'loginToken',
+                                {
+                                    token: sharedVariables.secondaryProfileToken,
+                                },
+                                () => {
+                                    socket.emit(
+                                        'joinCommunity',
+                                        {
+                                            communityId:
+                                                communityData.communityId,
+                                        },
+                                        () => {
+                                            socket.emit('logout', () => {
+                                                socket.emit(
+                                                    'loginToken',
+                                                    {
+                                                        token: sharedVariables.token,
+                                                    },
+                                                    () => {
+                                                        // Update communityId
+                                                        setTestVariable(
+                                                            'createdCommunityId',
+                                                            communityData.communityId
+                                                        );
+
+                                                        done();
+                                                    }
+                                                );
+                                            });
+                                        }
+                                    );
+                                }
+                            );
+                        });
                     }
                 );
             });

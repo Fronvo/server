@@ -164,20 +164,34 @@ function accountExists(
                 socket.emit('fetchProfileId', ({ profileId }) => {
                     setTestVariable('secondaryProfileId', profileId);
 
+                    // Get token
                     socket.emit('logout', () => {
                         socket.emit(
-                            'register',
+                            'login',
                             {
                                 email: existsEmail,
                                 password: existsPassword,
                             },
-                            ({ err }) => {
-                                callback(
-                                    assertCode(
-                                        err.code,
-                                        'ACCOUNT_ALREADY_EXISTS'
-                                    )
-                                );
+                            ({ token }) => {
+                                setTestVariable('secondaryProfileToken', token);
+
+                                socket.emit('logout', () => {
+                                    socket.emit(
+                                        'register',
+                                        {
+                                            email: existsEmail,
+                                            password: existsPassword,
+                                        },
+                                        ({ err }) => {
+                                            callback(
+                                                assertCode(
+                                                    err.code,
+                                                    'ACCOUNT_ALREADY_EXISTS'
+                                                )
+                                            );
+                                        }
+                                    );
+                                });
                             }
                         );
                     });

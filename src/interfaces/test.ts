@@ -16,6 +16,7 @@ export type SharedTestVariablesType =
     | 'password'
     | 'token'
     | 'profileId'
+    | 'secondaryProfileToken'
     | 'secondaryProfileId'
     | 'sharedPostId'
     | 'createdCommunityId'

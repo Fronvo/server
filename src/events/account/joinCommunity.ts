@@ -37,6 +37,11 @@ async function joinCommunity({
         return generateError('COMMUNITY_NOT_FOUND');
     }
 
+    // Check if banned
+    if (community.bannedMembers.includes(accountData.profileId)) {
+        return generateError('COMMUNITY_BAN');
+    }
+
     // Finally, join the community
     await prismaClient.community.update({
         where: {
@@ -69,11 +74,12 @@ async function joinCommunity({
         members: community.members,
     };
 
+    // Add socket to community room
+    await socket.join(communityId);
+
     io.to(communityId).emit('memberJoined', {
         profileId: accountData.profileId,
     });
-
-    await socket.join(communityId);
 
     return { communityData };
 }

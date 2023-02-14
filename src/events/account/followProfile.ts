@@ -71,7 +71,7 @@ async function followProfile({
     return {};
 }
 
-const fetchProfileIdTemplate: EventTemplate = {
+const followProfileTemplate: EventTemplate = {
     func: followProfile,
     template: ['profileId'],
     schema: new StringSchema({
@@ -83,4 +83,4 @@ const fetchProfileIdTemplate: EventTemplate = {
     }),
 };
 
-export default fetchProfileIdTemplate;
+export default followProfileTemplate;

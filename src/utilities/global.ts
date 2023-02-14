@@ -20,7 +20,7 @@ export function loginSocket(
     socket: Socket<ClientToServerEvents, ServerToClientEvents>,
     accountId: string
 ): void {
-    variables.loggedInSockets[socket.id] = { accountId };
+    variables.loggedInSockets[socket.id] = { accountId, socket };
 }
 
 export function logoutSocket(
@@ -44,6 +44,16 @@ export function isAccountLoggedIn(accountId: string): boolean {
     }
 
     return false;
+}
+
+export function getAccountSocketId(accountId: string): string {
+    for (const socketKeyIndex in variables.loggedInSockets) {
+        if (getSocketAccountId(socketKeyIndex) == accountId) {
+            return socketKeyIndex;
+        }
+    }
+
+    return '';
 }
 
 export function getSocketAccountId(socketId: string): string {

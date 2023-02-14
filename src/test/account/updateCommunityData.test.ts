@@ -169,7 +169,7 @@ function updateCommunityData(
 
             callback(
                 assertType(
-                    { communityID: communityData.communityId },
+                    { communityId: communityData.communityId },
                     'string'
                 ) ||
                     assertType({ name: communityData.name }, 'string') ||

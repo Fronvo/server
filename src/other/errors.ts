@@ -49,6 +49,8 @@ const errors: { [Error in Errors] } = {
     NOT_HIGHER_NUMBER:
         "The '%s' parameter must be a higher number than parameter '%s'.",
     TOO_MUCH_LOAD: "You can't load more than %i %s.",
+    COMMUNITY_BAN: 'You have been banned from this community.',
+    MEMBER_NOT_BANNED: 'This member has not been banned from this community.',
 };
 
 export default errors;

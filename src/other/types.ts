@@ -41,7 +41,9 @@ export type Errors =
     | 'ACCOUNT_NOT_ACCEPTED'
     | 'REQUEST_DOESNT_EXIST'
     | 'NOT_HIGHER_NUMBER'
-    | 'TOO_MUCH_LOAD';
+    | 'TOO_MUCH_LOAD'
+    | 'COMMUNITY_BAN'
+    | 'MEMBER_NOT_BANNED';
 
 export type TestAssertTypes =
     | 'string'

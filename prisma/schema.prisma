@@ -50,6 +50,7 @@ model Community {
   members              Json[]
   inviteOnly           Boolean  @default(false)
   acceptedChatRequests Json[]
+  bannedMembers        Json[]
 }
 
 model CommunityMessage {

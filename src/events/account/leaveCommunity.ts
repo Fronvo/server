@@ -59,6 +59,9 @@ async function leaveCommunity({
         });
 
         io.to(community.communityId).emit('communityDeleted');
+
+        // Clear room
+        io.socketsLeave(community.communityId);
     } else {
         // First, remove references to this community from the member's account
         await prismaClient.account.update({
@@ -99,11 +102,15 @@ async function leaveCommunity({
                 acceptedChatRequests: newAcceptedChatRequests,
             },
         });
-    }
 
-    io.to(community.communityId).emit('memberLeft', {
-        profileId: accountData.profileId,
-    });
+        // Remove socket from community room
+        await socket.leave(community.communityId);
+
+        // Member left, update members
+        io.to(community.communityId).emit('memberLeft', {
+            profileId: accountData.profileId,
+        });
+    }
 
     return {};
 }

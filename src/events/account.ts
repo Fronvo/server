@@ -27,6 +27,10 @@ import toggleDisableAccount from 'events/account/toggleDisableAccount';
 import acceptJoinRequest from 'events/account/acceptJoinRequest';
 import listJoinRequests from 'events/account/listJoinRequests';
 import rejectJoinRequest from 'events/account/rejectJoinRequest';
+import kickMember from 'events/account/kickMember';
+import banMember from 'events/account/banMember';
+import showBannedMembers from 'events/account/showBannedMembers';
+import unbanMember from 'events/account/unbanMember';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -56,6 +60,10 @@ const accountTemplate: EventExportTemplate = {
     acceptJoinRequest,
     listJoinRequests,
     rejectJoinRequest,
+    kickMember,
+    banMember,
+    showBannedMembers,
+    unbanMember,
 };
 
 export default accountTemplate;

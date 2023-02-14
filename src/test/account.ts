@@ -20,6 +20,10 @@ import joinCommunity from 'test/account/joinCommunity.test';
 import sendCommunityMessage from 'test/account/sendCommunityMessage.test';
 import fetchCommunityMessages from 'test/account/fetchCommunityMessages.test';
 import deleteCommunityMessage from 'test/account/deleteCommunityMessage.test';
+import kickMember from 'test/account/kickMember.test';
+import banMember from 'test/account/banMember.test';
+import showBannedMembers from 'test/account/showBannedMembers.test';
+import unbanMember from 'test/account/unbanMember.test';
 import leaveCommunity from 'test/account/leaveCommunity.test';
 import logout from 'test/account/logout.test';
 
@@ -42,6 +46,10 @@ export default {
     sendCommunityMessage,
     fetchCommunityMessages,
     deleteCommunityMessage,
+    kickMember,
+    banMember,
+    showBannedMembers,
+    unbanMember,
     leaveCommunity,
     logout,
 };

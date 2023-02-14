@@ -42,6 +42,7 @@ async function fetchCommunityData({
                 communityId: community.communityId,
             },
         }),
+        bannedMembers: community.bannedMembers || [],
     };
 
     return { communityData };
