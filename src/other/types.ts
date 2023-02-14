@@ -43,7 +43,8 @@ export type Errors =
     | 'NOT_HIGHER_NUMBER'
     | 'TOO_MUCH_LOAD'
     | 'COMMUNITY_BAN'
-    | 'MEMBER_NOT_BANNED';
+    | 'MEMBER_NOT_BANNED'
+    | 'CHAT_REQUESTS_DISABLED';
 
 export type TestAssertTypes =
     | 'string'

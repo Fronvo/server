@@ -74,11 +74,15 @@ async function sendCommunityMessage({
         },
 
         select: {
+            chatRequestsEnabled: true,
             acceptedChatRequests: true,
         },
     });
 
-    if (!community.acceptedChatRequests.includes(account.profileId)) {
+    if (
+        community.chatRequestsEnabled &&
+        !community.acceptedChatRequests.includes(account.profileId)
+    ) {
         return generateError('NO_CHAT_PERMISSION');
     }
 

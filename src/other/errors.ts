@@ -51,6 +51,7 @@ const errors: { [Error in Errors] } = {
     TOO_MUCH_LOAD: "You can't load more than %i %s.",
     COMMUNITY_BAN: 'You have been banned from this community.',
     MEMBER_NOT_BANNED: 'This member has not been banned from this community.',
+    CHAT_REQUESTS_DISABLED: 'Chat requests have not been enabled.',
 };
 
 export default errors;

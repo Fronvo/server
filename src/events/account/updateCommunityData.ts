@@ -12,12 +12,14 @@ import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function updateCommunityData({
+    io,
     socket,
     communityId,
     name,
     description,
     icon,
     inviteOnly,
+    chatRequestsEnabled,
 }: UpdateCommunityDataServerParams): Promise<
     UpdateCommunityDataResult | FronvoError
 > {
@@ -29,7 +31,8 @@ async function updateCommunityData({
         description != '' &&
         !icon &&
         icon != '' &&
-        inviteOnly == undefined
+        inviteOnly == undefined &&
+        chatRequestsEnabled == undefined
     ) {
         return {
             err: undefined,
@@ -58,6 +61,12 @@ async function updateCommunityData({
         }
     }
 
+    if (chatRequestsEnabled) {
+        if (typeof chatRequestsEnabled != 'boolean') {
+            return generateError('NOT_BOOLEAN');
+        }
+    }
+
     // Fetch old community id
     const accountData = await prismaClient.account.findFirst({
         where: {
@@ -82,6 +91,7 @@ async function updateCommunityData({
             description: description || previousCommunity.description,
             icon,
             inviteOnly,
+            chatRequestsEnabled,
         },
 
         where: {
@@ -94,6 +104,7 @@ async function updateCommunityData({
             description: true,
             icon: true,
             inviteOnly: true,
+            chatRequestsEnabled: true,
         },
     });
 
@@ -123,12 +134,26 @@ async function updateCommunityData({
         });
     }
 
+    // Send chat request update if updated
+    if (previousCommunity.chatRequestsEnabled != chatRequestsEnabled) {
+        io.to(communityData.communityId).emit('communityChatRequestsUpdated', {
+            state: chatRequestsEnabled,
+        });
+    }
+
     return { communityData };
 }
 
 const updateCommunityDataTemplate: EventTemplate = {
     func: updateCommunityData,
-    template: ['communityId', 'name', 'description', 'icon', 'inviteOnly'],
+    template: [
+        'communityId',
+        'name',
+        'description',
+        'icon',
+        'inviteOnly',
+        'chatRequestsEnabled',
+    ],
     schema: new StringSchema({
         communityId: {
             minLength: 3,
@@ -157,6 +182,10 @@ const updateCommunityDataTemplate: EventTemplate = {
         },
 
         inviteOnly: {
+            optional: true,
+        },
+
+        chatRequestsEnabled: {
             optional: true,
         },
     }),

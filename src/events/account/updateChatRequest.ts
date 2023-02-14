@@ -46,6 +46,10 @@ async function updateChatRequest({
         return generateError('NOT_COMMUNITY_OWNER');
     }
 
+    if (!community.chatRequestsEnabled) {
+        return generateError('CHAT_REQUESTS_DISABLED');
+    }
+
     const targetAccount = await prismaClient.account.findFirst({
         where: {
             profileId,
