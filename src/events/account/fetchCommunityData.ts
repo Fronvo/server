@@ -36,7 +36,10 @@ async function fetchCommunityData({
         icon: community.icon,
         members: community.members,
         inviteOnly: community.inviteOnly || false,
-        chatRequestsEnabled: community.chatRequestsEnabled || false,
+        chatRequestsEnabled:
+            typeof community.chatRequestsEnabled != 'undefined'
+                ? community.chatRequestsEnabled
+                : true,
         acceptedChatRequests: community.acceptedChatRequests || [],
         totalMessages: await prismaClient.communityMessage.count({
             where: {
