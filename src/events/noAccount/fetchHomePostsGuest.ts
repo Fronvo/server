@@ -90,7 +90,6 @@ async function fetchHomePostsGuest({
 
         select: {
             postId: true,
-            title: true,
             content: true,
             author: true,
             attachment: true,

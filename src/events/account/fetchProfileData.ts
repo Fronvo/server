@@ -25,18 +25,8 @@ async function fetchProfileData({
         },
     });
 
-    let community: Community;
-
     if (!account) {
         return generateError('PROFILE_NOT_FOUND');
-    }
-
-    if (account.isInCommunity) {
-        community = await prismaClient.community.findFirst({
-            where: {
-                communityId: account.communityId,
-            },
-        });
     }
 
     const isSelf = getSocketAccountId(socket.id) == profileId;
@@ -46,8 +36,6 @@ async function fetchProfileData({
     const isAccessible = isSelf || !isPrivate || isFollower;
 
     let totalPosts = 0;
-    let isInCommunity = false;
-    let communityId = '';
 
     if (isAccessible) {
         totalPosts = await prismaClient.post.count({
@@ -55,33 +43,6 @@ async function fetchProfileData({
                 author: profileId,
             },
         });
-    }
-
-    // Get community info
-    if (account.isInCommunity) {
-        const ourAccount = await prismaClient.account.findFirst({
-            where: {
-                profileId: getSocketAccountId(socket.id),
-            },
-
-            select: {
-                isInCommunity: true,
-                communityId: true,
-            },
-        });
-
-        // We can only get info if we are in the same community
-        // Or if its a public profile & public community
-        if (account.communityId == ourAccount.communityId) {
-            setCommunityInfo();
-        } else if (isAccessible && !community.inviteOnly) {
-            setCommunityInfo();
-        }
-
-        function setCommunityInfo(): void {
-            isInCommunity = true;
-            communityId = account.communityId;
-        }
     }
 
     // Block access to most info if private
@@ -98,9 +59,6 @@ async function fetchProfileData({
         totalPosts,
         isPrivate,
         isFollower,
-        isInCommunity,
-        communityId,
-
         isAdmin: account.isAdmin || account.profileId == 'fronvo',
         isDisabled: account.isDisabled || false,
     };
@@ -108,6 +66,8 @@ async function fetchProfileData({
     // More data if our profile
     if (profileData.isSelf) {
         profileData.email = account.email;
+        profileData.isInCommunity = account.isInCommunity;
+        profileData.communityId = account.communityId;
     }
 
     return { profileData };

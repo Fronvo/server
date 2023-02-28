@@ -40,10 +40,6 @@ import {
     FetchProfilePostsTestResult,
 } from 'interfaces/account/fetchProfilePosts';
 import {
-    FindCommunitiesParams,
-    FindCommunitiesTestResult,
-} from 'interfaces/account/findCommunities';
-import {
     FindProfilesParams,
     FindProfilesTestResult,
 } from 'interfaces/account/findProfiles';
@@ -213,10 +209,6 @@ export interface ClientToServerEvents {
     fetchCommunityData: (
         {}: FetchCommunityDataParams,
         callback?: ({}: FetchCommunityDataTestResult) => void
-    ) => void;
-    findCommunities: (
-        {}: FindCommunitiesParams,
-        callback?: ({}: FindCommunitiesTestResult) => void
     ) => void;
     updateCommunityData: (
         {}: UpdateCommunityDataParams,

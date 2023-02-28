@@ -129,7 +129,6 @@ async function fetchProfilePosts({
 
         select: {
             postId: true,
-            title: true,
             content: true,
             author: true,
             attachment: true,

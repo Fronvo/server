@@ -33,7 +33,6 @@ model Post {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   postId       String   @unique @default(uuid())
   author       String
-  title        String
   content      String
   attachment   String   @default("")
   creationDate DateTime @default(now())
@@ -44,7 +43,6 @@ model Community {
   ownerId              String
   communityId          String   @unique
   name                 String
-  description          String
   creationDate         DateTime @default(now())
   icon                 String   @default("")
   members              Json[]

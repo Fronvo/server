@@ -21,7 +21,7 @@ function lengthCommunityIdMin(
     socket.emit(
         'joinCommunity',
         {
-            communityId: generateChars(2),
+            communityId: generateChars(1),
         },
         ({ err }) => {
             callback(
@@ -84,10 +84,6 @@ function joinCommunity(
                 ) ||
                     assertType({ ownerId: communityData.ownerId }, 'string') ||
                     assertType({ name: communityData.name }, 'string') ||
-                    assertType(
-                        { description: communityData.description },
-                        'string'
-                    ) ||
                     assertType({ icon: communityData.icon }, 'string') ||
                     assertNotEqual(
                         { creationDate: new Date(communityData.creationDate) },
@@ -110,7 +106,6 @@ function joinCommunity(
                     'createCommunity',
                     {
                         name: generateChars(5),
-                        description: generateChars(15),
                     },
                     ({ communityData }) => {
                         // Add second profile to this community aswell, (kick ban etc.)

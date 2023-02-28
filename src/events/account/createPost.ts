@@ -13,24 +13,20 @@ import { prismaClient } from 'variables/global';
 
 async function createPost({
     socket,
-    title,
     attachment,
     content,
 }: CreatePostServerParams): Promise<CreatePostResult | FronvoError> {
-    title = title.replace(/\n\n/g, '\n');
     content = content.replace(/\n\n/g, '\n');
 
     const postData = await prismaClient.post.create({
         data: {
             author: getSocketAccountId(socket.id),
-            title,
             content,
             attachment,
         },
         select: {
             postId: true,
             author: true,
-            title: true,
             content: true,
             attachment: true,
             creationDate: true,
@@ -42,20 +38,15 @@ async function createPost({
 
 const createPostTemplate: EventTemplate = {
     func: createPost,
-    template: ['title', 'content', 'attachment'],
+    template: ['content', 'attachment'],
     schema: new StringSchema({
-        title: {
-            minLength: 5,
-            maxLength: 30,
-        },
-
         content: {
-            minLength: 15,
-            maxLength: 256,
+            minLength: 2,
+            maxLength: 512,
         },
 
         attachment: {
-            maxLength: 256,
+            maxLength: 512,
             regex: /^(https:\/\/).+$/,
             optional: true,
         },

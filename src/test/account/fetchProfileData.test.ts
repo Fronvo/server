@@ -111,14 +111,6 @@ function fetchProfileData(
                         { isFollower: profileData.isFollower },
                         'boolean'
                     ) ||
-                    assertType(
-                        { isInCommunity: profileData.isInCommunity },
-                        'boolean'
-                    ) ||
-                    assertType(
-                        { communityId: profileData.communityId },
-                        'string'
-                    ) ||
                     assertType({ isAdmin: profileData.isAdmin }, 'boolean') ||
                     assertType(
                         { isDisabled: profileData.isDisabled },

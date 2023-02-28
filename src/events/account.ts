@@ -16,7 +16,6 @@ import fetchHomePosts from 'events/account/fetchHomePosts';
 import createCommunity from 'events/account/createCommunity';
 import joinCommunity from 'events/account/joinCommunity';
 import fetchCommunityData from 'events/account/fetchCommunityData';
-import findCommunities from 'events/account/findCommunities';
 import updateCommunityData from 'events/account/updateCommunityData';
 import leaveCommunity from 'events/account/leaveCommunity';
 import sendCommunityMessage from 'events/account/sendCommunityMessage';
@@ -49,7 +48,6 @@ const accountTemplate: EventExportTemplate = {
     createCommunity,
     joinCommunity,
     fetchCommunityData,
-    findCommunities,
     updateCommunityData,
     leaveCommunity,
     sendCommunityMessage,

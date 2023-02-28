@@ -164,7 +164,6 @@ function fetchProfilePosts(
             callback(
                 assertType({ postId: targetPost.postId }, 'string') ||
                     assertType({ author: targetPost.author }, 'string') ||
-                    assertType({ title: targetPost.title }, 'string') ||
                     assertType({ content: targetPost.content }, 'string') ||
                     assertType(
                         { attachment: targetPost.attachment },

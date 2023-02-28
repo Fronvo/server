@@ -21,7 +21,7 @@ function lengthCommunityIdMin(
     socket.emit(
         'fetchCommunityData',
         {
-            communityId: generateChars(2),
+            communityId: generateChars(1),
         },
         ({ err }) => {
             callback(
@@ -84,10 +84,6 @@ function fetchCommunityData(
                 ) ||
                     assertType({ ownerId: communityData.ownerId }, 'string') ||
                     assertType({ name: communityData.name }, 'string') ||
-                    assertType(
-                        { description: communityData.description },
-                        'string'
-                    ) ||
                     assertType({ icon: communityData.icon }, 'string') ||
                     assertNotEqual(
                         { creationDate: new Date(communityData.creationDate) },

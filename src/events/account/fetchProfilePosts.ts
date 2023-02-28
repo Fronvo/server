@@ -74,7 +74,6 @@ async function fetchProfilePosts({
         select: {
             postId: true,
             author: true,
-            title: true,
             content: true,
             attachment: true,
             creationDate: true,

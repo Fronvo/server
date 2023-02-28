@@ -20,7 +20,7 @@ function lengthCommunityIdMin(
     socket.emit(
         'updateCommunityData',
         {
-            communityId: generateChars(2),
+            communityId: generateChars(1),
         },
         ({ err }) => {
             callback(
@@ -80,24 +80,6 @@ function lengthNameMax(
             callback(
                 assertCode(err.code, 'LENGTH') ||
                     assertEquals({ for: err.extras.for }, 'name')
-            );
-        }
-    );
-}
-
-function lengthDescriptionMax(
-    { socket }: Partial<TestArguments>,
-    callback: TestErrorCallback
-): void {
-    socket.emit(
-        'updateCommunityData',
-        {
-            description: generateChars(129),
-        },
-        ({ err }) => {
-            callback(
-                assertCode(err.code, 'LENGTH') ||
-                    assertEquals({ for: err.extras.for }, 'description')
             );
         }
     );
@@ -189,10 +171,6 @@ function updateCommunityData(
                     'string'
                 ) ||
                     assertType({ name: communityData.name }, 'string') ||
-                    assertType(
-                        { desciption: communityData.description },
-                        'string'
-                    ) ||
                     assertType({ icon: communityData.icon }, 'string')
             );
 
@@ -210,7 +188,6 @@ export default (testArgs: TestArguments): void => {
             lengthCommunityIdMax,
             lengthNameMin,
             lengthNameMax,
-            lengthDescriptionMax,
             lengthIconMax,
             invalidInviteOnly,
             invalidChatRequestsEnabled,

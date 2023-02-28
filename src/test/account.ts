@@ -15,7 +15,6 @@ import fetchHomePosts from 'test/account/fetchHomePosts.test';
 import createCommunity from 'test/account/createCommunity.test';
 import fetchCommunityData from 'test/account/fetchCommunityData.test';
 import updateCommunityData from 'test/account/updateCommunityData.test';
-import findCommunities from 'test/account/findCommunities.test';
 import joinCommunity from 'test/account/joinCommunity.test';
 import sendCommunityMessage from 'test/account/sendCommunityMessage.test';
 import fetchCommunityMessages from 'test/account/fetchCommunityMessages.test';
@@ -41,7 +40,6 @@ export default {
     createCommunity,
     fetchCommunityData,
     updateCommunityData,
-    findCommunities,
     joinCommunity,
     sendCommunityMessage,
     fetchCommunityMessages,

@@ -6,7 +6,6 @@ import { Post } from '@prisma/client';
 import { EventArguments, FronvoError } from 'interfaces/all';
 
 export interface CreatePostParams {
-    title: string;
     content: string;
     attachment?: string;
 }

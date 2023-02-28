@@ -15,11 +15,9 @@ import { prismaClient } from 'variables/global';
 async function createCommunity({
     socket,
     name,
-    description,
     icon,
 }: CreateCommunityServerParams): Promise<CreateCommunityResult | FronvoError> {
     name = name.replace(/\n/g, '');
-    description = description.replace(/\n\n/g, '\n');
 
     const accountData = await prismaClient.account.findFirst({
         where: {
@@ -38,7 +36,6 @@ async function createCommunity({
             communityId,
             ownerId: accountData.profileId,
             name,
-            description,
             icon,
             members: [accountData.profileId],
             chatRequestsEnabled: true,
@@ -49,7 +46,6 @@ async function createCommunity({
             communityId: true,
             ownerId: true,
             name: true,
-            description: true,
             creationDate: true,
             icon: true,
             members: true,
@@ -77,16 +73,11 @@ async function createCommunity({
 
 const createCommunityTemplate: EventTemplate = {
     func: createCommunity,
-    template: ['name', 'description', 'icon'],
+    template: ['name', 'icon'],
     schema: new StringSchema({
         name: {
-            minLength: 3,
+            minLength: 2,
             maxLength: 15,
-        },
-
-        description: {
-            minLength: 5,
-            maxLength: 50,
         },
 
         icon: {

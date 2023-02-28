@@ -152,7 +152,6 @@ async function setupDB(): Promise<void> {
             socket.emit(
                 'createPost',
                 {
-                    title: 'Welcome to Fronvo',
                     content: `Never be tracked again.
 Ads..?
 What are those?`,
@@ -169,7 +168,6 @@ What are those?`,
             socket.emit(
                 'createPost',
                 {
-                    title: 'Official Account Warning',
                     content: `This account, post and community have been auto-generated.
 Someone must first login to this account before trying to self-host this server instance.
 Other than that, have fun!`,
@@ -187,7 +185,6 @@ Other than that, have fun!`,
                 'createCommunity',
                 {
                     name: 'Fronvo',
-                    description: 'The official community of Fronvo.',
                     icon: 'https://i.ibb.co/QFT7SNj/logo.png',
                 },
                 () => {

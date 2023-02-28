@@ -68,7 +68,6 @@ async function joinCommunity({
         communityId,
         ownerId: community.ownerId,
         name: community.name,
-        description: community.description,
         creationDate: community.creationDate,
         icon: community.icon,
         members: community.members,
@@ -89,7 +88,7 @@ const joinCommunityTemplate: EventTemplate = {
     template: ['communityId'],
     schema: new StringSchema({
         communityId: {
-            minLength: 3,
+            minLength: 2,
             maxLength: 15,
             regex: /^[a-z0-9]+$/,
         },

@@ -14,44 +14,6 @@ import {
     generateChars,
 } from 'test/utilities';
 
-function lengthTitleMin(
-    { socket }: Partial<TestArguments>,
-    callback: TestErrorCallback
-): void {
-    socket.emit(
-        'createPost',
-        {
-            title: generateChars(4),
-            content: generateChars(10),
-        },
-        ({ err }) => {
-            callback(
-                assertCode(err.code, 'LENGTH') ||
-                    assertEquals({ for: err.extras.for }, 'title')
-            );
-        }
-    );
-}
-
-function lengthTitleMax(
-    { socket }: Partial<TestArguments>,
-    callback: TestErrorCallback
-): void {
-    socket.emit(
-        'createPost',
-        {
-            title: generateChars(31),
-            content: generateChars(10),
-        },
-        ({ err }) => {
-            callback(
-                assertCode(err.code, 'LENGTH') ||
-                    assertEquals({ for: err.extras.for }, 'title')
-            );
-        }
-    );
-}
-
 function lengthContentMin(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
@@ -59,8 +21,7 @@ function lengthContentMin(
     socket.emit(
         'createPost',
         {
-            title: generateChars(5),
-            content: generateChars(14),
+            content: generateChars(1),
         },
         ({ err }) => {
             callback(
@@ -78,8 +39,7 @@ function lengthContentMax(
     socket.emit(
         'createPost',
         {
-            title: generateChars(5),
-            content: generateChars(257),
+            content: generateChars(513),
         },
         ({ err }) => {
             callback(
@@ -97,9 +57,8 @@ function lengthAttachmentMax(
     socket.emit(
         'createPost',
         {
-            title: generateChars(5),
             content: generateChars(15),
-            attachment: `https://${generateChars(257)}`,
+            attachment: `https://${generateChars(513)}`,
         },
         ({ err }) => {
             callback(
@@ -117,7 +76,6 @@ function createPost(
     socket.emit(
         'createPost',
         {
-            title: generateChars(5),
             content: generateChars(15),
             attachment: `https://${generateChars(10)}`,
         },
@@ -127,7 +85,6 @@ function createPost(
             callback(
                 assertType({ postId: postData.postId }, 'string') ||
                     assertType({ author: postData.author }, 'string') ||
-                    assertType({ title: postData.title }, 'string') ||
                     assertType({ content: postData.content }, 'string') ||
                     assertType({ attachment: postData.attachment }, 'string') ||
                     assertNotEqual(
@@ -146,8 +103,6 @@ function createPost(
 export default (testArgs: TestArguments): void => {
     assertErrors(
         {
-            lengthTitleMin,
-            lengthTitleMax,
             lengthContentMin,
             lengthContentMax,
             lengthAttachmentMax,

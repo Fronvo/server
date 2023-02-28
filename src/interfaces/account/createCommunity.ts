@@ -2,12 +2,11 @@
 // Interfaces for the createCommunity event file.
 // ******************** //
 
-import { Community, Post } from '@prisma/client';
+import { Community } from '@prisma/client';
 import { EventArguments, FronvoError } from 'interfaces/all';
 
 export interface CreateCommunityParams {
     name: string;
-    description: string;
     icon?: string;
 }
 

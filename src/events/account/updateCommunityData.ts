@@ -88,7 +88,6 @@ async function updateCommunityData({
         data: {
             communityId,
             name,
-            description: description || previousCommunity.description,
             icon,
             inviteOnly,
             chatRequestsEnabled,
@@ -101,7 +100,6 @@ async function updateCommunityData({
         select: {
             communityId: true,
             name: true,
-            description: true,
             icon: true,
             inviteOnly: true,
             chatRequestsEnabled: true,
@@ -149,14 +147,13 @@ const updateCommunityDataTemplate: EventTemplate = {
     template: [
         'communityId',
         'name',
-        'description',
         'icon',
         'inviteOnly',
         'chatRequestsEnabled',
     ],
     schema: new StringSchema({
         communityId: {
-            minLength: 3,
+            minLength: 2,
             maxLength: 15,
             regex: /^[a-z0-9]+$/,
             optional: true,
@@ -165,12 +162,6 @@ const updateCommunityDataTemplate: EventTemplate = {
         name: {
             minLength: 3,
             maxLength: 15,
-            optional: true,
-        },
-
-        description: {
-            minLength: 5,
-            maxLength: 50,
             optional: true,
         },
 
