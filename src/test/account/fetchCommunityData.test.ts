@@ -95,10 +95,6 @@ function fetchCommunityData(
                         'number'
                     ) ||
                     assertType(
-                        { inviteOnly: communityData.inviteOnly },
-                        'boolean'
-                    ) ||
-                    assertType(
                         {
                             acceptedChatRequests:
                                 communityData.acceptedChatRequests,

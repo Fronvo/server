@@ -34,7 +34,6 @@ async function fetchCommunityData({
         creationDate: community.creationDate,
         icon: community.icon,
         members: community.members,
-        inviteOnly: community.inviteOnly || false,
         chatRequestsEnabled:
             typeof community.chatRequestsEnabled != 'undefined'
                 ? community.chatRequestsEnabled

@@ -18,7 +18,6 @@ async function updateCommunityData({
     name,
     description,
     icon,
-    inviteOnly,
     chatRequestsEnabled,
 }: UpdateCommunityDataServerParams): Promise<
     UpdateCommunityDataResult | FronvoError
@@ -31,7 +30,6 @@ async function updateCommunityData({
         description != '' &&
         !icon &&
         icon != '' &&
-        inviteOnly == undefined &&
         chatRequestsEnabled == undefined
     ) {
         return {
@@ -52,12 +50,6 @@ async function updateCommunityData({
 
         if (communityIdData) {
             return generateError('INVALID_COMMUNITY_ID');
-        }
-    }
-
-    if (inviteOnly) {
-        if (typeof inviteOnly != 'boolean') {
-            return generateError('NOT_BOOLEAN');
         }
     }
 
@@ -89,7 +81,6 @@ async function updateCommunityData({
             communityId,
             name,
             icon,
-            inviteOnly,
             chatRequestsEnabled,
         },
 
@@ -101,7 +92,6 @@ async function updateCommunityData({
             communityId: true,
             name: true,
             icon: true,
-            inviteOnly: true,
             chatRequestsEnabled: true,
         },
     });
@@ -144,13 +134,7 @@ async function updateCommunityData({
 
 const updateCommunityDataTemplate: EventTemplate = {
     func: updateCommunityData,
-    template: [
-        'communityId',
-        'name',
-        'icon',
-        'inviteOnly',
-        'chatRequestsEnabled',
-    ],
+    template: ['communityId', 'name', 'icon', 'chatRequestsEnabled'],
     schema: new StringSchema({
         communityId: {
             minLength: 2,
@@ -169,10 +153,6 @@ const updateCommunityDataTemplate: EventTemplate = {
             // Ensure https
             regex: /^(https:\/\/).+$/,
             maxLength: 512,
-            optional: true,
-        },
-
-        inviteOnly: {
             optional: true,
         },
 
