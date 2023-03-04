@@ -133,7 +133,7 @@ async function fetchCommunityMessages({
         });
     }
 
-    return { communityMessages: communityMessages.reverse() };
+    return { communityMessages };
 }
 
 const fetchCommunityMessagesTemplate: EventTemplate = {
