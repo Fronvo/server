@@ -1,13 +1,9 @@
 // ******************** //
-// The findProfile account-only event file.
+// The findProfiles account-only event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import {
-    maxResultsSchema,
-    profileIdSchema,
-    profileIdSearchSchema,
-} from 'events/shared';
+import { maxResultsSchema, profileIdSearchSchema } from 'events/shared';
 import {
     FindProfilesResult,
     FindProfilesServerParams,

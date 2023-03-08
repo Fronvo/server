@@ -1,5 +1,5 @@
 // ******************** //
-// The fetchProfilePosts account-only event file.
+// The fetchHomePosts account-only event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';

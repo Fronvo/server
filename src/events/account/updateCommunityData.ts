@@ -1,5 +1,5 @@
 // ******************** //
-// The updateProfileData account-only event file.
+// The updateCommunityData account-only event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
