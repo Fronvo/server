@@ -79,9 +79,3 @@ model Report {
   reportName String
   timestamp  DateTime @default(now())
 }
-
-model JoinRequests {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  email    String @unique
-  password String
-}

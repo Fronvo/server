@@ -15,17 +15,6 @@ async function login({
     email,
     password,
 }: LoginServerParams): Promise<LoginResult | FronvoError> {
-    // First check in join requests
-    const accountJoin = await prismaClient.joinRequests.findFirst({
-        where: {
-            email,
-        },
-    });
-
-    if (accountJoin) {
-        return utilities.generateError('ACCOUNT_NOT_ACCEPTED');
-    }
-
     const account = await prismaClient.account.findFirst({
         where: {
             email,

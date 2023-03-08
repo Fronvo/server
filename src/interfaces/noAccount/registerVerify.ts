@@ -13,7 +13,7 @@ export interface RegisterVerifyServerParams
         RegisterVerifyParams {}
 
 export interface RegisterVerifyResult {
-    token?: string;
+    token: string;
 }
 
 export interface RegisterVerifyTestResult

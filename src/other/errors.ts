@@ -43,9 +43,6 @@ const errors: { [Error in Errors] } = {
     NOT_IN_THIS_COMMUNITY: "The target profile isn't in this community.",
     ACCOUNT_DISABLED: 'This account has been disabled.',
     NOT_ADMIN: "You aren't an admin.",
-    ACCOUNT_NOT_ACCEPTED:
-        "This account hasn't yet been accepted to join Fronvo.",
-    REQUEST_DOESNT_EXIST: "The target request couldn't be found.",
     NOT_HIGHER_NUMBER:
         "The '%s' parameter must be a higher number than parameter '%s'.",
     TOO_MUCH_LOAD: "You can't load more than %i %s.",

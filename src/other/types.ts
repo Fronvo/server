@@ -38,8 +38,6 @@ export type Errors =
     | 'NOT_IN_THIS_COMMUNITY'
     | 'ACCOUNT_DISABLED'
     | 'NOT_ADMIN'
-    | 'ACCOUNT_NOT_ACCEPTED'
-    | 'REQUEST_DOESNT_EXIST'
     | 'NOT_HIGHER_NUMBER'
     | 'TOO_MUCH_LOAD'
     | 'COMMUNITY_BAN'
