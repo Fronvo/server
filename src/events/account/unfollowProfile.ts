@@ -74,7 +74,7 @@ async function unfollowProfile({
     return {};
 }
 
-const fetchProfileIdTemplate: EventTemplate = {
+const unfollowProfileTemplate: EventTemplate = {
     func: unfollowProfile,
     template: ['profileId'],
     schema: new StringSchema({
@@ -86,4 +86,4 @@ const fetchProfileIdTemplate: EventTemplate = {
     }),
 };
 
-export default fetchProfileIdTemplate;
+export default unfollowProfileTemplate;

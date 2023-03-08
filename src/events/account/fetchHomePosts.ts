@@ -12,7 +12,7 @@ import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
-async function fetchProfilePosts({
+async function fetchHomePosts({
     socket,
     from,
     to,
@@ -149,8 +149,8 @@ async function fetchProfilePosts({
     return { homePosts: homePosts.reverse(), totalPosts };
 }
 
-const fetchProfileDataTemplate: EventTemplate = {
-    func: fetchProfilePosts,
+const fetchHomePostsTemplate: EventTemplate = {
+    func: fetchHomePosts,
     template: ['from', 'to'],
     schema: new StringSchema({
         from: {
@@ -167,4 +167,4 @@ const fetchProfileDataTemplate: EventTemplate = {
     }),
 };
 
-export default fetchProfileDataTemplate;
+export default fetchHomePostsTemplate;

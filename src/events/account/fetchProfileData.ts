@@ -3,7 +3,6 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Community } from '@prisma/client';
 import {
     FetchedFronvoAccount,
     FetchProfileDataResult,

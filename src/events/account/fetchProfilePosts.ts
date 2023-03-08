@@ -83,7 +83,7 @@ async function fetchProfilePosts({
     return { profilePosts: profilePosts.reverse() };
 }
 
-const fetchProfileDataTemplate: EventTemplate = {
+const fetchProfilePostsTemplate: EventTemplate = {
     func: fetchProfilePosts,
     template: ['profileId', 'from', 'to'],
     schema: new StringSchema({
@@ -107,4 +107,4 @@ const fetchProfileDataTemplate: EventTemplate = {
     }),
 };
 
-export default fetchProfileDataTemplate;
+export default fetchProfilePostsTemplate;

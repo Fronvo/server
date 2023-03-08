@@ -50,7 +50,7 @@ async function findProfiles({
     return { findResults };
 }
 
-const fetchProfileDataTemplate: EventTemplate = {
+const findProfilesTemplate: EventTemplate = {
     func: findProfiles,
     template: ['profileId', 'maxResults'],
     schema: new StringSchema({
@@ -69,4 +69,4 @@ const fetchProfileDataTemplate: EventTemplate = {
     }),
 };
 
-export default fetchProfileDataTemplate;
+export default findProfilesTemplate;
