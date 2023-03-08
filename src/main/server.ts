@@ -141,7 +141,7 @@ async function startup(): Promise<void> {
             '#a812e8',
             '#8f12e8',
             '#8012e8',
-        ])(`Fronvo server v0.2`)
+        ])(`Fronvo server v0.3`)
     );
 
     // Special check because ora doesnt care
