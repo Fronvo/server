@@ -4,6 +4,10 @@
 
 import { StringSchema } from '@ezier/validate';
 import {
+    communityIdOptionalSchema,
+    communityNameOptionalSchema,
+} from 'events/shared';
+import {
     UpdateCommunityDataResult,
     UpdateCommunityDataServerParams,
 } from 'interfaces/account/updateCommunityData';
@@ -136,18 +140,9 @@ const updateCommunityDataTemplate: EventTemplate = {
     func: updateCommunityData,
     template: ['communityId', 'name', 'icon', 'chatRequestsEnabled'],
     schema: new StringSchema({
-        communityId: {
-            minLength: 2,
-            maxLength: 15,
-            regex: /^[a-z0-9]+$/,
-            optional: true,
-        },
+        ...communityIdOptionalSchema,
 
-        name: {
-            minLength: 3,
-            maxLength: 15,
-            optional: true,
-        },
+        ...communityNameOptionalSchema,
 
         icon: {
             // Ensure https

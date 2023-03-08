@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { profileIdSchema } from 'events/shared';
 import {
     FetchedFronvoAccount,
     FetchProfileDataResult,
@@ -76,11 +77,7 @@ const fetchProfileDataTemplate: EventTemplate = {
     func: fetchProfileData,
     template: ['profileId'],
     schema: new StringSchema({
-        profileId: {
-            minLength: 5,
-            maxLength: 30,
-            regex: /^[a-z0-9.]+$/,
-        },
+        ...profileIdSchema,
     }),
 };
 

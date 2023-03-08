@@ -4,6 +4,7 @@
 
 import { StringSchema } from '@ezier/validate';
 import { Community } from '@prisma/client';
+import { communityIdSchema } from 'events/shared';
 import {
     JoinCommunityResult,
     JoinCommunityServerParams,
@@ -87,11 +88,7 @@ const joinCommunityTemplate: EventTemplate = {
     func: joinCommunity,
     template: ['communityId'],
     schema: new StringSchema({
-        communityId: {
-            minLength: 2,
-            maxLength: 15,
-            regex: /^[a-z0-9]+$/,
-        },
+        ...communityIdSchema,
     }),
 };
 

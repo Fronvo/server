@@ -4,6 +4,7 @@
 
 import { StringSchema } from '@ezier/validate';
 import { Account, Post } from '@prisma/client';
+import { fromToSchema } from 'events/shared';
 import {
     FetchHomePostsResult,
     FetchHomePostsServerParams,
@@ -153,17 +154,7 @@ const fetchHomePostsTemplate: EventTemplate = {
     func: fetchHomePosts,
     template: ['from', 'to'],
     schema: new StringSchema({
-        from: {
-            minLength: 1,
-            maxLength: 7,
-            regex: /^[0-9]+$/,
-        },
-
-        to: {
-            minLength: 1,
-            maxLength: 7,
-            regex: /^[0-9]+$/,
-        },
+        ...fromToSchema,
     }),
 };
 

@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { profileIdOptionalSchema } from 'events/shared';
 import {
     UpdateProfileDataResult,
     UpdateProfileDataServerParams,
@@ -229,12 +230,7 @@ const updateProfileDataTemplate: EventTemplate = {
     func: updateProfileData,
     template: ['profileId', 'username', 'bio', 'avatar', 'banner', 'isPrivate'],
     schema: new StringSchema({
-        profileId: {
-            minLength: 5,
-            maxLength: 30,
-            regex: /^[a-z0-9.]+$/,
-            optional: true,
-        },
+        ...profileIdOptionalSchema,
 
         username: {
             minLength: 5,

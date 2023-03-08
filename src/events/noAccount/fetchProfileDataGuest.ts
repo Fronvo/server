@@ -4,6 +4,7 @@
 
 import { StringSchema } from '@ezier/validate';
 import { Account } from '@prisma/client';
+import { profileIdSchema } from 'events/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     FetchProfileDataGuestResult,
@@ -52,11 +53,7 @@ const fetchProfileDataGuestTemplate: EventTemplate = {
     func: fetchProfileDataGuest,
     template: ['profileId'],
     schema: new StringSchema({
-        profileId: {
-            minLength: 5,
-            maxLength: 30,
-            regex: /^[a-z0-9.]+$/,
-        },
+        ...profileIdSchema,
     }),
 };
 

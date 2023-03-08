@@ -4,6 +4,7 @@
 
 import { StringSchema } from '@ezier/validate';
 import bcrypt from 'bcrypt';
+import { emailSchema } from 'events/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     ResetPasswordResult,
@@ -118,11 +119,7 @@ const resetPasswordTemplate: EventTemplate = {
     func: resetPassword,
     template: ['email'],
     schema: new StringSchema({
-        email: {
-            minLength: 8,
-            maxLength: 120,
-            type: 'email',
-        },
+        ...emailSchema,
     }),
 };
 

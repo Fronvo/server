@@ -3,17 +3,10 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { emailSchema, passwordSchema } from 'events/shared';
 
 // register / login
 export const accountSchema = new StringSchema({
-    email: {
-        minLength: 8,
-        maxLength: 120,
-        type: 'email',
-    },
-
-    password: {
-        minLength: 8,
-        maxLength: 90,
-    },
+    ...emailSchema,
+    ...passwordSchema,
 });

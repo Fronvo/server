@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { profileIdSchema } from 'events/shared';
 import {
     ToggleDisableAccountResult,
     ToggleDisableAccountServerParams,
@@ -56,11 +57,7 @@ const toggleDisableAccountTemplate: EventTemplate = {
     func: toggleDisableAccount,
     template: ['profileId'],
     schema: new StringSchema({
-        profileId: {
-            minLength: 5,
-            maxLength: 30,
-            regex: /^[a-z0-9.]+$/,
-        },
+        ...profileIdSchema,
     }),
 };
 

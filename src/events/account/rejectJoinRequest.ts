@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { emailSchema } from 'events/shared';
 import {
     RejectJoinRequestResult,
     RejectJoinRequestServerParams,
@@ -52,11 +53,7 @@ const rejectJoinRequestTemplate: EventTemplate = {
     func: rejectJoinRequest,
     template: ['email'],
     schema: new StringSchema({
-        email: {
-            minLength: 8,
-            maxLength: 120,
-            type: 'email',
-        },
+        ...emailSchema,
     }),
 };
 

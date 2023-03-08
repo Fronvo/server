@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { profileIdSchema } from 'events/shared';
 import {
     UpdateChatRequestResult,
     UpdateChatRequestServerParams,
@@ -123,14 +124,9 @@ const updateChatRequestTemplate: EventTemplate = {
     func: updateChatRequest,
     template: ['profileId', 'accepted'],
     schema: new StringSchema({
-        profileId: {
-            minLength: 5,
-            maxLength: 30,
-            regex: /^[a-z0-9.]+$/,
-        },
+        ...profileIdSchema,
 
         accepted: {
-            // pls
             optional: true,
         },
     }),

@@ -4,6 +4,7 @@
 
 import { StringSchema } from '@ezier/validate';
 import { Account, Post } from '@prisma/client';
+import { fromToSchema } from 'events/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     FetchHomePostsGuestResult,
@@ -114,17 +115,7 @@ const fetchHomePostsGuestTemplate: EventTemplate = {
     func: fetchHomePostsGuest,
     template: ['from', 'to'],
     schema: new StringSchema({
-        from: {
-            minLength: 1,
-            maxLength: 7,
-            regex: /^[0-9]+$/,
-        },
-
-        to: {
-            minLength: 1,
-            maxLength: 7,
-            regex: /^[0-9]+$/,
-        },
+        ...fromToSchema,
     }),
 };
 

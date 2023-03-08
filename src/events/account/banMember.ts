@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { profileIdSchema } from 'events/shared';
 import {
     BanMemberResult,
     BanMemberServerParams,
@@ -109,11 +110,7 @@ const banMemberTemplate: EventTemplate = {
     func: banMember,
     template: ['profileId'],
     schema: new StringSchema({
-        profileId: {
-            minLength: 5,
-            maxLength: 30,
-            regex: /^[a-z0-9.]+$/,
-        },
+        ...profileIdSchema,
     }),
 };
 

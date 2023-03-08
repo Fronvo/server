@@ -14,6 +14,7 @@ import * as variables from 'variables/global';
 import { prismaClient } from 'variables/global';
 import { sendEmail } from 'utilities/global';
 import { StringSchema } from '@ezier/validate';
+import { emailSchema } from './../shared';
 
 async function acceptJoinRequest({
     socket,
@@ -87,11 +88,7 @@ const acceptJoinRequestTemplate: EventTemplate = {
     func: acceptJoinRequest,
     template: ['email'],
     schema: new StringSchema({
-        email: {
-            minLength: 8,
-            maxLength: 120,
-            type: 'email',
-        },
+        ...emailSchema,
     }),
 };
 

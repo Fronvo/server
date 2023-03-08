@@ -56,7 +56,7 @@ function lengthNameMin(
     socket.emit(
         'updateCommunityData',
         {
-            name: generateChars(2),
+            name: generateChars(1),
         },
         ({ err }) => {
             callback(

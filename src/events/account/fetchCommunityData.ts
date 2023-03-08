@@ -11,6 +11,7 @@ import {
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
+import { communityIdSchema } from './../shared';
 
 async function fetchCommunityData({
     communityId,
@@ -54,11 +55,7 @@ const fetchCommunityDataTemplate: EventTemplate = {
     func: fetchCommunityData,
     template: ['communityId'],
     schema: new StringSchema({
-        communityId: {
-            minLength: 2,
-            maxLength: 15,
-            regex: /^[a-z0-9]+$/,
-        },
+        ...communityIdSchema,
     }),
 };
 

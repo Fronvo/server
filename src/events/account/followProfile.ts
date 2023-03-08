@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { profileIdSchema } from 'events/shared';
 import {
     FollowProfileResult,
     FollowProfileServerParams,
@@ -75,11 +76,7 @@ const followProfileTemplate: EventTemplate = {
     func: followProfile,
     template: ['profileId'],
     schema: new StringSchema({
-        profileId: {
-            minLength: 5,
-            maxLength: 30,
-            regex: /^[a-z0-9.]+$/,
-        },
+        ...profileIdSchema,
     }),
 };
 

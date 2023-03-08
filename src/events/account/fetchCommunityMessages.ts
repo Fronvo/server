@@ -11,6 +11,7 @@ import {
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
+import { fromToSchema } from './../shared';
 
 async function fetchCommunityMessages({
     socket,
@@ -140,17 +141,7 @@ const fetchCommunityMessagesTemplate: EventTemplate = {
     func: fetchCommunityMessages,
     template: ['from', 'to'],
     schema: new StringSchema({
-        from: {
-            minLength: 1,
-            maxLength: 7,
-            regex: /^[0-9]+$/,
-        },
-
-        to: {
-            minLength: 1,
-            maxLength: 7,
-            regex: /^[0-9]+$/,
-        },
+        ...fromToSchema,
     }),
 };
 

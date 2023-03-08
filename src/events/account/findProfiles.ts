@@ -4,6 +4,11 @@
 
 import { StringSchema } from '@ezier/validate';
 import {
+    maxResultsSchema,
+    profileIdSchema,
+    profileIdSearchSchema,
+} from 'events/shared';
+import {
     FindProfilesResult,
     FindProfilesServerParams,
 } from 'interfaces/account/findProfiles';
@@ -54,18 +59,8 @@ const findProfilesTemplate: EventTemplate = {
     func: findProfiles,
     template: ['profileId', 'maxResults'],
     schema: new StringSchema({
-        profileId: {
-            minLength: 1,
-            maxLength: 30,
-            regex: /^[a-z0-9.]+$/,
-        },
-
-        maxResults: {
-            minLength: 1,
-            maxLength: 3,
-            regex: /^[0-9]+$/,
-            optional: true,
-        },
+        ...profileIdSearchSchema,
+        ...maxResultsSchema,
     }),
 };
 

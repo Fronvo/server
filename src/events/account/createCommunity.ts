@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { communityIconSchema, communityNameSchema } from 'events/shared';
 import {
     CreateCommunityResult,
     CreateCommunityServerParams,
@@ -75,16 +76,8 @@ const createCommunityTemplate: EventTemplate = {
     func: createCommunity,
     template: ['name', 'icon'],
     schema: new StringSchema({
-        name: {
-            minLength: 2,
-            maxLength: 15,
-        },
-
-        icon: {
-            maxLength: 512,
-            regex: /^(https:\/\/).+$/,
-            optional: true,
-        },
+        ...communityNameSchema,
+        ...communityIconSchema,
     }),
 };
 

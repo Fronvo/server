@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { fromToSchema, profileIdSchema } from 'events/shared';
 import {
     FetchProfilePostsResult,
     FetchProfilePostsServerParams,
@@ -87,23 +88,8 @@ const fetchProfilePostsTemplate: EventTemplate = {
     func: fetchProfilePosts,
     template: ['profileId', 'from', 'to'],
     schema: new StringSchema({
-        profileId: {
-            minLength: 5,
-            maxLength: 30,
-            regex: /^[a-z0-9.]+$/,
-        },
-
-        from: {
-            minLength: 1,
-            maxLength: 7,
-            regex: /^[0-9]+$/,
-        },
-
-        to: {
-            minLength: 1,
-            maxLength: 7,
-            regex: /^[0-9]+$/,
-        },
+        ...profileIdSchema,
+        ...fromToSchema,
     }),
 };
 
