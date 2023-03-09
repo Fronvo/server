@@ -39,7 +39,6 @@ async function createCommunity({
             name,
             icon,
             members: [accountData.profileId],
-            chatRequestsEnabled: true,
             acceptedChatRequests: [accountData.profileId],
             bannedMembers: [],
         },
