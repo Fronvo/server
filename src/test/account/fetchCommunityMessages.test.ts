@@ -96,11 +96,11 @@ function fetchCommunityMessages(
                         { creationDate: new Date(targetMessage.creationDate) },
                         'Invalid Date'
                     ) ||
+                    assertType({ isReply: targetMessage.isReply }, 'boolean') ||
                     assertType(
                         { replyContent: targetMessage.replyContent },
                         'string'
-                    ) ||
-                    assertType({ isReply: targetMessage.isReply }, 'boolean')
+                    )
             );
 
             done();

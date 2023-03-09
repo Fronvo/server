@@ -59,8 +59,6 @@ async function showBannedMembers({
                 username: true,
                 isAdmin: true,
                 isDisabled: true,
-                isInCommunity: true,
-                communityId: true,
             },
         });
 

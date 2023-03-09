@@ -80,8 +80,6 @@ async function fetchHomePosts({
                 username: true,
                 isAdmin: true,
                 isDisabled: true,
-                isInCommunity: true,
-                communityId: true,
             },
         });
 

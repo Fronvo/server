@@ -109,8 +109,6 @@ async function fetchCommunityMessages({
                     username: true,
                     isAdmin: true,
                     isDisabled: true,
-                    isInCommunity: true,
-                    communityId: true,
                 },
             });
 
