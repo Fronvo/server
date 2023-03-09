@@ -200,11 +200,9 @@ export async function sendEmail(
     let finalHtml = '';
 
     for (const contentStrIndex in content) {
-        finalHtml += `
-<h1 align='center'>
+        finalHtml += `<p align='start'>
     ${content[contentStrIndex]}
-</h1>
-`;
+</p>`;
     }
 
     const send = gmail({
@@ -213,14 +211,94 @@ export async function sendEmail(
         to,
         subject,
         html: `
-<div>
-    <p align='center'>
-        <a href='https://fronvo.herokuapp.com'><img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/email/fronvo-logo-large.png'></a>
-    </p>
+<html>
+    <head>
+        <style>
+            body {
+                background: gray;
+            }
 
-    ${finalHtml}
+            .main {
+                width: 100%;
+                background: rgb(230, 230, 230);
+                padding: 15px;
+            }
 
-</div>
+            .content {
+                width: 40%;
+                margin: auto;
+                border-radius: 5px;
+                background: white;
+                padding-top: 20px;
+            }
+
+            hr {
+                width: 100%;
+                opacity: 25%;
+                border-width: 1px;
+                border-color: rgb(240, 240, 240);
+            }
+
+            p {
+                font-family: Arial;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                color: rgb(20, 20, 20);
+                font-size: 16px;
+                padding-right: 50px;
+                padding-left: 50px;
+                margin-bottom: 10px;
+            }
+
+            #logo {
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+            }
+
+            #top {
+                margin-top: 0;
+                margin-bottom: 5px;
+            }
+
+            #colored {
+                color: rgb(130, 70, 255);
+                font-size: 20px;
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+
+            #footer {
+                margin-top: 10px;
+                white-space: pre-wrap;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class='main'>
+            <div class='content'
+
+                <p align='center' id='top'>
+                    <a href='https://fronvo.vercel.app' id='top'>
+                        <img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/email/fronvo-logo-large.png'>
+                    </a>
+
+                    <hr />
+                </p>
+
+                <p align='center' id='colored'>Hello there,</p>
+
+                ${finalHtml}
+
+                <p align='start' id='footer'>
+Sincerely,
+The Fronvo team
+                </p>
+
+            </div>
+        </div>
+    </body>
+</html>
 `,
     });
 
