@@ -9,7 +9,7 @@ import {
     ToggleDisableAccountServerParams,
 } from 'interfaces/account/toggleDisableAccount';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError, getSocketAccountId, sendEmail } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function toggleDisableAccount({
@@ -48,7 +48,7 @@ async function toggleDisableAccount({
         return generateError('DISABLE_ADMIN');
     }
 
-    await prismaClient.account.update({
+    const disabledState = await prismaClient.account.update({
         where: {
             profileId,
         },
@@ -56,7 +56,18 @@ async function toggleDisableAccount({
         data: {
             isDisabled: !targetAccount.isDisabled,
         },
+
+        select: {
+            isDisabled: true,
+        },
     });
+
+    if (disabledState.isDisabled) {
+        sendEmail(targetAccount.email, `Account Disabled`, [
+            'We have decided to disable your account.',
+            'You will be unable to create posts but will still be able to message in communities.',
+        ]);
+    }
 
     return {};
 }
