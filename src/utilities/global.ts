@@ -244,7 +244,7 @@ export async function sendEmail(
                 margin-top: 5px;
                 margin-bottom: 5px;
                 color: rgb(20, 20, 20);
-                font-size: 16px;
+                font-size: 1.1rem;
                 padding-right: 50px;
                 padding-left: 50px;
                 margin-bottom: 10px;
@@ -262,7 +262,7 @@ export async function sendEmail(
 
             #colored {
                 color: rgb(130, 70, 255);
-                font-size: 20px;
+                font-size: 1.2rem;
                 margin-top: 0;
                 margin-bottom: 20px;
             }
@@ -270,6 +270,22 @@ export async function sendEmail(
             #footer {
                 margin-top: 10px;
                 white-space: pre-wrap;
+            }
+
+            @media screen and (max-width: 1400px) {
+                .main {
+                    padding: 0;
+                }
+
+                .content {
+                    border-radius: 0;
+                    width: 100%;
+                }
+
+                p {
+                    padding-left: 25px;
+                    padding-right: 25px;
+                }
             }
         </style>
     </head>
