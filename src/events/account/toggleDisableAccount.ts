@@ -30,14 +30,22 @@ async function toggleDisableAccount({
         return generateError('NOT_ADMIN');
     }
 
-    const previousState = await prismaClient.account.findFirst({
+    const targetAccount = await prismaClient.account.findFirst({
         where: {
             profileId,
         },
     });
 
-    if (!account) {
+    if (!targetAccount) {
         return generateError('ACCOUNT_DOESNT_EXIST');
+    }
+
+    if (targetAccount.profileId == account.profileId) {
+        return generateError('DISABLE_SELF');
+    }
+
+    if (targetAccount.isAdmin) {
+        return generateError('DISABLE_ADMIN');
     }
 
     await prismaClient.account.update({
@@ -46,7 +54,7 @@ async function toggleDisableAccount({
         },
 
         data: {
-            isDisabled: !previousState.isDisabled,
+            isDisabled: !targetAccount.isDisabled,
         },
     });
 

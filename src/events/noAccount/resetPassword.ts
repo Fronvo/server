@@ -29,10 +29,6 @@ async function resetPassword({
         return generateError('ACCOUNT_DOESNT_EXIST');
     }
 
-    if (account.isDisabled) {
-        return generateError('ACCOUNT_DISABLED');
-    }
-
     let sentCode: string;
 
     if (!variables.testMode) {

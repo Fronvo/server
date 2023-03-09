@@ -37,6 +37,8 @@ export type Errors =
     | 'NO_CHAT_PERMISSION'
     | 'NOT_IN_THIS_COMMUNITY'
     | 'ACCOUNT_DISABLED'
+    | 'DISABLE_SELF'
+    | 'DISABLE_ADMIN'
     | 'NOT_ADMIN'
     | 'NOT_HIGHER_NUMBER'
     | 'TOO_MUCH_LOAD'

@@ -32,10 +32,6 @@ async function loginToken({
         },
     });
 
-    if (account.isDisabled) {
-        return generateError('ACCOUNT_DISABLED');
-    }
-
     loginSocket(io, socket, tokenItem.profileId);
 
     // Enter the community room, if joined one, for messages
