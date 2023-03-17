@@ -233,7 +233,7 @@ const updateProfileDataTemplate: EventTemplate = {
         ...profileIdOptionalSchema,
 
         username: {
-            minLength: 5,
+            minLength: 1,
             maxLength: 30,
             optional: true,
         },

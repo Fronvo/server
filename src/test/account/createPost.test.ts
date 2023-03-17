@@ -14,24 +14,6 @@ import {
     generateChars,
 } from 'test/utilities';
 
-function lengthContentMin(
-    { socket }: Partial<TestArguments>,
-    callback: TestErrorCallback
-): void {
-    socket.emit(
-        'createPost',
-        {
-            content: generateChars(1),
-        },
-        ({ err }) => {
-            callback(
-                assertCode(err.code, 'LENGTH') ||
-                    assertEquals({ for: err.extras.for }, 'content')
-            );
-        }
-    );
-}
-
 function lengthContentMax(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
@@ -103,7 +85,6 @@ function createPost(
 export default (testArgs: TestArguments): void => {
     assertErrors(
         {
-            lengthContentMin,
             lengthContentMax,
             lengthAttachmentMax,
         },

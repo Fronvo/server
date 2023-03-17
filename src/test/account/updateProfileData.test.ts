@@ -49,24 +49,6 @@ function lengthProfileIdMax(
     );
 }
 
-function lengthUsernameMin(
-    { socket }: Partial<TestArguments>,
-    callback: TestErrorCallback
-): void {
-    socket.emit(
-        'updateProfileData',
-        {
-            username: generateChars(4),
-        },
-        ({ err }) => {
-            callback(
-                assertCode(err.code, 'LENGTH') ||
-                    assertEquals({ for: err.extras.for }, 'username')
-            );
-        }
-    );
-}
-
 function lengthUsernameMax(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
@@ -207,7 +189,6 @@ export default (testArgs: TestArguments): void => {
         {
             lengthProfileIdMin,
             lengthProfileIdMax,
-            lengthUsernameMin,
             lengthUsernameMax,
             lengthBioMax,
             lengthAvatarMax,

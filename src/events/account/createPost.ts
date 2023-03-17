@@ -51,7 +51,7 @@ const createPostTemplate: EventTemplate = {
     template: ['content', 'attachment'],
     schema: new StringSchema({
         content: {
-            minLength: 2,
+            minLength: 1,
             maxLength: 512,
         },
 
