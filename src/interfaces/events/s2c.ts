@@ -8,6 +8,7 @@ import { CommunityMessageDeletedParams } from 'interfaces/account/communityMessa
 import { MemberJoinedParams } from 'interfaces/account/memberJoined';
 import { MemberLeftParams } from 'interfaces/account/memberLeft';
 import { NewCommunityMessageParams } from 'interfaces/account/newCommunityMessage';
+import { OnlineStatusUpdatedParams } from 'interfaces/account/onlineStatusUpdated';
 import {
     RegisterVerifyParams,
     RegisterVerifyTestResult,
@@ -49,4 +50,6 @@ export interface ServerToClientEvents {
     memberLeft: ({}: MemberLeftParams) => void;
 
     communityChatRequestsUpdated: ({}: CommunityChatRequestsUpdatedParams) => void;
+
+    onlineStatusUpdated: ({}: OnlineStatusUpdatedParams) => void;
 }

@@ -15,19 +15,47 @@ import { v4 } from 'uuid';
 import * as variables from 'variables/global';
 import { prismaClient } from 'variables/global';
 
-export function loginSocket(
+export async function loginSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ClientToServerEvents, ServerToClientEvents>,
     accountId: string
-): void {
+): Promise<void> {
     variables.loggedInSockets[socket.id] = { accountId, socket };
+
+    const account = await prismaClient.account.findFirst({
+        where: {
+            profileId: getSocketAccountId(socket.id),
+        },
+    });
+
+    console.log(account);
+
+    if (account.isInCommunity) {
+        io.to(account.communityId).emit('onlineStatusUpdated', {
+            profileId: account.profileId,
+            online: true,
+        });
+    }
 }
 
-export function logoutSocket(
+export async function logoutSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ClientToServerEvents, ServerToClientEvents>
-): void {
+): Promise<void> {
     delete variables.loggedInSockets[socket.id];
+
+    const account = await prismaClient.account.findFirst({
+        where: {
+            profileId: getSocketAccountId(socket.id),
+        },
+    });
+
+    if (account.isInCommunity) {
+        io.to(account.communityId).emit('onlineStatusUpdated', {
+            profileId: account.profileId,
+            online: false,
+        });
+    }
 }
 
 export function isSocketLoggedIn(
