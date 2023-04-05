@@ -10,7 +10,11 @@ import {
     FetchProfileDataServerParams,
 } from 'interfaces/account/fetchProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import {
+    generateError,
+    getAccountSocketId,
+    getSocketAccountId,
+} from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchProfileData({
@@ -61,6 +65,7 @@ async function fetchProfileData({
         isFollower,
         isAdmin: account.isAdmin || account.profileId == 'fronvo',
         isDisabled: account.isDisabled || false,
+        online: getAccountSocketId(profileId) != '',
     };
 
     // More data if our profile

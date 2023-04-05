@@ -40,13 +40,13 @@ export async function logoutSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ClientToServerEvents, ServerToClientEvents>
 ): Promise<void> {
-    delete variables.loggedInSockets[socket.id];
-
     const account = await prismaClient.account.findFirst({
         where: {
             profileId: getSocketAccountId(socket.id),
         },
     });
+
+    delete variables.loggedInSockets[socket.id];
 
     if (account.isInCommunity) {
         io.to(account.communityId).emit('onlineStatusUpdated', {
