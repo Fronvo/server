@@ -116,7 +116,8 @@ function fetchProfileData(
                         { isDisabled: profileData.isDisabled },
                         'boolean'
                     ) ||
-                    assertType({ online: profileData.online }, 'boolean')
+                    assertType({ online: profileData.online }, 'boolean') ||
+                    assertType({ lastOnline: profileData.lastOnline }, 'string')
             );
 
             done();

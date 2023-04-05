@@ -65,7 +65,10 @@ async function fetchProfileData({
         isFollower,
         isAdmin: account.isAdmin || account.profileId == 'fronvo',
         isDisabled: account.isDisabled || false,
+
+        // No accessibility checks, think about it
         online: getAccountSocketId(profileId) != '',
+        lastOnline: account.lastOnline,
     };
 
     // More data if our profile
