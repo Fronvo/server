@@ -28,8 +28,6 @@ export async function loginSocket(
         },
     });
 
-    console.log(account);
-
     if (account.isInCommunity) {
         io.to(account.communityId).emit('onlineStatusUpdated', {
             profileId: account.profileId,
