@@ -11,7 +11,6 @@ import fetchProfilePosts from 'events/account/fetchProfilePosts';
 import deletePost from 'events/account/deletePost';
 import followProfile from 'events/account/followProfile';
 import unfollowProfile from 'events/account/unfollowProfile';
-import findProfiles from 'events/account/findProfiles';
 import fetchHomePosts from 'events/account/fetchHomePosts';
 import createCommunity from 'events/account/createCommunity';
 import joinCommunity from 'events/account/joinCommunity';
@@ -40,7 +39,6 @@ const accountTemplate: EventExportTemplate = {
     deletePost,
     followProfile,
     unfollowProfile,
-    findProfiles,
     fetchHomePosts,
     createCommunity,
     joinCommunity,

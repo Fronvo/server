@@ -10,7 +10,6 @@ import fetchProfilePosts from 'test/account/fetchProfilePosts.test';
 import deletePost from 'test/account/deletePost.test';
 import followProfile from 'test/account/followProfile.test';
 import unfollowProfile from 'test/account/unfollowProfile.test';
-import findProfiles from 'test/account/findProfiles.test';
 import fetchHomePosts from 'test/account/fetchHomePosts.test';
 import createCommunity from 'test/account/createCommunity.test';
 import fetchCommunityData from 'test/account/fetchCommunityData.test';
@@ -35,7 +34,6 @@ export default {
     deletePost,
     followProfile,
     unfollowProfile,
-    findProfiles,
     fetchHomePosts,
     createCommunity,
     fetchCommunityData,
