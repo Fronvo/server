@@ -100,14 +100,6 @@ import {
     ToggleDisableAccountTestResult,
 } from 'interfaces/account/toggleDisableAccount';
 import {
-    FetchHomePostsGuestParams,
-    FetchHomePostsGuestTestResult,
-} from 'interfaces/noAccount/fetchHomePostsGuest';
-import {
-    FetchProfileDataGuestParams,
-    FetchProfileDataGuestTestResult,
-} from 'interfaces/noAccount/fetchProfileDataGuest';
-import {
     KickMemberParams,
     KickMemberTestResult,
 } from 'interfaces/account/kickMember';
@@ -218,14 +210,6 @@ export interface ClientToServerEvents {
     toggleDisableAccount: (
         {}: ToggleDisableAccountParams,
         callback?: ({}: ToggleDisableAccountTestResult) => void
-    ) => void;
-    fetchHomePostsGuest: (
-        {}: FetchHomePostsGuestParams,
-        callback?: ({}: FetchHomePostsGuestTestResult) => void
-    ) => void;
-    fetchProfileDataGuest: (
-        {}: FetchProfileDataGuestParams,
-        callback?: ({}: FetchProfileDataGuestTestResult) => void
     ) => void;
     kickMember: (
         {}: KickMemberParams,
