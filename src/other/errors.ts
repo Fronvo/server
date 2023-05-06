@@ -41,7 +41,6 @@ const errors: { [Error in Errors] } = {
     NO_CHAT_PERMISSION:
         "The community owner hasn't accepted your chat request.",
     NOT_IN_THIS_COMMUNITY: "The target profile isn't in this community.",
-    ACCOUNT_DISABLED: 'Your account has been disabled.',
     NOT_ADMIN: "You aren't an admin.",
     NOT_HIGHER_NUMBER:
         "The '%s' parameter must be a higher number than parameter '%s'.",
@@ -49,8 +48,6 @@ const errors: { [Error in Errors] } = {
     COMMUNITY_BAN: 'You have been banned from this community.',
     MEMBER_NOT_BANNED: 'This member has not been banned from this community.',
     CHAT_REQUESTS_DISABLED: 'Chat requests have not been enabled.',
-    DISABLE_SELF: "You can't disable your own account.",
-    DISABLE_ADMIN: "You can't disable another admin's account.",
 };
 
 export default errors;

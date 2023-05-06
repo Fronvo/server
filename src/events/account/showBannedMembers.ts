@@ -58,7 +58,6 @@ async function showBannedMembers({
                 profileId: true,
                 username: true,
                 isAdmin: true,
-                isDisabled: true,
             },
         });
 

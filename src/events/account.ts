@@ -21,7 +21,6 @@ import sendCommunityMessage from 'events/account/sendCommunityMessage';
 import fetchCommunityMessages from 'events/account/fetchCommunityMessages';
 import deleteCommunityMessage from 'events/account/deleteCommunityMessage';
 import updateChatRequest from 'events/account/updateChatRequest';
-import toggleDisableAccount from 'events/account/toggleDisableAccount';
 import kickMember from 'events/account/kickMember';
 import banMember from 'events/account/banMember';
 import showBannedMembers from 'events/account/showBannedMembers';
@@ -49,7 +48,6 @@ const accountTemplate: EventExportTemplate = {
     fetchCommunityMessages,
     deleteCommunityMessage,
     updateChatRequest,
-    toggleDisableAccount,
     kickMember,
     banMember,
     showBannedMembers,

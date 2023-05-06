@@ -79,7 +79,6 @@ async function fetchHomePosts({
                 profileId: true,
                 username: true,
                 isAdmin: true,
-                isDisabled: true,
             },
         });
 

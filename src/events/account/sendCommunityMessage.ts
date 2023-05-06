@@ -40,7 +40,6 @@ async function sendCommunityMessage({
             profileId: true,
             username: true,
             isAdmin: true,
-            isDisabled: true,
             isInCommunity: true,
             communityId: true,
         },

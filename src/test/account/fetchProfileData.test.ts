@@ -112,10 +112,6 @@ function fetchProfileData(
                         'boolean'
                     ) ||
                     assertType({ isAdmin: profileData.isAdmin }, 'boolean') ||
-                    assertType(
-                        { isDisabled: profileData.isDisabled },
-                        'boolean'
-                    ) ||
                     assertType({ online: profileData.online }, 'boolean') ||
                     assertType({ lastOnline: profileData.lastOnline }, 'string')
             );

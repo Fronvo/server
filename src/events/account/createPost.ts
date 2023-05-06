@@ -8,7 +8,7 @@ import {
     CreatePostServerParams,
 } from 'interfaces/account/createPost';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function createPost({
@@ -17,16 +17,6 @@ async function createPost({
     content,
 }: CreatePostServerParams): Promise<CreatePostResult | FronvoError> {
     content = content.replace(/\n\n/g, '\n');
-
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
-    if (account.isDisabled) {
-        return generateError('ACCOUNT_DISABLED');
-    }
 
     const postData = await prismaClient.post.create({
         data: {
