@@ -95,13 +95,6 @@ function fetchCommunityData(
                         'number'
                     ) ||
                     assertType(
-                        {
-                            acceptedChatRequests:
-                                communityData.acceptedChatRequests,
-                        },
-                        'object'
-                    ) ||
-                    assertType(
                         { bannedMembers: communityData.bannedMembers },
                         'object'
                     )

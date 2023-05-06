@@ -10,7 +10,6 @@ export interface UpdateCommunityDataParams {
     name?: string;
     description?: string;
     icon?: string;
-    chatRequestsEnabled?: boolean;
 }
 
 export interface UpdateCommunityDataServerParams

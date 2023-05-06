@@ -39,16 +39,14 @@ model Post {
 }
 
 model Community {
-  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
-  ownerId              String
-  communityId          String   @unique
-  name                 String
-  creationDate         DateTime @default(now())
-  icon                 String   @default("")
-  members              Json[]
-  chatRequestsEnabled  Boolean  @default(false)
-  acceptedChatRequests Json[]
-  bannedMembers        Json[]
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId       String
+  communityId   String   @unique
+  name          String
+  creationDate  DateTime @default(now())
+  icon          String   @default("")
+  members       Json[]
+  bannedMembers Json[]
 }
 
 model CommunityMessage {

@@ -79,18 +79,9 @@ async function leaveCommunity({
 
         // Set in-place
         const newMembers = community.members;
-        const newAcceptedChatRequests = community.acceptedChatRequests;
 
         // Remove current member
         newMembers.splice(newMembers.indexOf(accountData.profileId), 1);
-
-        // If the chat request is accepted, remove
-        if (newAcceptedChatRequests.includes(accountData.profileId)) {
-            newAcceptedChatRequests.splice(
-                newAcceptedChatRequests.indexOf(accountData.profileId),
-                1
-            );
-        }
 
         await prismaClient.community.update({
             where: {
@@ -99,7 +90,6 @@ async function leaveCommunity({
 
             data: {
                 members: newMembers,
-                acceptedChatRequests: newAcceptedChatRequests,
             },
         });
 

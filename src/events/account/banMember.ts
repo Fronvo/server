@@ -52,19 +52,10 @@ async function banMember({
 
     // Remove from members list
     const newMembers = community.members;
-    const newAcceptedChatRequests = community.acceptedChatRequests;
     const newBannedMembers = community.bannedMembers;
 
     // Remove current member
     newMembers.splice(newMembers.indexOf(profileId), 1);
-
-    // If the chat request is accepted, remove
-    if (newAcceptedChatRequests.includes(profileId)) {
-        newAcceptedChatRequests.splice(
-            newAcceptedChatRequests.indexOf(profileId),
-            1
-        );
-    }
 
     // Just ban
     newBannedMembers.push(profileId);
@@ -76,7 +67,6 @@ async function banMember({
 
         data: {
             members: newMembers,
-            acceptedChatRequests: newAcceptedChatRequests,
             bannedMembers: newBannedMembers,
         },
     });

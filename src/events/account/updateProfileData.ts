@@ -170,7 +170,7 @@ async function updateProfileData({
             });
         }
 
-        // If currently in community, update members and chat requests
+        // If currently in community, update members
         if (profileData.isInCommunity) {
             const community = await prismaClient.community.findFirst({
                 where: {
@@ -178,12 +178,10 @@ async function updateProfileData({
                 },
                 select: {
                     members: true,
-                    acceptedChatRequests: true,
                 },
             });
 
             const newMembers = community.members;
-            const chatRequests = community.acceptedChatRequests;
 
             newMembers.splice(
                 newMembers.indexOf(getSocketAccountId(socket.id)),
@@ -191,19 +189,12 @@ async function updateProfileData({
             );
             newMembers.push(profileId);
 
-            chatRequests.splice(
-                chatRequests.indexOf(getSocketAccountId(socket.id)),
-                1
-            );
-            chatRequests.push(profileId);
-
             await prismaClient.community.update({
                 where: {
                     communityId: profileData.communityId,
                 },
                 data: {
                     members: newMembers,
-                    acceptedChatRequests: chatRequests,
                 },
             });
         }

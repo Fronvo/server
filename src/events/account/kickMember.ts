@@ -52,18 +52,9 @@ async function kickMember({
 
     // Remove from members list
     const newMembers = community.members;
-    const newAcceptedChatRequests = community.acceptedChatRequests;
 
     // Remove current member
     newMembers.splice(newMembers.indexOf(profileId), 1);
-
-    // If the chat request is accepted, remove
-    if (newAcceptedChatRequests.includes(profileId)) {
-        newAcceptedChatRequests.splice(
-            newAcceptedChatRequests.indexOf(profileId),
-            1
-        );
-    }
 
     await prismaClient.community.update({
         where: {
@@ -72,7 +63,6 @@ async function kickMember({
 
         data: {
             members: newMembers,
-            acceptedChatRequests: newAcceptedChatRequests,
         },
     });
 

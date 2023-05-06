@@ -103,22 +103,6 @@ function lengthIconMax(
     );
 }
 
-function invalidChatRequestsEnabled(
-    { socket }: Partial<TestArguments>,
-    callback: TestErrorCallback
-): void {
-    socket.emit(
-        'updateCommunityData',
-        {
-            // @ts-ignore
-            chatRequestsEnabled: '123',
-        },
-        ({ err }) => {
-            callback(assertCode(err.code, 'NOT_BOOLEAN'));
-        }
-    );
-}
-
 function invalidCommunityId(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
@@ -173,7 +157,6 @@ export default (testArgs: TestArguments): void => {
             lengthNameMin,
             lengthNameMax,
             lengthIconMax,
-            invalidChatRequestsEnabled,
             invalidCommunityId,
         },
         testArgs,

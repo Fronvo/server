@@ -39,7 +39,6 @@ async function createCommunity({
             name,
             icon,
             members: [accountData.profileId],
-            acceptedChatRequests: [accountData.profileId],
             bannedMembers: [],
         },
         select: {
@@ -49,8 +48,6 @@ async function createCommunity({
             creationDate: true,
             icon: true,
             members: true,
-            chatRequestsEnabled: true,
-            acceptedChatRequests: true,
             bannedMembers: true,
         },
     });

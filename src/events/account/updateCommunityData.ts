@@ -22,7 +22,6 @@ async function updateCommunityData({
     name,
     description,
     icon,
-    chatRequestsEnabled,
 }: UpdateCommunityDataServerParams): Promise<
     UpdateCommunityDataResult | FronvoError
 > {
@@ -33,8 +32,7 @@ async function updateCommunityData({
         !description &&
         description != '' &&
         !icon &&
-        icon != '' &&
-        chatRequestsEnabled == undefined
+        icon != ''
     ) {
         return {
             err: undefined,
@@ -54,12 +52,6 @@ async function updateCommunityData({
 
         if (communityIdData) {
             return generateError('INVALID_COMMUNITY_ID');
-        }
-    }
-
-    if (chatRequestsEnabled) {
-        if (typeof chatRequestsEnabled != 'boolean') {
-            return generateError('NOT_BOOLEAN');
         }
     }
 
@@ -85,7 +77,6 @@ async function updateCommunityData({
             communityId,
             name,
             icon,
-            chatRequestsEnabled,
         },
 
         where: {
@@ -96,7 +87,6 @@ async function updateCommunityData({
             communityId: true,
             name: true,
             icon: true,
-            chatRequestsEnabled: true,
         },
     });
 
@@ -126,19 +116,12 @@ async function updateCommunityData({
         });
     }
 
-    // Send chat request update if updated
-    if (previousCommunity.chatRequestsEnabled != chatRequestsEnabled) {
-        io.to(communityData.communityId).emit('communityChatRequestsUpdated', {
-            state: chatRequestsEnabled,
-        });
-    }
-
     return { communityData };
 }
 
 const updateCommunityDataTemplate: EventTemplate = {
     func: updateCommunityData,
-    template: ['communityId', 'name', 'icon', 'chatRequestsEnabled'],
+    template: ['communityId', 'name', 'icon'],
     schema: new StringSchema({
         ...communityIdOptionalSchema,
 
@@ -148,10 +131,6 @@ const updateCommunityDataTemplate: EventTemplate = {
             // Ensure https
             regex: /^(https:\/\/).+$/,
             maxLength: 512,
-            optional: true,
-        },
-
-        chatRequestsEnabled: {
             optional: true,
         },
     }),

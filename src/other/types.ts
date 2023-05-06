@@ -34,14 +34,12 @@ export type Errors =
     | 'INVALID_COMMUNITY_ID'
     | 'NOT_COMMUNITY_OWNER'
     | 'INVALID_MESSAGE'
-    | 'NO_CHAT_PERMISSION'
     | 'NOT_IN_THIS_COMMUNITY'
     | 'NOT_ADMIN'
     | 'NOT_HIGHER_NUMBER'
     | 'TOO_MUCH_LOAD'
     | 'COMMUNITY_BAN'
-    | 'MEMBER_NOT_BANNED'
-    | 'CHAT_REQUESTS_DISABLED';
+    | 'MEMBER_NOT_BANNED';
 
 export type TestAssertTypes =
     | 'string'
