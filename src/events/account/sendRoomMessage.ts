@@ -1,12 +1,12 @@
 // ******************** //
-// The sendCommunityMessage account-only event file.
+// The sendRoomMessage account-only event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
 import {
-    SendCommunityMessageResult,
-    SendCommunityMessageServerParams,
-} from 'interfaces/account/sendCommunityMessage';
+    SendRoomMessageResult,
+    SendRoomMessageServerParams,
+} from 'interfaces/account/sendRoomMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     generateError,
@@ -16,14 +16,12 @@ import {
 import { v4 } from 'uuid';
 import { prismaClient } from 'variables/global';
 
-async function sendCommunityMessage({
+async function sendRoomMessage({
     io,
     socket,
     message,
     replyId,
-}: SendCommunityMessageServerParams): Promise<
-    SendCommunityMessageResult | FronvoError
-> {
+}: SendRoomMessageServerParams): Promise<SendRoomMessageResult | FronvoError> {
     const account = await prismaClient.account.findFirst({
         where: {
             profileId: getSocketAccountId(socket.id),
@@ -40,13 +38,13 @@ async function sendCommunityMessage({
             profileId: true,
             username: true,
             isAdmin: true,
-            isInCommunity: true,
-            communityId: true,
+            isInRoom: true,
+            roomId: true,
         },
     });
 
-    if (!account.isInCommunity) {
-        return generateError('NOT_IN_COMMUNITY');
+    if (!account.isInRoom) {
+        return generateError('NOT_IN_ROOM');
     }
 
     // Remove unnecessary whitespace, dont allow 3 new lines in a row
@@ -69,7 +67,7 @@ async function sendCommunityMessage({
     let replyContent = '';
 
     if (replyId) {
-        const replyMessage = await prismaClient.communityMessage.findFirst({
+        const replyMessage = await prismaClient.roomMessage.findFirst({
             where: {
                 messageId: replyId,
             },
@@ -86,10 +84,10 @@ async function sendCommunityMessage({
         replyContent = replyMessage.content;
     }
 
-    const newMessageData = await prismaClient.communityMessage.create({
+    const newMessageData = await prismaClient.roomMessage.create({
         data: {
             ownerId: account.profileId,
-            communityId: account.communityId,
+            roomId: account.roomId,
             messageId: v4(),
             content: message,
             isReply: Boolean(replyId),
@@ -98,7 +96,7 @@ async function sendCommunityMessage({
 
         select: {
             ownerId: true,
-            communityId: true,
+            roomId: true,
             content: true,
             creationDate: true,
             isReply: true,
@@ -107,7 +105,7 @@ async function sendCommunityMessage({
         },
     });
 
-    io.to(account.communityId).emit('newCommunityMessage', {
+    io.to(account.roomId).emit('newRoomMessage', {
         newMessageData: {
             message: newMessageData,
             profileData: account,
@@ -117,8 +115,8 @@ async function sendCommunityMessage({
     return {};
 }
 
-const sendCommunityMessageTemplate: EventTemplate = {
-    func: sendCommunityMessage,
+const sendRoomMessageTemplate: EventTemplate = {
+    func: sendRoomMessage,
     template: ['message', 'replyId'],
     schema: new StringSchema({
         message: {
@@ -133,4 +131,4 @@ const sendCommunityMessageTemplate: EventTemplate = {
     }),
 };
 
-export default sendCommunityMessageTemplate;
+export default sendRoomMessageTemplate;

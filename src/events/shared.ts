@@ -56,50 +56,50 @@ export const profileIdOptionalSchema: {
     },
 };
 
-// Community id
-const communityId: EzierValidatorStringSchema = {
+// Room id
+const roomId: EzierValidatorStringSchema = {
     minLength: 2,
     maxLength: 15,
     regex: /^[a-z0-9]+$/,
 };
 
-export const communityIdSchema: {
-    communityId: EzierValidatorStringSchema;
+export const roomIdSchema: {
+    roomId: EzierValidatorStringSchema;
 } = {
-    communityId,
+    roomId,
 };
 
-export const communityIdOptionalSchema: {
-    communityId: EzierValidatorStringSchema;
+export const roomIdOptionalSchema: {
+    roomId: EzierValidatorStringSchema;
 } = {
-    communityId: {
-        ...communityId,
+    roomId: {
+        ...roomId,
         optional: true,
     },
 };
 
-// Community name
-const communityName: EzierValidatorStringSchema = {
+// Room name
+const roomName: EzierValidatorStringSchema = {
     minLength: 2,
     maxLength: 15,
 };
 
-export const communityNameSchema: {
+export const roomNameSchema: {
     name: EzierValidatorStringSchema;
 } = {
-    name: communityName,
+    name: roomName,
 };
 
-export const communityNameOptionalSchema: {
+export const roomNameOptionalSchema: {
     name: EzierValidatorStringSchema;
 } = {
     name: {
-        ...communityName,
+        ...roomName,
         optional: true,
     },
 };
 
-export const communityIconSchema: {
+export const roomIconSchema: {
     icon: EzierValidatorStringSchema;
 } = {
     icon: {

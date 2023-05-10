@@ -20,8 +20,8 @@ const sharedVariables: { [TestVariable in SharedTestVariablesType] } = {
     secondaryProfileToken: '',
     secondaryProfileId: '',
     sharedPostId: '',
-    createdCommunityId: '',
-    createdCommunityName: '',
+    createdRoomId: '',
+    createdRoomName: '',
     sharedMessageId: '',
 };
 

@@ -3,29 +3,29 @@
 // ******************** //
 
 import {
-    CreateCommunityParams,
-    CreateCommunityTestResult,
-} from 'interfaces/account/createCommunity';
+    CreateRoomParams,
+    CreateRoomTestResult,
+} from 'interfaces/account/createRoom';
 import {
     CreatePostParams,
     CreatePostTestResult,
 } from 'interfaces/account/createPost';
 import {
-    DeleteCommunityMessageParams,
-    DeleteCommunityMessageTestResult,
-} from 'interfaces/account/deleteCommunityMessage';
+    DeleteRoomMessageParams,
+    DeleteRoomMessageTestResult,
+} from 'interfaces/account/deleteRoomMessage';
 import {
     DeletePostParams,
     DeletePostTestResult,
 } from 'interfaces/account/deletePost';
 import {
-    FetchCommunityDataParams,
-    FetchCommunityDataTestResult,
-} from 'interfaces/account/fetchCommunityData';
+    FetchRoomDataParams,
+    FetchRoomDataTestResult,
+} from 'interfaces/account/fetchRoomData';
 import {
-    FetchCommunityMessagesParams,
-    FetchCommunityMessagesTestResult,
-} from 'interfaces/account/fetchCommunityMessages';
+    FetchRoomMessagesParams,
+    FetchRoomMessagesTestResult,
+} from 'interfaces/account/fetchRoomMessages';
 import {
     FetchHomePostsParams,
     FetchHomePostsTestResult,
@@ -44,23 +44,23 @@ import {
     FollowProfileTestResult,
 } from 'interfaces/account/followProfile';
 import {
-    JoinCommunityParams,
-    JoinCommunityTestResult,
-} from 'interfaces/account/joinCommunity';
-import { LeaveCommunityTestResult } from 'interfaces/account/leaveCommunity';
+    JoinRoomParams,
+    JoinRoomTestResult,
+} from 'interfaces/account/joinRoom';
+import { LeaveRoomTestResult } from 'interfaces/account/leaveRoom';
 import { LogoutTestResult } from 'interfaces/account/logout';
 import {
-    SendCommunityMessageParams,
-    SendCommunityMessageTestResult,
-} from 'interfaces/account/sendCommunityMessage';
+    SendRoomMessageParams,
+    SendRoomMessageTestResult,
+} from 'interfaces/account/sendRoomMessage';
 import {
     UnfollowProfileParams,
     UnfollowProfileTestResult,
 } from 'interfaces/account/unfollowProfile';
 import {
-    UpdateCommunityDataParams,
-    UpdateCommunityDataTestResult,
-} from 'interfaces/account/updateCommunityData';
+    UpdateRoomDataParams,
+    UpdateRoomDataTestResult,
+} from 'interfaces/account/updateRoomData';
 import {
     UpdateProfileDataParams,
     UpdateProfileDataTestResult,
@@ -166,34 +166,34 @@ export interface ClientToServerEvents {
         {}: FetchHomePostsParams,
         callback?: ({}: FetchHomePostsTestResult) => void
     ) => void;
-    createCommunity: (
-        {}: CreateCommunityParams,
-        callback?: ({}: CreateCommunityTestResult) => void
+    createRoom: (
+        {}: CreateRoomParams,
+        callback?: ({}: CreateRoomTestResult) => void
     ) => void;
-    joinCommunity: (
-        {}: JoinCommunityParams,
-        callback?: ({}: JoinCommunityTestResult) => void
+    joinRoom: (
+        {}: JoinRoomParams,
+        callback?: ({}: JoinRoomTestResult) => void
     ) => void;
-    fetchCommunityData: (
-        {}: FetchCommunityDataParams,
-        callback?: ({}: FetchCommunityDataTestResult) => void
+    fetchRoomData: (
+        {}: FetchRoomDataParams,
+        callback?: ({}: FetchRoomDataTestResult) => void
     ) => void;
-    updateCommunityData: (
-        {}: UpdateCommunityDataParams,
-        callback?: ({}: UpdateCommunityDataTestResult) => void
+    updateRoomData: (
+        {}: UpdateRoomDataParams,
+        callback?: ({}: UpdateRoomDataTestResult) => void
     ) => void;
-    leaveCommunity: (callback?: ({}: LeaveCommunityTestResult) => void) => void;
-    sendCommunityMessage: (
-        {}: SendCommunityMessageParams,
-        callback?: ({}: SendCommunityMessageTestResult) => void
+    leaveRoom: (callback?: ({}: LeaveRoomTestResult) => void) => void;
+    sendRoomMessage: (
+        {}: SendRoomMessageParams,
+        callback?: ({}: SendRoomMessageTestResult) => void
     ) => void;
-    fetchCommunityMessages: (
-        {}: FetchCommunityMessagesParams,
-        callback?: ({}: FetchCommunityMessagesTestResult) => void
+    fetchRoomMessages: (
+        {}: FetchRoomMessagesParams,
+        callback?: ({}: FetchRoomMessagesTestResult) => void
     ) => void;
-    deleteCommunityMessage: (
-        {}: DeleteCommunityMessageParams,
-        callback?: ({}: DeleteCommunityMessageTestResult) => void
+    deleteRoomMessage: (
+        {}: DeleteRoomMessageParams,
+        callback?: ({}: DeleteRoomMessageTestResult) => void
     ) => void;
     kickMember: (
         {}: KickMemberParams,

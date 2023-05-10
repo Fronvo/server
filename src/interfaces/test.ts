@@ -19,8 +19,8 @@ export type SharedTestVariablesType =
     | 'secondaryProfileToken'
     | 'secondaryProfileId'
     | 'sharedPostId'
-    | 'createdCommunityId'
-    | 'createdCommunityName'
+    | 'createdRoomId'
+    | 'createdRoomName'
     | 'sharedMessageId';
 
 export interface TestErrorCallback {

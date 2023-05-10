@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 3001;
 import accountTests from 'test/account';
 import generalTests from 'test/general';
 import noAccountTests from 'test/noAccount';
-import preTests from 'test/other/preTests';
 
 // Other
 import { ClientToServerEvents } from 'interfaces/events/c2s';
@@ -53,9 +52,6 @@ describe('Fronvo', () => {
     const testArguments: Partial<TestArguments> = {
         socket,
     };
-
-    // Pre-test checking
-    preTests();
 
     for (const test in tests) {
         it(test, (done) => {

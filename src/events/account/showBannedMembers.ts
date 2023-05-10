@@ -22,29 +22,28 @@ async function showBannedMembers({
         },
     });
 
-    // Must be in community
-    if (!account.isInCommunity) {
-        return generateError('NOT_IN_COMMUNITY');
+    // Must be in room
+    if (!account.isInRoom) {
+        return generateError('NOT_IN_ROOM');
     }
 
-    const community = await prismaClient.community.findFirst({
+    const room = await prismaClient.room.findFirst({
         where: {
-            communityId: account.communityId,
+            roomId: account.roomId,
         },
     });
 
     // Must be the owner
-    if (!(account.profileId == community.ownerId)) {
-        return generateError('NOT_COMMUNITY_OWNER');
+    if (!(account.profileId == room.ownerId)) {
+        return generateError('NOT_ROOM_OWNER');
     }
 
     const bannedMembers: Partial<Account>[] = [];
 
-    for (const memberIndex in community.bannedMembers) {
+    for (const memberIndex in room.bannedMembers) {
         const bannedMember = await prismaClient.account.findFirst({
             where: {
-                profileId:
-                    community.bannedMembers[Number(memberIndex)].toString(),
+                profileId: room.bannedMembers[Number(memberIndex)].toString(),
             },
 
             select: {

@@ -1,5 +1,5 @@
 // ******************** //
-// The test file for the deleteCommunityMessage event.
+// The test file for the deleteRoomMessage event.
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
@@ -17,7 +17,7 @@ function invalidMessageIdType(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'deleteCommunityMessage',
+        'deleteRoomMessage',
         {
             messageId: v4().replace(/-/, 'a'),
         },
@@ -35,7 +35,7 @@ function invalidMessage(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'deleteCommunityMessage',
+        'deleteRoomMessage',
         {
             messageId: v4(),
         },
@@ -45,12 +45,12 @@ function invalidMessage(
     );
 }
 
-function deleteCommunityMessage(
+function deleteRoomMessage(
     { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'deleteCommunityMessage',
+        'deleteRoomMessage',
         {
             messageId: shared.sharedMessageId,
         },
@@ -60,7 +60,7 @@ function deleteCommunityMessage(
     );
 
     // Attach asynchronously
-    socket.on('communityMessageDeleted', ({ messageId }) => {
+    socket.on('roomMessageDeleted', ({ messageId }) => {
         callback(assertEquals({ messageId }, shared.sharedMessageId));
 
         done();
@@ -74,6 +74,6 @@ export default (testArgs: TestArguments): void => {
             invalidMessage,
         },
         testArgs,
-        deleteCommunityMessage
+        deleteRoomMessage
     );
 };

@@ -1,5 +1,5 @@
 // ******************** //
-// The test file for the sendCommunityMessage event.
+// The test file for the sendRoomMessage event.
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
@@ -19,7 +19,7 @@ function lengthMessageMax(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'sendCommunityMessage',
+        'sendRoomMessage',
         {
             message: generateChars(501),
         },
@@ -32,15 +32,15 @@ function lengthMessageMax(
     );
 }
 
-function sendCommunityMessage(
+function sendRoomMessage(
     { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
-    socket.on('newCommunityMessage', ({ newMessageData }) => {
+    socket.on('newRoomMessage', ({ newMessageData }) => {
         const newMessage = newMessageData.message;
 
         callback(
-            assertType({ communityId: newMessage.communityId }, 'string') ||
+            assertType({ roomId: newMessage.roomId }, 'string') ||
                 assertType({ ownerId: newMessage.ownerId }, 'string') ||
                 assertType({ messageId: newMessage.messageId }, 'string') ||
                 assertType({ description: newMessage.content }, 'string') ||
@@ -56,7 +56,7 @@ function sendCommunityMessage(
     });
 
     socket.emit(
-        'sendCommunityMessage',
+        'sendRoomMessage',
         {
             message: generateChars(10),
         },
@@ -72,6 +72,6 @@ export default (testArgs: TestArguments): void => {
             lengthMessageMax,
         },
         testArgs,
-        sendCommunityMessage
+        sendRoomMessage
     );
 };

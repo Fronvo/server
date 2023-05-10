@@ -1,5 +1,5 @@
 // ******************** //
-// The test file for the fetchCommunityMessages event.
+// The test file for the fetchRoomMessages event.
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
@@ -17,7 +17,7 @@ function lengthFromMax(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'fetchCommunityMessages',
+        'fetchRoomMessages',
         {
             from: '10000000',
             to: '10',
@@ -36,7 +36,7 @@ function lengthToMax(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'fetchCommunityMessages',
+        'fetchRoomMessages',
         {
             from: '10',
             to: '10000000',
@@ -55,7 +55,7 @@ function loadMore100(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'fetchCommunityMessages',
+        'fetchRoomMessages',
         {
             from: '0',
             to: '101',
@@ -66,26 +66,23 @@ function loadMore100(
     );
 }
 
-function fetchCommunityMessages(
+function fetchRoomMessages(
     { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'fetchCommunityMessages',
+        'fetchRoomMessages',
         {
             from: '0',
             to: '2',
         },
-        ({ err, communityMessages }): void => {
+        ({ err, roomMessages }): void => {
             callback(assertError({ err }));
 
-            const targetMessage = communityMessages[0].message;
+            const targetMessage = roomMessages[0].message;
 
             callback(
-                assertType(
-                    { communityId: targetMessage.communityId },
-                    'string'
-                ) ||
+                assertType({ roomId: targetMessage.roomId }, 'string') ||
                     assertType({ ownerId: targetMessage.ownerId }, 'string') ||
                     assertType({ content: targetMessage.content }, 'string') ||
                     assertType(
@@ -112,6 +109,6 @@ export default (testArgs: TestArguments): void => {
     assertErrors(
         { lengthFromMax, lengthToMax, loadMore100 },
         testArgs,
-        fetchCommunityMessages
+        fetchRoomMessages
     );
 };

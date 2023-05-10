@@ -81,8 +81,8 @@ async function updateProfileData({
             avatar: true,
             banner: true,
             isPrivate: true,
-            isInCommunity: true,
-            communityId: true,
+            isInRoom: true,
+            roomId: true,
         },
     });
 
@@ -170,18 +170,18 @@ async function updateProfileData({
             });
         }
 
-        // If currently in community, update members
-        if (profileData.isInCommunity) {
-            const community = await prismaClient.community.findFirst({
+        // If currently in room, update members
+        if (profileData.isInRoom) {
+            const room = await prismaClient.room.findFirst({
                 where: {
-                    communityId: profileData.communityId,
+                    roomId: profileData.roomId,
                 },
                 select: {
                     members: true,
                 },
             });
 
-            const newMembers = community.members;
+            const newMembers = room.members;
 
             newMembers.splice(
                 newMembers.indexOf(getSocketAccountId(socket.id)),
@@ -189,9 +189,9 @@ async function updateProfileData({
             );
             newMembers.push(profileId);
 
-            await prismaClient.community.update({
+            await prismaClient.room.update({
                 where: {
-                    communityId: profileData.communityId,
+                    roomId: profileData.roomId,
                 },
                 data: {
                     members: newMembers,
@@ -199,8 +199,8 @@ async function updateProfileData({
             });
         }
 
-        // Update community messages
-        await prismaClient.communityMessage.updateMany({
+        // Update room messages
+        await prismaClient.roomMessage.updateMany({
             where: {
                 ownerId: getSocketAccountId(socket.id),
             },

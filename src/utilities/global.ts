@@ -29,13 +29,13 @@ export async function loginSocket(
 
         select: {
             profileId: true,
-            isInCommunity: true,
-            communityId: true,
+            isInRoom: true,
+            roomId: true,
         },
     });
 
-    if (account.isInCommunity) {
-        io.to(account.communityId).emit('onlineStatusUpdated', {
+    if (account.isInRoom) {
+        io.to(account.roomId).emit('onlineStatusUpdated', {
             profileId: account.profileId,
             online: true,
         });
@@ -57,13 +57,13 @@ export async function logoutSocket(
 
         select: {
             profileId: true,
-            isInCommunity: true,
-            communityId: true,
+            isInRoom: true,
+            roomId: true,
         },
     });
 
-    if (account.isInCommunity) {
-        io.to(account.communityId).emit('onlineStatusUpdated', {
+    if (account.isInRoom) {
+        io.to(account.roomId).emit('onlineStatusUpdated', {
             profileId: account.profileId,
             online: false,
         });

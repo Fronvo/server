@@ -1,33 +1,28 @@
 // ******************** //
-// The updateCommunityData account-only event file.
+// The updateRoomData account-only event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { roomIdOptionalSchema, roomNameOptionalSchema } from 'events/shared';
 import {
-    communityIdOptionalSchema,
-    communityNameOptionalSchema,
-} from 'events/shared';
-import {
-    UpdateCommunityDataResult,
-    UpdateCommunityDataServerParams,
-} from 'interfaces/account/updateCommunityData';
+    UpdateRoomDataResult,
+    UpdateRoomDataServerParams,
+} from 'interfaces/account/updateRoomData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
-async function updateCommunityData({
+async function updateRoomData({
     io,
     socket,
-    communityId,
+    roomId,
     name,
     description,
     icon,
-}: UpdateCommunityDataServerParams): Promise<
-    UpdateCommunityDataResult | FronvoError
-> {
+}: UpdateRoomDataServerParams): Promise<UpdateRoomDataResult | FronvoError> {
     // If none provided, return immediately
     if (
-        !communityId &&
+        !roomId &&
         !name &&
         !description &&
         description != '' &&
@@ -42,90 +37,90 @@ async function updateCommunityData({
     // Name validation not needed here, see schema below
     // Nor icon, may need for content-type and extension if applicable (|| ?)
 
-    // Check community id availability
-    if (communityId) {
-        const communityIdData = await prismaClient.community.findFirst({
+    // Check room id availability
+    if (roomId) {
+        const roomIdData = await prismaClient.room.findFirst({
             where: {
-                communityId,
+                roomId,
             },
         });
 
-        if (communityIdData) {
-            return generateError('INVALID_COMMUNITY_ID');
+        if (roomIdData) {
+            return generateError('INVALID_ROOM_ID');
         }
     }
 
-    // Fetch old community id
+    // Fetch old room id
     const accountData = await prismaClient.account.findFirst({
         where: {
             profileId: getSocketAccountId(socket.id),
         },
 
         select: {
-            communityId: true,
+            roomId: true,
         },
     });
 
-    const previousCommunity = await prismaClient.community.findFirst({
+    const previousRoom = await prismaClient.room.findFirst({
         where: {
-            communityId: accountData.communityId,
+            roomId: accountData.roomId,
         },
     });
 
-    const communityData = await prismaClient.community.update({
+    const roomData = await prismaClient.room.update({
         data: {
-            communityId,
+            roomId,
             name,
             icon,
         },
 
         where: {
-            communityId: previousCommunity.communityId,
+            roomId: previousRoom.roomId,
         },
 
         select: {
-            communityId: true,
+            roomId: true,
             name: true,
             icon: true,
         },
     });
 
-    if (communityId) {
+    if (roomId) {
         // Update related entries
 
         // Update accounts
         await prismaClient.account.updateMany({
             where: {
-                communityId: previousCommunity.communityId,
+                roomId: previousRoom.roomId,
             },
 
             data: {
-                communityId,
+                roomId,
             },
         });
 
         // Update messages
-        await prismaClient.communityMessage.updateMany({
+        await prismaClient.roomMessage.updateMany({
             where: {
-                communityId: previousCommunity.communityId,
+                roomId: previousRoom.roomId,
             },
 
             data: {
-                communityId,
+                roomId,
             },
         });
     }
 
-    return { communityData };
+    return { roomData };
 }
 
-const updateCommunityDataTemplate: EventTemplate = {
-    func: updateCommunityData,
-    template: ['communityId', 'name', 'icon'],
+const updateRoomDataTemplate: EventTemplate = {
+    func: updateRoomData,
+    template: ['roomId', 'name', 'icon'],
     schema: new StringSchema({
-        ...communityIdOptionalSchema,
+        ...roomIdOptionalSchema,
 
-        ...communityNameOptionalSchema,
+        ...roomNameOptionalSchema,
 
         icon: {
             // Ensure https
@@ -136,4 +131,4 @@ const updateCommunityDataTemplate: EventTemplate = {
     }),
 };
 
-export default updateCommunityDataTemplate;
+export default updateRoomDataTemplate;

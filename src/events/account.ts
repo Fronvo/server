@@ -12,14 +12,14 @@ import deletePost from 'events/account/deletePost';
 import followProfile from 'events/account/followProfile';
 import unfollowProfile from 'events/account/unfollowProfile';
 import fetchHomePosts from 'events/account/fetchHomePosts';
-import createCommunity from 'events/account/createCommunity';
-import joinCommunity from 'events/account/joinCommunity';
-import fetchCommunityData from 'events/account/fetchCommunityData';
-import updateCommunityData from 'events/account/updateCommunityData';
-import leaveCommunity from 'events/account/leaveCommunity';
-import sendCommunityMessage from 'events/account/sendCommunityMessage';
-import fetchCommunityMessages from 'events/account/fetchCommunityMessages';
-import deleteCommunityMessage from 'events/account/deleteCommunityMessage';
+import createRoom from 'events/account/createRoom';
+import joinRoom from 'events/account/joinRoom';
+import fetchRoomData from 'events/account/fetchRoomData';
+import updateRoomData from 'events/account/updateRoomData';
+import leaveRoom from 'events/account/leaveRoom';
+import sendRoomMessage from 'events/account/sendRoomMessage';
+import fetchRoomMessages from 'events/account/fetchRoomMessages';
+import deleteRoomMessage from 'events/account/deleteRoomMessage';
 import kickMember from 'events/account/kickMember';
 import banMember from 'events/account/banMember';
 import showBannedMembers from 'events/account/showBannedMembers';
@@ -38,14 +38,14 @@ const accountTemplate: EventExportTemplate = {
     followProfile,
     unfollowProfile,
     fetchHomePosts,
-    createCommunity,
-    joinCommunity,
-    fetchCommunityData,
-    updateCommunityData,
-    leaveCommunity,
-    sendCommunityMessage,
-    fetchCommunityMessages,
-    deleteCommunityMessage,
+    createRoom,
+    joinRoom,
+    fetchRoomData,
+    updateRoomData,
+    leaveRoom,
+    sendRoomMessage,
+    fetchRoomMessages,
+    deleteRoomMessage,
     kickMember,
     banMember,
     showBannedMembers,

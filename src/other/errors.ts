@@ -32,19 +32,19 @@ const errors: { [Error in Errors] } = {
     UNFOLLOW_SELF: "You can't unfollow yourself.",
     ALREADY_UNFOLLOWING: 'You are not following this user.',
     PROFILE_PRIVATE: 'The requested profile is private.',
-    COMMUNITY_NOT_FOUND: 'The requested community could not be found.',
-    ALREADY_IN_COMMUNITY: 'You have already joined a community!',
-    NOT_IN_COMMUNITY: "You aren't in a community!",
-    INVALID_COMMUNITY_ID: 'A community with the given ID already exists.',
-    NOT_COMMUNITY_OWNER: "You don't own this community!",
+    ROOM_NOT_FOUND: 'The requested room could not be found.',
+    ALREADY_IN_ROOM: 'You have already joined a room!',
+    NOT_IN_ROOM: "You aren't in a room!",
+    INVALID_ROOM_ID: 'A room with the given ID already exists.',
+    NOT_ROOM_OWNER: "You don't own this room!",
     INVALID_MESSAGE: 'The requested message was not found.',
-    NOT_IN_THIS_COMMUNITY: "The target profile isn't in this community.",
+    NOT_IN_THIS_ROOM: "The target profile isn't in this room.",
     NOT_ADMIN: "You aren't an admin.",
     NOT_HIGHER_NUMBER:
         "The '%s' parameter must be a higher number than parameter '%s'.",
     TOO_MUCH_LOAD: "You can't load more than %i %s.",
-    COMMUNITY_BAN: 'You have been banned from this community.',
-    MEMBER_NOT_BANNED: 'This member has not been banned from this community.',
+    ROOM_BAN: 'You have been banned from this room.',
+    MEMBER_NOT_BANNED: 'This member has not been banned from this room.',
 };
 
 export default errors;

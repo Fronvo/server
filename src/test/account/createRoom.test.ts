@@ -1,5 +1,5 @@
 // ******************** //
-// The test file for the createCommunity event.
+// The test file for the createRoom event.
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
@@ -19,7 +19,7 @@ function lengthNameMin(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'createCommunity',
+        'createRoom',
         {
             name: generateChars(1),
         },
@@ -37,7 +37,7 @@ function lengthNameMax(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'createCommunity',
+        'createRoom',
         {
             name: generateChars(16),
         },
@@ -55,7 +55,7 @@ function lengthIconMax(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'createCommunity',
+        'createRoom',
         {
             name: generateChars(5),
             icon: `https://${generateChars(513)}`,
@@ -69,39 +69,33 @@ function lengthIconMax(
     );
 }
 
-function createCommunity(
+function createRoom(
     { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'createCommunity',
+        'createRoom',
         {
             name: generateChars(5),
             icon: `https://${generateChars(10)}`,
         },
-        ({ err, communityData }): void => {
+        ({ err, roomData }): void => {
             callback(assertError({ err }));
 
             callback(
-                assertType(
-                    { communityId: communityData.communityId },
-                    'string'
-                ) ||
-                    assertType({ ownerId: communityData.ownerId }, 'string') ||
-                    assertType({ name: communityData.name }, 'string') ||
-                    assertType({ icon: communityData.icon }, 'string') ||
+                assertType({ roomId: roomData.roomId }, 'string') ||
+                    assertType({ ownerId: roomData.ownerId }, 'string') ||
+                    assertType({ name: roomData.name }, 'string') ||
+                    assertType({ icon: roomData.icon }, 'string') ||
                     assertNotEqual(
-                        { creationDate: new Date(communityData.creationDate) },
+                        { creationDate: new Date(roomData.creationDate) },
                         'Invalid Date'
                     ) ||
-                    assertType({ members: communityData.members }, 'object')
+                    assertType({ members: roomData.members }, 'object')
             );
 
-            shared.setTestVariable(
-                'createdCommunityId',
-                communityData.communityId
-            );
-            shared.setTestVariable('createdCommunityName', communityData.name);
+            shared.setTestVariable('createdRoomId', roomData.roomId);
+            shared.setTestVariable('createdRoomName', roomData.name);
 
             done();
         }
@@ -116,6 +110,6 @@ export default (testArgs: TestArguments): void => {
             lengthIconMax,
         },
         testArgs,
-        createCommunity
+        createRoom
     );
 };

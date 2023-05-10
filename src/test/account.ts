@@ -11,18 +11,18 @@ import deletePost from 'test/account/deletePost.test';
 import followProfile from 'test/account/followProfile.test';
 import unfollowProfile from 'test/account/unfollowProfile.test';
 import fetchHomePosts from 'test/account/fetchHomePosts.test';
-import createCommunity from 'test/account/createCommunity.test';
-import fetchCommunityData from 'test/account/fetchCommunityData.test';
-import updateCommunityData from 'test/account/updateCommunityData.test';
-import joinCommunity from 'test/account/joinCommunity.test';
-import sendCommunityMessage from 'test/account/sendCommunityMessage.test';
-import fetchCommunityMessages from 'test/account/fetchCommunityMessages.test';
-import deleteCommunityMessage from 'test/account/deleteCommunityMessage.test';
+import createRoom from 'test/account/createRoom.test';
+import fetchRoomData from 'test/account/fetchRoomData.test';
+import updateRoomData from 'test/account/updateRoomData.test';
+import joinRoom from 'test/account/joinRoom.test';
+import sendRoomMessage from 'test/account/sendRoomMessage.test';
+import fetchRoomMessages from 'test/account/fetchRoomMessages.test';
+import deleteRoomMessage from 'test/account/deleteRoomMessage.test';
 import kickMember from 'test/account/kickMember.test';
 import banMember from 'test/account/banMember.test';
 import showBannedMembers from 'test/account/showBannedMembers.test';
 import unbanMember from 'test/account/unbanMember.test';
-import leaveCommunity from 'test/account/leaveCommunity.test';
+import leaveRoom from 'test/account/leaveRoom.test';
 import logout from 'test/account/logout.test';
 
 export default {
@@ -35,17 +35,17 @@ export default {
     followProfile,
     unfollowProfile,
     fetchHomePosts,
-    createCommunity,
-    fetchCommunityData,
-    updateCommunityData,
-    joinCommunity,
-    sendCommunityMessage,
-    fetchCommunityMessages,
-    deleteCommunityMessage,
+    createRoom,
+    fetchRoomData,
+    updateRoomData,
+    joinRoom,
+    sendRoomMessage,
+    fetchRoomMessages,
+    deleteRoomMessage,
     kickMember,
     banMember,
     showBannedMembers,
     unbanMember,
-    leaveCommunity,
+    leaveRoom,
     logout,
 };

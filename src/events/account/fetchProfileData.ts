@@ -70,8 +70,8 @@ async function fetchProfileData({
     // More data if our profile
     if (profileData.isSelf) {
         profileData.email = account.email;
-        profileData.isInCommunity = account.isInCommunity;
-        profileData.communityId = account.communityId;
+        profileData.isInRoom = account.isInRoom;
+        profileData.roomId = account.roomId;
     }
 
     return { profileData };

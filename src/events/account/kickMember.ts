@@ -27,38 +27,38 @@ async function kickMember({
         },
     });
 
-    // Must be in community
-    if (!account.isInCommunity) {
-        return generateError('NOT_IN_COMMUNITY');
+    // Must be in room
+    if (!account.isInRoom) {
+        return generateError('NOT_IN_ROOM');
     }
 
-    const community = await prismaClient.community.findFirst({
+    const room = await prismaClient.room.findFirst({
         where: {
-            communityId: account.communityId,
+            roomId: account.roomId,
         },
     });
 
     // Must be the owner
-    if (!(account.profileId == community.ownerId)) {
-        return generateError('NOT_COMMUNITY_OWNER');
+    if (!(account.profileId == room.ownerId)) {
+        return generateError('NOT_ROOM_OWNER');
     }
 
-    // Check if member with id is in this community
-    if (!community.members.includes(profileId)) {
-        return generateError('NOT_IN_THIS_COMMUNITY');
+    // Check if member with id is in this room
+    if (!room.members.includes(profileId)) {
+        return generateError('NOT_IN_THIS_ROOM');
     }
 
     // Kick him now
 
     // Remove from members list
-    const newMembers = community.members;
+    const newMembers = room.members;
 
     // Remove current member
     newMembers.splice(newMembers.indexOf(profileId), 1);
 
-    await prismaClient.community.update({
+    await prismaClient.room.update({
         where: {
-            communityId: community.communityId,
+            roomId: room.roomId,
         },
 
         data: {
@@ -73,19 +73,19 @@ async function kickMember({
         },
 
         data: {
-            communityId: '',
-            isInCommunity: false,
+            roomId: '',
+            isInRoom: false,
         },
     });
 
     // Notify all members (including banned member, update client)
-    io.to(community.communityId).emit('memberLeft', {
+    io.to(room.roomId).emit('memberLeft', {
         profileId,
     });
 
-    // Remove socket from community room (if online)
+    // Remove socket from room room (if online)
     await loggedInSockets[getAccountSocketId(profileId)]?.socket.leave(
-        community.communityId
+        room.roomId
     );
 
     return {};

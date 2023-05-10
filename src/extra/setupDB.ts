@@ -168,7 +168,7 @@ What are those?`,
             socket.emit(
                 'createPost',
                 {
-                    content: `This account, post and community have been auto-generated.
+                    content: `This account, post and room have been auto-generated.
 Someone must first login to this account before trying to self-host this server instance.
 Other than that, have fun!`,
                     attachment:
@@ -179,19 +179,19 @@ Other than that, have fun!`,
         });
     }
 
-    async function createOfficialCommunity(): Promise<void> {
+    async function createOfficialRoom(): Promise<void> {
         return new Promise((resolve) => {
             socket.emit(
-                'createCommunity',
+                'createRoom',
                 {
                     name: 'Fronvo',
                     icon: 'https://i.ibb.co/QFT7SNj/logo.png',
                 },
                 () => {
                     socket.emit(
-                        'updateCommunityData',
+                        'updateRoomData',
                         {
-                            communityId: 'fronvo',
+                            roomId: 'fronvo',
                         },
                         () => {
                             resolve();
@@ -205,7 +205,7 @@ Other than that, have fun!`,
     await createOfficialAccount();
     await createOfficialPost();
     await createOfficialWarningPost();
-    await createOfficialCommunity();
+    await createOfficialRoom();
 }
 
 async function startup(): Promise<void> {

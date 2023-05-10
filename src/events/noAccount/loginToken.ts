@@ -34,9 +34,9 @@ async function loginToken({
 
     loginSocket(io, socket, tokenItem.profileId);
 
-    // Enter the community room, if joined one, for messages
-    if (account.isInCommunity) {
-        await socket.join(account.communityId);
+    // Enter the room room, if joined one, for messages
+    if (account.isInRoom) {
+        await socket.join(account.roomId);
     }
 
     return {};

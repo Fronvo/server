@@ -11,21 +11,21 @@ datasource db {
 }
 
 model Account {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  profileId     String   @unique
-  email         String   @unique
-  username      String
-  bio           String   @default("")
-  password      String
-  avatar        String   @default("")
-  banner        String   @default("")
-  creationDate  DateTime @default(now())
-  following     Json[]
-  followers     Json[]
-  isPrivate     Boolean?
-  isInCommunity Boolean  @default(false)
-  communityId   String   @default("")
-  isAdmin       Boolean  @default(false)
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  profileId    String   @unique
+  email        String   @unique
+  username     String
+  bio          String   @default("")
+  password     String
+  avatar       String   @default("")
+  banner       String   @default("")
+  creationDate DateTime @default(now())
+  following    Json[]
+  followers    Json[]
+  isPrivate    Boolean?
+  isInRoom     Boolean  @default(false)
+  roomId       String   @default("")
+  isAdmin      Boolean  @default(false)
 }
 
 model Post {
@@ -37,10 +37,10 @@ model Post {
   creationDate DateTime @default(now())
 }
 
-model Community {
+model Room {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   ownerId       String
-  communityId   String   @unique
+  roomId        String   @unique
   name          String
   creationDate  DateTime @default(now())
   icon          String   @default("")
@@ -48,10 +48,10 @@ model Community {
   bannedMembers Json[]
 }
 
-model CommunityMessage {
+model RoomMessage {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   ownerId      String
-  communityId  String
+  roomId       String
   messageId    String   @unique
   content      String
   creationDate DateTime @default(now())

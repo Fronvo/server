@@ -1,23 +1,23 @@
 // ******************** //
-// The createCommunity account-only event file.
+// The createRoom account-only event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { communityIconSchema, communityNameSchema } from 'events/shared';
+import { roomIconSchema, roomNameSchema } from 'events/shared';
 import {
-    CreateCommunityResult,
-    CreateCommunityServerParams,
-} from 'interfaces/account/createCommunity';
+    CreateRoomResult,
+    CreateRoomServerParams,
+} from 'interfaces/account/createRoom';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateChars } from 'test/utilities';
 import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
-async function createCommunity({
+async function createRoom({
     socket,
     name,
     icon,
-}: CreateCommunityServerParams): Promise<CreateCommunityResult | FronvoError> {
+}: CreateRoomServerParams): Promise<CreateRoomResult | FronvoError> {
     name = name.replace(/\n/g, '');
 
     const accountData = await prismaClient.account.findFirst({
@@ -26,15 +26,15 @@ async function createCommunity({
         },
     });
 
-    if (accountData.isInCommunity) {
-        return generateError('ALREADY_IN_COMMUNITY');
+    if (accountData.isInRoom) {
+        return generateError('ALREADY_IN_ROOM');
     }
 
-    const communityId = generateChars(12);
+    const roomId = generateChars(12);
 
-    const communityData = await prismaClient.community.create({
+    const roomData = await prismaClient.room.create({
         data: {
-            communityId,
+            roomId,
             ownerId: accountData.profileId,
             name,
             icon,
@@ -42,7 +42,7 @@ async function createCommunity({
             bannedMembers: [],
         },
         select: {
-            communityId: true,
+            roomId: true,
             ownerId: true,
             name: true,
             creationDate: true,
@@ -58,23 +58,23 @@ async function createCommunity({
         },
 
         data: {
-            isInCommunity: true,
-            communityId,
+            isInRoom: true,
+            roomId,
         },
     });
 
-    await socket.join(communityId);
+    await socket.join(roomId);
 
-    return { communityData };
+    return { roomData };
 }
 
-const createCommunityTemplate: EventTemplate = {
-    func: createCommunity,
+const createRoomTemplate: EventTemplate = {
+    func: createRoom,
     template: ['name', 'icon'],
     schema: new StringSchema({
-        ...communityNameSchema,
-        ...communityIconSchema,
+        ...roomNameSchema,
+        ...roomIconSchema,
     }),
 };
 
-export default createCommunityTemplate;
+export default createRoomTemplate;

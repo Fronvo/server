@@ -1,5 +1,5 @@
 // ******************** //
-// The test file for the updateCommunityData event.
+// The test file for the updateRoomData event.
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
@@ -13,37 +13,37 @@ import {
     generateChars,
 } from 'test/utilities';
 
-function lengthCommunityIdMin(
+function lengthRoomIdMin(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'updateCommunityData',
+        'updateRoomData',
         {
-            communityId: generateChars(1),
+            roomId: generateChars(1),
         },
         ({ err }) => {
             callback(
                 assertCode(err.code, 'LENGTH') ||
-                    assertEquals({ for: err.extras.for }, 'communityId')
+                    assertEquals({ for: err.extras.for }, 'roomId')
             );
         }
     );
 }
 
-function lengthCommunityIdMax(
+function lengthRoomIdMax(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'updateCommunityData',
+        'updateRoomData',
         {
-            communityId: generateChars(31),
+            roomId: generateChars(31),
         },
         ({ err }) => {
             callback(
                 assertCode(err.code, 'LENGTH') ||
-                    assertEquals({ for: err.extras.for }, 'communityId')
+                    assertEquals({ for: err.extras.for }, 'roomId')
             );
         }
     );
@@ -54,7 +54,7 @@ function lengthNameMin(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'updateCommunityData',
+        'updateRoomData',
         {
             name: generateChars(1),
         },
@@ -72,7 +72,7 @@ function lengthNameMax(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'updateCommunityData',
+        'updateRoomData',
         {
             name: generateChars(31),
         },
@@ -90,7 +90,7 @@ function lengthIconMax(
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'updateCommunityData',
+        'updateRoomData',
         {
             icon: `https://${generateChars(513)}`,
         },
@@ -103,46 +103,43 @@ function lengthIconMax(
     );
 }
 
-function invalidCommunityId(
+function invalidRoomId(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'updateCommunityData',
+        'updateRoomData',
         {
-            communityId: shared.createdCommunityId,
+            roomId: shared.createdRoomId,
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'INVALID_COMMUNITY_ID'));
+            callback(assertCode(err.code, 'INVALID_ROOM_ID'));
         }
     );
 }
 
-function updateCommunityData(
+function updateRoomData(
     { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'updateCommunityData',
+        'updateRoomData',
         {
-            communityId: generateChars(),
+            roomId: generateChars(),
             name: generateChars(),
             description: generateChars(15),
             icon: `https://${generateChars()}`,
         },
-        ({ err, communityData }): void => {
+        ({ err, roomData }): void => {
             callback(assertError({ err }));
 
             callback(
-                assertType(
-                    { communityId: communityData.communityId },
-                    'string'
-                ) ||
-                    assertType({ name: communityData.name }, 'string') ||
-                    assertType({ icon: communityData.icon }, 'string')
+                assertType({ roomId: roomData.roomId }, 'string') ||
+                    assertType({ name: roomData.name }, 'string') ||
+                    assertType({ icon: roomData.icon }, 'string')
             );
 
-            setTestVariable('createdCommunityId', communityData.communityId);
+            setTestVariable('createdRoomId', roomData.roomId);
 
             done();
         }
@@ -152,14 +149,14 @@ function updateCommunityData(
 export default (testArgs: TestArguments): void => {
     assertErrors(
         {
-            lengthCommunityIdMin,
-            lengthCommunityIdMax,
+            lengthRoomIdMin,
+            lengthRoomIdMax,
             lengthNameMin,
             lengthNameMax,
             lengthIconMax,
-            invalidCommunityId,
+            invalidRoomId,
         },
         testArgs,
-        updateCommunityData
+        updateRoomData
     );
 };

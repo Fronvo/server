@@ -1,5 +1,5 @@
 // ******************** //
-// The test file for the joinCommunity event.
+// The test file for the joinRoom event.
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
@@ -14,101 +14,98 @@ import {
     generateChars,
 } from 'test/utilities';
 
-function lengthCommunityIdMin(
+function lengthRoomIdMin(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'joinCommunity',
+        'joinRoom',
         {
-            communityId: generateChars(1),
+            roomId: generateChars(1),
         },
         ({ err }) => {
             callback(
                 assertCode(err.code, 'LENGTH') ||
-                    assertEquals({ for: err.extras.for }, 'communityId')
+                    assertEquals({ for: err.extras.for }, 'roomId')
             );
         }
     );
 }
 
-function lengthCommunityIdMax(
+function lengthRoomIdMax(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'joinCommunity',
+        'joinRoom',
         {
-            communityId: generateChars(16),
+            roomId: generateChars(16),
         },
         ({ err }) => {
             callback(
                 assertCode(err.code, 'LENGTH') ||
-                    assertEquals({ for: err.extras.for }, 'communityId')
+                    assertEquals({ for: err.extras.for }, 'roomId')
             );
         }
     );
 }
 
-function communityNotFound(
+function roomNotFound(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'joinCommunity',
+        'joinRoom',
         {
-            communityId: generateChars(),
+            roomId: generateChars(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'COMMUNITY_NOT_FOUND'));
+            callback(assertCode(err.code, 'ROOM_NOT_FOUND'));
         }
     );
 }
 
-function joinCommunity(
+function joinRoom(
     { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
     socket.emit(
-        'joinCommunity',
+        'joinRoom',
         {
-            communityId: 'fronvo',
+            roomId: 'fronvo',
         },
-        ({ err, communityData }): void => {
+        ({ err, roomData }): void => {
             callback(assertError({ err }));
 
             callback(
-                assertType(
-                    { communityId: communityData.communityId },
-                    'string'
-                ) ||
-                    assertType({ ownerId: communityData.ownerId }, 'string') ||
-                    assertType({ name: communityData.name }, 'string') ||
-                    assertType({ icon: communityData.icon }, 'string') ||
+                assertType({ roomId: roomData.roomId }, 'string') ||
+                    assertType({ ownerId: roomData.ownerId }, 'string') ||
+                    assertType({ name: roomData.name }, 'string') ||
+                    assertType({ icon: roomData.icon }, 'string') ||
                     assertNotEqual(
-                        { creationDate: new Date(communityData.creationDate) },
+                        { creationDate: new Date(roomData.creationDate) },
                         'Invalid Date'
                     ) ||
-                    assertType({ members: communityData.members }, 'object')
+                    assertType({ members: roomData.members }, 'object')
             );
 
-            for (const memberIndex in communityData.members) {
+            for (const memberIndex in roomData.members) {
                 callback(
                     assertType(
-                        { member: communityData.members[memberIndex] },
+                        { member: roomData.members[memberIndex] },
                         'string'
                     )
                 );
             }
 
-            socket.emit('leaveCommunity', () => {
+            socket.emit('leaveRoom', () => {
                 socket.emit(
-                    'createCommunity',
+                    'createRoom',
                     {
                         name: generateChars(5),
                     },
-                    ({ communityData }) => {
-                        // Add second profile to this community aswell, (kick ban etc.)
+                    ({ roomData }) => {
+                        // Add second profile to this room aswell, (kick ban etc.)
                         socket.emit('logout', () => {
                             socket.emit(
                                 'loginToken',
@@ -117,10 +114,9 @@ function joinCommunity(
                                 },
                                 () => {
                                     socket.emit(
-                                        'joinCommunity',
+                                        'joinRoom',
                                         {
-                                            communityId:
-                                                communityData.communityId,
+                                            roomId: roomData.roomId,
                                         },
                                         () => {
                                             socket.emit('logout', () => {
@@ -130,10 +126,10 @@ function joinCommunity(
                                                         token: sharedVariables.token,
                                                     },
                                                     () => {
-                                                        // Update communityId
+                                                        // Update roomId
                                                         setTestVariable(
-                                                            'createdCommunityId',
-                                                            communityData.communityId
+                                                            'createdRoomId',
+                                                            roomData.roomId
                                                         );
 
                                                         done();
@@ -153,15 +149,15 @@ function joinCommunity(
 }
 
 export default (testArgs: TestArguments): void => {
-    testArgs.socket.emit('leaveCommunity', () => {
+    testArgs.socket.emit('leaveRoom', () => {
         assertErrors(
             {
-                lengthCommunityIdMin,
-                lengthCommunityIdMax,
-                communityNotFound,
+                lengthRoomIdMin,
+                lengthRoomIdMax,
+                roomNotFound,
             },
             testArgs,
-            joinCommunity
+            joinRoom
         );
     });
 };

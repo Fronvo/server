@@ -1,15 +1,15 @@
 // ******************** //
-// The test file for the leaveCommunity event.
+// The test file for the leaveRoom event.
 // ******************** //
 
 import { TestArguments, TestErrorCallback } from 'interfaces/test';
 import { assertError, assertErrors } from 'test/utilities';
 
-function leaveCommunity(
+function leaveRoom(
     { socket, done }: TestArguments,
     callback: TestErrorCallback
 ): void {
-    socket.emit('leaveCommunity', ({ err }) => {
+    socket.emit('leaveRoom', ({ err }) => {
         callback(assertError({ err }));
 
         done();
@@ -17,5 +17,5 @@ function leaveCommunity(
 }
 
 export default (testArgs: TestArguments): void => {
-    assertErrors({}, testArgs, leaveCommunity);
+    assertErrors({}, testArgs, leaveRoom);
 };

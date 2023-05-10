@@ -48,7 +48,7 @@ function lengthProfileIdMax(
     );
 }
 
-function notInThisCommunity(
+function notInThisRoom(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
@@ -58,7 +58,7 @@ function notInThisCommunity(
             profileId: generateChars(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'NOT_IN_THIS_COMMUNITY'));
+            callback(assertCode(err.code, 'NOT_IN_THIS_ROOM'));
         }
     );
 }
@@ -75,16 +75,16 @@ function kickMember(
         ({ err }) => {
             callback(assertError({ err }));
 
-            // Add second profile to the community again (ban etc.)
+            // Add second profile to the room again (ban etc.)
             socket.emit('logout', () => {
                 socket.emit(
                     'loginToken',
                     { token: shared.secondaryProfileToken },
                     () => {
                         socket.emit(
-                            'joinCommunity',
+                            'joinRoom',
                             {
-                                communityId: shared.createdCommunityId,
+                                roomId: shared.createdRoomId,
                             },
                             ({ err }) => {
                                 callback(assertError({ err }));
@@ -113,7 +113,7 @@ export default (testArgs: TestArguments): void => {
         {
             lengthProfileIdMin,
             lengthProfileIdMax,
-            notInThisCommunity,
+            notInThisRoom,
         },
         testArgs,
         kickMember

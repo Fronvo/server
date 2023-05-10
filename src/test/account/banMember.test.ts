@@ -48,7 +48,7 @@ function lengthProfileIdMax(
     );
 }
 
-function notInThisCommunity(
+function notInThisRoom(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
 ): void {
@@ -58,7 +58,7 @@ function notInThisCommunity(
             profileId: generateChars(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'NOT_IN_THIS_COMMUNITY'));
+            callback(assertCode(err.code, 'NOT_IN_THIS_ROOM'));
         }
     );
 }
@@ -82,9 +82,9 @@ function banMember(
                     { token: shared.secondaryProfileToken },
                     () => {
                         socket.emit(
-                            'joinCommunity',
+                            'joinRoom',
                             {
-                                communityId: shared.createdCommunityId,
+                                roomId: shared.createdRoomId,
                             },
                             ({ err }) => {
                                 if (err) {
@@ -103,7 +103,7 @@ function banMember(
                                         assertError({
                                             err: {
                                                 code: 0,
-                                                msg: "Shouldn't be able to rejoin community after being banned.",
+                                                msg: "Shouldn't be able to rejoin room after being banned.",
                                                 name: 'SHOULDNT_REJOIN',
                                             },
                                         })
@@ -123,7 +123,7 @@ export default (testArgs: TestArguments): void => {
         {
             lengthProfileIdMin,
             lengthProfileIdMax,
-            notInThisCommunity,
+            notInThisRoom,
         },
         testArgs,
         banMember

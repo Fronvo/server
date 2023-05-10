@@ -17,8 +17,8 @@ async function logout({
         },
     });
 
-    if (account.isInCommunity) {
-        await socket.leave(account.communityId);
+    if (account.isInRoom) {
+        await socket.leave(account.roomId);
     }
 
     logoutSocket(io, socket);

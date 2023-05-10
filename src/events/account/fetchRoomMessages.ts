@@ -1,24 +1,24 @@
 // ******************** //
-// The fetchCommunityMessages account-only event file.
+// The fetchRoomMessages account-only event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Account, CommunityMessage } from '@prisma/client';
-import {
-    FetchCommunityMessagesResult,
-    FetchCommunityMessagesServerParams,
-} from 'interfaces/account/fetchCommunityMessages';
+import { Account, RoomMessage } from '@prisma/client';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
-import { fromToSchema } from './../shared';
+import { fromToSchema } from '../shared';
+import {
+    FetchRoomMessagesResult,
+    FetchRoomMessagesServerParams,
+} from 'interfaces/account/fetchRoomMessages';
 
-async function fetchCommunityMessages({
+async function fetchRoomMessages({
     socket,
     from,
     to,
-}: FetchCommunityMessagesServerParams): Promise<
-    FetchCommunityMessagesResult | FronvoError
+}: FetchRoomMessagesServerParams): Promise<
+    FetchRoomMessagesResult | FronvoError
 > {
     const account = await prismaClient.account.findFirst({
         where: {
@@ -26,8 +26,8 @@ async function fetchCommunityMessages({
         },
     });
 
-    if (!account.isInCommunity) {
-        return generateError('NOT_IN_COMMUNITY');
+    if (!account.isInRoom) {
+        return generateError('NOT_IN_ROOM');
     }
 
     const fromNumber = Number(from);
@@ -63,9 +63,9 @@ async function fetchCommunityMessages({
         }
     }
 
-    const messages = await prismaClient.communityMessage.findMany({
+    const messages = await prismaClient.roomMessage.findMany({
         where: {
-            communityId: account.communityId,
+            roomId: account.roomId,
         },
 
         // Last shown first
@@ -78,7 +78,7 @@ async function fetchCommunityMessages({
         take: -(Number(to) - Number(from)),
         select: {
             ownerId: true,
-            communityId: true,
+            roomId: true,
             content: true,
             creationDate: true,
             isReply: true,
@@ -116,8 +116,8 @@ async function fetchCommunityMessages({
         }
     }
 
-    const communityMessages: {
-        message: Partial<CommunityMessage>;
+    const roomMessages: {
+        message: Partial<RoomMessage>;
         profileData: Partial<Account>;
     }[] = [];
 
@@ -125,21 +125,21 @@ async function fetchCommunityMessages({
     for (const messageIndex in messages) {
         const message = messages[messageIndex];
 
-        communityMessages.push({
+        roomMessages.push({
             message,
             profileData: getProfileData(message.ownerId),
         });
     }
 
-    return { communityMessages };
+    return { roomMessages };
 }
 
-const fetchCommunityMessagesTemplate: EventTemplate = {
-    func: fetchCommunityMessages,
+const fetchRoomMessagesTemplate: EventTemplate = {
+    func: fetchRoomMessages,
     template: ['from', 'to'],
     schema: new StringSchema({
         ...fromToSchema,
     }),
 };
 
-export default fetchCommunityMessagesTemplate;
+export default fetchRoomMessagesTemplate;
