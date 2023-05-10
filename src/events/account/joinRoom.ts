@@ -38,11 +38,6 @@ async function joinRoom({
         return generateError('ROOM_NOT_FOUND');
     }
 
-    // Check if banned
-    if (room.bannedMembers.includes(accountData.profileId)) {
-        return generateError('ROOM_BAN');
-    }
-
     // Finally, join the room
     await prismaClient.room.update({
         where: {

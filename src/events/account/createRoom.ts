@@ -39,7 +39,6 @@ async function createRoom({
             name,
             icon,
             members: [accountData.profileId],
-            bannedMembers: [],
         },
         select: {
             roomId: true,
@@ -48,7 +47,6 @@ async function createRoom({
             creationDate: true,
             icon: true,
             members: true,
-            bannedMembers: true,
         },
     });
 

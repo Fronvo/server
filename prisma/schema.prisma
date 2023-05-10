@@ -38,14 +38,13 @@ model Post {
 }
 
 model Room {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  ownerId       String
-  roomId        String   @unique
-  name          String
-  creationDate  DateTime @default(now())
-  icon          String   @default("")
-  members       Json[]
-  bannedMembers Json[]
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId      String
+  roomId       String   @unique
+  name         String
+  creationDate DateTime @default(now())
+  icon         String   @default("")
+  members      Json[]
 }
 
 model RoomMessage {

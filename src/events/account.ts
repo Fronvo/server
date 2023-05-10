@@ -21,9 +21,6 @@ import sendRoomMessage from 'events/account/sendRoomMessage';
 import fetchRoomMessages from 'events/account/fetchRoomMessages';
 import deleteRoomMessage from 'events/account/deleteRoomMessage';
 import kickMember from 'events/account/kickMember';
-import banMember from 'events/account/banMember';
-import showBannedMembers from 'events/account/showBannedMembers';
-import unbanMember from 'events/account/unbanMember';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -47,9 +44,6 @@ const accountTemplate: EventExportTemplate = {
     fetchRoomMessages,
     deleteRoomMessage,
     kickMember,
-    banMember,
-    showBannedMembers,
-    unbanMember,
 };
 
 export default accountTemplate;

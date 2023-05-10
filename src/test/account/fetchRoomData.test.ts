@@ -90,10 +90,6 @@ function fetchRoomData(
                     assertType(
                         { totalMessages: roomData.totalMessages },
                         'number'
-                    ) ||
-                    assertType(
-                        { bannedMembers: roomData.bannedMembers },
-                        'object'
                     )
             );
 

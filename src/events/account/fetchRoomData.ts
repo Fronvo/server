@@ -38,7 +38,6 @@ async function fetchRoomData({
                 roomId: room.roomId,
             },
         }),
-        bannedMembers: room.bannedMembers || [],
     };
 
     return { roomData };

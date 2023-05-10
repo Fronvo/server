@@ -95,15 +95,6 @@ import {
     KickMemberParams,
     KickMemberTestResult,
 } from 'interfaces/account/kickMember';
-import {
-    BanMemberParams,
-    BanMemberTestResult,
-} from 'interfaces/account/banMember';
-import { ShowBannedMembersTestResult } from 'interfaces/account/showBannedMembers';
-import {
-    UnbanMemberParams,
-    UnbanMemberTestResult,
-} from 'interfaces/account/unbanMember';
 
 export interface ClientToServerEvents {
     register: (
@@ -198,16 +189,5 @@ export interface ClientToServerEvents {
     kickMember: (
         {}: KickMemberParams,
         callback?: ({}: KickMemberTestResult) => void
-    ) => void;
-    banMember: (
-        {}: BanMemberParams,
-        callback?: ({}: BanMemberTestResult) => void
-    ) => void;
-    showBannedMembers: (
-        callback?: ({}: ShowBannedMembersTestResult) => void
-    ) => void;
-    unbanMember: (
-        {}: UnbanMemberParams,
-        callback?: ({}: UnbanMemberTestResult) => void
     ) => void;
 }
