@@ -26,6 +26,12 @@ export async function loginSocket(
         where: {
             profileId: getSocketAccountId(socket.id),
         },
+
+        select: {
+            profileId: true,
+            isInCommunity: true,
+            communityId: true,
+        },
     });
 
     if (account.isInCommunity) {
@@ -53,17 +59,6 @@ export async function logoutSocket(
             profileId: true,
             isInCommunity: true,
             communityId: true,
-        },
-    });
-
-    // Update last online time
-    await prismaClient.account.update({
-        where: {
-            profileId: account.profileId,
-        },
-
-        data: {
-            lastOnline: new Date(),
         },
     });
 
