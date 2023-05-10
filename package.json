@@ -1,12 +1,12 @@
 {
   "name": "fronvo-server",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "The server of the open-source free-convo chat app.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Fronvo/server.git"
   },
-  "author": "Shadofer#6681",
+  "author": "@Shadofer",
   "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/Fronvo/server/issues"
