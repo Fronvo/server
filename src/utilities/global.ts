@@ -267,8 +267,9 @@ export async function sendEmail(
             .content {
                 width: 40%;
                 margin: auto;
-                border-radius: 5px;
+                border-radius: 10px;
                 background: white;
+                box-shadow: rgb(10, 10, 10);
                 padding-top: 20px;
             }
 
@@ -276,7 +277,7 @@ export async function sendEmail(
                 width: 100%;
                 opacity: 25%;
                 border-width: 1px;
-                border-color: rgb(240, 240, 240);
+                border-color: rgb(0, 0, 0);
             }
 
             p {
@@ -301,8 +302,8 @@ export async function sendEmail(
             }
 
             #colored {
-                color: rgb(130, 70, 255);
-                font-size: 1.2rem;
+                color: black;
+                font-size: 1.4rem;
                 margin-top: 0;
                 margin-bottom: 20px;
             }
