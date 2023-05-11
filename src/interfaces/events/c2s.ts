@@ -27,10 +27,6 @@ import {
     FetchRoomMessagesTestResult,
 } from 'interfaces/account/fetchRoomMessages';
 import {
-    FetchHomePostsParams,
-    FetchHomePostsTestResult,
-} from 'interfaces/account/fetchHomePosts';
-import {
     FetchProfileDataParams,
     FetchProfileDataTestResult,
 } from 'interfaces/account/fetchProfileData';
@@ -152,10 +148,6 @@ export interface ClientToServerEvents {
     unfollowProfile: (
         {}: UnfollowProfileParams,
         callback?: ({}: UnfollowProfileTestResult) => void
-    ) => void;
-    fetchHomePosts: (
-        {}: FetchHomePostsParams,
-        callback?: ({}: FetchHomePostsTestResult) => void
     ) => void;
     createRoom: (
         {}: CreateRoomParams,

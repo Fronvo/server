@@ -10,7 +10,6 @@ import fetchProfilePosts from 'test/account/fetchProfilePosts.test';
 import deletePost from 'test/account/deletePost.test';
 import followProfile from 'test/account/followProfile.test';
 import unfollowProfile from 'test/account/unfollowProfile.test';
-import fetchHomePosts from 'test/account/fetchHomePosts.test';
 import createRoom from 'test/account/createRoom.test';
 import fetchRoomData from 'test/account/fetchRoomData.test';
 import updateRoomData from 'test/account/updateRoomData.test';
@@ -31,7 +30,6 @@ export default {
     deletePost,
     followProfile,
     unfollowProfile,
-    fetchHomePosts,
     createRoom,
     fetchRoomData,
     updateRoomData,
