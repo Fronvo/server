@@ -19,7 +19,6 @@ async function updateProfileData({
     bio,
     avatar,
     banner,
-    isPrivate,
 }: UpdateProfileDataServerParams): Promise<
     UpdateProfileDataResult | FronvoError
 > {
@@ -32,8 +31,7 @@ async function updateProfileData({
         !avatar &&
         avatar != '' &&
         !banner &&
-        banner != '' &&
-        isPrivate == undefined
+        banner != ''
     ) {
         return {
             err: undefined,
@@ -56,12 +54,6 @@ async function updateProfileData({
         }
     }
 
-    if (isPrivate) {
-        if (typeof isPrivate != 'boolean') {
-            return generateError('NOT_BOOLEAN');
-        }
-    }
-
     const profileData = await prismaClient.account.update({
         data: {
             profileId,
@@ -69,7 +61,6 @@ async function updateProfileData({
             bio,
             avatar,
             banner,
-            isPrivate,
         },
         where: {
             profileId: getSocketAccountId(socket.id),
@@ -80,7 +71,6 @@ async function updateProfileData({
             bio: true,
             avatar: true,
             banner: true,
-            isPrivate: true,
             isInRoom: true,
             roomId: true,
         },
@@ -88,17 +78,6 @@ async function updateProfileData({
 
     if (profileId) {
         // Update related entries
-
-        // Update posts
-        await prismaClient.post.updateMany({
-            where: {
-                author: getSocketAccountId(socket.id),
-            },
-
-            data: {
-                author: profileId,
-            },
-        });
 
         // Update token
         await prismaClient.token.update({
@@ -110,65 +89,6 @@ async function updateProfileData({
                 profileId,
             },
         });
-
-        // Update follow relations
-        function normalizeList(targetList: Array<string>): Array<string> {
-            const resultList = targetList;
-
-            const targetIndex = resultList.indexOf(
-                getSocketAccountId(socket.id)
-            );
-
-            // Replace with new one
-            resultList[targetIndex] = profileId;
-
-            return resultList;
-        }
-
-        // Update following first
-        const targetFollowingAccounts = await prismaClient.account.findMany({
-            where: {
-                followers: {
-                    has: getSocketAccountId(socket.id),
-                },
-            },
-        });
-
-        for (const accountIndex in targetFollowingAccounts) {
-            await prismaClient.account.update({
-                where: {
-                    profileId: targetFollowingAccounts[accountIndex].profileId,
-                },
-                data: {
-                    followers: normalizeList(
-                        targetFollowingAccounts[accountIndex]
-                            .followers as string[]
-                    ),
-                },
-            });
-        }
-
-        // Then followers
-        const targetFollowers = await prismaClient.account.findMany({
-            where: {
-                following: {
-                    has: getSocketAccountId(socket.id),
-                },
-            },
-        });
-
-        for (const accountIndex in targetFollowers) {
-            await prismaClient.account.update({
-                where: {
-                    profileId: targetFollowers[accountIndex].profileId,
-                },
-                data: {
-                    following: normalizeList(
-                        targetFollowers[accountIndex].following as string[]
-                    ),
-                },
-            });
-        }
 
         // If currently in room, update members
         if (profileData.isInRoom) {

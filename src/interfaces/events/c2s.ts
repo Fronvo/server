@@ -7,17 +7,9 @@ import {
     CreateRoomTestResult,
 } from 'interfaces/account/createRoom';
 import {
-    CreatePostParams,
-    CreatePostTestResult,
-} from 'interfaces/account/createPost';
-import {
     DeleteRoomMessageParams,
     DeleteRoomMessageTestResult,
 } from 'interfaces/account/deleteRoomMessage';
-import {
-    DeletePostParams,
-    DeletePostTestResult,
-} from 'interfaces/account/deletePost';
 import {
     FetchRoomDataParams,
     FetchRoomDataTestResult,
@@ -32,14 +24,6 @@ import {
 } from 'interfaces/account/fetchProfileData';
 import { FetchProfileIdTestResult } from 'interfaces/account/fetchProfileId';
 import {
-    FetchProfilePostsParams,
-    FetchProfilePostsTestResult,
-} from 'interfaces/account/fetchProfilePosts';
-import {
-    FollowProfileParams,
-    FollowProfileTestResult,
-} from 'interfaces/account/followProfile';
-import {
     JoinRoomParams,
     JoinRoomTestResult,
 } from 'interfaces/account/joinRoom';
@@ -49,10 +33,6 @@ import {
     SendRoomMessageParams,
     SendRoomMessageTestResult,
 } from 'interfaces/account/sendRoomMessage';
-import {
-    UnfollowProfileParams,
-    UnfollowProfileTestResult,
-} from 'interfaces/account/unfollowProfile';
 import {
     UpdateRoomDataParams,
     UpdateRoomDataTestResult,
@@ -128,26 +108,6 @@ export interface ClientToServerEvents {
     updateProfileData: (
         {}: UpdateProfileDataParams,
         callback?: ({}: UpdateProfileDataTestResult) => void
-    ) => void;
-    createPost: (
-        {}: CreatePostParams,
-        callback?: ({}: CreatePostTestResult) => void
-    ) => void;
-    fetchProfilePosts: (
-        {}: FetchProfilePostsParams,
-        callback?: ({}: FetchProfilePostsTestResult) => void
-    ) => void;
-    deletePost: (
-        {}: DeletePostParams,
-        callback?: ({}: DeletePostTestResult) => void
-    ) => void;
-    followProfile: (
-        {}: FollowProfileParams,
-        callback?: ({}: FollowProfileTestResult) => void
-    ) => void;
-    unfollowProfile: (
-        {}: UnfollowProfileParams,
-        callback?: ({}: UnfollowProfileTestResult) => void
     ) => void;
     createRoom: (
         {}: CreateRoomParams,

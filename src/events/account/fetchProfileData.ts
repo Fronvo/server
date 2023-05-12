@@ -34,20 +34,6 @@ async function fetchProfileData({
     }
 
     const isSelf = getSocketAccountId(socket.id) == profileId;
-    const isFollower =
-        !isSelf && account.following.includes(getSocketAccountId(socket.id));
-    const isPrivate = account.isPrivate;
-    const isAccessible = isSelf || !isPrivate || isFollower;
-
-    let totalPosts = 0;
-
-    if (isAccessible) {
-        totalPosts = await prismaClient.post.count({
-            where: {
-                author: profileId,
-            },
-        });
-    }
 
     // Block access to most info if private
     const profileData: FetchedFronvoAccount = {
@@ -55,15 +41,9 @@ async function fetchProfileData({
         profileId: account.profileId,
         username: account.username,
         bio: account.bio,
-        creationDate: (isAccessible && account.creationDate) || new Date(),
+        creationDate: account.creationDate || new Date(),
         avatar: account.avatar,
         banner: account.banner,
-        following: (isAccessible && account.following) || [],
-        followers: (isAccessible && account.followers) || [],
-        totalPosts,
-        isPrivate,
-        isFollower,
-        isAdmin: account.isAdmin || account.profileId == 'fronvo',
         online: getAccountSocketId(profileId) != '',
     };
 

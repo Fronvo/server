@@ -11,7 +11,6 @@ export interface UpdateProfileDataParams {
     bio?: string;
     avatar?: string;
     banner?: string;
-    isPrivate?: boolean;
 }
 
 export interface UpdateProfileDataServerParams

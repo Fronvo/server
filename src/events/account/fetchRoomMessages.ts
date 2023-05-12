@@ -102,12 +102,8 @@ async function fetchRoomMessages({
                     banner: true,
                     bio: true,
                     creationDate: true,
-                    followers: true,
-                    following: true,
-                    isPrivate: true,
                     profileId: true,
                     username: true,
-                    isAdmin: true,
                 },
             });
 

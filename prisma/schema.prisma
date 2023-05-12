@@ -20,21 +20,8 @@ model Account {
   avatar       String   @default("")
   banner       String   @default("")
   creationDate DateTime @default(now())
-  following    Json[]
-  followers    Json[]
-  isPrivate    Boolean?
   isInRoom     Boolean  @default(false)
   roomId       String   @default("")
-  isAdmin      Boolean  @default(false)
-}
-
-model Post {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  postId       String   @unique @default(uuid())
-  author       String
-  content      String
-  attachment   String   @default("")
-  creationDate DateTime @default(now())
 }
 
 model Room {

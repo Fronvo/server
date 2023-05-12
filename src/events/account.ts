@@ -6,11 +6,6 @@ import fetchProfileId from 'events/account/fetchProfileId';
 import fetchProfileData from 'events/account/fetchProfileData';
 import logout from 'events/account/logout';
 import updateProfileData from 'events/account/updateProfileData';
-import createPost from 'events/account/createPost';
-import fetchProfilePosts from 'events/account/fetchProfilePosts';
-import deletePost from 'events/account/deletePost';
-import followProfile from 'events/account/followProfile';
-import unfollowProfile from 'events/account/unfollowProfile';
 import createRoom from 'events/account/createRoom';
 import joinRoom from 'events/account/joinRoom';
 import fetchRoomData from 'events/account/fetchRoomData';
@@ -28,11 +23,6 @@ const accountTemplate: EventExportTemplate = {
     fetchProfileData,
     logout,
     updateProfileData,
-    createPost,
-    fetchProfilePosts,
-    deletePost,
-    followProfile,
-    unfollowProfile,
     createRoom,
     joinRoom,
     fetchRoomData,

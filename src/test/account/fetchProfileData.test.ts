@@ -91,27 +91,6 @@ function fetchProfileData(
                     ) ||
                     assertType({ avatar: profileData.avatar }, 'string') ||
                     assertType({ banner: profileData.banner }, 'string') ||
-                    assertType(
-                        { following: profileData.following },
-                        'object'
-                    ) ||
-                    assertType(
-                        { followers: profileData.followers },
-                        'object'
-                    ) ||
-                    assertType(
-                        { totalPosts: profileData.totalPosts },
-                        'number'
-                    ) ||
-                    assertType(
-                        { isPrivate: profileData.isPrivate },
-                        'boolean'
-                    ) ||
-                    assertType(
-                        { isFollower: profileData.isFollower },
-                        'boolean'
-                    ) ||
-                    assertType({ isAdmin: profileData.isAdmin }, 'boolean') ||
                     assertType({ online: profileData.online }, 'boolean')
             );
 

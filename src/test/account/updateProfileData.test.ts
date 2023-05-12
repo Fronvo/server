@@ -121,22 +121,6 @@ function lengthBannerMax(
     );
 }
 
-function invalidIsPrivate(
-    { socket }: Partial<TestArguments>,
-    callback: TestErrorCallback
-): void {
-    socket.emit(
-        'updateProfileData',
-        {
-            // @ts-ignore
-            isPrivate: '123',
-        },
-        ({ err }) => {
-            callback(assertCode(err.code, 'NOT_BOOLEAN'));
-        }
-    );
-}
-
 function invalidProfileId(
     { socket }: Partial<TestArguments>,
     callback: TestErrorCallback
@@ -164,7 +148,6 @@ function updateProfileData(
             bio: generateChars(),
             avatar: `https://${generateChars()}`,
             banner: `https://${generateChars()}`,
-            isPrivate: false,
         },
         ({ err, profileData }): void => {
             callback(assertError({ err }));
@@ -193,7 +176,6 @@ export default (testArgs: TestArguments): void => {
             lengthBioMax,
             lengthAvatarMax,
             lengthBannerMax,
-            invalidIsPrivate,
             invalidProfileId,
         },
         testArgs,

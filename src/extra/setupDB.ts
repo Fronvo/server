@@ -147,38 +147,6 @@ async function setupDB(): Promise<void> {
         });
     }
 
-    async function createOfficialPost(): Promise<void> {
-        return new Promise((resolve) => {
-            socket.emit(
-                'createPost',
-                {
-                    content: `Never be tracked again.
-Ads..?
-What are those?`,
-                    attachment:
-                        'https://github.com/Fronvo/server/blob/master/.github/email/fronvo-logo-large.png?raw=true',
-                },
-                () => resolve()
-            );
-        });
-    }
-
-    async function createOfficialWarningPost(): Promise<void> {
-        return new Promise((resolve) => {
-            socket.emit(
-                'createPost',
-                {
-                    content: `This account, post and room have been auto-generated.
-Someone must first login to this account before trying to self-host this server instance.
-Other than that, have fun!`,
-                    attachment:
-                        'https://github.com/Fronvo/server/blob/master/.github/email/fronvo-logo-large.png?raw=true',
-                },
-                () => resolve()
-            );
-        });
-    }
-
     async function createOfficialRoom(): Promise<void> {
         return new Promise((resolve) => {
             socket.emit(
@@ -203,8 +171,6 @@ Other than that, have fun!`,
     }
 
     await createOfficialAccount();
-    await createOfficialPost();
-    await createOfficialWarningPost();
     await createOfficialRoom();
 }
 
