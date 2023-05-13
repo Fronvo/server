@@ -20,7 +20,6 @@ async function sendRoomMessage({
     io,
     socket,
     message,
-    replyId,
 }: SendRoomMessageServerParams): Promise<SendRoomMessageResult | FronvoError> {
     const account = await prismaClient.account.findFirst({
         where: {
@@ -60,34 +59,12 @@ async function sendRoomMessage({
         return newSchemaResult;
     }
 
-    let replyContent = '';
-
-    if (replyId) {
-        const replyMessage = await prismaClient.roomMessage.findFirst({
-            where: {
-                messageId: replyId,
-            },
-
-            select: {
-                content: true,
-            },
-        });
-
-        if (!replyMessage) {
-            return generateError('INVALID_MESSAGE');
-        }
-
-        replyContent = replyMessage.content;
-    }
-
     const newMessageData = await prismaClient.roomMessage.create({
         data: {
             ownerId: account.profileId,
             roomId: account.roomId,
             messageId: v4(),
             content: message,
-            isReply: Boolean(replyId),
-            replyContent,
         },
 
         select: {
@@ -95,9 +72,7 @@ async function sendRoomMessage({
             roomId: true,
             content: true,
             creationDate: true,
-            isReply: true,
             messageId: true,
-            replyContent: true,
         },
     });
 
@@ -113,16 +88,11 @@ async function sendRoomMessage({
 
 const sendRoomMessageTemplate: EventTemplate = {
     func: sendRoomMessage,
-    template: ['message', 'replyId'],
+    template: ['message'],
     schema: new StringSchema({
         message: {
             minLength: 1,
             maxLength: 500,
-        },
-
-        replyId: {
-            type: 'uuid',
-            optional: true,
         },
     }),
 };
