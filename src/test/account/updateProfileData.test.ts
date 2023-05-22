@@ -131,7 +131,7 @@ function invalidProfileId(
             profileId: shared.profileId,
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'INVALID_PROFILE_ID'));
+            callback(assertCode(err.code, 'INVALID_ID'));
         }
     );
 }

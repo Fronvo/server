@@ -50,7 +50,7 @@ async function updateProfileData({
         });
 
         if (profileIdData) {
-            return generateError('INVALID_PROFILE_ID');
+            return generateError('INVALID_ID');
         }
     }
 

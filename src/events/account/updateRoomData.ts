@@ -46,7 +46,7 @@ async function updateRoomData({
         });
 
         if (roomIdData) {
-            return generateError('INVALID_ROOM_ID');
+            return generateError('INVALID_ID');
         }
     }
 
