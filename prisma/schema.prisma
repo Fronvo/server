@@ -41,6 +41,8 @@ model RoomMessage {
   messageId    String   @unique
   content      String
   creationDate DateTime @default(now())
+  isReply      Boolean  @default(false)
+  replyContent String   @default("")
 }
 
 model Token {

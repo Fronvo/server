@@ -6,6 +6,7 @@ import { EventArguments, FronvoError } from 'interfaces/all';
 
 export interface SendRoomMessageParams {
     message: string;
+    replyId?: string;
 }
 
 export interface SendRoomMessageServerParams

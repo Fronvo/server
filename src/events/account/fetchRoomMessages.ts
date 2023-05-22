@@ -82,6 +82,8 @@ async function fetchRoomMessages({
             content: true,
             creationDate: true,
             messageId: true,
+            isReply: true,
+            replyContent: true,
         },
     });
 

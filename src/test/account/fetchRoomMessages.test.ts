@@ -92,6 +92,11 @@ function fetchRoomMessages(
                     assertNotEqual(
                         { creationDate: new Date(targetMessage.creationDate) },
                         'Invalid Date'
+                    ) ||
+                    assertType({ isReply: targetMessage.isReply }, 'boolean') ||
+                    assertType(
+                        { replyContent: targetMessage.replyContent },
+                        'string'
                     )
             );
 
