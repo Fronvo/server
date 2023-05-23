@@ -45,7 +45,7 @@ async function deleteRoomMessage({
         account.profileId != room.ownerId &&
         account.profileId != targetMessage.ownerId
     ) {
-        return generateError('NOT_ROOM_OWNER');
+        return generateError('NOT_OWNER');
     }
 
     const deletedMessage = await prismaClient.roomMessage.deleteMany({
@@ -55,7 +55,7 @@ async function deleteRoomMessage({
     });
 
     if (deletedMessage.count == 0) {
-        return generateError('INVALID_MESSAGE');
+        return generateError('INVALID', undefined, ['message ID']);
     }
 
     io.to(room.roomId).emit('roomMessageDeleted', { messageId });

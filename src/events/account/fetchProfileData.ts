@@ -30,7 +30,7 @@ async function fetchProfileData({
     });
 
     if (!account) {
-        return generateError('PROFILE_NOT_FOUND');
+        return generateError('INVALID', undefined, ['profile ID']);
     }
 
     const isSelf = getSocketAccountId(socket.id) == profileId;

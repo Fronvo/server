@@ -74,7 +74,7 @@ async function sendRoomMessage({
         });
 
         if (!replyMessage) {
-            return generateError('INVALID_MESSAGE');
+            return generateError('INVALID', undefined, ['message ID']);
         }
 
         replyContent = replyMessage.content;

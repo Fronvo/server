@@ -27,7 +27,7 @@ async function register({
                 utilities.getEmailDomain(email)
             ) > -1
         ) {
-            return utilities.generateError('REQUIRED_EMAIL');
+            return utilities.generateError('REQUIRED', ['email']);
         }
     }
 
@@ -39,7 +39,7 @@ async function register({
 
     // Check if the email is already registered by another user
     if (account) {
-        return utilities.generateError('ACCOUNT_ALREADY_EXISTS');
+        return utilities.generateError('EMAIL_TAKEN');
     }
 
     let sentCode: string;
@@ -61,7 +61,7 @@ async function register({
         let token: string;
 
         if (code != sentCode) {
-            finalError = utilities.generateError('INVALID_CODE');
+            finalError = utilities.generateError('INVALID', ['code']);
         } else {
             // Double-check if someone else registered this during verification
             const account = await prismaClient.account.findFirst({
@@ -71,7 +71,7 @@ async function register({
             });
 
             if (account) {
-                finalError = utilities.generateError('ACCOUNT_ALREADY_EXISTS');
+                finalError = utilities.generateError('EMAIL_TAKEN');
             } else {
                 // Detach listener
                 socket.removeAllListeners('registerVerify');

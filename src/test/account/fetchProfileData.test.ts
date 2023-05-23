@@ -60,7 +60,7 @@ function profileNotFound(
             profileId: generateChars(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'PROFILE_NOT_FOUND'));
+            callback(assertCode(err.code, 'INVALID'));
         }
     );
 }

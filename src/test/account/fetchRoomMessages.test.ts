@@ -61,7 +61,7 @@ function loadMore100(
             to: '101',
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'TOO_MUCH_LOAD'));
+            callback(assertCode(err.code, 'TOO_MUCH'));
         }
     );
 }

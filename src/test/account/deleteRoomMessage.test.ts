@@ -22,10 +22,7 @@ function invalidMessageIdType(
             messageId: v4().replace(/-/, 'a'),
         },
         ({ err }) => {
-            callback(
-                assertCode(err.code, 'REQUIRED_UUID') ||
-                    assertEquals({ for: err.extras.for }, 'messageId')
-            );
+            callback(assertCode(err.code, 'REQUIRED'));
         }
     );
 }
@@ -40,7 +37,7 @@ function invalidMessage(
             messageId: v4(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'INVALID_MESSAGE'));
+            callback(assertCode(err.code, 'INVALID'));
         }
     );
 }

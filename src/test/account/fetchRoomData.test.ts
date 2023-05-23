@@ -60,7 +60,7 @@ function roomNotFound(
             roomId: generateChars(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'ROOM_NOT_FOUND'));
+            callback(assertCode(err.code, 'INVALID'));
         }
     );
 }

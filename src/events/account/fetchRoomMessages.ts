@@ -34,19 +34,17 @@ async function fetchRoomMessages({
     const toNumber = Number(to);
 
     if (fromNumber > toNumber) {
-        return generateError(
-            'NOT_HIGHER_NUMBER',
-            { to: toNumber, from: fromNumber },
-            ['to', 'from']
-        );
+        return generateError('NOT_HIGHER', { to: toNumber, from: fromNumber }, [
+            'to',
+            'from',
+        ]);
     }
 
     if (toNumber - fromNumber > 100) {
-        return generateError(
-            'TOO_MUCH_LOAD',
-            { to: toNumber, from: fromNumber },
-            [100, 'messages']
-        );
+        return generateError('TOO_MUCH', { to: toNumber, from: fromNumber }, [
+            100,
+            'messages',
+        ]);
     }
 
     // Gather available account data (not private, or followed back)

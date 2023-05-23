@@ -23,7 +23,7 @@ async function loginToken({
     });
 
     if (!tokenItem) {
-        return generateError('INVALID_TOKEN');
+        return generateError('INVALID', undefined, ['token']);
     }
 
     const account = await prismaClient.account.findFirst({

@@ -40,7 +40,7 @@ async function kickMember({
 
     // Must be the owner
     if (!(account.profileId == room.ownerId)) {
-        return generateError('NOT_ROOM_OWNER');
+        return generateError('NOT_OWNER');
     }
 
     // Check if member with id is in this room

@@ -141,7 +141,7 @@ function invalidEmailFormat(
             password: generatePassword(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'REQUIRED_EMAIL'));
+            callback(assertCode(err.code, 'REQUIRED'));
         }
     );
 }
@@ -186,7 +186,7 @@ function accountExists(
                                             callback(
                                                 assertCode(
                                                     err.code,
-                                                    'ACCOUNT_ALREADY_EXISTS'
+                                                    'EMAIL_TAKEN'
                                                 )
                                             );
                                         }

@@ -113,7 +113,7 @@ function invalidRoomId(
             roomId: shared.createdRoomId,
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'INVALID_ID'));
+            callback(assertCode(err.code, 'INVALID'));
         }
     );
 }

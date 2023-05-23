@@ -60,7 +60,7 @@ function roomNotFound(
             roomId: generateChars(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'ROOM_NOT_FOUND'));
+            callback(assertCode(err.code, 'INVALID'));
         }
     );
 }
@@ -105,7 +105,7 @@ function joinRoom(
                         name: generateChars(5),
                     },
                     ({ roomData }) => {
-                        // Add second profile to this room aswell, (kick ban etc.)
+                        // Add second profile to this room aswell
                         socket.emit('logout', () => {
                             socket.emit(
                                 'loginToken',

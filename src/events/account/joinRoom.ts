@@ -35,7 +35,7 @@ async function joinRoom({
     });
 
     if (!room) {
-        return generateError('ROOM_NOT_FOUND');
+        return generateError('INVALID', undefined, ['room ID']);
     }
 
     // Finally, join the room

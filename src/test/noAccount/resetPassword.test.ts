@@ -78,7 +78,7 @@ function invalidEmailFormat(
             email: generateEmail().replace(/@/, ''),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'REQUIRED_EMAIL'));
+            callback(assertCode(err.code, 'REQUIRED'));
         }
     );
 }
@@ -93,7 +93,7 @@ function accountDoesntExist(
             email: generateEmail(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'ACCOUNT_DOESNT_EXIST'));
+            callback(assertCode(err.code, 'ACCOUNT_404'));
         }
     );
 }

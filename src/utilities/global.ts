@@ -405,7 +405,7 @@ export function validateSchema(
                 return generateError('REQUIRED', extras, [key]);
 
             case 'STRING_INVALID_LENGTH':
-                return generateError('EXACT_LENGTH', extras, [
+                return generateError('LENGTH_EXACT', extras, [
                     key,
                     schema.schema[key].length,
                 ]);
@@ -424,10 +424,10 @@ export function validateSchema(
             case 'STRING_INVALID_TYPE':
                 switch (result.extras.type) {
                     case 'email':
-                        return generateError('REQUIRED_EMAIL', extras);
+                        return generateError('REQUIRED', extras);
 
                     case 'uuid':
-                        return generateError('REQUIRED_UUID', extras);
+                        return generateError('REQUIRED', extras);
 
                     default:
                         return generateError('UNKNOWN');

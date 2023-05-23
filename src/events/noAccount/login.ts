@@ -22,7 +22,7 @@ async function login({
     });
 
     if (!account) {
-        return utilities.generateError('ACCOUNT_DOESNT_EXIST');
+        return utilities.generateError('ACCOUNT_404');
     }
 
     // Validate the password, synchronously
@@ -48,7 +48,7 @@ async function login({
 
         return { token };
     } else {
-        return utilities.generateError('INVALID_PASSWORD');
+        return utilities.generateError('INVALID', undefined, ['password']);
     }
 }
 

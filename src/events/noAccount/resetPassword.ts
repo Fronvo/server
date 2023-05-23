@@ -26,7 +26,7 @@ async function resetPassword({
     });
 
     if (!account) {
-        return generateError('ACCOUNT_DOESNT_EXIST');
+        return generateError('ACCOUNT_404');
     }
 
     let sentCode: string;
@@ -49,7 +49,11 @@ async function resetPassword({
         socket.on('resetPasswordVerify', ({ code }, callback) => {
             if (code != sentCode) {
                 callback({
-                    err: { ...utilities.generateError('INVALID_CODE').err },
+                    err: {
+                        ...utilities.generateError('INVALID', undefined, [
+                            'code',
+                        ]).err,
+                    },
                 });
                 return;
             }

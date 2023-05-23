@@ -40,10 +40,7 @@ function invalidTokenType(
             token: v4().replace(/-/, 'a'),
         },
         ({ err }) => {
-            callback(
-                assertCode(err.code, 'REQUIRED_UUID') ||
-                    assertEquals({ for: err.extras.for }, 'token')
-            );
+            callback(assertCode(err.code, 'REQUIRED'));
         }
     );
 }
@@ -58,7 +55,7 @@ function invalidToken(
             token: v4(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'INVALID_TOKEN'));
+            callback(assertCode(err.code, 'INVALID'));
         }
     );
 }

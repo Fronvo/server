@@ -141,7 +141,7 @@ function invalidEmailFormat(
             password: generatePassword(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'REQUIRED_EMAIL'));
+            callback(assertCode(err.code, 'REQUIRED'));
         }
     );
 }
@@ -157,7 +157,7 @@ function accountDoesntExist(
             password: generatePassword(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'ACCOUNT_DOESNT_EXIST'));
+            callback(assertCode(err.code, 'ACCOUNT_404'));
         }
     );
 }
@@ -173,7 +173,7 @@ function invalidPassword(
             password: generatePassword(),
         },
         ({ err }) => {
-            callback(assertCode(err.code, 'INVALID_PASSWORD'));
+            callback(assertCode(err.code, 'INVALID'));
         }
     );
 }

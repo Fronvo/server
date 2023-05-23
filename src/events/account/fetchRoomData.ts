@@ -23,7 +23,7 @@ async function fetchRoomData({
     });
 
     if (!room) {
-        return generateError('ROOM_NOT_FOUND');
+        return generateError('INVALID', undefined, ['room ID']);
     }
 
     const roomData: FetchedFronvoRoom = {

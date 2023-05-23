@@ -75,7 +75,7 @@ function kickMember(
         ({ err }) => {
             callback(assertError({ err }));
 
-            // Add second profile to the room again (ban etc.)
+            // Add second profile to the room again
             socket.emit('logout', () => {
                 socket.emit(
                     'loginToken',

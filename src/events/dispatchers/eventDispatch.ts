@@ -89,12 +89,12 @@ function checkEventPermission(
     socket: Socket<ServerToClientEvents, ClientToServerEvents>
 ): undefined | FronvoError {
     if (eventName in accountEvents && !utilities.isSocketLoggedIn(socket)) {
-        return generateError('MUST_BE_LOGGED_IN', { eventName });
+        return generateError('LOGGED_IN', { eventName });
     } else if (
         eventName in noAccountEvents &&
         utilities.isSocketLoggedIn(socket)
     ) {
-        return generateError('MUST_BE_LOGGED_OUT', { eventName });
+        return generateError('LOGGED_OUT', { eventName });
     }
 }
 
@@ -195,7 +195,7 @@ export default function eventDispatch(
         if (neededArgs.length > 0) {
             sendCallback(
                 callback,
-                generateError('MISSING_ARGUMENTS', { neededArgs }),
+                generateError('MISSING', { neededArgs }),
                 socket
             );
         } else {
