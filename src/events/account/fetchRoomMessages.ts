@@ -127,7 +127,7 @@ async function fetchRoomMessages({
         });
     }
 
-    return { roomMessages };
+    return { roomMessages: roomMessages.reverse() };
 }
 
 const fetchRoomMessagesTemplate: EventTemplate = {
