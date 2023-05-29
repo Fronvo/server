@@ -21,3 +21,6 @@ output/
 
 # Github
 .github/assets
+
+# PNPM
+pnpm-lock.yaml
