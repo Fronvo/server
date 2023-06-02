@@ -45,6 +45,7 @@ async function fetchProfileData({
         avatar: account.avatar,
         banner: account.banner,
         online: getAccountSocketId(profileId) != '',
+        status: account.status,
     };
 
     // More data if our profile

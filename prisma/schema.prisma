@@ -22,6 +22,7 @@ model Account {
   creationDate DateTime @default(now())
   isInRoom     Boolean  @default(false)
   roomId       String   @default("")
+  status       String   @default("")
 }
 
 model Room {

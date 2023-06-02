@@ -71,6 +71,11 @@ import {
     KickMemberParams,
     KickMemberTestResult,
 } from 'interfaces/account/kickMember';
+import {
+    UpdateProfileStatusParams,
+    UpdateProfileStatusTestResult,
+} from 'interfaces/account/updateProfileStatus';
+import { ClearProfileStatusTestResult } from 'interfaces/account/clearProfileStatus';
 
 export interface ClientToServerEvents {
     register: (
@@ -141,5 +146,12 @@ export interface ClientToServerEvents {
     kickMember: (
         {}: KickMemberParams,
         callback?: ({}: KickMemberTestResult) => void
+    ) => void;
+    updateProfileStatus: (
+        {}: UpdateProfileStatusParams,
+        callback?: ({}: UpdateProfileStatusTestResult) => void
+    ) => void;
+    clearProfileStatus: (
+        callback?: ({}: ClearProfileStatusTestResult) => void
     ) => void;
 }
