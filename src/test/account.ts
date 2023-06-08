@@ -6,7 +6,6 @@ import fetchProfileId from 'test/account/fetchProfileId.test';
 import fetchProfileData from 'test/account/fetchProfileData.test';
 import updateProfileData from 'test/account/updateProfileData.test';
 import updateProfileStatus from 'test/account/updateProfileStatus.test';
-import clearProfileStatus from 'test/account/clearProfileStatus.test';
 import createRoom from 'test/account/createRoom.test';
 import fetchRoomData from 'test/account/fetchRoomData.test';
 import updateRoomData from 'test/account/updateRoomData.test';
@@ -23,7 +22,6 @@ export default {
     fetchProfileData,
     updateProfileData,
     updateProfileStatus,
-    clearProfileStatus,
     createRoom,
     fetchRoomData,
     updateRoomData,
