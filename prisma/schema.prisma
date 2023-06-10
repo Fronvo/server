@@ -11,18 +11,19 @@ datasource db {
 }
 
 model Account {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  profileId    String   @unique
-  email        String   @unique
-  username     String
-  bio          String   @default("")
-  password     String
-  avatar       String   @default("")
-  banner       String   @default("")
-  creationDate DateTime @default(now())
-  isInRoom     Boolean  @default(false)
-  roomId       String   @default("")
-  status       String   @default("")
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  profileId         String    @unique
+  email             String    @unique
+  username          String
+  bio               String    @default("")
+  password          String
+  avatar            String    @default("")
+  banner            String    @default("")
+  creationDate      DateTime  @default(now())
+  isInRoom          Boolean   @default(false)
+  roomId            String    @default("")
+  status            String    @default("")
+  statusUpdatedTime DateTime? @default(now())
 }
 
 model Room {

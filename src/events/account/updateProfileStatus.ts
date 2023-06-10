@@ -24,6 +24,7 @@ async function updateProfileStatus({
 
         data: {
             status,
+            statusUpdatedTime: new Date(),
         },
     });
 

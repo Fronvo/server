@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { differenceInHours } from 'date-fns';
 import { profileIdSchema } from 'events/shared';
 import {
     FetchedFronvoAccount,
@@ -35,6 +36,18 @@ async function fetchProfileData({
 
     const isSelf = getSocketAccountId(socket.id) == profileId;
 
+    // ignore given status if set >24 hours
+    let showStatus = false;
+
+    if (account.statusUpdatedTime) {
+        if (
+            differenceInHours(new Date(), new Date(account.statusUpdatedTime)) <
+            24
+        ) {
+            showStatus = true;
+        }
+    }
+
     // Block access to most info if private
     const profileData: FetchedFronvoAccount = {
         isSelf,
@@ -45,7 +58,7 @@ async function fetchProfileData({
         avatar: account.avatar,
         banner: account.banner,
         online: getAccountSocketId(profileId) != '',
-        status: account.status,
+        status: showStatus ? account.status : '',
     };
 
     // More data if our profile

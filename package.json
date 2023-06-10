@@ -38,6 +38,7 @@
     "bcrypt": "^5.1.0",
     "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
+    "date-fns": "^2.30.0",
     "dotenv": "^10.0.0",
     "gmail-send": "^1.8.14",
     "gradient-string": "^1.2.0",
