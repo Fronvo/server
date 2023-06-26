@@ -3,5 +3,6 @@
 // ******************** //
 
 export interface MemberJoinedParams {
+    roomId: string;
     profileId: string;
 }

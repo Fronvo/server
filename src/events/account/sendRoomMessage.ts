@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { RoomMessage } from '@prisma/client';
 import {
     SendRoomMessageResult,
     SendRoomMessageServerParams,
@@ -19,6 +20,7 @@ import { prismaClient } from 'variables/global';
 async function sendRoomMessage({
     io,
     socket,
+    roomId,
     message,
     replyId,
 }: SendRoomMessageServerParams): Promise<SendRoomMessageResult | FronvoError> {
@@ -34,12 +36,24 @@ async function sendRoomMessage({
             creationDate: true,
             profileId: true,
             username: true,
-            isInRoom: true,
-            roomId: true,
         },
     });
 
-    if (!account.isInRoom) {
+    const room = await prismaClient.room.findFirst({
+        where: {
+            roomId,
+        },
+    });
+
+    if (!room) {
+        return generateError('ROOM_404');
+    }
+
+    // Must be in the room
+    if (
+        !room.members.includes(account.profileId) &&
+        !room.dmUsers.includes(account.profileId)
+    ) {
         return generateError('NOT_IN_ROOM');
     }
 
@@ -80,41 +94,116 @@ async function sendRoomMessage({
         replyContent = replyMessage.content;
     }
 
-    const newMessageData = await prismaClient.roomMessage.create({
-        data: {
-            ownerId: account.profileId,
-            roomId: account.roomId,
-            messageId: v4(),
-            content: message,
-            isReply: Boolean(replyId),
-            replyContent,
-        },
+    let newMessageData: Partial<RoomMessage>;
 
-        select: {
-            ownerId: true,
-            roomId: true,
-            content: true,
-            creationDate: true,
-            messageId: true,
-            isReply: true,
-            replyContent: true,
-        },
+    try {
+        newMessageData = await prismaClient.roomMessage.create({
+            data: {
+                ownerId: account.profileId,
+                roomId,
+                messageId: v4(),
+                content: message,
+                isReply: Boolean(replyId),
+                replyContent,
+            },
+
+            select: {
+                ownerId: true,
+                roomId: true,
+                content: true,
+                creationDate: true,
+                messageId: true,
+                isReply: true,
+                replyContent: true,
+            },
+        });
+    } catch (e) {
+        return generateError('UNKNOWN');
+    }
+
+    const targetSockets = await io.in(roomId).fetchSockets();
+
+    // Force end typing
+    io.to(roomId).emit('typingEnded', {
+        roomId,
+        profileId: account.profileId,
     });
 
-    io.to(account.roomId).emit('newRoomMessage', {
+    io.to(roomId).emit('newRoomMessage', {
+        roomId,
         newMessageData: {
             message: newMessageData,
             profileData: account,
         },
     });
 
+    try {
+        // Update ordering of message lists
+        await prismaClient.room.update({
+            where: {
+                roomId,
+            },
+
+            data: {
+                lastMessage: message,
+                lastMessageAt: new Date(),
+                lastMessageFrom: account.username,
+            },
+        });
+    } catch (e) {
+        return generateError('UNKNOWN');
+    }
+
+    // Don't delay messages for these
+    setTimeout(async () => {
+        for (const socketIndex in targetSockets) {
+            const target = targetSockets[socketIndex];
+
+            const newSeenStates = await prismaClient.account.findFirst({
+                where: {
+                    profileId: getSocketAccountId(target.id),
+                },
+
+                select: {
+                    seenStates: true,
+                },
+            });
+
+            if (!newSeenStates.seenStates) {
+                // @ts-ignore
+                newSeenStates.seenStates = {};
+            }
+
+            newSeenStates.seenStates[roomId] =
+                await prismaClient.roomMessage.count({
+                    where: { roomId },
+                });
+
+            try {
+                await prismaClient.account.update({
+                    where: {
+                        profileId: getSocketAccountId(target.id),
+                    },
+
+                    data: {
+                        seenStates: newSeenStates.seenStates,
+                    },
+                });
+            } catch (e) {}
+        }
+    }, 1000);
+
     return {};
 }
 
 const sendRoomMessageTemplate: EventTemplate = {
     func: sendRoomMessage,
-    template: ['message', 'replyId'],
+    template: ['roomId', 'message', 'replyId'],
     schema: new StringSchema({
+        roomId: {
+            type: 'uuid',
+        },
+
         message: {
             minLength: 1,
             maxLength: 500,

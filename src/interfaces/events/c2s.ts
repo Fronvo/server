@@ -23,10 +23,6 @@ import {
     FetchProfileDataTestResult,
 } from 'interfaces/account/fetchProfileData';
 import { FetchProfileIdTestResult } from 'interfaces/account/fetchProfileId';
-import {
-    JoinRoomParams,
-    JoinRoomTestResult,
-} from 'interfaces/account/joinRoom';
 import { LeaveRoomTestResult } from 'interfaces/account/leaveRoom';
 import { LogoutTestResult } from 'interfaces/account/logout';
 import {
@@ -75,6 +71,50 @@ import {
     UpdateProfileStatusParams,
     UpdateProfileStatusTestResult,
 } from 'interfaces/account/updateProfileStatus';
+import {
+    FetchConvosParams,
+    FetchConvosTestResult,
+} from 'interfaces/account/fetchConvos';
+import {
+    StartTypingParams,
+    StartTypingTestResult,
+} from 'interfaces/account/startTyping';
+import {
+    FinishTypingParams,
+    FinishTypingTestResult,
+} from 'interfaces/account/finishTyping';
+import {
+    AddFriendParams,
+    AddFriendTestResult,
+} from 'interfaces/account/addFriend';
+import {
+    RemoveFriendParams,
+    RemoveFriendTestResult,
+} from 'interfaces/account/removeFriend';
+import {
+    AcceptFriendRequestParams,
+    AcceptFriendRequestTestResult,
+} from 'interfaces/account/acceptFriendRequest';
+import {
+    RejectFriendRequestParams,
+    RejectFriendRequestTestResult,
+} from 'interfaces/account/rejectFriendRequest';
+import {
+    AddRoomMemberParams,
+    AddRoomMemberTestResult,
+} from 'interfaces/account/addRoomMember';
+import {
+    RemoveRoomMemberParams,
+    RemoveRoomMemberTestResult,
+} from 'interfaces/account/removeRoomMember';
+import {
+    CreateDMParams,
+    CreateDMTestResult,
+} from 'interfaces/account/createDM';
+import {
+    SendRoomImageParams,
+    SendRoomImageTestResult,
+} from 'interfaces/account/sendRoomImage';
 
 export interface ClientToServerEvents {
     register: (
@@ -117,10 +157,6 @@ export interface ClientToServerEvents {
         {}: CreateRoomParams,
         callback?: ({}: CreateRoomTestResult) => void
     ) => void;
-    joinRoom: (
-        {}: JoinRoomParams,
-        callback?: ({}: JoinRoomTestResult) => void
-    ) => void;
     fetchRoomData: (
         {}: FetchRoomDataParams,
         callback?: ({}: FetchRoomDataTestResult) => void
@@ -149,5 +185,49 @@ export interface ClientToServerEvents {
     updateProfileStatus: (
         {}: UpdateProfileStatusParams,
         callback?: ({}: UpdateProfileStatusTestResult) => void
+    ) => void;
+    fetchConvos: (
+        {}: FetchConvosParams,
+        callback?: ({}: FetchConvosTestResult) => void
+    ) => void;
+    startTyping: (
+        {}: StartTypingParams,
+        callback?: ({}: StartTypingTestResult) => void
+    ) => void;
+    finishTyping: (
+        {}: FinishTypingParams,
+        callback?: ({}: FinishTypingTestResult) => void
+    ) => void;
+    addFriend: (
+        {}: AddFriendParams,
+        callback?: ({}: AddFriendTestResult) => void
+    ) => void;
+    removeFriend: (
+        {}: RemoveFriendParams,
+        callback?: ({}: RemoveFriendTestResult) => void
+    ) => void;
+    acceptFriendRequest: (
+        {}: AcceptFriendRequestParams,
+        callback?: ({}: AcceptFriendRequestTestResult) => void
+    ) => void;
+    rejectFriendRequest: (
+        {}: RejectFriendRequestParams,
+        callback?: ({}: RejectFriendRequestTestResult) => void
+    ) => void;
+    addRoomMember: (
+        {}: AddRoomMemberParams,
+        callback?: ({}: AddRoomMemberTestResult) => void
+    ) => void;
+    removeRoomMember: (
+        {}: RemoveRoomMemberParams,
+        callback?: ({}: RemoveRoomMemberTestResult) => void
+    ) => void;
+    createDM: (
+        {}: CreateDMParams,
+        callback?: ({}: CreateDMTestResult) => void
+    ) => void;
+    sendRoomImage: (
+        {}: SendRoomImageParams,
+        callback?: ({}: SendRoomImageTestResult) => void
     ) => void;
 }

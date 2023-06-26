@@ -16,9 +16,9 @@ import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server } from 'socket.io';
 import { io, Socket } from 'socket.io-client';
-import { generateEmail, generatePassword } from 'test/utilities';
 import * as variables from 'variables/global';
 import { getEnvBoolean } from 'variables/varUtils';
+import { generateEmail, generatePassword } from 'utilities/global';
 
 // Variables
 let ioObject: Server<ClientToServerEvents, ServerToClientEvents>;
@@ -129,19 +129,25 @@ async function setupDB(): Promise<void> {
         return new Promise((resolve) => {
             socket.emit(
                 'register',
-                { email: officialEmail, password: officialPassword },
+                {
+                    email: officialEmail,
+                    password: officialPassword,
+                },
                 () => {
-                    socket.emit('registerVerify', { code: '123456' }, () => {
-                        socket.emit(
-                            'updateProfileData',
-                            {
-                                profileId: 'fronvo',
-                                username: 'Fronvo',
-                                bio: 'The official account of Fronvo',
-                            },
-                            () => resolve()
-                        );
-                    });
+                    socket.emit(
+                        'registerVerify',
+                        { code: '123456', identifier: 'fronvo' },
+                        () => {
+                            socket.emit(
+                                'updateProfileData',
+                                {
+                                    username: 'Fronvo',
+                                    bio: 'The official account of Fronvo',
+                                },
+                                () => resolve()
+                            );
+                        }
+                    );
                 }
             );
         });
@@ -153,19 +159,8 @@ async function setupDB(): Promise<void> {
                 'createRoom',
                 {
                     name: 'Fronvo',
-                    icon: 'https://i.ibb.co/QFT7SNj/logo.png',
                 },
-                () => {
-                    socket.emit(
-                        'updateRoomData',
-                        {
-                            roomId: 'fronvo',
-                        },
-                        () => {
-                            resolve();
-                        }
-                    );
-                }
+                () => resolve()
             );
         });
     }
@@ -178,18 +173,7 @@ async function startup(): Promise<void> {
     preStartupChecks();
 
     // Gradient shenanigans
-    console.log(
-        gradient([
-            '#e8128f',
-            '#e812d2',
-            '#e412e8',
-            '#cb12e8',
-            '#bd12e8',
-            '#a812e8',
-            '#8f12e8',
-            '#8012e8',
-        ])(`Fronvo DB utility`)
-    );
+    console.log(gradient(['#1047fe', '#1047fe'])(`Fronvo DB utility`));
 
     loadingSpinner = ora({
         text: loadingSpinnerDefaultText,

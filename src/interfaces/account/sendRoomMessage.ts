@@ -5,8 +5,10 @@
 import { EventArguments, FronvoError } from 'interfaces/all';
 
 export interface SendRoomMessageParams {
-    message: string;
+    roomId: string;
+    message?: string;
     replyId?: string;
+    attachment?: string;
 }
 
 export interface SendRoomMessageServerParams

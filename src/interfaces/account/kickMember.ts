@@ -5,6 +5,7 @@
 import { FronvoError, EventArguments } from 'interfaces/all';
 
 export interface KickMemberParams {
+    roomId: string;
     profileId: string;
 }
 

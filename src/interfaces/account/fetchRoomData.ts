@@ -15,6 +15,7 @@ export interface FetchRoomDataServerParams
 
 export interface FetchedFronvoRoom extends Partial<Room> {
     totalMessages: number;
+    unreadCount: number;
 }
 
 export interface FetchRoomDataResult {

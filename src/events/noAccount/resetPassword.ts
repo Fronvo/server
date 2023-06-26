@@ -31,7 +31,7 @@ async function resetPassword({
 
     let sentCode: string;
 
-    if (!variables.testMode) {
+    if (!variables.setupMode) {
         // 6 digits [0-9]
         sentCode = utilities.generateNumbers(0, 9, 6);
     } else {
@@ -90,9 +90,10 @@ async function resetPassword({
                     email,
                 },
                 data: {
-                    password: !variables.testMode
-                        ? bcrypt.hashSync(newPassword, variables.mainBcryptHash)
-                        : newPassword,
+                    password: bcrypt.hashSync(
+                        newPassword,
+                        variables.mainBcryptHash
+                    ),
                 },
             });
 

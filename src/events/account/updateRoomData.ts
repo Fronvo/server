@@ -3,7 +3,12 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { roomIdOptionalSchema, roomNameOptionalSchema } from 'events/shared';
+import { Room } from '@prisma/client';
+import {
+    roomIconSchema,
+    roomIdSchema,
+    roomNameOptionalSchema,
+} from 'events/shared';
 import {
     UpdateRoomDataResult,
     UpdateRoomDataServerParams,
@@ -17,117 +22,74 @@ async function updateRoomData({
     socket,
     roomId,
     name,
-    description,
     icon,
 }: UpdateRoomDataServerParams): Promise<UpdateRoomDataResult | FronvoError> {
-    // If none provided, return immediately
-    if (
-        !roomId &&
-        !name &&
-        !description &&
-        description != '' &&
-        !icon &&
-        icon != ''
-    ) {
-        return {
-            err: undefined,
-        };
-    }
-
     // Name validation not needed here, see schema below
-    // Nor icon, may need for content-type and extension if applicable (|| ?)
+    const room = await prismaClient.room.findFirst({
+        where: {
+            roomId,
+        },
+    });
 
-    // Check room id availability
-    if (roomId) {
-        const roomIdData = await prismaClient.room.findFirst({
-            where: {
-                roomId,
-            },
-        });
-
-        if (roomIdData) {
-            return generateError('INVALID', undefined, ['room ID']);
-        }
+    if (!room) {
+        return generateError('ROOM_404');
     }
 
-    // Fetch old room id
-    const accountData = await prismaClient.account.findFirst({
+    // Check if we are in the room, not necessary to be the owner
+    const account = await prismaClient.account.findFirst({
         where: {
             profileId: getSocketAccountId(socket.id),
         },
-
-        select: {
-            roomId: true,
-        },
     });
 
-    const previousRoom = await prismaClient.room.findFirst({
-        where: {
-            roomId: accountData.roomId,
-        },
-    });
-
-    const roomData = await prismaClient.room.update({
-        data: {
-            roomId,
-            name,
-            icon,
-        },
-
-        where: {
-            roomId: previousRoom.roomId,
-        },
-
-        select: {
-            roomId: true,
-            name: true,
-            icon: true,
-        },
-    });
-
-    if (roomId) {
-        // Update related entries
-
-        // Update accounts
-        await prismaClient.account.updateMany({
-            where: {
-                roomId: previousRoom.roomId,
-            },
-
-            data: {
-                roomId,
-            },
-        });
-
-        // Update messages
-        await prismaClient.roomMessage.updateMany({
-            where: {
-                roomId: previousRoom.roomId,
-            },
-
-            data: {
-                roomId,
-            },
-        });
+    if (!room.members.includes(account.profileId)) {
+        return generateError('NOT_IN_ROOM');
     }
 
-    return { roomData };
+    // Ensure name is not empty
+    if (!name) {
+        name = room.name;
+    }
+
+    // Not really Partial but roll with it
+    let roomData: Partial<Room>;
+
+    try {
+        roomData = await prismaClient.room.update({
+            where: {
+                roomId,
+            },
+
+            data: {
+                name,
+                icon,
+            },
+
+            select: {
+                name: true,
+                icon: true,
+            },
+        });
+    } catch (e) {
+        return generateError('UNKNOWN');
+    }
+
+    io.to(roomId).emit('roomDataUpdated', {
+        roomId,
+        name: roomData.name,
+        icon: roomData.icon,
+    });
+
+    return {};
 }
 
 const updateRoomDataTemplate: EventTemplate = {
     func: updateRoomData,
     template: ['roomId', 'name', 'icon'],
     schema: new StringSchema({
-        ...roomIdOptionalSchema,
-
+        ...roomIdSchema,
         ...roomNameOptionalSchema,
-
-        icon: {
-            // Ensure https
-            regex: /^(https:\/\/).+$/,
-            maxLength: 512,
-            optional: true,
-        },
+        ...roomIconSchema,
     }),
 };
 

@@ -2,11 +2,25 @@
 // Interfaces for the server to client events of Socket.IO
 // ******************** //
 
+import { DmCreatedParams } from 'interfaces/account/dmCreated';
+import { FriendAddedParams } from 'interfaces/account/friendAdded';
+import { FriendRemovedParams } from 'interfaces/account/friendRemoved';
 import { MemberJoinedParams } from 'interfaces/account/memberJoined';
 import { MemberLeftParams } from 'interfaces/account/memberLeft';
+import { NewFriendRequestParams } from 'interfaces/account/newFriendRequest';
 import { NewRoomMessageParams } from 'interfaces/account/newRoomMessage';
 import { OnlineStatusUpdatedParams } from 'interfaces/account/onlineStatusUpdated';
+import { PendingFriendRemovedParams } from 'interfaces/account/pendingFriendRemoved';
+import { ProfileDataUpdatedParams } from 'interfaces/account/profileDataUpdated';
+import { ProfileStatusUpdatedParams } from 'interfaces/account/profileStatusUpdated';
+import { RoomAddedParams } from 'interfaces/account/roomAdded';
+import { RoomCreatedParams } from 'interfaces/account/roomCreated';
+import { RoomDataUpdatedParams } from 'interfaces/account/roomDataUpdated';
+import { RoomDeletedParams } from 'interfaces/account/roomDeleted';
 import { RoomMessageDeletedParams } from 'interfaces/account/roomMessageDeleted';
+import { RoomRemovedParams } from 'interfaces/account/roomRemoved';
+import { TypingEndedParams } from 'interfaces/account/typingEnded';
+import { TypingStartedParams } from 'interfaces/account/typingStarted';
 import {
     RegisterVerifyParams,
     RegisterVerifyTestResult,
@@ -25,6 +39,7 @@ export interface ServerToClientEvents {
         {}: RegisterVerifyParams,
         callback?: ({}: RegisterVerifyTestResult) => void
     ) => void;
+
     resetPasswordVerify: (
         {}: ResetPasswordVerifyParams,
         callback?: ({}: ResetPasswordVerifyTestResult) => void
@@ -39,11 +54,37 @@ export interface ServerToClientEvents {
 
     roomMessageDeleted: ({}: RoomMessageDeletedParams) => void;
 
-    roomDeleted: () => void;
+    roomCreated: ({}: RoomCreatedParams) => void;
+
+    roomDeleted: ({}: RoomDeletedParams) => void;
+
+    roomAdded: ({}: RoomAddedParams) => void;
+
+    roomRemoved: ({}: RoomRemovedParams) => void;
+
+    dmCreated: ({}: DmCreatedParams) => void;
 
     memberJoined: ({}: MemberJoinedParams) => void;
 
     memberLeft: ({}: MemberLeftParams) => void;
 
     onlineStatusUpdated: ({}: OnlineStatusUpdatedParams) => void;
+
+    roomDataUpdated: ({}: RoomDataUpdatedParams) => void;
+
+    profileDataUpdated: ({}: ProfileDataUpdatedParams) => void;
+
+    typingStarted: ({}: TypingStartedParams) => void;
+
+    typingEnded: ({}: TypingEndedParams) => void;
+
+    newFriendRequest: ({}: NewFriendRequestParams) => void;
+
+    friendAdded: ({}: FriendAddedParams) => void;
+
+    friendRemoved: ({}: FriendRemovedParams) => void;
+
+    profileStatusUpdated: ({}: ProfileStatusUpdatedParams) => void;
+
+    pendingFriendRemoved: ({}: PendingFriendRemovedParams) => void;
 }

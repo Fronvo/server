@@ -26,18 +26,7 @@ async function loginToken({
         return generateError('INVALID', undefined, ['token']);
     }
 
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: tokenItem.profileId,
-        },
-    });
-
     loginSocket(io, socket, tokenItem.profileId);
-
-    // Enter the room room, if joined one, for messages
-    if (account.isInRoom) {
-        await socket.join(account.roomId);
-    }
 
     return {};
 }

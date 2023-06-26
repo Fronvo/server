@@ -8,11 +8,11 @@ import {
     RegisterResult,
     RegisterServerParams,
 } from 'interfaces/noAccount/register';
-import { generateChars } from 'test/utilities';
 import utilities from 'utilities/all';
 import * as variables from 'variables/global';
 import { prismaClient } from 'variables/global';
-import { accountSchema } from './shared';
+import { StringSchema } from '@ezier/validate';
+import { emailSchema, passwordSchema, profileId } from 'events/shared';
 
 async function register({
     io,
@@ -44,7 +44,7 @@ async function register({
 
     let sentCode: string;
 
-    if (!variables.testMode) {
+    if (!variables.setupMode) {
         // 6 digits [0-9]
         sentCode = utilities.generateNumbers(0, 9, 6);
     } else {
@@ -56,7 +56,7 @@ async function register({
     ]);
 
     // Attach registerVerify now, will be detached after verification / discarded
-    socket.on('registerVerify', async ({ code }, callback) => {
+    socket.on('registerVerify', async ({ code, identifier }, callback) => {
         let finalError: FronvoError;
         let token: string;
 
@@ -64,6 +64,9 @@ async function register({
             finalError = utilities.generateError('INVALID', ['code']);
         } else {
             // Double-check if someone else registered this during verification
+            let prematureFinalError: FronvoError;
+
+            // Check for email and identifier
             const account = await prismaClient.account.findFirst({
                 where: {
                     email,
@@ -71,12 +74,24 @@ async function register({
             });
 
             if (account) {
-                finalError = utilities.generateError('EMAIL_TAKEN');
+                prematureFinalError = utilities.generateError('EMAIL_TAKEN');
+            }
+
+            const account2 = await prismaClient.account.findFirst({
+                where: {
+                    profileId: identifier,
+                },
+            });
+
+            if (account2) {
+                prematureFinalError = utilities.generateError('ID_TAKEN');
+            }
+
+            if (prematureFinalError) {
+                finalError = prematureFinalError;
             } else {
                 // Detach listener
                 socket.removeAllListeners('registerVerify');
-
-                const profileId = generateChars(10);
 
                 const username = `Fronvo user ${
                     (await prismaClient.account.count()) + 1
@@ -84,27 +99,24 @@ async function register({
 
                 await prismaClient.account.create({
                     data: {
-                        profileId,
+                        profileId: identifier,
                         email,
-                        password:
-                            !variables.testMode || variables.setupMode
-                                ? bcrypt.hashSync(
-                                      password,
-                                      variables.mainBcryptHash
-                                  )
-                                : password,
+                        password: bcrypt.hashSync(
+                            password,
+                            variables.mainBcryptHash
+                        ),
                         username,
                     },
                 });
 
-                token = await utilities.getToken(profileId);
+                token = await utilities.getToken(identifier);
 
                 utilities.sendEmail(email, 'Welcome to Fronvo!', [
                     "We're so glad to have you on our platform!",
                     'Enjoy your stay on the safest social media!',
                 ]);
 
-                utilities.loginSocket(io, socket, profileId);
+                utilities.loginSocket(io, socket, identifier);
 
                 callback({
                     // May be undefined if not in test / setup
@@ -121,7 +133,10 @@ async function register({
 const registerTemplate: EventTemplate = {
     func: register,
     template: ['email', 'password'],
-    schema: accountSchema,
+    schema: new StringSchema({
+        ...emailSchema,
+        ...passwordSchema,
+    }),
 };
 
 export default registerTemplate;

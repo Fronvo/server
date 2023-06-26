@@ -3,5 +3,6 @@
 // ******************** //
 
 export interface RoomMessageDeletedParams {
+    roomId: string;
     messageId: string;
 }

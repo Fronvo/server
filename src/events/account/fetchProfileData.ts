@@ -64,8 +64,8 @@ async function fetchProfileData({
     // More data if our profile
     if (profileData.isSelf) {
         profileData.email = account.email;
-        profileData.isInRoom = account.isInRoom;
-        profileData.roomId = account.roomId;
+        profileData.pendingFriendRequests = account.pendingFriendRequests;
+        profileData.friends = account.friends;
     }
 
     return { profileData };

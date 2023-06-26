@@ -26,10 +26,10 @@ export const passwordSchema: {
 };
 
 // Profile id
-const profileId: EzierValidatorStringSchema = {
+export const profileId: EzierValidatorStringSchema = {
     minLength: 5,
-    maxLength: 30,
-    regex: /^[a-z0-9.]+$/,
+    maxLength: 20,
+    regex: /^[a-z0-9._]+$/,
 };
 
 export const profileIdSchema: {
@@ -38,29 +38,9 @@ export const profileIdSchema: {
     profileId,
 };
 
-export const profileIdSearchSchema: {
-    profileId: EzierValidatorStringSchema;
-} = {
-    profileId: {
-        ...profileId,
-        minLength: 1,
-    },
-};
-
-export const profileIdOptionalSchema: {
-    profileId: EzierValidatorStringSchema;
-} = {
-    profileId: {
-        ...profileId,
-        optional: true,
-    },
-};
-
 // Room id
 const roomId: EzierValidatorStringSchema = {
-    minLength: 2,
-    maxLength: 15,
-    regex: /^[a-z0-9]+$/,
+    type: 'uuid',
 };
 
 export const roomIdSchema: {
@@ -69,18 +49,9 @@ export const roomIdSchema: {
     roomId,
 };
 
-export const roomIdOptionalSchema: {
-    roomId: EzierValidatorStringSchema;
-} = {
-    roomId: {
-        ...roomId,
-        optional: true,
-    },
-};
-
 // Room name
 const roomName: EzierValidatorStringSchema = {
-    minLength: 2,
+    minLength: 1,
     maxLength: 15,
 };
 
@@ -104,8 +75,7 @@ export const roomIconSchema: {
 } = {
     icon: {
         // Ensure https
-        regex: /^(https:\/\/).+$/,
-        maxLength: 512,
+        regex: /https:\/\/ik.imagekit.io\/fronvo\/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-4[0-9A-Za-z]{3}-[89ABab][0-9A-Za-z]{3}-[0-9A-Za-z]{12}.+/,
         optional: true,
     },
 };

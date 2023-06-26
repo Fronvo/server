@@ -21,6 +21,10 @@ import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server } from 'socket.io';
 import * as variables from 'variables/global';
 import { getEnv, getEnvBoolean } from 'variables/varUtils';
+import ImageKit from 'imagekit';
+import { v4 } from 'uuid';
+import fs from 'fs';
+import path from 'path';
 
 // Variables
 let io: Server<ClientToServerEvents, ServerToClientEvents>;
@@ -131,7 +135,7 @@ async function startup(): Promise<void> {
     preStartupChecks();
 
     // Gradient shenanigans
-    console.log(gradient(['#1047fe', '#5000cd'])(`Fronvo server v1.0`));
+    console.log(gradient(['#1047fe', '#1047fe'])(`Fronvo server v1.0`));
 
     // Special check because ora doesnt care
     if (!variables.silentLogging) {
@@ -139,7 +143,7 @@ async function startup(): Promise<void> {
             text: loadingSpinnerDefaultText,
             spinner: 'dots12', // wonky windows 10 style
             interval: 40,
-            color: 'magenta',
+            color: 'blue',
         }).start();
     }
 
@@ -152,16 +156,6 @@ async function startup(): Promise<void> {
     // Finally, display successful server run
     if (!variables.silentLogging) {
         loadingSpinner.succeed('Server running at port ' + PORT + '.');
-
-        // No silent logging
-        // Log request number and reset it every *12* hours
-        setInterval(() => {
-            console.log(
-                `Total requests in 12 hours: ${variables.getTotalRequests()}`
-            );
-
-            variables.resetTotalRequests();
-        }, 60 * 60 * 12 * 1000);
     }
 }
 

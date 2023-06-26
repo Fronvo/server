@@ -6,6 +6,7 @@ import { Account, RoomMessage } from '@prisma/client';
 import { EventArguments, FronvoError } from 'interfaces/all';
 
 export interface FetchRoomMessagesParams {
+    roomId: string;
     from: string;
     to: string;
 }

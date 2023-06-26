@@ -5,6 +5,7 @@
 import { EventArguments, FronvoError } from 'interfaces/all';
 
 export interface DeleteRoomMessageParams {
+    roomId: string;
     messageId: string;
 }
 

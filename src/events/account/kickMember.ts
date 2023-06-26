@@ -3,7 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { profileIdSchema } from 'events/shared';
+import { profileIdSchema, roomIdSchema } from 'events/shared';
 import {
     KickMemberResult,
     KickMemberServerParams,
@@ -19,6 +19,7 @@ import { loggedInSockets, prismaClient } from 'variables/global';
 async function kickMember({
     io,
     socket,
+    roomId,
     profileId,
 }: KickMemberServerParams): Promise<KickMemberResult | FronvoError> {
     const account = await prismaClient.account.findFirst({
@@ -27,28 +28,28 @@ async function kickMember({
         },
     });
 
-    // Must be in room
-    if (!account.isInRoom) {
-        return generateError('NOT_IN_ROOM');
-    }
-
     const room = await prismaClient.room.findFirst({
         where: {
-            roomId: account.roomId,
+            roomId,
         },
     });
 
+    if (!room) {
+        return generateError('ROOM_404');
+    }
+
+    if (!room.members.includes(profileId)) {
+        return generateError('NOT_IN_ROOM');
+    }
+
     // Must be the owner
-    if (!(account.profileId == room.ownerId)) {
+    if (account.profileId != room.ownerId) {
         return generateError('NOT_OWNER');
     }
 
-    // Check if member with id is in this room
-    if (!room.members.includes(profileId)) {
-        return generateError('NOT_IN_THIS_ROOM');
+    if (profileId == account.profileId) {
+        return generateError('NOT_YOURSELF');
     }
-
-    // Kick him now
 
     // Remove from members list
     const newMembers = room.members;
@@ -56,30 +57,23 @@ async function kickMember({
     // Remove current member
     newMembers.splice(newMembers.indexOf(profileId), 1);
 
-    await prismaClient.room.update({
-        where: {
-            roomId: room.roomId,
-        },
+    try {
+        await prismaClient.room.update({
+            where: {
+                roomId,
+            },
 
-        data: {
-            members: newMembers,
-        },
-    });
-
-    // Update the member's profile aswell
-    await prismaClient.account.update({
-        where: {
-            profileId,
-        },
-
-        data: {
-            roomId: '',
-            isInRoom: false,
-        },
-    });
+            data: {
+                members: newMembers,
+            },
+        });
+    } catch (e) {
+        return generateError('UNKNOWN');
+    }
 
     // Notify all members (including banned member, update client)
-    io.to(room.roomId).emit('memberLeft', {
+    io.to(roomId).emit('memberLeft', {
+        roomId,
         profileId,
     });
 
@@ -93,8 +87,9 @@ async function kickMember({
 
 const kickMemberTemplate: EventTemplate = {
     func: kickMember,
-    template: ['profileId'],
+    template: ['roomId', 'profileId'],
     schema: new StringSchema({
+        ...roomIdSchema,
         ...profileIdSchema,
     }),
 };

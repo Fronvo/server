@@ -7,7 +7,7 @@ import { Account, RoomMessage } from '@prisma/client';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
-import { fromToSchema } from '../shared';
+import { fromToSchema, roomIdSchema } from '../shared';
 import {
     FetchRoomMessagesResult,
     FetchRoomMessagesServerParams,
@@ -15,6 +15,7 @@ import {
 
 async function fetchRoomMessages({
     socket,
+    roomId,
     from,
     to,
 }: FetchRoomMessagesServerParams): Promise<
@@ -26,7 +27,20 @@ async function fetchRoomMessages({
         },
     });
 
-    if (!account.isInRoom) {
+    const room = await prismaClient.room.findFirst({
+        where: {
+            roomId,
+        },
+    });
+
+    if (!room) {
+        return generateError('ROOM_404');
+    }
+
+    if (
+        !room.members.includes(account.profileId) &&
+        !room.dmUsers.includes(account.profileId)
+    ) {
         return generateError('NOT_IN_ROOM');
     }
 
@@ -63,7 +77,7 @@ async function fetchRoomMessages({
 
     const messages = await prismaClient.roomMessage.findMany({
         where: {
-            roomId: account.roomId,
+            roomId,
         },
 
         // Last shown first
@@ -72,7 +86,7 @@ async function fetchRoomMessages({
         // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination
         skip: Number(from),
 
-        // from: 5, to: 10 = 10 - 5 = 5 posts fetched after from pos
+        // from: 5, to: 10 = 10 - 5 = 5 messages fetched after from pos
         take: -(Number(to) - Number(from)),
         select: {
             ownerId: true,
@@ -82,6 +96,8 @@ async function fetchRoomMessages({
             messageId: true,
             isReply: true,
             replyContent: true,
+            isImage: true,
+            attachment: true,
         },
     });
 
@@ -106,6 +122,7 @@ async function fetchRoomMessages({
             });
 
             messageAccounts.push(message.ownerId);
+
             messageProfileData.push(profileData);
         }
     }
@@ -125,13 +142,37 @@ async function fetchRoomMessages({
         });
     }
 
-    return { roomMessages: roomMessages.reverse() };
+    // Update seen state
+    const newSeenStates = account.seenStates || {};
+
+    const totalMessages = await prismaClient.roomMessage.count({
+        where: { roomId },
+    });
+
+    if (newSeenStates[roomId] != totalMessages) {
+        newSeenStates[roomId] = totalMessages;
+
+        try {
+            await prismaClient.account.update({
+                where: {
+                    profileId: account.profileId,
+                },
+
+                data: {
+                    seenStates: newSeenStates,
+                },
+            });
+        } catch (e) {}
+    }
+
+    return { roomMessages };
 }
 
 const fetchRoomMessagesTemplate: EventTemplate = {
     func: fetchRoomMessages,
-    template: ['from', 'to'],
+    template: ['roomId', 'from', 'to'],
     schema: new StringSchema({
+        ...roomIdSchema,
         ...fromToSchema,
     }),
 };

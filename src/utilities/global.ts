@@ -29,17 +29,73 @@ export async function loginSocket(
 
         select: {
             profileId: true,
-            isInRoom: true,
-            roomId: true,
+            friends: true,
+            pendingFriendRequests: true,
         },
     });
 
-    if (account.isInRoom) {
-        io.to(account.roomId).emit('onlineStatusUpdated', {
-            profileId: account.profileId,
-            online: true,
-        });
+    // Add to all of the available rooms
+    const availableRooms = await prismaClient.room.findMany({
+        where: {
+            members: {
+                has: account.profileId,
+            },
+        },
+    });
+
+    const availableDMS = await prismaClient.room.findMany({
+        where: {
+            dmUsers: {
+                has: account.profileId,
+            },
+        },
+    });
+
+    for (const roomIndex in availableRooms) {
+        const room = availableRooms[roomIndex];
+
+        // This works
+        socket.join(room.roomId);
+
+        for (const memberIndex in room.members) {
+            const member = room.members[memberIndex];
+
+            if (member == account.profileId) continue;
+
+            socket.join(member as string);
+        }
     }
+
+    for (const dmIndex in availableDMS) {
+        const dm = availableDMS[dmIndex];
+
+        // Find the correct profile room to join, not ours
+        let targetDMUser = dm.dmUsers[0];
+
+        if (targetDMUser == account.profileId) {
+            targetDMUser = dm.dmUsers[1];
+        }
+
+        socket.join(targetDMUser as string);
+
+        socket.join(availableDMS[dmIndex].roomId);
+    }
+
+    // All friend rooms too
+    for (const friendIndex in account.friends) {
+        socket.join(account.friends[friendIndex] as string);
+    }
+
+    for (const pendingFriendIndex in account.pendingFriendRequests) {
+        socket.join(
+            account.pendingFriendRequests[pendingFriendIndex] as string
+        );
+    }
+
+    io.to(account.profileId).emit('onlineStatusUpdated', {
+        profileId: account.profileId,
+        online: true,
+    });
 }
 
 export async function logoutSocket(
@@ -57,17 +113,13 @@ export async function logoutSocket(
 
         select: {
             profileId: true,
-            isInRoom: true,
-            roomId: true,
         },
     });
 
-    if (account.isInRoom) {
-        io.to(account.roomId).emit('onlineStatusUpdated', {
-            profileId: account.profileId,
-            online: false,
-        });
-    }
+    io.to(account.profileId).emit('onlineStatusUpdated', {
+        profileId: account.profileId,
+        online: false,
+    });
 }
 
 export function isSocketLoggedIn(
@@ -102,47 +154,6 @@ export function getSocketAccountId(socketId: string): string {
 
 export function getLoggedInSockets(): { [socketId: string]: LoggedInSocket } {
     return variables.loggedInSockets;
-}
-
-export function reportStart(reportName: string): string {
-    if (!variables.performanceReportsEnabled) return;
-
-    // Mantain uniqueness regardless of reportName
-    const reportUUID = v4();
-
-    variables.performanceReports[reportUUID] = {
-        reportName,
-        timestamp: new Date(),
-    };
-
-    // Return it for reportEnd
-    return reportUUID;
-}
-
-export async function reportEnd(reportUUID: string): Promise<void> {
-    if (
-        !variables.performanceReportsEnabled ||
-        !(reportUUID in variables.performanceReports)
-    )
-        return;
-
-    // Basically copy the dictionary
-    const reportDict = variables.performanceReports[reportUUID];
-
-    const msDuration =
-        new Date().getMilliseconds() - reportDict.timestamp.getMilliseconds();
-
-    // Check if it passes the min report MS duration (optional)
-    if (msDuration >= variables.performanceReportsMinMS) {
-        await prismaClient.report.create({
-            data: {
-                reportName: `${reportDict.reportName} took ${msDuration}ms.`,
-            },
-        });
-    }
-
-    // Delete to save memory
-    delete variables.performanceReports[reportUUID];
 }
 
 export function getErrorCode(errName: Errors): number {
@@ -232,7 +243,7 @@ export async function sendEmail(
     if (
         !variables.emailUsername ||
         !variables.emailPassword ||
-        variables.testMode
+        variables.setupMode
     ) {
         return;
     }
@@ -440,4 +451,23 @@ export function validateSchema(
                 return generateError('UNKNOWN');
         }
     }
+}
+
+export function generateEmail(): string {
+    return v4().replace(/-/g, '') + '@gmail.com';
+}
+
+export function generatePassword(): string {
+    return v4().replace(/-/g, '').substring(0, 30);
+}
+
+export function generateChars(length?: number): string {
+    const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
+
+    const randomArray = Array.from(
+        { length: length ? length : 10 },
+        () => chars[Math.floor(Math.random() * chars.length)]
+    );
+
+    return randomArray.join('');
 }

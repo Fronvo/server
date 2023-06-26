@@ -4,7 +4,9 @@
 
 import { EventArguments, FronvoError } from 'interfaces/all';
 
-export interface LeaveRoomParams {}
+export interface LeaveRoomParams {
+    roomId: string;
+}
 
 export interface LeaveRoomServerParams
     extends EventArguments,

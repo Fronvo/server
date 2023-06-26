@@ -16,12 +16,23 @@ export type Errors =
     | 'EMAIL_TAKEN'
     | 'ID_TAKEN'
     | 'ACCOUNT_404'
+    | 'ROOM_404'
     | 'ALREADY_IN_ROOM'
+    | 'USER_IN_ROOM'
+    | 'USER_NOT_IN_ROOM'
     | 'NOT_IN_ROOM'
+    | 'ROOM_NOT_DM'
+    | 'DM_EXISTS'
     | 'NOT_OWNER'
-    | 'NOT_IN_THIS_ROOM'
+    | 'NOT_YOURSELF'
+    | 'NOT_FRIEND'
+    | 'FRIEND_ALREADY_SENT'
+    | 'FRIEND_ALREADY_PENDING'
+    | 'FRIEND_NOT_PENDING'
+    | 'FRIEND_ALREADY_ACCEPTED'
     | 'NOT_HIGHER'
-    | 'TOO_MUCH';
+    | 'TOO_MUCH'
+    | 'OVER_LIMIT';
 
 export type TestAssertTypes =
     | 'string'

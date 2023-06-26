@@ -2,12 +2,13 @@
 // The login no-account-only event file.
 // ******************** //
 
+import { StringSchema } from '@ezier/validate';
 import { compareSync } from 'bcrypt';
-import { accountSchema } from 'events/noAccount/shared';
+import { emailSchema, passwordSchema } from 'events/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { LoginResult, LoginServerParams } from 'interfaces/noAccount/login';
 import * as utilities from 'utilities/global';
-import { prismaClient, testMode } from 'variables/global';
+import { prismaClient } from 'variables/global';
 
 async function login({
     io,
@@ -26,11 +27,7 @@ async function login({
     }
 
     // Validate the password, synchronously
-    if (
-        !testMode
-            ? compareSync(password, account.password)
-            : password == account.password
-    ) {
+    if (compareSync(password, account.password)) {
         utilities.loginSocket(io, socket, account.profileId);
 
         const token = await utilities.getToken(account.profileId);
@@ -41,11 +38,6 @@ async function login({
             'You may want to take extra action incase you believe that your account has been compromised',
         ]);
 
-        // Enter the room room, if joined one, for messages
-        if (account.isInRoom) {
-            await socket.join(account.roomId);
-        }
-
         return { token };
     } else {
         return utilities.generateError('INVALID', undefined, ['password']);
@@ -55,7 +47,10 @@ async function login({
 const loginTemplate: EventTemplate = {
     func: login,
     template: ['email', 'password'],
-    schema: accountSchema,
+    schema: new StringSchema({
+        ...emailSchema,
+        ...passwordSchema,
+    }),
 };
 
 export default loginTemplate;

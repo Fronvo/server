@@ -11,7 +11,6 @@ import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server, Socket } from 'socket.io';
 import utilities from 'utilities/all';
 import { generateError } from 'utilities/global';
-import { incrementTotalRequests } from 'variables/global';
 
 const funcs: EventExportTemplate = {
     ...noAccountEvents,
@@ -105,7 +104,13 @@ async function fireEvent(
     callback: Function,
     eventArgs: { [key: string]: any }
 ) {
-    validateAndRun();
+    const t = new Date();
+
+    await validateAndRun();
+
+    const t2 = new Date();
+
+    console.log(`${eventName} took ${t2.getTime() - t.getTime()}ms.`);
 
     async function validateAndRun(): Promise<void> {
         // Validate if a schema present
@@ -116,25 +121,19 @@ async function fireEvent(
             );
 
             if (!schemaResult) {
-                fireCallback();
+                await fireCallback();
             } else {
-                sendCallback(
-                    callback,
-                    schemaResult,
-                    socket,
-                    utilities.reportStart(eventName)
-                );
+                sendCallback(callback, schemaResult, socket);
             }
         } else {
-            fireCallback();
+            await fireCallback();
         }
 
         async function fireCallback(): Promise<void> {
             sendCallback(
                 callback,
                 await runEventFunc(io, socket, eventName, eventArgs),
-                socket,
-                utilities.reportStart(eventName)
+                socket
             );
         }
     }
@@ -158,13 +157,10 @@ async function runEventFunc(
 function sendCallback(
     callback: undefined | Function,
     callbackResponse: undefined | { [key: string]: any },
-    socket: Socket<ServerToClientEvents, ClientToServerEvents>,
-    perfId?: string
+    socket: Socket<ServerToClientEvents, ClientToServerEvents>
 ): void {
     if (callback) {
         if (callbackResponse) {
-            utilities.reportEnd(perfId);
-
             callback(callbackResponse);
         } else {
             callback(generateError('UNKNOWN'));
@@ -199,9 +195,6 @@ export default function eventDispatch(
                 socket
             );
         } else {
-            // Only count valid requests
-            incrementTotalRequests();
-
             fireEvent(io, socket, event, callback, eventArgs);
         }
     }
