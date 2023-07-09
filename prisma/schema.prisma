@@ -49,6 +49,7 @@ model Room {
   lastMessageFrom String?
   isDM            Boolean?  @default(false)
   dmUsers         Json[]
+  dmHiddenFor     Json[]
 }
 
 model RoomMessage {
@@ -62,6 +63,8 @@ model RoomMessage {
   replyContent String   @default("")
   isImage      Boolean  @default(false)
   attachment   String?
+  isSpotify    Boolean? @default(false)
+  spotifyEmbed String?  @default("")
 }
 
 model Token {
@@ -79,9 +82,9 @@ model Theme {
   brandingDarken String
 }
 
+// what could this possibly mean!?
 model Bot {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  ownerId      String
   name         String
   description  String   @default("")
   icon         String   @default("")

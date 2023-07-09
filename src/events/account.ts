@@ -7,7 +7,6 @@ import fetchProfileData from 'events/account/fetchProfileData';
 import logout from 'events/account/logout';
 import updateProfileData from 'events/account/updateProfileData';
 import createRoom from 'events/account/createRoom';
-import fetchRoomData from 'events/account/fetchRoomData';
 import updateRoomData from 'events/account/updateRoomData';
 import leaveRoom from 'events/account/leaveRoom';
 import sendRoomMessage from 'events/account/sendRoomMessage';
@@ -26,6 +25,9 @@ import addRoomMember from 'events/account/addRoomMember';
 import removeRoomMember from 'events/account/removeRoomMember';
 import createDM from 'events/account/createDM';
 import sendRoomImage from 'events/account/sendRoomImage';
+import fetchHomePosts from 'events/account/fetchHomePosts';
+import fetchProfilePosts from 'events/account/fetchProfilePosts';
+import closeDM from 'events/account/closeDM';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -35,7 +37,6 @@ const accountTemplate: EventExportTemplate = {
     logout,
     updateProfileData,
     createRoom,
-    fetchRoomData,
     updateRoomData,
     leaveRoom,
     sendRoomMessage,
@@ -54,6 +55,9 @@ const accountTemplate: EventExportTemplate = {
     removeRoomMember,
     createDM,
     sendRoomImage,
+    fetchHomePosts,
+    fetchProfilePosts,
+    closeDM,
 };
 
 export default accountTemplate;

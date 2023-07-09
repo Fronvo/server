@@ -15,7 +15,7 @@ import {
     validateSchema,
 } from 'utilities/global';
 import { v4 } from 'uuid';
-import { prismaClient } from 'variables/global';
+import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function sendRoomMessage({
     io,
@@ -57,6 +57,24 @@ async function sendRoomMessage({
         return generateError('NOT_IN_ROOM');
     }
 
+    // Check if other user is still friended
+    if (room.isDM) {
+        const otherUser =
+            room.dmUsers[0] != account.profileId
+                ? room.dmUsers[0]
+                : room.dmUsers[1];
+
+        const otherDMUser = await prismaClient.account.findFirst({
+            where: {
+                profileId: otherUser as string,
+            },
+        });
+
+        if (!otherDMUser.friends.includes(account.profileId)) {
+            return generateError('NOT_FRIEND');
+        }
+    }
+
     // Remove unnecessary whitespace, dont allow 3 new lines in a row
     message = message.trim().replace(/\n\n\n/g, '');
 
@@ -74,6 +92,44 @@ async function sendRoomMessage({
         return newSchemaResult;
     }
 
+    let newMessageData: Partial<RoomMessage>;
+
+    let isSpotify = false;
+    let spotifyEmbed = '';
+
+    // Check for Spotify link (track or playlist)
+
+    // First check track
+    let spotifySchemaResult = validateSchema(
+        new StringSchema({
+            message: {
+                regex: /^(https:\/\/open.spotify.com\/track\/[0-9a-zA-Z?=]+)$/,
+            },
+        }),
+        { message }
+    );
+
+    // Now for playlist if not track
+    if (spotifySchemaResult) {
+        spotifySchemaResult = validateSchema(
+            new StringSchema({
+                message: {
+                    regex: /^(https:\/\/open.spotify.com\/playlist\/[0-9a-zA-Z?=]+)$/,
+                },
+            }),
+            { message }
+        );
+    }
+
+    // Track or playlist
+    if (!spotifySchemaResult) {
+        isSpotify = true;
+        spotifyEmbed = message.replace(
+            'https://open.spotify.com/',
+            'https://open.spotify.com/embed/'
+        );
+    }
+
     let replyContent = '';
 
     if (replyId) {
@@ -84,6 +140,8 @@ async function sendRoomMessage({
 
             select: {
                 content: true,
+                isImage: true,
+                isSpotify: true,
             },
         });
 
@@ -91,10 +149,11 @@ async function sendRoomMessage({
             return generateError('INVALID', undefined, ['message ID']);
         }
 
-        replyContent = replyMessage.content;
+        // Can't be image / Spotify
+        if (!replyMessage.isImage && !replyMessage.isSpotify) {
+            replyContent = replyMessage.content;
+        }
     }
-
-    let newMessageData: Partial<RoomMessage>;
 
     try {
         newMessageData = await prismaClient.roomMessage.create({
@@ -105,6 +164,8 @@ async function sendRoomMessage({
                 content: message,
                 isReply: Boolean(replyId),
                 replyContent,
+                isSpotify,
+                spotifyEmbed,
             },
 
             select: {
@@ -115,6 +176,8 @@ async function sendRoomMessage({
                 messageId: true,
                 isReply: true,
                 replyContent: true,
+                isSpotify: true,
+                spotifyEmbed: true,
             },
         });
     } catch (e) {
@@ -138,18 +201,43 @@ async function sendRoomMessage({
     });
 
     try {
-        // Update ordering of message lists
-        await prismaClient.room.update({
-            where: {
-                roomId,
-            },
+        if (isSpotify) {
+            // Update ordering of message lists
+            await prismaClient.room.update({
+                where: {
+                    roomId,
+                },
 
-            data: {
-                lastMessage: message,
-                lastMessageAt: new Date(),
-                lastMessageFrom: account.username,
-            },
-        });
+                data: {
+                    lastMessage: `${account.username} shared a Spotify song`,
+                    lastMessageAt: new Date(),
+                    lastMessageFrom: '',
+
+                    // Reset hidden states
+                    dmHiddenFor: {
+                        set: [],
+                    },
+                },
+            });
+        } else {
+            // Update ordering of message lists
+            await prismaClient.room.update({
+                where: {
+                    roomId,
+                },
+
+                data: {
+                    lastMessage: message,
+                    lastMessageAt: new Date(),
+                    lastMessageFrom: account.username,
+
+                    // Reset hidden states
+                    dmHiddenFor: {
+                        set: [],
+                    },
+                },
+            });
+        }
     } catch (e) {
         return generateError('UNKNOWN');
     }
@@ -191,7 +279,7 @@ async function sendRoomMessage({
                 });
             } catch (e) {}
         }
-    }, 1000);
+    }, batchUpdatesDelay);
 
     return {};
 }

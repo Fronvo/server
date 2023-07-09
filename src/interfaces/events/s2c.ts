@@ -2,7 +2,6 @@
 // Interfaces for the server to client events of Socket.IO
 // ******************** //
 
-import { DmCreatedParams } from 'interfaces/account/dmCreated';
 import { FriendAddedParams } from 'interfaces/account/friendAdded';
 import { FriendRemovedParams } from 'interfaces/account/friendRemoved';
 import { MemberJoinedParams } from 'interfaces/account/memberJoined';
@@ -61,8 +60,6 @@ export interface ServerToClientEvents {
     roomAdded: ({}: RoomAddedParams) => void;
 
     roomRemoved: ({}: RoomRemovedParams) => void;
-
-    dmCreated: ({}: DmCreatedParams) => void;
 
     memberJoined: ({}: MemberJoinedParams) => void;
 

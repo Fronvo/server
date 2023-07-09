@@ -23,6 +23,7 @@ export type Errors =
     | 'NOT_IN_ROOM'
     | 'ROOM_NOT_DM'
     | 'DM_EXISTS'
+    | 'DM_HIDDEN'
     | 'NOT_OWNER'
     | 'NOT_YOURSELF'
     | 'NOT_FRIEND'

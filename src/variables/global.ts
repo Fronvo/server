@@ -50,3 +50,6 @@ export const prismaClient = new PrismaClient({
 // Email-related
 export let emailUsername = getEnv('EMAIL_USERNAME');
 export let emailPassword = getEnv('EMAIL_PASSWORD');
+
+// Batch updates delay in ms, preferred range: [100 - 500]ms
+export const batchUpdatesDelay = 250;

@@ -35,6 +35,8 @@ async function fetchProfileData({
     }
 
     const isSelf = getSocketAccountId(socket.id) == profileId;
+    const isFriend = account.friends.includes(getSocketAccountId(socket.id));
+    const isAccessible = isSelf || isFriend;
 
     // ignore given status if set >24 hours
     let showStatus = false;
@@ -48,6 +50,16 @@ async function fetchProfileData({
         }
     }
 
+    let totalPosts: number;
+
+    if (isAccessible) {
+        totalPosts = await prismaClient.post.count({
+            where: {
+                author: profileId,
+            },
+        });
+    }
+
     // Block access to most info if private
     const profileData: FetchedFronvoAccount = {
         isSelf,
@@ -59,11 +71,13 @@ async function fetchProfileData({
         banner: account.banner,
         online: getAccountSocketId(profileId) != '',
         status: showStatus ? account.status : '',
+        totalPosts,
     };
 
     // More data if our profile
     if (profileData.isSelf) {
-        profileData.email = account.email;
+        // Unused
+        // profileData.email = account.email;
         profileData.pendingFriendRequests = account.pendingFriendRequests;
         profileData.friends = account.friends;
     }

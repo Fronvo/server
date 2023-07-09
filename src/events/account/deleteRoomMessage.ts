@@ -10,7 +10,7 @@ import {
 } from 'interfaces/account/deleteRoomMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
-import { prismaClient } from 'variables/global';
+import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function deleteRoomMessage({
     io,
@@ -79,23 +79,43 @@ async function deleteRoomMessage({
     setTimeout(async () => {
         try {
             // Update last message
-            const lastMessageObj = await prismaClient.roomMessage.findMany({
-                where: {
-                    roomId,
-                },
+            const lastMessageObj = (
+                await prismaClient.roomMessage.findMany({
+                    where: {
+                        roomId,
+                    },
 
-                select: {
-                    content: true,
-                    creationDate: true,
-                    ownerId: true,
-                },
+                    select: {
+                        content: true,
+                        creationDate: true,
+                        ownerId: true,
+                        isImage: true,
+                        isSpotify: true,
+                    },
 
-                take: -1,
-            });
+                    take: -1,
+                })
+            )[0];
+
+            if (!lastMessageObj) {
+                await prismaClient.room.update({
+                    where: {
+                        roomId,
+                    },
+
+                    data: {
+                        lastMessage: '',
+                        lastMessageAt: undefined,
+                        lastMessageFrom: '',
+                    },
+                });
+
+                return;
+            }
 
             const lastMessageOwner = await prismaClient.account.findFirst({
                 where: {
-                    profileId: lastMessageObj[0].ownerId,
+                    profileId: lastMessageObj.ownerId,
                 },
 
                 select: {
@@ -103,20 +123,44 @@ async function deleteRoomMessage({
                 },
             });
 
-            await prismaClient.room.update({
-                where: {
-                    roomId,
-                },
-                data: {
-                    lastMessage: lastMessageObj[0].content,
+            if (lastMessageObj.isSpotify) {
+                await prismaClient.room.update({
+                    where: {
+                        roomId,
+                    },
 
-                    lastMessageAt: lastMessageObj[0].creationDate,
+                    data: {
+                        lastMessage: `${lastMessageOwner.username} shared a Spotify song`,
+                        lastMessageAt: new Date(),
+                        lastMessageFrom: '',
+                    },
+                });
+            } else if (lastMessageObj.isImage) {
+                await prismaClient.room.update({
+                    where: {
+                        roomId,
+                    },
 
-                    lastMessageFrom: lastMessageOwner.username,
-                },
-            });
+                    data: {
+                        lastMessage: `${lastMessageOwner.username} sent an image`,
+                        lastMessageAt: lastMessageObj.creationDate,
+                        lastMessageFrom: '',
+                    },
+                });
+            } else {
+                await prismaClient.room.update({
+                    where: {
+                        roomId,
+                    },
+                    data: {
+                        lastMessage: lastMessageObj.content,
+                        lastMessageAt: lastMessageObj.creationDate,
+                        lastMessageFrom: lastMessageOwner.username,
+                    },
+                });
+            }
         } catch (e) {}
-    }, 1000);
+    }, batchUpdatesDelay);
 
     return {};
 }

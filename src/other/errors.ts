@@ -34,6 +34,7 @@ const errors: { [Error in Errors] } = {
     NOT_IN_ROOM: 'Not in this room.',
     ROOM_NOT_DM: 'This is a DM not a room.',
     DM_EXISTS: 'This DM already exists.',
+    DM_HIDDEN: 'This DM is already hidden from you.',
     NOT_OWNER: 'Not the owner of this room',
     NOT_YOURSELF: "You can't do this to yourself.",
     NOT_FRIEND: 'Not your friend.',

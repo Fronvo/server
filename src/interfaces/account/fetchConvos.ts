@@ -18,11 +18,12 @@ export interface FetchConvosResult {
 
 export interface FetchedRoom extends Room {
     unreadCount: number;
+    totalMessages: number;
 }
 
 export interface FetchedDM extends FetchedRoom {
     dmUserOnline: boolean;
-    dmUser: FetchedFronvoAccount;
+    dmUser: Partial<FetchedFronvoAccount>;
 }
 
 export interface FetchConvosTestResult extends FronvoError, FetchConvosResult {}

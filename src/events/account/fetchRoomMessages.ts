@@ -6,7 +6,7 @@ import { StringSchema } from '@ezier/validate';
 import { Account, RoomMessage } from '@prisma/client';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
-import { prismaClient } from 'variables/global';
+import { batchUpdatesDelay, prismaClient } from 'variables/global';
 import { fromToSchema, roomIdSchema } from '../shared';
 import {
     FetchRoomMessagesResult,
@@ -61,7 +61,8 @@ async function fetchRoomMessages({
         ]);
     }
 
-    // Gather available account data (not private, or followed back)
+    // Gather available account data
+    const pendingAccounts = [];
     const messageAccounts = [];
     const messageProfileData: Partial<Account>[] = [];
 
@@ -98,34 +99,61 @@ async function fetchRoomMessages({
             replyContent: true,
             isImage: true,
             attachment: true,
+            isSpotify: true,
+            spotifyEmbed: true,
         },
     });
 
-    // Add all profile IDs to the list
-    for (const messageIndex in messages) {
-        const message = messages[messageIndex];
+    async function getMessageAccounts(): Promise<void> {
+        return new Promise((resolve) => {
+            if (messages.length == 0) {
+                resolve();
+                return;
+            }
 
-        if (!messageAccounts.includes(message.ownerId)) {
-            const profileData = await prismaClient.account.findFirst({
-                where: {
-                    profileId: message.ownerId,
-                },
+            // Add all profile IDs to the list
+            for (const messageIndex in messages) {
+                const message = messages[messageIndex];
 
-                select: {
-                    avatar: true,
-                    banner: true,
-                    bio: true,
-                    creationDate: true,
-                    profileId: true,
-                    username: true,
-                },
-            });
+                if (
+                    !messageAccounts.includes(message.ownerId) &&
+                    !pendingAccounts.includes(message.ownerId)
+                ) {
+                    pendingAccounts.push(message.ownerId);
 
-            messageAccounts.push(message.ownerId);
+                    prismaClient.account
+                        .findFirst({
+                            where: {
+                                profileId: message.ownerId,
+                            },
 
-            messageProfileData.push(profileData);
-        }
+                            select: {
+                                avatar: true,
+                                banner: true,
+                                bio: true,
+                                creationDate: true,
+                                profileId: true,
+                                username: true,
+                            },
+                        })
+                        .then((data) => {
+                            messageAccounts.push(message.ownerId);
+
+                            messageProfileData.push(data);
+
+                            if (messageAccounts.length == messages.length) {
+                                resolve();
+                                return;
+                            }
+                        });
+                } else {
+                    messageAccounts.push(message.ownerId);
+                }
+            }
+        });
     }
+
+    await getMessageAccounts();
 
     const roomMessages: {
         message: Partial<RoomMessage>;
@@ -142,28 +170,30 @@ async function fetchRoomMessages({
         });
     }
 
-    // Update seen state
-    const newSeenStates = account.seenStates || {};
+    setTimeout(async () => {
+        // Update seen state
+        const newSeenStates = account.seenStates || {};
 
-    const totalMessages = await prismaClient.roomMessage.count({
-        where: { roomId },
-    });
+        const totalMessages = await prismaClient.roomMessage.count({
+            where: { roomId },
+        });
 
-    if (newSeenStates[roomId] != totalMessages) {
-        newSeenStates[roomId] = totalMessages;
+        if (newSeenStates[roomId] != totalMessages) {
+            newSeenStates[roomId] = totalMessages;
 
-        try {
-            await prismaClient.account.update({
-                where: {
-                    profileId: account.profileId,
-                },
+            try {
+                await prismaClient.account.update({
+                    where: {
+                        profileId: account.profileId,
+                    },
 
-                data: {
-                    seenStates: newSeenStates,
-                },
-            });
-        } catch (e) {}
-    }
+                    data: {
+                        seenStates: newSeenStates,
+                    },
+                });
+            } catch (e) {}
+        }
+    }, batchUpdatesDelay);
 
     return { roomMessages };
 }

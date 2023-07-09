@@ -164,31 +164,4 @@ with open(f'{src}/events/{event_type_name}.ts', 'r') as f:
 with open(f'{src}/events/{event_type_name}.ts', 'w') as f:
     f.write(new_file_contents)
 
-# Add test file
-with open(f'{src}/test/{event_type_name}/{target_filename_test}', 'w') as f:
-    # Start with header
-    f.write('// ******************** //\n')
-    f.write(f'// The test file for the {event_name} event.\n')
-    f.write('// ******************** //\n\n')
-
-    # Continue with imports
-    f.write("import { TestArguments, TestErrorCallback } from 'interfaces/test';\n")
-    f.write("import { assertError, assertErrors } from 'test/utilities';\n\n")
-
-    # Then the event function
-    f.write(f'function {event_name}({bracket_l} socket, done {bracket_r}: TestArguments,\n')
-    f.write(f'    callback: TestErrorCallback\n')
-    f.write(f'): void {bracket_l}\n')
-
-    f.write(f"    socket.emit('{event_name}', ({bracket_l} err {bracket_r}) => {bracket_l}\n")
-    f.write(f'        callback(assertError({bracket_l} err {bracket_r}));\n\n')
-    f.write('        done();\n')
-    f.write(f'    {bracket_r});\n')
-    f.write(f'{bracket_r}\n\n')
-
-    # Finally, export
-    f.write('export default (testArgs: TestArguments): void => {\n')
-    f.write(f'    assertErrors({brackets}, testArgs, {event_name});\n')
-    f.write('};\n')
-
 print(f'Event *{event_name}* created successfully')

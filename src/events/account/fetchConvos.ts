@@ -56,13 +56,10 @@ async function fetchConvos({
         return generateError('UNKNOWN');
     }
 
-    async function getUnreadCount(roomId: string): Promise<number> {
-        const totalMessages = await prismaClient.roomMessage.count({
-            where: {
-                roomId,
-            },
-        });
-
+    async function getUnreadCount(
+        totalMessages: number,
+        roomId: string
+    ): Promise<number> {
         // @ts-ignore
         const seenStates: { [key: string]: number } = account.seenStates || {};
 
@@ -73,91 +70,138 @@ async function fetchConvos({
         return totalMessages - seenStates[roomId];
     }
 
-    const convos: Partial<FetchedDM | FetchedRoom>[] = [];
+    let convos: Partial<FetchedDM | FetchedRoom>[] = [];
+    let hiddenConvos = 0;
 
     async function gatherConvos(): Promise<void> {
         return new Promise((resolve) => {
+            if (convosRaw.length == 0) {
+                resolve();
+                return;
+            }
+
             for (const convoIndex in convosRaw) {
                 const convo = convosRaw[convoIndex];
 
-                getUnreadCount(convo.roomId).then(async (unread) => {
-                    if (convo.isDM) {
-                        const targetDMUser =
-                            convo.dmUsers[0] != account.profileId
-                                ? (convo.dmUsers[0] as string)
-                                : (convo.dmUsers[1] as string);
-
-                        const targetDMUserData: FetchedFronvoAccount = {
-                            ...(await prismaClient.account.findFirst({
-                                where: {
-                                    profileId: targetDMUser,
-                                },
-
-                                select: {
-                                    profileId: true,
-                                    username: true,
-                                    avatar: true,
-                                    banner: true,
-                                    bio: true,
-                                    creationDate: true,
-                                },
-                            })),
-
-                            isSelf: false,
-                            online: isAccountLoggedIn(targetDMUser),
-                        };
-
-                        // Keep Room / DM only attributes
-                        // Clients MUST be able to differentiate from isDM
-                        convos[convoIndex] = {
+                prismaClient.roomMessage
+                    .count({
+                        where: {
                             roomId: convo.roomId,
-                            isDM: true,
-                            dmUsers: convo.dmUsers,
-                            lastMessage: convo.lastMessage,
-                            lastMessageAt: convo.lastMessageAt,
-                            lastMessageFrom: convo.lastMessageFrom,
-                            dmUserOnline: isAccountLoggedIn(targetDMUser),
-                            unreadCount: unread,
-                            dmUser: targetDMUserData,
-                        };
-                    } else {
-                        convos[convoIndex] = {
-                            roomId: convo.roomId,
-                            isDM: false,
-                            creationDate: convo.creationDate,
-                            icon: convo.icon,
-                            lastMessage: convo.lastMessage,
-                            lastMessageAt: convo.lastMessageAt,
-                            lastMessageFrom: convo.lastMessageFrom,
-                            members: convo.members,
-                            name: convo.name,
-                            ownerId: convo.ownerId,
-                            unreadCount: unread,
-                        };
-                    }
+                        },
+                    })
+                    .then((totalMessages) => {
+                        getUnreadCount(totalMessages, convo.roomId).then(
+                            async (unread) => {
+                                if (convo.isDM) {
+                                    const targetDMUser =
+                                        convo.dmUsers[0] != account.profileId
+                                            ? (convo.dmUsers[0] as string)
+                                            : (convo.dmUsers[1] as string);
 
-                    checkLoadingDone();
-                });
-            }
+                                    const targetDMUserData: Partial<FetchedFronvoAccount> =
+                                        {
+                                            ...(await prismaClient.account.findFirst(
+                                                {
+                                                    where: {
+                                                        profileId: targetDMUser,
+                                                    },
 
-            function checkLoadingDone() {
-                let filledItems = 0;
+                                                    select: {
+                                                        profileId: true,
+                                                        username: true,
+                                                        avatar: true,
+                                                        banner: true,
+                                                        bio: true,
+                                                        creationDate: true,
+                                                    },
+                                                }
+                                            )),
 
-                for (const convoIndex in convos) {
-                    if (typeof convos[convoIndex] != 'undefined') {
-                        filledItems += 1;
-                    }
-                }
+                                            isSelf: false,
+                                            online: isAccountLoggedIn(
+                                                targetDMUser
+                                            ),
+                                        };
 
-                if (filledItems == convosRaw.length) resolve();
+                                    // Keep Room / DM only attributes
+                                    // Clients MUST be able to differentiate from isDM
+                                    convos[convoIndex] = {
+                                        roomId: convo.roomId,
+                                        isDM: true,
+                                        dmUsers: convo.dmUsers,
+                                        lastMessage: convo.lastMessage,
+                                        lastMessageAt: convo.lastMessageAt,
+                                        lastMessageFrom: convo.lastMessageFrom,
+                                        dmUserOnline: targetDMUserData.online,
+                                        unreadCount: unread,
+                                        dmUser: targetDMUserData,
+                                        dmHiddenFor: convo.dmHiddenFor,
+                                        totalMessages,
+                                    };
+                                } else {
+                                    convos[convoIndex] = {
+                                        roomId: convo.roomId,
+                                        isDM: false,
+                                        creationDate: convo.creationDate,
+                                        icon: convo.icon,
+                                        lastMessage: convo.lastMessage,
+                                        lastMessageAt: convo.lastMessageAt,
+                                        lastMessageFrom: convo.lastMessageFrom,
+                                        members: convo.members,
+                                        name: convo.name,
+                                        ownerId: convo.ownerId,
+                                        unreadCount: unread,
+                                        totalMessages,
+                                    };
+                                }
+
+                                checkLoadingDone();
+                            }
+                        );
+
+                        function checkLoadingDone() {
+                            let filledItems = 0;
+
+                            for (const convoIndex in convos) {
+                                if (typeof convos[convoIndex] != 'undefined') {
+                                    filledItems += 1;
+                                }
+                            }
+
+                            // Count hidden DMs aswell
+                            if (filledItems + hiddenConvos == convosRaw.length)
+                                resolve();
+                        }
+                    });
             }
         });
     }
 
-    // Premature for empty array
-    if (convosRaw.length == 0) return { convos: [] };
+    function removeHiddenConvos(): void {
+        let finalConvos: Partial<FetchedDM | FetchedRoom>[] = [];
+
+        for (const convoIndex in convos) {
+            const convo = convos[convoIndex];
+
+            if (convo.isDM) {
+                if (!convo.dmHiddenFor?.includes(account.profileId)) {
+                    finalConvos.push(convo);
+                }
+            } else {
+                finalConvos.push(convo);
+            }
+        }
+
+        convos = finalConvos;
+    }
 
     await gatherConvos();
+    removeHiddenConvos();
+
+    // Premature for empty array
+    if (convos.length == 0) {
+        return { convos };
+    }
 
     return { convos };
 }

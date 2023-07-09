@@ -43,7 +43,7 @@ async function createDM({
         return generateError('NOT_FRIEND');
     }
 
-    const dmExists = await prismaClient.room.findFirst({
+    const room = await prismaClient.room.findFirst({
         where: {
             AND: [
                 {
@@ -60,8 +60,32 @@ async function createDM({
         },
     });
 
-    if (dmExists) {
-        return generateError('DM_EXISTS');
+    if (room) {
+        if (room.dmHiddenFor?.includes(account.profileId)) {
+            const newDmHiddenFor = room.dmHiddenFor;
+            newDmHiddenFor.splice(newDmHiddenFor.indexOf(account.profileId), 1);
+
+            await prismaClient.room.update({
+                where: {
+                    roomId: room.roomId,
+                },
+
+                data: {
+                    dmHiddenFor: {
+                        set: newDmHiddenFor,
+                    },
+                },
+            });
+
+            // Notify sockets about the new dm
+            io.to(socket.id).emit('roomCreated', {
+                roomId: room.roomId,
+            });
+
+            return { roomId: room.roomId };
+        } else {
+            return generateError('DM_EXISTS');
+        }
     }
 
     const roomId = v4();
@@ -81,11 +105,11 @@ async function createDM({
     }
 
     // Notify both sockets about the new dm
-    io.to(socket.id).emit('dmCreated', {
+    io.to(socket.id).emit('roomCreated', {
         roomId,
     });
 
-    io.sockets.sockets.get(getAccountSocketId(profileId))?.emit('dmCreated', {
+    io.sockets.sockets.get(getAccountSocketId(profileId))?.emit('roomCreated', {
         roomId,
     });
 

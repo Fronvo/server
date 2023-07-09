@@ -12,7 +12,7 @@ import {
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
 import { v4 } from 'uuid';
-import { prismaClient } from 'variables/global';
+import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function sendRoomMessage({
     io,
@@ -108,42 +108,43 @@ async function sendRoomMessage({
         return generateError('UNKNOWN');
     }
 
-    for (const socketIndex in targetSockets) {
-        const target = targetSockets[socketIndex];
+    setTimeout(async () => {
+        for (const socketIndex in targetSockets) {
+            const target = targetSockets[socketIndex];
 
-        const newSeenStates = await prismaClient.account.findFirst({
-            where: {
-                profileId: getSocketAccountId(target.id),
-            },
-
-            select: {
-                seenStates: true,
-            },
-        });
-
-        if (!newSeenStates.seenStates) {
-            // @ts-ignore
-            newSeenStates.seenStates = {};
-        }
-
-        newSeenStates.seenStates[roomId] = await prismaClient.roomMessage.count(
-            {
-                where: { roomId },
-            }
-        );
-
-        try {
-            await prismaClient.account.update({
+            const newSeenStates = await prismaClient.account.findFirst({
                 where: {
                     profileId: getSocketAccountId(target.id),
                 },
 
-                data: {
-                    seenStates: newSeenStates.seenStates,
+                select: {
+                    seenStates: true,
                 },
             });
-        } catch (e) {}
-    }
+
+            if (!newSeenStates.seenStates) {
+                // @ts-ignore
+                newSeenStates.seenStates = {};
+            }
+
+            newSeenStates.seenStates[roomId] =
+                await prismaClient.roomMessage.count({
+                    where: { roomId },
+                });
+
+            try {
+                await prismaClient.account.update({
+                    where: {
+                        profileId: getSocketAccountId(target.id),
+                    },
+
+                    data: {
+                        seenStates: newSeenStates.seenStates,
+                    },
+                });
+            } catch (e) {}
+        }
+    }, batchUpdatesDelay);
 
     return {};
 }
