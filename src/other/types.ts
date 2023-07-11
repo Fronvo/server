@@ -34,7 +34,9 @@ export type Errors =
     | 'FRIEND_ALREADY_ACCEPTED'
     | 'NOT_HIGHER'
     | 'TOO_MUCH'
-    | 'OVER_LIMIT';
+    | 'OVER_LIMIT'
+    | 'NOT_IN_BETA'
+    | 'DISABLED_IN_BETA';
 
 export type TestAssertTypes =
     | 'string'

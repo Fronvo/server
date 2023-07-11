@@ -161,8 +161,6 @@ function sendCallback(
 ): void {
     if (callback) {
         if (callbackResponse) {
-            console.log(callbackResponse);
-
             callback(callbackResponse);
         } else {
             callback(generateError('UNKNOWN'));

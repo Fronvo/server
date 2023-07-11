@@ -25,11 +25,12 @@ model Account {
   pendingFriendRequests Json[]
   friends               Json[]
   seenStates            Json?     @default("{}")
+  allowedInBeta         Boolean?  @default(false)
 }
 
 model Post {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  postId       String
+  postId       String   @unique
   author       String
   content      String
   attachment   String?  @default("")
@@ -69,13 +70,13 @@ model RoomMessage {
 
 model Token {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
-  token     String
+  token     String @unique
   profileId String @unique
 }
 
 model Theme {
   id             String @id @default(auto()) @map("_id") @db.ObjectId
-  title          String
+  title          String @unique
   description    String @default("")
   icon           String @default("")
   branding       String
@@ -85,7 +86,7 @@ model Theme {
 // what could this possibly mean!?
 model Bot {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
+  name         String   @unique
   description  String   @default("")
   icon         String   @default("")
   creationDate DateTime @default(now())
