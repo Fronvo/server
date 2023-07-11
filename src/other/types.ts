@@ -24,6 +24,7 @@ export type Errors =
     | 'ROOM_NOT_DM'
     | 'DM_EXISTS'
     | 'DM_HIDDEN'
+    | 'DM_INACCESSIBLE'
     | 'NOT_OWNER'
     | 'NOT_YOURSELF'
     | 'NOT_FRIEND'

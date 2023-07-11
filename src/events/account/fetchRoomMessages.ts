@@ -44,6 +44,12 @@ async function fetchRoomMessages({
         return generateError('NOT_IN_ROOM');
     }
 
+    if (room.isDM) {
+        if (room.dmHiddenFor.includes(account.profileId)) {
+            return generateError('DM_HIDDEN');
+        }
+    }
+
     const fromNumber = Number(from);
     const toNumber = Number(to);
 

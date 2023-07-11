@@ -131,7 +131,7 @@ async function deleteRoomMessage({
 
                     data: {
                         lastMessage: `${lastMessageOwner.username} shared a Spotify song`,
-                        lastMessageAt: new Date(),
+                        lastMessageAt: lastMessageObj.creationDate,
                         lastMessageFrom: '',
                     },
                 });
