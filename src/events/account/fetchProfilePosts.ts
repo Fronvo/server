@@ -98,10 +98,11 @@ async function fetchProfilePosts({
             content: true,
             attachment: true,
             creationDate: true,
+            likes: true,
         },
     });
 
-    // Push post data with profile data
+    // Push post data with profile data, join all post rooms
     for (const postIndex in posts) {
         const post = posts[postIndex];
 
@@ -109,6 +110,8 @@ async function fetchProfilePosts({
             post,
             profileData: account,
         });
+
+        socket.join(post.postId);
     }
 
     return { profilePosts: profilePosts.reverse(), totalPosts };

@@ -27,6 +27,7 @@ const errors: { [Error in Errors] } = {
 
     ACCOUNT_404: 'Account not found.',
     ROOM_404: 'Room not found.',
+    POST_404: 'Post not found.',
 
     ALREADY_IN_ROOM: 'You are already in this room.',
     USER_IN_ROOM: 'User already in this room.',

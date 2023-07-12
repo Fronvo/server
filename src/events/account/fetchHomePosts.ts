@@ -156,10 +156,11 @@ async function fetchHomePosts({
             author: true,
             attachment: true,
             creationDate: true,
+            likes: true,
         },
     });
 
-    // Push post data with profile data
+    // Push post data with profile data, join all post rooms
     for (const postIndex in posts) {
         const post = posts[postIndex];
 
@@ -167,6 +168,8 @@ async function fetchHomePosts({
             post,
             profileData: getProfileData(post.author),
         });
+
+        socket.join(post.postId);
     }
 
     return { homePosts: homePosts.reverse(), totalPosts };

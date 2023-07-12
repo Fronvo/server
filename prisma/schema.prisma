@@ -35,6 +35,7 @@ model Post {
   content      String
   attachment   String?  @default("")
   creationDate DateTime @default(now())
+  likes        Json[]
 }
 
 model Room {

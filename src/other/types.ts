@@ -17,6 +17,7 @@ export type Errors =
     | 'ID_TAKEN'
     | 'ACCOUNT_404'
     | 'ROOM_404'
+    | 'POST_404'
     | 'ALREADY_IN_ROOM'
     | 'USER_IN_ROOM'
     | 'USER_NOT_IN_ROOM'

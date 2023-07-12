@@ -120,6 +120,10 @@ import {
     FetchProfilePostsTestResult,
 } from 'interfaces/account/fetchProfilePosts';
 import { CloseDMParams, CloseDMTestResult } from 'interfaces/account/closeDM';
+import {
+    LikePostParams,
+    LikePostTestResult,
+} from 'interfaces/account/likePost';
 
 export interface ClientToServerEvents {
     register: (
@@ -242,5 +246,9 @@ export interface ClientToServerEvents {
     closeDM: (
         {}: CloseDMParams,
         callback?: ({}: CloseDMTestResult) => void
+    ) => void;
+    likePost: (
+        {}: LikePostParams,
+        callback?: ({}: LikePostTestResult) => void
     ) => void;
 }

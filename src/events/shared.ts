@@ -106,3 +106,11 @@ export const maxResultsSchema: {
         optional: true,
     },
 };
+
+export const postIdSchema: {
+    postId: EzierValidatorStringSchema;
+} = {
+    postId: {
+        type: 'uuid',
+    },
+};
