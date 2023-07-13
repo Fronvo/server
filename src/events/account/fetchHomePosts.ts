@@ -3,13 +3,14 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Account, Post } from '@prisma/client';
+import { Account } from '@prisma/client';
 import { fromToSchema } from 'events/shared';
 import {
     FetchHomePostsResult,
     FetchHomePostsServerParams,
 } from 'interfaces/account/fetchHomePosts';
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
+import { FetchedFronvoPost } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
@@ -116,8 +117,10 @@ async function fetchHomePosts({
 
     await getFriendsAccounts();
 
-    const homePosts: { post: Partial<Post>; profileData: Partial<Account> }[] =
-        [];
+    const homePosts: {
+        post: FetchedFronvoPost;
+        profileData: Partial<Account>;
+    }[] = [];
 
     // Get totalPosts
     const totalPosts = await prismaClient.post.count({
@@ -165,7 +168,12 @@ async function fetchHomePosts({
         const post = posts[postIndex];
 
         homePosts.push({
-            post,
+            post: {
+                ...post,
+                totalLikes: post.likes.length,
+                likes: undefined,
+                isLiked: post.likes.includes(account.profileId),
+            },
             profileData: getProfileData(post.author),
         });
 

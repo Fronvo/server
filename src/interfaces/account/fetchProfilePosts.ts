@@ -15,8 +15,13 @@ export interface FetchProfilePostsServerParams
     extends EventArguments,
         FetchProfilePostsParams {}
 
+export interface FetchedFronvoPost extends Partial<Post> {
+    totalLikes: number;
+    isLiked: boolean;
+}
+
 export interface FetchProfilePostsResult {
-    profilePosts: { post: Partial<Post>; profileData: Partial<Account> }[];
+    profilePosts: { post: FetchedFronvoPost; profileData: Partial<Account> }[];
     totalPosts: number;
 }
 

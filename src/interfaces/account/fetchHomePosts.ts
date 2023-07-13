@@ -2,8 +2,9 @@
 // Interfaces for the fetchHomePosts event file.
 // ******************** //
 
-import { Account, Post } from '@prisma/client';
+import { Account } from '@prisma/client';
 import { FronvoError, EventArguments } from 'interfaces/all';
+import { FetchedFronvoPost } from './fetchProfilePosts';
 
 export interface FetchHomePostsParams {
     from: string;
@@ -15,7 +16,7 @@ export interface FetchHomePostsServerParams
         FetchHomePostsParams {}
 
 export interface FetchHomePostsResult {
-    homePosts: { post: Partial<Post>; profileData: Partial<Account> }[];
+    homePosts: { post: FetchedFronvoPost; profileData: Partial<Account> }[];
     totalPosts: number;
 }
 

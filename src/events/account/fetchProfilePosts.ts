@@ -3,11 +3,12 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Account, Post } from '@prisma/client';
+import { Account } from '@prisma/client';
 import { fromToSchema, profileIdSchema } from 'events/shared';
 import {
     FetchProfilePostsResult,
     FetchProfilePostsServerParams,
+    FetchedFronvoPost,
 } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
@@ -75,7 +76,7 @@ async function fetchProfilePosts({
     }
 
     const profilePosts: {
-        post: Partial<Post>;
+        post: FetchedFronvoPost;
         profileData: Partial<Account>;
     }[] = [];
 
@@ -107,7 +108,12 @@ async function fetchProfilePosts({
         const post = posts[postIndex];
 
         profilePosts.push({
-            post,
+            post: {
+                ...post,
+                likes: undefined,
+                totalLikes: post.likes.length,
+                isLiked: post.likes.includes(account.profileId),
+            },
             profileData: account,
         });
 

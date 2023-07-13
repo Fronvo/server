@@ -4,5 +4,5 @@
 
 export interface PostLikesChangedParams {
     postId: string;
-    likes: string[];
+    likes: number;
 }

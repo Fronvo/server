@@ -72,7 +72,7 @@ async function likePost({
 
             io.to(post.postId).emit('postLikesChanged', {
                 postId: post.postId,
-                likes: newLikes as string[],
+                likes: newLikes.length,
             });
         } else {
             await prismaClient.post.update({
@@ -89,7 +89,7 @@ async function likePost({
 
             io.to(post.postId).emit('postLikesChanged', {
                 postId: post.postId,
-                likes: [...(post.likes as string[]), account.profileId],
+                likes: post.likes.length + 1,
             });
         }
     } catch (e) {}
