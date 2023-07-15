@@ -107,6 +107,8 @@ async function fetchRoomMessages({
             attachment: true,
             isSpotify: true,
             spotifyEmbed: true,
+            isTenor: true,
+            tenorUrl: true,
         },
     });
 

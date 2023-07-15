@@ -94,10 +94,9 @@ async function sendRoomMessage({
 
     let newMessageData: Partial<RoomMessage>;
 
+    // Check for Spotify link (track or playlist)
     let isSpotify = false;
     let spotifyEmbed = '';
-
-    // Check for Spotify link (track or playlist)
 
     // First check track
     let spotifySchemaResult = validateSchema(
@@ -130,6 +129,28 @@ async function sendRoomMessage({
         );
     }
 
+    // Can't be both Spotify and Tenor
+    // Check for Tenor link
+    let isTenor = false;
+    let tenorUrl: string;
+
+    if (spotifySchemaResult) {
+        let tenorSchemaResult = validateSchema(
+            new StringSchema({
+                message: {
+                    regex: /https:\/\/media.tenor.com\/[a-zA-Z0-9_-]{16}\/[a-zA-Z0-9-_]+.gif/,
+                },
+            }),
+            { message }
+        );
+
+        // Track or playlist
+        if (!tenorSchemaResult) {
+            isTenor = true;
+            tenorUrl = message;
+        }
+    }
+
     let replyContent = '';
 
     if (replyId) {
@@ -142,6 +163,7 @@ async function sendRoomMessage({
                 content: true,
                 isImage: true,
                 isSpotify: true,
+                isTenor: true,
             },
         });
 
@@ -150,7 +172,11 @@ async function sendRoomMessage({
         }
 
         // Can't be image / Spotify
-        if (!replyMessage.isImage && !replyMessage.isSpotify) {
+        if (
+            !replyMessage.isImage &&
+            !replyMessage.isSpotify &&
+            !replyMessage.isTenor
+        ) {
             replyContent = replyMessage.content;
         }
     }
@@ -166,6 +192,8 @@ async function sendRoomMessage({
                 replyContent,
                 isSpotify,
                 spotifyEmbed,
+                isTenor,
+                tenorUrl,
             },
 
             select: {
@@ -178,6 +206,8 @@ async function sendRoomMessage({
                 replyContent: true,
                 isSpotify: true,
                 spotifyEmbed: true,
+                isTenor: true,
+                tenorUrl: true,
             },
         });
     } catch (e) {
@@ -201,7 +231,25 @@ async function sendRoomMessage({
     });
 
     try {
-        if (isSpotify) {
+        if (isTenor) {
+            // Update ordering of message lists
+            await prismaClient.room.update({
+                where: {
+                    roomId,
+                },
+
+                data: {
+                    lastMessage: `${account.username} sent a GIF`,
+                    lastMessageAt: new Date(),
+                    lastMessageFrom: '',
+
+                    // Reset hidden states
+                    dmHiddenFor: {
+                        set: [],
+                    },
+                },
+            });
+        } else if (isSpotify) {
             // Update ordering of message lists
             await prismaClient.room.update({
                 where: {

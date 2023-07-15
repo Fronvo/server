@@ -91,6 +91,7 @@ async function deleteRoomMessage({
                         ownerId: true,
                         isImage: true,
                         isSpotify: true,
+                        isTenor: true,
                     },
 
                     take: -1,
@@ -123,7 +124,19 @@ async function deleteRoomMessage({
                 },
             });
 
-            if (lastMessageObj.isSpotify) {
+            if (lastMessageObj.isTenor) {
+                await prismaClient.room.update({
+                    where: {
+                        roomId,
+                    },
+
+                    data: {
+                        lastMessage: `${lastMessageOwner.username} sent a GIF`,
+                        lastMessageAt: lastMessageObj.creationDate,
+                        lastMessageFrom: '',
+                    },
+                });
+            } else if (lastMessageObj.isSpotify) {
                 await prismaClient.room.update({
                     where: {
                         roomId,

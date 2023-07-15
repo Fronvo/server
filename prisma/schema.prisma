@@ -67,6 +67,8 @@ model RoomMessage {
   attachment   String?
   isSpotify    Boolean? @default(false)
   spotifyEmbed String?  @default("")
+  isTenor      Boolean  @default(false)
+  tenorUrl     String?  @default("")
 }
 
 model Token {
