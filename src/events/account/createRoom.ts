@@ -28,7 +28,7 @@ async function createRoom({
         },
     });
 
-    // Limit to 20 rooms max
+    // Limit to 5 rooms max
     let totalRooms: number;
 
     try {
@@ -41,7 +41,7 @@ async function createRoom({
         return generateError('UNKNOWN');
     }
 
-    if (totalRooms > 20) {
+    if (totalRooms > 5) {
         return generateError('OVER_LIMIT');
     }
 
