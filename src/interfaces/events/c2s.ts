@@ -129,6 +129,14 @@ import {
     DeleteAccountParams,
     DeleteAccountTestResult,
 } from 'interfaces/account/deleteAccount';
+import {
+    SharePostParams,
+    SharePostTestResult,
+} from 'interfaces/account/sharePost';
+import {
+    DeletePostParams,
+    DeletePostTestResult,
+} from 'interfaces/account/deletePost';
 
 export interface ClientToServerEvents {
     register: (
@@ -260,5 +268,13 @@ export interface ClientToServerEvents {
     deleteAccount: (
         {}: DeleteAccountParams,
         callback?: ({}: DeleteAccountTestResult) => void
+    ) => void;
+    sharePost: (
+        {}: SharePostParams,
+        callback?: ({}: SharePostTestResult) => void
+    ) => void;
+    deletePost: (
+        {}: DeletePostParams,
+        callback?: ({}: DeletePostTestResult) => void
     ) => void;
 }

@@ -24,7 +24,7 @@ async function register({
                 utilities.getEmailDomain(email)
             ) > -1
         ) {
-            return utilities.generateError('REQUIRED', ['email']);
+            return utilities.generateError('REQUIRED', undefined, ['email']);
         }
     }
 

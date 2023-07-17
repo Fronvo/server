@@ -31,6 +31,8 @@ import closeDM from 'events/account/closeDM';
 import likePost from 'events/account/likePost';
 import requestData from 'events/account/requestData';
 import deleteAccount from 'events/account/deleteAccount';
+import sharePost from 'events/account/sharePost';
+import deletePost from 'events/account/deletePost';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -64,6 +66,8 @@ const accountTemplate: EventExportTemplate = {
     likePost,
     requestData,
     deleteAccount,
+    sharePost,
+    deletePost,
 };
 
 export default accountTemplate;

@@ -29,6 +29,9 @@ const errors: { [Error in Errors] } = {
     ROOM_404: 'Room not found.',
     POST_404: 'Post not found.',
 
+    NOT_POST_CREATOR: "You didn't create this post.",
+    POST_BOTH_TYPES: 'Choose one attachment type.',
+
     ALREADY_IN_ROOM: 'You are already in this room.',
     USER_IN_ROOM: 'User already in this room.',
     USER_NOT_IN_ROOM: 'User not in this room.',

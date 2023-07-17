@@ -11,6 +11,8 @@ import { NewRoomMessageParams } from 'interfaces/account/newRoomMessage';
 import { OnlineStatusUpdatedParams } from 'interfaces/account/onlineStatusUpdated';
 import { PendingFriendRemovedParams } from 'interfaces/account/pendingFriendRemoved';
 import { PostLikesChangedParams } from 'interfaces/account/postLikesChanged';
+import { PostRemovedParams } from 'interfaces/account/postRemoved';
+import { PostSharedParams } from 'interfaces/account/postShared';
 import { ProfileDataUpdatedParams } from 'interfaces/account/profileDataUpdated';
 import { ProfileStatusUpdatedParams } from 'interfaces/account/profileStatusUpdated';
 import { RoomAddedParams } from 'interfaces/account/roomAdded';
@@ -87,4 +89,8 @@ export interface ServerToClientEvents {
     pendingFriendRemoved: ({}: PendingFriendRemovedParams) => void;
 
     postLikesChanged: ({}: PostLikesChangedParams) => void;
+
+    postShared: ({}: PostSharedParams) => void;
+
+    postRemoved: ({}: PostRemovedParams) => void;
 }

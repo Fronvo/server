@@ -18,6 +18,8 @@ export type Errors =
     | 'ACCOUNT_404'
     | 'ROOM_404'
     | 'POST_404'
+    | 'NOT_POST_CREATOR'
+    | 'POST_BOTH_TYPES'
     | 'ALREADY_IN_ROOM'
     | 'USER_IN_ROOM'
     | 'USER_NOT_IN_ROOM'
