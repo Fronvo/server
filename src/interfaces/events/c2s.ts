@@ -125,6 +125,10 @@ import {
     LikePostTestResult,
 } from 'interfaces/account/likePost';
 import { RequestDataTestResult } from 'interfaces/account/requestData';
+import {
+    DeleteAccountParams,
+    DeleteAccountTestResult,
+} from 'interfaces/account/deleteAccount';
 
 export interface ClientToServerEvents {
     register: (
@@ -253,4 +257,8 @@ export interface ClientToServerEvents {
         callback?: ({}: LikePostTestResult) => void
     ) => void;
     requestData: (callback?: ({}: RequestDataTestResult) => void) => void;
+    deleteAccount: (
+        {}: DeleteAccountParams,
+        callback?: ({}: DeleteAccountTestResult) => void
+    ) => void;
 }

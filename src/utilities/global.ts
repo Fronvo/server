@@ -116,6 +116,9 @@ export async function logoutSocket(
         },
     });
 
+    // Possibol
+    if (!account) return;
+
     io.to(account.profileId).emit('onlineStatusUpdated', {
         profileId: account.profileId,
         online: false,
