@@ -112,7 +112,7 @@ async function fetchProfilePosts({
                 ...post,
                 likes: undefined,
                 totalLikes: post.likes.length,
-                isLiked: post.likes.includes(account.profileId),
+                isLiked: post.likes.includes(getSocketAccountId(socket.id)),
             },
             profileData: account,
         });
