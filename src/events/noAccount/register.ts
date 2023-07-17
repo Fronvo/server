@@ -4,131 +4,128 @@
 
 import bcrypt from 'bcrypt';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    RegisterResult,
-    RegisterServerParams,
-} from 'interfaces/noAccount/register';
+import { RegisterResult } from 'interfaces/noAccount/register';
 import utilities from 'utilities/all';
 import * as variables from 'variables/global';
 import { prismaClient } from 'variables/global';
 import { StringSchema } from '@ezier/validate';
-import { emailSchema, passwordSchema, profileId } from 'events/shared';
+import { emailSchema, passwordSchema } from 'events/shared';
 
-async function register({}: // io,
-// socket,
-// email,
-// password,
-RegisterServerParams): Promise<RegisterResult | FronvoError> {
-    return utilities.generateError('DISABLED_IN_BETA');
+async function register({
+    io,
+    socket,
+    email,
+    password,
+}): Promise<RegisterResult | FronvoError> {
+    // Check if the email is from a dummy (blacklisted) domain, if applicable
+    if (variables.blacklistedEmailDomainsEnabled) {
+        if (
+            variables.blacklistedEmailDomains.indexOf(
+                utilities.getEmailDomain(email)
+            ) > -1
+        ) {
+            return utilities.generateError('REQUIRED', ['email']);
+        }
+    }
 
-    // // Check if the email is from a dummy (blacklisted) domain, if applicable
-    // if (variables.blacklistedEmailDomainsEnabled) {
-    //     if (
-    //         variables.blacklistedEmailDomains.indexOf(
-    //             utilities.getEmailDomain(email)
-    //         ) > -1
-    //     ) {
-    //         return utilities.generateError('REQUIRED', ['email']);
-    //     }
-    // }
+    const account = await prismaClient.account.findFirst({
+        where: {
+            email,
+        },
+    });
 
-    // const account = await prismaClient.account.findFirst({
-    //     where: {
-    //         email,
-    //     },
-    // });
+    // Check if the email is already registered by another user
+    if (account) {
+        return utilities.generateError('EMAIL_TAKEN');
+    }
 
-    // // Check if the email is already registered by another user
-    // if (account) {
-    //     return utilities.generateError('EMAIL_TAKEN');
-    // }
+    let sentCode: string;
 
-    // let sentCode: string;
+    if (!variables.setupMode) {
+        // 6 digits [0-9]
+        sentCode = utilities.generateNumbers(0, 9, 6);
+    } else {
+        sentCode = '123456';
+    }
 
-    // if (!variables.setupMode) {
-    //     // 6 digits [0-9]
-    //     sentCode = utilities.generateNumbers(0, 9, 6);
-    // } else {
-    //     sentCode = '123456';
-    // }
+    utilities.sendEmail(email, 'Fronvo email verification code', [
+        `Your verification code is ${sentCode}`,
+    ]);
 
-    // utilities.sendEmail(email, 'Fronvo email verification code', [
-    //     `Your verification code is ${sentCode}`,
-    // ]);
+    // Attach registerVerify now, will be detached after verification / discarded
+    socket.on('registerVerify', async ({ code, identifier }, callback) => {
+        let finalError: FronvoError;
+        let token: string;
 
-    // // Attach registerVerify now, will be detached after verification / discarded
-    // socket.on('registerVerify', async ({ code, identifier }, callback) => {
-    //     let finalError: FronvoError;
-    //     let token: string;
+        if (code != sentCode) {
+            finalError = utilities.generateError('INVALID', ['code']);
+        } else {
+            // Double-check if someone else registered this during verification
+            let prematureFinalError: FronvoError;
 
-    //     if (code != sentCode) {
-    //         finalError = utilities.generateError('INVALID', ['code']);
-    //     } else {
-    //         // Double-check if someone else registered this during verification
-    //         let prematureFinalError: FronvoError;
+            // Check for email and identifier
+            const account = await prismaClient.account.findFirst({
+                where: {
+                    email,
+                },
+            });
 
-    //         // Check for email and identifier
-    //         const account = await prismaClient.account.findFirst({
-    //             where: {
-    //                 email,
-    //             },
-    //         });
+            if (account) {
+                prematureFinalError = utilities.generateError('EMAIL_TAKEN');
+            }
 
-    //         if (account) {
-    //             prematureFinalError = utilities.generateError('EMAIL_TAKEN');
-    //         }
+            const account2 = await prismaClient.account.findFirst({
+                where: {
+                    profileId: identifier,
+                },
+            });
 
-    //         const account2 = await prismaClient.account.findFirst({
-    //             where: {
-    //                 profileId: identifier,
-    //             },
-    //         });
+            if (account2) {
+                prematureFinalError = utilities.generateError('ID_TAKEN');
+            }
 
-    //         if (account2) {
-    //             prematureFinalError = utilities.generateError('ID_TAKEN');
-    //         }
+            if (prematureFinalError) {
+                finalError = prematureFinalError;
+            } else {
+                // Detach listener
+                socket.removeAllListeners('registerVerify');
 
-    //         if (prematureFinalError) {
-    //             finalError = prematureFinalError;
-    //         } else {
-    //             // Detach listener
-    //             socket.removeAllListeners('registerVerify');
+                const username = `Fronvo user ${
+                    (await prismaClient.account.count()) + 1
+                }`;
 
-    //             const username = `Fronvo user ${
-    //                 (await prismaClient.account.count()) + 1
-    //             }`;
+                await prismaClient.account.create({
+                    data: {
+                        profileId: identifier,
+                        email,
+                        password: bcrypt.hashSync(
+                            password,
+                            variables.mainBcryptHash
+                        ),
+                        username,
+                        friends: [],
+                    },
+                });
 
-    //             await prismaClient.account.create({
-    //                 data: {
-    //                     profileId: identifier,
-    //                     email,
-    //                     password: bcrypt.hashSync(
-    //                         password,
-    //                         variables.mainBcryptHash
-    //                     ),
-    //                     username,
-    //                 },
-    //             });
+                token = await utilities.getToken(identifier);
 
-    //             token = await utilities.getToken(identifier);
+                utilities.sendEmail(email, 'Welcome to Fronvo!', [
+                    "We're so glad to have you on our platform!",
+                    'Enjoy your stay on the safest social media!',
+                ]);
 
-    //             utilities.sendEmail(email, 'Welcome to Fronvo!', [
-    //                 "We're so glad to have you on our platform!",
-    //                 'Enjoy your stay on the safest social media!',
-    //             ]);
+                utilities.loginSocket(io, socket, identifier);
 
-    //             utilities.loginSocket(io, socket, identifier);
+                callback({
+                    // May be undefined if not in setup
+                    token,
+                    err: finalError ? { ...finalError.err } : undefined,
+                });
+            }
+        }
+    });
 
-    //             callback({
-    //                 // May be undefined if not in test / setup
-    //                 token,
-    //                 err: finalError ? { ...finalError.err } : undefined,
-    //             });
-    //         }
-    //     }
-    // });
-
-    // return {};
+    return {};
 }
 
 const registerTemplate: EventTemplate = {

@@ -28,10 +28,6 @@ async function login({
 
     // Validate the password, synchronously
     if (compareSync(password, account.password)) {
-        if (!account.allowedInBeta) {
-            return utilities.generateError('NOT_IN_BETA');
-        }
-
         utilities.loginSocket(io, socket, account.profileId);
 
         const token = await utilities.getToken(account.profileId);

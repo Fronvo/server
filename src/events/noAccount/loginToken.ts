@@ -26,16 +26,6 @@ async function loginToken({
         return generateError('INVALID', undefined, ['token']);
     }
 
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: tokenItem.profileId,
-        },
-    });
-
-    if (!account.allowedInBeta) {
-        return generateError('NOT_IN_BETA');
-    }
-
     loginSocket(io, socket, tokenItem.profileId);
 
     return {};
