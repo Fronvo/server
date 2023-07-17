@@ -25,7 +25,7 @@ model Account {
   pendingFriendRequests Json[]
   friends               Json[]
   seenStates            Json?     @default("{}")
-  allowedInBeta         Boolean?  @default(false)
+  dataSentTime          DateTime? @default(now())
 }
 
 model Post {

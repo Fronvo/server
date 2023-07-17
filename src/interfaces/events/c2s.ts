@@ -124,6 +124,7 @@ import {
     LikePostParams,
     LikePostTestResult,
 } from 'interfaces/account/likePost';
+import { RequestDataTestResult } from 'interfaces/account/requestData';
 
 export interface ClientToServerEvents {
     register: (
@@ -251,4 +252,5 @@ export interface ClientToServerEvents {
         {}: LikePostParams,
         callback?: ({}: LikePostTestResult) => void
     ) => void;
+    requestData: (callback?: ({}: RequestDataTestResult) => void) => void;
 }

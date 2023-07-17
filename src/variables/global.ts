@@ -51,5 +51,13 @@ export const prismaClient = new PrismaClient({
 export let emailUsername = getEnv('EMAIL_USERNAME');
 export let emailPassword = getEnv('EMAIL_PASSWORD');
 
+// ImageKit
+export let imagekitEndpoint = getEnv('IMAGEKIT_ENDPOINT');
+export let imagekitPublic = getEnv('IMAGEKIT_PUBLIC');
+export let imagekitPrivate = getEnv('IMAGEKIT_PRIVATE');
+
+// Tenor
+export let tenorKey = getEnv('TENOR_KEY');
+
 // Batch updates delay in ms, preferred range: [100 - 500]ms
 export const batchUpdatesDelay = 250;

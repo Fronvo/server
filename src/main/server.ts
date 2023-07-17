@@ -21,10 +21,6 @@ import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server } from 'socket.io';
 import * as variables from 'variables/global';
 import { getEnv, getEnvBoolean } from 'variables/varUtils';
-import ImageKit from 'imagekit';
-import { v4 } from 'uuid';
-import fs from 'fs';
-import path from 'path';
 
 // Variables
 let io: Server<ClientToServerEvents, ServerToClientEvents>;

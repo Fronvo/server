@@ -29,6 +29,7 @@ import fetchHomePosts from 'events/account/fetchHomePosts';
 import fetchProfilePosts from 'events/account/fetchProfilePosts';
 import closeDM from 'events/account/closeDM';
 import likePost from 'events/account/likePost';
+import requestData from 'events/account/requestData';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -60,6 +61,7 @@ const accountTemplate: EventExportTemplate = {
     fetchProfilePosts,
     closeDM,
     likePost,
+    requestData,
 };
 
 export default accountTemplate;
