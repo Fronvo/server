@@ -33,6 +33,7 @@ import requestData from 'events/account/requestData';
 import deleteAccount from 'events/account/deleteAccount';
 import sharePost from 'events/account/sharePost';
 import deletePost from 'events/account/deletePost';
+import fetchTenor from 'events/account/fetchTenor';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -68,6 +69,7 @@ const accountTemplate: EventExportTemplate = {
     deleteAccount,
     sharePost,
     deletePost,
+    fetchTenor,
 };
 
 export default accountTemplate;

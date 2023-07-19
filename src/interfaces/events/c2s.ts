@@ -137,6 +137,10 @@ import {
     DeletePostParams,
     DeletePostTestResult,
 } from 'interfaces/account/deletePost';
+import {
+    FetchTenorParams,
+    FetchTenorTestResult,
+} from 'interfaces/account/fetchTenor';
 
 export interface ClientToServerEvents {
     register: (
@@ -276,5 +280,9 @@ export interface ClientToServerEvents {
     deletePost: (
         {}: DeletePostParams,
         callback?: ({}: DeletePostTestResult) => void
+    ) => void;
+    fetchTenor: (
+        {}: FetchTenorParams,
+        callback?: ({}: FetchTenorTestResult) => void
     ) => void;
 }
