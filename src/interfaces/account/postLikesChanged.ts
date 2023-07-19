@@ -3,6 +3,7 @@
 // ******************** //
 
 export interface PostLikesChangedParams {
+    author: string;
     postId: string;
     likes: number;
 }

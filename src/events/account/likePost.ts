@@ -71,6 +71,7 @@ async function likePost({
             });
 
             io.to(post.postId).emit('postLikesChanged', {
+                author: post.author,
                 postId: post.postId,
                 likes: newLikes.length,
             });
@@ -88,6 +89,7 @@ async function likePost({
             });
 
             io.to(post.postId).emit('postLikesChanged', {
+                author: post.author,
                 postId: post.postId,
                 likes: post.likes.length + 1,
             });
