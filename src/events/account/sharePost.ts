@@ -45,6 +45,7 @@ async function sharePost({
             content,
             attachment,
             gif,
+            likes: [account.profileId],
         },
     });
 
