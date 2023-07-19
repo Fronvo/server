@@ -100,6 +100,7 @@ async function fetchProfilePosts({
             attachment: true,
             creationDate: true,
             likes: true,
+            gif: true,
         },
     });
 

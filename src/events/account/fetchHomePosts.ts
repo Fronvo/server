@@ -160,6 +160,7 @@ async function fetchHomePosts({
             attachment: true,
             creationDate: true,
             likes: true,
+            gif: true,
         },
     });
 
