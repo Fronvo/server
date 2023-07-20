@@ -81,6 +81,7 @@ async function fetchHomePosts({
                                 creationDate: true,
                                 profileId: true,
                                 username: true,
+                                isPRO: true,
                             },
                         })
                         .then((friendData) => {

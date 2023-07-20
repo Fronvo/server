@@ -142,6 +142,7 @@ async function fetchRoomMessages({
                                 creationDate: true,
                                 profileId: true,
                                 username: true,
+                                isPRO: true,
                             },
                         })
                         .then((data) => {

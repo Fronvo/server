@@ -113,6 +113,7 @@ async function fetchConvos({
                                                         banner: true,
                                                         bio: true,
                                                         creationDate: true,
+                                                        isPRO: true,
                                                     },
                                                 }
                                             )),
