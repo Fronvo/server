@@ -41,7 +41,8 @@ async function createRoom({
         return generateError('UNKNOWN');
     }
 
-    if (totalRooms > 5) {
+    // Free limit: < 5 rooms, PRO limit: < 20 rooms
+    if (totalRooms >= (account.isPRO ? 20 : 5)) {
         return generateError('OVER_LIMIT');
     }
 

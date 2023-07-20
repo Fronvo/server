@@ -104,6 +104,7 @@ async function register({
                         ),
                         username,
                         friends: [],
+                        isPRO: false,
                     },
                 });
 

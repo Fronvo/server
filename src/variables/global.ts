@@ -52,9 +52,15 @@ export let emailUsername = getEnv('EMAIL_USERNAME');
 export let emailPassword = getEnv('EMAIL_PASSWORD');
 
 // ImageKit
+// PRO plan
 export let imagekitEndpoint = getEnv('IMAGEKIT_ENDPOINT');
 export let imagekitPublic = getEnv('IMAGEKIT_PUBLIC');
 export let imagekitPrivate = getEnv('IMAGEKIT_PRIVATE');
+
+// FREE PLAN
+export let imagekitFreeEndpoint = getEnv('IMAGEKIT2_ENDPOINT');
+export let imagekitFreePublic = getEnv('IMAGEKIT2_PUBLIC');
+export let imagekitFreePrivate = getEnv('IMAGEKIT2_PRIVATE');
 
 // Tenor
 export let tenorKey = getEnv('TENOR_KEY');

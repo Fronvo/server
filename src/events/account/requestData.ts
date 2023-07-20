@@ -13,6 +13,9 @@ import { generateError, getSocketAccountId, sendEmail } from 'utilities/global';
 import { v4 } from 'uuid';
 import {
     imagekitEndpoint,
+    imagekitFreeEndpoint,
+    imagekitFreePrivate,
+    imagekitFreePublic,
     imagekitPrivate,
     imagekitPublic,
     prismaClient,
@@ -33,6 +36,7 @@ async function requestData({
         select: {
             email: true,
             dataSentTime: true,
+            isPRO: true,
         },
     });
 
@@ -51,9 +55,9 @@ async function requestData({
     });
 
     const imagekit = new ImageKit({
-        urlEndpoint: imagekitEndpoint,
-        publicKey: imagekitPublic,
-        privateKey: imagekitPrivate,
+        urlEndpoint: account.isPRO ? imagekitEndpoint : imagekitFreeEndpoint,
+        publicKey: account.isPRO ? imagekitPublic : imagekitFreePublic,
+        privateKey: account.isPRO ? imagekitPrivate : imagekitFreePrivate,
     });
 
     const res = await imagekit.upload({

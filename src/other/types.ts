@@ -31,16 +31,20 @@ export type Errors =
     | 'NOT_OWNER'
     | 'NOT_YOURSELF'
     | 'NOT_FRIEND'
+    | 'OVER_FRIENDS_LIMIT'
     | 'FRIEND_ALREADY_SENT'
     | 'FRIEND_ALREADY_PENDING'
     | 'FRIEND_NOT_PENDING'
     | 'FRIEND_ALREADY_ACCEPTED'
     | 'NOT_HIGHER'
     | 'TOO_MUCH'
+    | 'DO_AGAIN'
     | 'OVER_LIMIT'
     | 'ALREADY_USED'
     | 'NOT_IN_BETA'
-    | 'DISABLED_IN_BETA';
+    | 'DISABLED_IN_BETA'
+    | 'PRO_REQUIRED'
+    | 'NOT_FRONVO';
 
 export type TestAssertTypes =
     | 'string'
@@ -62,4 +66,7 @@ export type EnvValues =
     | 'IMAGEKIT_ENDPOINT'
     | 'IMAGEKIT_PUBLIC'
     | 'IMAGEKIT_PRIVATE'
+    | 'IMAGEKIT2_ENDPOINT'
+    | 'IMAGEKIT2_PUBLIC'
+    | 'IMAGEKIT2_PRIVATE'
     | 'TENOR_KEY';

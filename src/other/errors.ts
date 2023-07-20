@@ -43,6 +43,7 @@ const errors: { [Error in Errors] } = {
     NOT_OWNER: 'Not the owner of this room',
     NOT_YOURSELF: "You can't do this to yourself.",
     NOT_FRIEND: 'Not your friend.',
+    OVER_FRIENDS_LIMIT: 'You have reached the friend limit.',
 
     FRIEND_ALREADY_SENT: 'This user has already sent you a friend request.',
     FRIEND_ALREADY_PENDING: 'Friend request already sent.',
@@ -51,11 +52,16 @@ const errors: { [Error in Errors] } = {
 
     NOT_HIGHER: "The '%s' must be higher than the '%s'.",
     TOO_MUCH: 'Load less than %i %s.',
+    DO_AGAIN: 'Do this again in %i %s.',
     OVER_LIMIT: "Can't do more of those.",
+
     ALREADY_USED: 'Already used in the previous %i %s.',
 
     NOT_IN_BETA: "You haven't joined the BETA account list.",
     DISABLED_IN_BETA: 'This feature is disabled while in BETA.',
+
+    PRO_REQUIRED: 'This action requires a PRO membership.',
+    NOT_FRONVO: "You aren't that guy.",
 };
 
 export default errors;

@@ -42,6 +42,14 @@ async function addFriend({
         return generateError('NOT_YOURSELF');
     }
 
+    // Free limit: < 15 friends, PRO limit: < 100 friends
+    if (
+        account.friends.length + account.pendingFriendRequests.length >=
+        (account.isPRO ? 100 : 15)
+    ) {
+        return generateError('OVER_FRIENDS_LIMIT');
+    }
+
     // Target account has already sent a friend request, inform
     if (account.pendingFriendRequests.includes(profileId)) {
         return generateError('FRIEND_ALREADY_SENT');

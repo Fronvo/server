@@ -26,6 +26,8 @@ model Account {
   friends               Json[]
   seenStates            Json?     @default("{}")
   dataSentTime          DateTime? @default(now())
+  isPRO                 Boolean?  @default(false)
+  lastPostAt            DateTime? @default(now())
 }
 
 model Post {
@@ -79,12 +81,14 @@ model Token {
 }
 
 model Theme {
-  id             String @id @default(auto()) @map("_id") @db.ObjectId
-  title          String @unique
-  description    String @default("")
-  icon           String @default("")
-  branding       String
-  brandingDarken String
+  id                  String @id @default(auto()) @map("_id") @db.ObjectId
+  title               String @unique
+  description         String
+  icon                String
+  brandingWhite       String
+  brandingDarkenWhite String
+  brandingDark        String
+  brandingDarkenDark  String
 }
 
 // what could this possibly mean!?

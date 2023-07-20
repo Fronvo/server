@@ -80,6 +80,7 @@ async function fetchProfileData({
         // profileData.email = account.email;
         profileData.pendingFriendRequests = account.pendingFriendRequests;
         profileData.friends = account.friends;
+        profileData.isPRO = account.isPRO;
     }
 
     return { profileData };

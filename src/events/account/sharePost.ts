@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { differenceInMinutes } from 'date-fns';
 import {
     SharePostResult,
     SharePostServerParams,
@@ -10,7 +11,7 @@ import {
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, getSocketAccountId } from 'utilities/global';
 import { v4 } from 'uuid';
-import { prismaClient } from 'variables/global';
+import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function sharePost({
     io,
@@ -37,6 +38,30 @@ async function sharePost({
     if (!content) content = '';
     if (!attachment) attachment = '';
     if (!gif) gif = '';
+
+    // Free limit: Post cooldown for 10 minutes, PRO limit: none
+    if (!account.isPRO) {
+        if (differenceInMinutes(new Date(), account.lastPostAt) < 10) {
+            return generateError('DO_AGAIN', undefined, [
+                10 - differenceInMinutes(new Date(), account.lastPostAt),
+                'minutes',
+            ]);
+        }
+    }
+
+    if (!account.isPRO) {
+        setTimeout(async () => {
+            await prismaClient.account.update({
+                where: {
+                    profileId: account.profileId,
+                },
+
+                data: {
+                    lastPostAt: new Date(),
+                },
+            });
+        }, batchUpdatesDelay);
+    }
 
     const createdPost = await prismaClient.post.create({
         data: {
@@ -69,7 +94,7 @@ const sharePostTemplate: EventTemplate = {
 
         attachment: {
             optional: true,
-            regex: /https:\/\/ik.imagekit.io\/fronvo\/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-4[0-9A-Za-z]{3}-[89ABab][0-9A-Za-z]{3}-[0-9A-Za-z]{12}.+/,
+            regex: /https:\/\/ik.imagekit.io\/fronvo(2)?\/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-4[0-9A-Za-z]{3}-[89ABab][0-9A-Za-z]{3}-[0-9A-Za-z]{12}.+/,
         },
 
         gif: {

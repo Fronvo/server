@@ -37,6 +37,17 @@ async function updateProfileData({
         };
     }
 
+    const account = await prismaClient.account.findFirst({
+        where: {
+            profileId: getSocketAccountId(socket.id),
+        },
+    });
+
+    // Free limit: No banner update
+    if (!account.isPRO) {
+        return generateError('PRO_REQUIRED');
+    }
+
     let profileData: Partial<Account>;
 
     try {
@@ -92,13 +103,13 @@ const updateProfileDataTemplate: EventTemplate = {
 
         avatar: {
             // Ensure https
-            regex: /https:\/\/ik.imagekit.io\/fronvo\/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-4[0-9A-Za-z]{3}-[89ABab][0-9A-Za-z]{3}-[0-9A-Za-z]{12}.+/,
+            regex: /https:\/\/ik.imagekit.io\/fronvo(2)?\/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-4[0-9A-Za-z]{3}-[89ABab][0-9A-Za-z]{3}-[0-9A-Za-z]{12}.+/,
             optional: true,
         },
 
         banner: {
             // Ensure https
-            regex: /https:\/\/ik.imagekit.io\/fronvo\/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-4[0-9A-Za-z]{3}-[89ABab][0-9A-Za-z]{3}-[0-9A-Za-z]{12}.+/,
+            regex: /https:\/\/ik.imagekit.io\/fronvo(2)?\/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-4[0-9A-Za-z]{3}-[89ABab][0-9A-Za-z]{3}-[0-9A-Za-z]{12}.+/,
             optional: true,
         },
 
