@@ -102,7 +102,7 @@ async function sendRoomMessage({
     let spotifySchemaResult = validateSchema(
         new StringSchema({
             message: {
-                regex: /^(https:\/\/open.spotify.com\/track\/[0-9a-zA-Z?=]+)$/,
+                regex: /^(https:\/\/open.spotify.com\/track\/[0-9a-zA-Z?=-_]+)$/,
             },
         }),
         { message }
@@ -113,7 +113,7 @@ async function sendRoomMessage({
         spotifySchemaResult = validateSchema(
             new StringSchema({
                 message: {
-                    regex: /^(https:\/\/open.spotify.com\/playlist\/[0-9a-zA-Z?=]+)$/,
+                    regex: /^(https:\/\/open.spotify.com\/playlist\/[0-9a-zA-Z?=-_]+)$/,
                 },
             }),
             { message }
