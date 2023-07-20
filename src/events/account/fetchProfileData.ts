@@ -72,6 +72,7 @@ async function fetchProfileData({
         online: getAccountSocketId(profileId) != '',
         status: showStatus ? account.status : '',
         totalPosts,
+        isPRO: account.isPRO,
     };
 
     // More data if our profile
@@ -80,7 +81,6 @@ async function fetchProfileData({
         // profileData.email = account.email;
         profileData.pendingFriendRequests = account.pendingFriendRequests;
         profileData.friends = account.friends;
-        profileData.isPRO = account.isPRO;
     }
 
     return { profileData };
