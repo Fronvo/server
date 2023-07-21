@@ -9,7 +9,8 @@ import utilities from 'utilities/all';
 import * as variables from 'variables/global';
 import { prismaClient } from 'variables/global';
 import { StringSchema } from '@ezier/validate';
-import { emailSchema, passwordSchema } from 'events/shared';
+import { emailSchema, passwordSchema, profileIdSchema } from 'events/shared';
+import { validateSchema } from 'utilities/global';
 
 async function register({
     io,
@@ -53,7 +54,7 @@ async function register({
     ]);
 
     // Attach registerVerify now, will be detached after verification / discarded
-    socket.on('registerVerify', async ({ code, identifier }, callback) => {
+    socket.on('registerVerify', async ({ code, profileId }, callback) => {
         let finalError: FronvoError;
         let token: string;
 
@@ -76,9 +77,18 @@ async function register({
 
             const account2 = await prismaClient.account.findFirst({
                 where: {
-                    profileId: identifier,
+                    profileId: profileId,
                 },
             });
+
+            const profileSchemaCheck = validateSchema(
+                new StringSchema(profileIdSchema),
+                { profileId }
+            );
+
+            if (profileSchemaCheck) {
+                prematureFinalError = profileSchemaCheck;
+            }
 
             if (account2) {
                 prematureFinalError = utilities.generateError('ID_TAKEN');
@@ -96,7 +106,7 @@ async function register({
 
                 await prismaClient.account.create({
                     data: {
-                        profileId: identifier,
+                        profileId,
                         email,
                         password: bcrypt.hashSync(
                             password,
@@ -108,14 +118,14 @@ async function register({
                     },
                 });
 
-                token = await utilities.getToken(identifier);
+                token = await utilities.getToken(profileId);
 
                 utilities.sendEmail(email, 'Welcome to Fronvo!', [
                     "We're so glad to have you on our platform!",
                     'Enjoy your stay on the safest social media!',
                 ]);
 
-                utilities.loginSocket(io, socket, identifier);
+                utilities.loginSocket(io, socket, profileId);
 
                 callback({
                     // May be undefined if not in setup

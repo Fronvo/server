@@ -6,7 +6,7 @@ import { FronvoError, EventArguments } from 'interfaces/all';
 
 export interface RegisterVerifyParams {
     code: string;
-    identifier: string;
+    profileId: string;
 }
 
 export interface RegisterVerifyServerParams
