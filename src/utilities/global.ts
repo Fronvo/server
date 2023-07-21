@@ -438,10 +438,10 @@ export function validateSchema(
             case 'STRING_INVALID_TYPE':
                 switch (result.extras.type) {
                     case 'email':
-                        return generateError('REQUIRED', extras);
+                        return generateError('REQUIRED', extras, [key]);
 
                     case 'uuid':
-                        return generateError('REQUIRED', extras);
+                        return generateError('REQUIRED', extras, [key]);
 
                     default:
                         return generateError('UNKNOWN');
