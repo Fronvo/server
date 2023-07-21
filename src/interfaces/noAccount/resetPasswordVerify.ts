@@ -6,6 +6,7 @@ import { FronvoError, EventArguments } from 'interfaces/all';
 
 export interface ResetPasswordVerifyParams {
     code: string;
+    password: string;
 }
 
 export interface ResetPasswordVerifyServerParams

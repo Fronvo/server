@@ -9,8 +9,17 @@ import utilities from 'utilities/all';
 import * as variables from 'variables/global';
 import { prismaClient } from 'variables/global';
 import { StringSchema } from '@ezier/validate';
-import { emailSchema, passwordSchema, profileIdSchema } from 'events/shared';
+import {
+    codeSchema,
+    emailSchema,
+    passwordSchema,
+    profileIdSchema,
+} from 'events/shared';
 import { validateSchema } from 'utilities/global';
+import {
+    RegisterVerifyParams,
+    RegisterVerifyTestResult,
+} from 'interfaces/noAccount/registerVerify';
 
 async function register({
     io,
@@ -54,15 +63,41 @@ async function register({
     ]);
 
     // Attach registerVerify now, will be detached after verification / discarded
-    socket.on('registerVerify', async ({ code, profileId }, callback) => {
-        let finalError: FronvoError;
-        let token: string;
+    socket.on(
+        'registerVerify',
+        async (
+            { code, profileId }: RegisterVerifyParams,
+            callback: ({}: RegisterVerifyTestResult) => void
+        ) => {
+            const codeSchemaCheck = validateSchema(
+                new StringSchema(codeSchema),
+                {
+                    code,
+                }
+            );
 
-        if (code != sentCode) {
-            finalError = utilities.generateError('INVALID', ['code']);
-        } else {
-            // Double-check if someone else registered this during verification
-            let prematureFinalError: FronvoError;
+            if (codeSchemaCheck) {
+                reportError(codeSchemaCheck, callback);
+                return;
+            }
+
+            if (code != sentCode) {
+                reportError(
+                    utilities.generateError('INVALID', undefined, ['code']),
+                    callback
+                );
+                return;
+            }
+
+            const profileSchemaCheck = validateSchema(
+                new StringSchema(profileIdSchema),
+                { profileId }
+            );
+
+            if (profileSchemaCheck) {
+                reportError(profileSchemaCheck, callback);
+                return;
+            }
 
             // Check for email and identifier
             const account = await prismaClient.account.findFirst({
@@ -72,7 +107,8 @@ async function register({
             });
 
             if (account) {
-                prematureFinalError = utilities.generateError('EMAIL_TAKEN');
+                reportError(utilities.generateError('EMAIL_TAKEN'), callback);
+                return;
             }
 
             const account2 = await prismaClient.account.findFirst({
@@ -81,60 +117,56 @@ async function register({
                 },
             });
 
-            const profileSchemaCheck = validateSchema(
-                new StringSchema(profileIdSchema),
-                { profileId }
-            );
-
-            if (profileSchemaCheck) {
-                prematureFinalError = profileSchemaCheck;
-            }
-
             if (account2) {
-                prematureFinalError = utilities.generateError('ID_TAKEN');
+                reportError(utilities.generateError('ID_TAKEN'), callback);
+                return;
             }
 
-            if (prematureFinalError) {
-                finalError = prematureFinalError;
-            } else {
-                // Detach listener
-                socket.removeAllListeners('registerVerify');
+            // Detach listener
+            socket.removeAllListeners('registerVerify');
 
-                const username = `Fronvo user ${
-                    (await prismaClient.account.count()) + 1
-                }`;
+            const username = `Fronvo user ${
+                (await prismaClient.account.count()) + 1
+            }`;
 
-                await prismaClient.account.create({
-                    data: {
-                        profileId,
-                        email,
-                        password: bcrypt.hashSync(
-                            password,
-                            variables.mainBcryptHash
-                        ),
-                        username,
-                        friends: [],
-                        isPRO: false,
-                    },
-                });
+            await prismaClient.account.create({
+                data: {
+                    profileId,
+                    email,
+                    password: bcrypt.hashSync(
+                        password,
+                        variables.mainBcryptHash
+                    ),
+                    username,
+                    friends: [],
+                    isPRO: false,
+                },
+            });
 
-                token = await utilities.getToken(profileId);
+            const token = await utilities.getToken(profileId);
 
-                utilities.sendEmail(email, 'Welcome to Fronvo!', [
-                    "We're so glad to have you on our platform!",
-                    'Enjoy your stay on the safest social media!',
-                ]);
+            utilities.sendEmail(email, 'Welcome to Fronvo!', [
+                "We're so glad to have you on our platform!",
+                'Enjoy your stay on the safest social media!',
+            ]);
 
-                utilities.loginSocket(io, socket, profileId);
+            utilities.loginSocket(io, socket, profileId);
 
-                callback({
-                    // May be undefined if not in setup
-                    token,
-                    err: finalError ? { ...finalError.err } : undefined,
-                });
-            }
+            callback({ token, err: undefined });
         }
-    });
+    );
+
+    function reportError(
+        err: FronvoError,
+        callback: ({}: RegisterVerifyTestResult) => any
+    ) {
+        if (!err) return;
+
+        callback({
+            err: { ...err.err },
+            token: undefined,
+        });
+    }
 
     return {};
 }

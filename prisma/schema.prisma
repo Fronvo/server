@@ -21,13 +21,13 @@ model Account {
   banner                String    @default("")
   creationDate          DateTime  @default(now())
   status                String    @default("")
-  statusUpdatedTime     DateTime? @default(now())
+  statusUpdatedTime     DateTime?
   pendingFriendRequests Json[]
   friends               Json[]
   seenStates            Json?     @default("{}")
-  dataSentTime          DateTime? @default(now())
+  dataSentTime          DateTime?
   isPRO                 Boolean?  @default(false)
-  lastPostAt            DateTime? @default(now())
+  lastPostAt            DateTime?
 }
 
 model Post {

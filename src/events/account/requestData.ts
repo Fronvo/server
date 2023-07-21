@@ -2,7 +2,7 @@
 // The requestData account event file.
 // ******************** //
 
-import { differenceInMonths } from 'date-fns';
+import { differenceInDays, differenceInMonths } from 'date-fns';
 import ImageKit from 'imagekit';
 import {
     RequestDataResult,
@@ -41,7 +41,10 @@ async function requestData({
     });
 
     if (differenceInMonths(new Date(), new Date(account.dataSentTime)) < 1) {
-        return generateError('ALREADY_USED', undefined, [30, 'days']);
+        return generateError('DO_AGAIN', undefined, [
+            30 - differenceInDays(new Date(), new Date(account.dataSentTime)),
+            'days',
+        ]);
     }
 
     await prismaClient.account.update({

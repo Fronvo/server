@@ -309,8 +309,6 @@ async function deleteAccount({
                     for (const likeIndex in likesToDelete) {
                         const post = likesToDelete[likeIndex];
 
-                        console.log(likeIndex);
-
                         const newLikes = post.likes;
                         newLikes.splice(newLikes.indexOf(account.profileId), 1);
 
@@ -330,8 +328,6 @@ async function deleteAccount({
                             .then(() => {
                                 deletedLikes += 1;
 
-                                console.log(deletedLikes, likesToDelete.length);
-
                                 if (deletedLikes == likesToDelete.length) {
                                     resolve();
                                 }
@@ -349,7 +345,6 @@ async function deleteAccount({
     }
 
     sendEmail(account.email, 'Goodbye and farewell!', [
-        'What a journey that was..!',
         'Thank you for choosing Fronvo!',
         'Good luck in your future endeavours.',
     ]);

@@ -27,10 +27,7 @@ import {
     RegisterVerifyParams,
     RegisterVerifyTestResult,
 } from 'interfaces/noAccount/registerVerify';
-import {
-    ResetPasswordFinalParams,
-    ResetPasswordFinalTestResult,
-} from 'interfaces/noAccount/resetPasswordFinal';
+
 import {
     ResetPasswordVerifyParams,
     ResetPasswordVerifyTestResult,
@@ -45,11 +42,6 @@ export interface ServerToClientEvents {
     resetPasswordVerify: (
         {}: ResetPasswordVerifyParams,
         callback?: ({}: ResetPasswordVerifyTestResult) => void
-    ) => void;
-
-    resetPasswordFinal: (
-        {}: ResetPasswordFinalParams,
-        callback?: ({}: ResetPasswordFinalTestResult) => void
     ) => void;
 
     newRoomMessage: ({}: NewRoomMessageParams) => void;

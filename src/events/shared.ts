@@ -114,3 +114,15 @@ export const postIdSchema: {
         type: 'uuid',
     },
 };
+
+// Verification codes
+export const code: EzierValidatorStringSchema = {
+    length: 6,
+    regex: /^[0-9]+$/,
+};
+
+export const codeSchema: {
+    code: EzierValidatorStringSchema;
+} = {
+    code,
+};

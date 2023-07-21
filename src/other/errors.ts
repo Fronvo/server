@@ -55,8 +55,6 @@ const errors: { [Error in Errors] } = {
     DO_AGAIN: 'Do this again in %i %s.',
     OVER_LIMIT: "Can't do more of those.",
 
-    ALREADY_USED: 'Already used in the previous %i %s.',
-
     NOT_IN_BETA: "You haven't joined the BETA account list.",
     DISABLED_IN_BETA: 'This feature is disabled while in BETA.',
 

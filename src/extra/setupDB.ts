@@ -136,7 +136,7 @@ async function setupDB(): Promise<void> {
                 () => {
                     socket.emit(
                         'registerVerify',
-                        { code: '123456', identifier: 'fronvo' },
+                        { code: '123456', profileId: 'fronvo' },
                         () => {
                             socket.emit(
                                 'updateProfileData',

@@ -4,12 +4,14 @@
 
 import { StringSchema } from '@ezier/validate';
 import bcrypt from 'bcrypt';
-import { emailSchema } from 'events/shared';
+import { codeSchema, emailSchema, passwordSchema } from 'events/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     ResetPasswordResult,
     ResetPasswordServerParams,
+    ResetPasswordTestResult,
 } from 'interfaces/noAccount/resetPassword';
+import { ResetPasswordVerifyParams } from 'interfaces/noAccount/resetPasswordVerify';
 import utilities from 'utilities/all';
 import { generateError, revokeToken, sendEmail } from 'utilities/global';
 import * as variables from 'variables/global';
@@ -42,48 +44,43 @@ async function resetPassword({
         `Your password reset code is ${sentCode}`,
     ]);
 
-    attachCodeListener(sentCode);
+    socket.on(
+        'resetPasswordVerify',
+        async ({ code, password }: ResetPasswordVerifyParams, callback) => {
+            const codeSchemaCheck = utilities.validateSchema(
+                new StringSchema(codeSchema),
+                {
+                    code,
+                }
+            );
 
-    // Here for better readability
-    function attachCodeListener(sentCode: string): void {
-        socket.on('resetPasswordVerify', ({ code }, callback) => {
+            if (codeSchemaCheck) {
+                reportError(codeSchemaCheck, callback);
+                return;
+            }
+
+            const passwordCheck = utilities.validateSchema(
+                new StringSchema(passwordSchema),
+                {
+                    password,
+                }
+            );
+
+            if (passwordCheck) {
+                reportError(passwordCheck, callback);
+                return;
+            }
+
             if (code != sentCode) {
-                callback({
-                    err: {
-                        ...utilities.generateError('INVALID', undefined, [
-                            'code',
-                        ]).err,
-                    },
-                });
+                reportError(
+                    utilities.generateError('INVALID', undefined, ['code']),
+                    callback
+                );
                 return;
             }
 
             // Detach listener
-            socket.removeAllListeners('resetPasswordVerify');
-
-            // Attach last listener
-            attachChangeListener();
-
-            callback({ err: undefined });
-        });
-    }
-
-    function attachChangeListener(): void {
-        socket.on('resetPasswordFinal', async ({ newPassword }, callback) => {
-            const passwordCheck = utilities.validateSchema(
-                new StringSchema({
-                    newPassword: {
-                        minLength: 8,
-                        maxLength: 90,
-                    },
-                }),
-                { newPassword }
-            );
-
-            if (passwordCheck) {
-                callback({ err: { ...passwordCheck.err } });
-                return;
-            }
+            socket.removeAllListeners('resetPasswordFinal');
 
             await prismaClient.account.update({
                 where: {
@@ -91,7 +88,7 @@ async function resetPassword({
                 },
                 data: {
                     password: bcrypt.hashSync(
-                        newPassword,
+                        password,
                         variables.mainBcryptHash
                     ),
                 },
@@ -106,10 +103,18 @@ async function resetPassword({
                 'You may need to re-login to your account on all associated devices',
             ]);
 
-            // Detach listener
-            socket.removeAllListeners('resetPasswordFinal');
-
             callback({ err: undefined });
+        }
+    );
+
+    function reportError(
+        err: FronvoError,
+        callback: ({}: ResetPasswordTestResult) => any
+    ) {
+        if (!err) return;
+
+        callback({
+            err: { ...err.err },
         });
     }
 

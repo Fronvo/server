@@ -40,7 +40,6 @@ export type Errors =
     | 'TOO_MUCH'
     | 'DO_AGAIN'
     | 'OVER_LIMIT'
-    | 'ALREADY_USED'
     | 'NOT_IN_BETA'
     | 'DISABLED_IN_BETA'
     | 'PRO_REQUIRED'
