@@ -44,7 +44,7 @@ async function updateProfileData({
     });
 
     // Free limit: No banner update
-    if (!account.isPRO) {
+    if (!account.isPRO && banner) {
         return generateError('PRO_REQUIRED');
     }
 
