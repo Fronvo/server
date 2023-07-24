@@ -8,13 +8,18 @@ import {
     LoginTokenResult,
     LoginTokenServerParams,
 } from 'interfaces/noAccount/loginToken';
-import { generateError, loginSocket } from 'utilities/global';
-import { prismaClient } from 'variables/global';
+import {
+    generateError,
+    getSocketAccountId,
+    loginSocket,
+} from 'utilities/global';
+import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function loginToken({
     io,
     socket,
     token,
+    fcm,
 }: LoginTokenServerParams): Promise<LoginTokenResult | FronvoError> {
     const tokenItem = await prismaClient.token.findFirst({
         where: {
@@ -26,17 +31,39 @@ async function loginToken({
         return generateError('INVALID', undefined, ['token']);
     }
 
-    loginSocket(io, socket, tokenItem.profileId);
+    // Always provided on mobile, site we don't care
+    loginSocket(io, socket, tokenItem.profileId, fcm);
+
+    // Update account fcm key to provide notifications while socket.id is offline
+    // Only on mobile
+    if (fcm) {
+        setTimeout(async () => {
+            await prismaClient.account.update({
+                where: {
+                    profileId: getSocketAccountId(socket.id),
+                },
+
+                data: {
+                    fcm,
+                },
+            });
+        }, batchUpdatesDelay);
+    }
 
     return {};
 }
 
 const loginTokenTemplate: EventTemplate = {
     func: loginToken,
-    template: ['token'],
+    template: ['token', 'fcm'],
     schema: new StringSchema({
         token: {
             type: 'uuid',
+        },
+
+        fcm: {
+            minLength: 64,
+            optional: true,
         },
     }),
 };

@@ -12,6 +12,9 @@ import { PrismaClient } from '@prisma/client';
 import { LoggedInSocket } from 'interfaces/all';
 import { getEnv, getEnvBoolean } from './varUtils';
 
+// Firebase
+import admin from 'firebase-admin';
+
 // Generic variables
 const generatedFilesDirectory = resolve(__dirname, '../../generated');
 
@@ -45,6 +48,19 @@ export const prismaClient = new PrismaClient({
             url: getEnv('PRISMA_URL'),
         },
     },
+});
+
+// Firebase, filled in server.ts
+const firebaseCredentials = JSON.parse(getEnv('FIREBASE_CREDENTIALS'));
+
+export let firebase = admin.initializeApp({
+    projectId: firebaseCredentials.project_id,
+
+    credential: admin.credential.cert({
+        clientEmail: firebaseCredentials.client_email,
+        privateKey: firebaseCredentials.private_key,
+        projectId: firebaseCredentials.project_id,
+    }),
 });
 
 // Email-related

@@ -185,7 +185,7 @@ async function fetchConvos({
             const convo = convos[convoIndex];
 
             if (convo.isDM) {
-                if (!convo.dmHiddenFor?.includes(account.profileId)) {
+                if (!convo.dmHiddenFor?.includes(account?.profileId)) {
                     finalConvos.push(convo);
                 }
             } else {

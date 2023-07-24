@@ -27,6 +27,7 @@ export interface FronvoError {
 export interface LoggedInSocket {
     accountId: string;
     socket: Socket;
+    fcm?: string;
 }
 
 export interface PerformanceReport {

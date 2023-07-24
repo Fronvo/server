@@ -9,7 +9,11 @@ import {
     SharePostServerParams,
 } from 'interfaces/account/sharePost';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import {
+    generateError,
+    getSocketAccountId,
+    sendMulticastFCM,
+} from 'utilities/global';
 import { v4 } from 'uuid';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
@@ -78,6 +82,14 @@ async function sharePost({
         postId: createdPost.postId,
         author: account.profileId,
     });
+
+    sendMulticastFCM(
+        account.friends as string[],
+        'New post',
+        `@${account.profileId} shared a new post`,
+        account.profileId,
+        false
+    );
 
     return {};
 }

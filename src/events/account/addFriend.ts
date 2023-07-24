@@ -11,8 +11,10 @@ import {
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     generateError,
+    getAccountFCM,
     getAccountSocketId,
     getSocketAccountId,
+    sendFCM,
 } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
@@ -86,6 +88,13 @@ async function addFriend({
     io.to(getAccountSocketId(profileId)).emit('newFriendRequest', {
         profileId: account.profileId,
     });
+
+    sendFCM(
+        [await getAccountFCM(targetAccount.profileId)],
+        'New friend request',
+        `@${account.profileId} wants to be your friend`,
+        false
+    );
 
     return {};
 }

@@ -104,13 +104,7 @@ async function fireEvent(
     callback: Function,
     eventArgs: { [key: string]: any }
 ) {
-    const t = new Date();
-
     await validateAndRun();
-
-    const t2 = new Date();
-
-    console.log(`${eventName} took ${t2.getTime() - t.getTime()}ms.`);
 
     async function validateAndRun(): Promise<void> {
         // Validate if a schema present

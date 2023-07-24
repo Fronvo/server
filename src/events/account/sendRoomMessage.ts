@@ -12,6 +12,7 @@ import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     generateError,
     getSocketAccountId,
+    sendMulticastFCM,
     validateSchema,
 } from 'utilities/global';
 import { v4 } from 'uuid';
@@ -230,8 +231,13 @@ async function sendRoomMessage({
         },
     });
 
+    // For FCM
+    let finalLastMessage: string;
+
     try {
         if (isTenor) {
+            finalLastMessage = `${account.username} sent a GIF`;
+
             // Update ordering of message lists
             await prismaClient.room.update({
                 where: {
@@ -239,7 +245,7 @@ async function sendRoomMessage({
                 },
 
                 data: {
-                    lastMessage: `${account.username} sent a GIF`,
+                    lastMessage: finalLastMessage,
                     lastMessageAt: new Date(),
                     lastMessageFrom: '',
 
@@ -250,6 +256,8 @@ async function sendRoomMessage({
                 },
             });
         } else if (isSpotify) {
+            finalLastMessage = `${account.username} shared a Spotify song`;
+
             // Update ordering of message lists
             await prismaClient.room.update({
                 where: {
@@ -257,7 +265,7 @@ async function sendRoomMessage({
                 },
 
                 data: {
-                    lastMessage: `${account.username} shared a Spotify song`,
+                    lastMessage: finalLastMessage,
                     lastMessageAt: new Date(),
                     lastMessageFrom: '',
 
@@ -285,6 +293,25 @@ async function sendRoomMessage({
                     },
                 },
             });
+        }
+
+        if (!room.isDM) {
+            sendMulticastFCM(
+                room.members as string[],
+                room.name,
+                finalLastMessage || message,
+                account.profileId,
+                true
+            );
+        } else {
+            sendMulticastFCM(
+                room.dmUsers as string[],
+                `@${account.profileId}`,
+                finalLastMessage || message,
+                account.profileId,
+                true,
+                'dm'
+            );
         }
     } catch (e) {
         return generateError('UNKNOWN');

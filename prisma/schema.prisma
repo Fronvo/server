@@ -28,6 +28,7 @@ model Account {
   dataSentTime          DateTime?
   isPRO                 Boolean?  @default(false)
   lastPostAt            DateTime?
+  fcm                   String?   @default("")
 }
 
 model Post {

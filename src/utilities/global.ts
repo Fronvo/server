@@ -3,6 +3,7 @@
 // ******************** //
 
 import { EzierValidatorError, StringSchema } from '@ezier/validate';
+import { BatchResponse } from 'firebase-admin/lib/messaging/messaging-api';
 import gmail from 'gmail-send';
 import { FronvoError, LoggedInSocket } from 'interfaces/all';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
@@ -18,9 +19,10 @@ import { prismaClient } from 'variables/global';
 export async function loginSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ClientToServerEvents, ServerToClientEvents>,
-    accountId: string
+    accountId: string,
+    fcm?: string
 ): Promise<void> {
-    variables.loggedInSockets[socket.id] = { accountId, socket };
+    variables.loggedInSockets[socket.id] = { accountId, socket, fcm };
 
     const account = await prismaClient.account.findFirst({
         where: {
@@ -157,6 +159,113 @@ export function getSocketAccountId(socketId: string): string {
 
 export function getLoggedInSockets(): { [socketId: string]: LoggedInSocket } {
     return variables.loggedInSockets;
+}
+
+export async function sendFCM(
+    fcm: string[],
+    title: string,
+    content: string,
+    groupToOne: boolean,
+    collapseSuffix?: string
+): Promise<BatchResponse> {
+    // Abort empty list
+    if (fcm.length == 0 || !fcm[0]) return;
+
+    console.log(fcm, groupToOne ? fcm.toString() : v4());
+
+    return await variables.firebase.messaging().sendEachForMulticast({
+        tokens: fcm,
+
+        notification: {
+            title,
+            body: content,
+        },
+
+        android: {
+            restrictedPackageName: 'com.fronvo',
+            notification: {
+                // If FCMs are multiple / groupToOne enabled, prefer one notification
+                // Otherwise seperate each notification with a random identifier
+
+                // Friend sharePost: multiple
+                // Friend likes: one
+
+                // Collapse suffix is a way to identify dms, likes by appending certain words like -dm, -like
+                tag: groupToOne
+                    ? `${fcm.toString()}${
+                          collapseSuffix ? '-' + collapseSuffix : ''
+                      }`
+                    : v4(),
+            },
+        },
+    });
+}
+
+export async function sendMulticastFCM(
+    members: string[],
+    title: string,
+    content: string,
+    sender: string,
+    groupToOne: boolean,
+    collapseSuffix?: string
+): Promise<string[]> {
+    const finalFCMs: string[] = [];
+
+    for (const memberIndex in members) {
+        const target = members[memberIndex];
+
+        if (target == sender) {
+            continue;
+        }
+
+        const fcm = await getAccountFCM(target);
+
+        // If an fcm exists but the account is on pc, consider ignoring fcm
+        if (fcm && isAccountLoggedIn(target)) {
+            // If no fcm is provided, user is from PC, ignore
+            if (!variables.loggedInSockets[getAccountSocketId(target)].fcm) {
+                continue;
+            }
+        }
+
+        if (typeof fcm != 'undefined') {
+            finalFCMs.push(fcm);
+        }
+    }
+
+    // Might still be empty, some on pc and whatnot
+    if (finalFCMs.length == 0) return;
+
+    await sendFCM(finalFCMs, title, content, groupToOne, collapseSuffix);
+
+    return finalFCMs;
+}
+
+export async function getAccountFCM(accountId: string): Promise<string> {
+    for (const socketKeyIndex in variables.loggedInSockets) {
+        const target = variables.loggedInSockets[socketKeyIndex];
+
+        if (target.accountId == accountId) {
+            // Attempt fetch if not online from mobile
+            if (target.fcm) return target.fcm;
+        }
+    }
+
+    // Try to fetch
+    const account = await prismaClient.account.findFirst({
+        where: {
+            profileId: accountId,
+        },
+
+        select: {
+            profileId: true,
+            fcm: true,
+        },
+    });
+
+    if (account.fcm) {
+        return account.fcm;
+    }
 }
 
 export function getErrorCode(errName: Errors): number {

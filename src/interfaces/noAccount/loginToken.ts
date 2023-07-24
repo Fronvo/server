@@ -6,6 +6,7 @@ import { FronvoError, EventArguments } from 'interfaces/all';
 
 export interface LoginTokenParams {
     token: string;
+    fcm?: string;
 }
 
 export interface LoginTokenServerParams

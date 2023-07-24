@@ -9,7 +9,12 @@ import {
     LikePostServerParams,
 } from 'interfaces/account/likePost';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import {
+    generateError,
+    getAccountFCM,
+    getSocketAccountId,
+    sendFCM,
+} from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function likePost({
@@ -93,6 +98,14 @@ async function likePost({
                 postId: post.postId,
                 likes: post.likes.length + 1,
             });
+
+            sendFCM(
+                [await getAccountFCM(postAuthor.profileId)],
+                'Post liked',
+                `@${account.profileId} liked one of your posts`,
+                true,
+                'like'
+            );
         }
     } catch (e) {}
 

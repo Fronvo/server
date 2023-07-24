@@ -10,7 +10,11 @@ import {
 } from 'interfaces/account/sendRoomImage';
 
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import {
+    generateError,
+    getSocketAccountId,
+    sendMulticastFCM,
+} from 'utilities/global';
 import { v4 } from 'uuid';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
@@ -104,6 +108,24 @@ async function sendRoomMessage({
                 lastMessageFrom: '',
             },
         });
+
+        if (!room.isDM) {
+            sendMulticastFCM(
+                room.members as string[],
+                room.name,
+                `${account.username} sent an image`,
+                account.profileId,
+                true
+            );
+        } else {
+            sendMulticastFCM(
+                room.dmUsers as string[],
+                `@${account.profileId}`,
+                `${account.username} sent an image`,
+                account.profileId,
+                true
+            );
+        }
     } catch (e) {
         return generateError('UNKNOWN');
     }
