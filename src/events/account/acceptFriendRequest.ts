@@ -13,6 +13,8 @@ import {
     getSocketAccountId,
     generateError,
     getAccountSocketId,
+    sendFCM,
+    getAccountFCM,
 } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
@@ -122,6 +124,13 @@ async function acceptFriendRequest({
     io.sockets.sockets
         .get(getAccountSocketId(profileId))
         ?.join(account.profileId);
+
+    sendFCM(
+        [await getAccountFCM(targetAccount.profileId)],
+        'Friend added',
+        `@${account.profileId} has accepted your friend request`,
+        false
+    );
 
     return {};
 }
