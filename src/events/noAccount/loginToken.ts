@@ -36,7 +36,7 @@ async function loginToken({
 
     // Update account fcm key to provide notifications while socket.id is offline
     // Only on mobile
-    if (fcm) {
+    if (fcm && getSocketAccountId(socket.id)) {
         setTimeout(async () => {
             await prismaClient.account.update({
                 where: {

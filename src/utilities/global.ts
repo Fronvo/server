@@ -171,8 +171,6 @@ export async function sendFCM(
     // Abort empty list
     if (fcm.length == 0 || !fcm[0]) return;
 
-    console.log(fcm, groupToOne ? fcm.toString() : v4());
-
     return await variables.firebase.messaging().sendEachForMulticast({
         tokens: fcm,
 
