@@ -34,6 +34,9 @@ import deleteAccount from 'events/account/deleteAccount';
 import sharePost from 'events/account/sharePost';
 import deletePost from 'events/account/deletePost';
 import fetchTenor from 'events/account/fetchTenor';
+import fetchThemes from 'events/account/fetchThemes';
+import applyTheme from 'events/account/applyTheme';
+import createTheme from 'events/account/createTheme';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -70,6 +73,9 @@ const accountTemplate: EventExportTemplate = {
     sharePost,
     deletePost,
     fetchTenor,
+    fetchThemes,
+    applyTheme,
+    createTheme,
 };
 
 export default accountTemplate;

@@ -28,6 +28,7 @@ const errors: { [Error in Errors] } = {
     ACCOUNT_404: 'Account not found.',
     ROOM_404: 'Room not found.',
     POST_404: 'Post not found.',
+    THEME_404: 'Theme not found.',
 
     NOT_POST_CREATOR: "You didn't create this post.",
     POST_BOTH_TYPES: 'Choose one attachment type.',
@@ -58,7 +59,7 @@ const errors: { [Error in Errors] } = {
     NOT_IN_BETA: "You haven't joined the BETA account list.",
     DISABLED_IN_BETA: 'This feature is disabled while in BETA.',
 
-    PRO_REQUIRED: 'This action requires a PRO membership.',
+    PRO_REQUIRED: "You aren't a PRO",
     NOT_FRONVO: "You aren't that guy.",
 };
 

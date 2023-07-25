@@ -81,6 +81,23 @@ async function fetchProfileData({
         // profileData.email = account.email;
         profileData.pendingFriendRequests = account.pendingFriendRequests;
         profileData.friends = account.friends;
+
+        // Unusable if unsubscribed
+        if (account.isPRO) {
+            if (account.appliedTheme) {
+                const theme = await prismaClient.theme.findFirst({
+                    where: {
+                        title: account.appliedTheme,
+                    },
+                });
+
+                profileData.appliedTheme = account.appliedTheme;
+                profileData.bW = theme.brandingWhite;
+                profileData.bDW = theme.brandingDarkenWhite;
+                profileData.bD = theme.brandingDark;
+                profileData.bDD = theme.brandingDarkenDark;
+            }
+        }
     }
 
     return { profileData };

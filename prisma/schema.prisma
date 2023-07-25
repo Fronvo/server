@@ -29,6 +29,7 @@ model Account {
   isPRO                 Boolean?  @default(false)
   lastPostAt            DateTime?
   fcm                   String?   @default("")
+  appliedTheme          String?   @default("Fronvo")
 }
 
 model Post {
@@ -84,8 +85,6 @@ model Token {
 model Theme {
   id                  String @id @default(auto()) @map("_id") @db.ObjectId
   title               String @unique
-  description         String
-  icon                String
   brandingWhite       String
   brandingDarkenWhite String
   brandingDark        String

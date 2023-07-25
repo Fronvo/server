@@ -141,6 +141,18 @@ import {
     FetchTenorParams,
     FetchTenorTestResult,
 } from 'interfaces/account/fetchTenor';
+import {
+    FetchThemesParams,
+    FetchThemesTestResult,
+} from 'interfaces/account/fetchThemes';
+import {
+    ApplyThemeParams,
+    ApplyThemeTestResult,
+} from 'interfaces/account/applyTheme';
+import {
+    CreateThemeParams,
+    CreateThemeTestResult,
+} from 'interfaces/account/createTheme';
 
 export interface ClientToServerEvents {
     register: (
@@ -170,10 +182,6 @@ export interface ClientToServerEvents {
     resetPasswordVerify: (
         {}: ResetPasswordVerifyParams,
         callback?: ({}: ResetPasswordVerifyTestResult) => void
-    ) => void;
-    resetPasswordFinal: (
-        {}: ResetPasswordFinalParams,
-        callback?: ({}: ResetPasswordFinalTestResult) => void
     ) => void;
     updateProfileData: (
         {}: UpdateProfileDataParams,
@@ -284,5 +292,17 @@ export interface ClientToServerEvents {
     fetchTenor: (
         {}: FetchTenorParams,
         callback?: ({}: FetchTenorTestResult) => void
+    ) => void;
+    fetchThemes: (
+        {}: FetchThemesParams,
+        callback?: ({}: FetchThemesTestResult) => void
+    ) => void;
+    applyTheme: (
+        {}: ApplyThemeParams,
+        callback?: ({}: ApplyThemeTestResult) => void
+    ) => void;
+    createTheme: (
+        {}: CreateThemeParams,
+        callback?: ({}: CreateThemeTestResult) => void
     ) => void;
 }

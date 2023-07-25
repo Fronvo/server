@@ -17,6 +17,10 @@ export interface FetchedFronvoAccount extends Partial<Account> {
     isSelf: boolean;
     online: boolean;
     totalPosts: number;
+    bW?: string;
+    bDW?: string;
+    bD?: string;
+    bDD?: string;
 }
 
 export interface FetchProfileDataResult {
