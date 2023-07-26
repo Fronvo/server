@@ -91,11 +91,14 @@ async function fetchProfileData({
                     },
                 });
 
-                profileData.appliedTheme = account.appliedTheme;
-                profileData.bW = theme.brandingWhite;
-                profileData.bDW = theme.brandingDarkenWhite;
-                profileData.bD = theme.brandingDark;
-                profileData.bDD = theme.brandingDarkenDark;
+                // Might have changed title
+                if (theme) {
+                    profileData.appliedTheme = account.appliedTheme;
+                    profileData.bW = theme.brandingWhite;
+                    profileData.bDW = theme.brandingDarkenWhite;
+                    profileData.bD = theme.brandingDark;
+                    profileData.bDD = theme.brandingDarkenDark;
+                }
             }
         }
     }
