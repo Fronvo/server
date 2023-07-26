@@ -40,6 +40,7 @@ import createTheme from 'events/account/createTheme';
 import applyPro from 'events/account/applyPro';
 import refundPro from 'events/account/refundPro';
 import fetchPROCH from 'events/account/fetchPROCH';
+import fetchLatestVersion from 'events/account/fetchLatestVersion';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -82,6 +83,7 @@ const accountTemplate: EventExportTemplate = {
     applyPro,
     refundPro,
     fetchPROCH,
+    fetchLatestVersion,
 };
 
 export default accountTemplate;

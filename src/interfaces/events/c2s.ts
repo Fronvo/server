@@ -165,6 +165,10 @@ import {
     FetchPROCHParams,
     FetchPROCHTestResult,
 } from 'interfaces/account/fetchPROCH';
+import {
+    FetchLatestVersionParams,
+    FetchLatestVersionTestResult,
+} from 'interfaces/account/fetchLatestVersion';
 
 export interface ClientToServerEvents {
     register: (
@@ -328,5 +332,9 @@ export interface ClientToServerEvents {
     fetchPROCH: (
         {}: FetchPROCHParams,
         callback?: ({}: FetchPROCHTestResult) => void
+    ) => void;
+    fetchLatestVersion: (
+        {}: FetchLatestVersionParams,
+        callback?: ({}: FetchLatestVersionTestResult) => void
     ) => void;
 }

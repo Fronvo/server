@@ -19,6 +19,8 @@ import admin from 'firebase-admin';
 const generatedFilesDirectory = resolve(__dirname, '../../generated');
 
 // Reusable variables
+export const serverVersion = getEnv('VERSION');
+
 export const blacklistedEmailDomainsEnabled = getEnvBoolean(
     'EMAIL_BLACKLISTING_ENABLED',
     true

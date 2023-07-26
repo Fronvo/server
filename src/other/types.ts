@@ -72,4 +72,5 @@ export type EnvValues =
     | 'TENOR_KEY'
     | 'FIREBASE_CREDENTIALS'
     | 'FIREBASE_PROJECT_ID'
-    | 'PRO_SECRET';
+    | 'PRO_SECRET'
+    | 'VERSION';
