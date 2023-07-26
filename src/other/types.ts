@@ -71,4 +71,5 @@ export type EnvValues =
     | 'IMAGEKIT2_PRIVATE'
     | 'TENOR_KEY'
     | 'FIREBASE_CREDENTIALS'
-    | 'FIREBASE_PROJECT_ID';
+    | 'FIREBASE_PROJECT_ID'
+    | 'PRO_SECRET';

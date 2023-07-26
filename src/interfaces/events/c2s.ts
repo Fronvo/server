@@ -153,6 +153,18 @@ import {
     CreateThemeParams,
     CreateThemeTestResult,
 } from 'interfaces/account/createTheme';
+import {
+    ApplyProParams,
+    ApplyProTestResult,
+} from 'interfaces/account/applyPro';
+import {
+    RefundProParams,
+    RefundProTestResult,
+} from 'interfaces/account/refundPro';
+import {
+    FetchPROCHParams,
+    FetchPROCHTestResult,
+} from 'interfaces/account/fetchPROCH';
 
 export interface ClientToServerEvents {
     register: (
@@ -304,5 +316,17 @@ export interface ClientToServerEvents {
     createTheme: (
         {}: CreateThemeParams,
         callback?: ({}: CreateThemeTestResult) => void
+    ) => void;
+    applyPro: (
+        {}: ApplyProParams,
+        callback?: ({}: ApplyProTestResult) => void
+    ) => void;
+    refundPro: (
+        {}: RefundProParams,
+        callback?: ({}: RefundProTestResult) => void
+    ) => void;
+    fetchPROCH: (
+        {}: FetchPROCHParams,
+        callback?: ({}: FetchPROCHTestResult) => void
     ) => void;
 }

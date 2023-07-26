@@ -37,6 +37,9 @@ import fetchTenor from 'events/account/fetchTenor';
 import fetchThemes from 'events/account/fetchThemes';
 import applyTheme from 'events/account/applyTheme';
 import createTheme from 'events/account/createTheme';
+import applyPro from 'events/account/applyPro';
+import refundPro from 'events/account/refundPro';
+import fetchPROCH from 'events/account/fetchPROCH';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -76,6 +79,9 @@ const accountTemplate: EventExportTemplate = {
     fetchThemes,
     applyTheme,
     createTheme,
+    applyPro,
+    refundPro,
+    fetchPROCH,
 };
 
 export default accountTemplate;

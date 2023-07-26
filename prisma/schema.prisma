@@ -27,6 +27,7 @@ model Account {
   seenStates            Json?     @default("{}")
   dataSentTime          DateTime?
   isPRO                 Boolean?  @default(false)
+  proCH                 String?
   lastPostAt            DateTime?
   fcm                   String?   @default("")
   appliedTheme          String?   @default("Fronvo")
