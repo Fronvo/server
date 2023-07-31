@@ -9,27 +9,17 @@ import {
     SharePostServerParams,
 } from 'interfaces/account/sharePost';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    generateError,
-    getSocketAccountId,
-    sendMulticastFCM,
-} from 'utilities/global';
+import { generateError, sendMulticastFCM } from 'utilities/global';
 import { v4 } from 'uuid';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function sharePost({
     io,
-    socket,
+    account,
     content,
     attachment,
     gif,
 }: SharePostServerParams): Promise<SharePostResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     // Must have content if not an attachment inside
     if (!gif && !attachment && !content) {
         return generateError('REQUIRED', undefined, ['content']);
@@ -114,6 +104,7 @@ const sharePostTemplate: EventTemplate = {
             regex: /https:\/\/media.tenor.com\/[a-zA-Z0-9_-]{16}\/[a-zA-Z0-9-_]+.gif/,
         },
     }),
+    fetchAccount: true,
 };
 
 export default sharePostTemplate;

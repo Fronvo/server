@@ -12,11 +12,12 @@ import {
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { FetchedFronvoPost } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchHomePosts({
     socket,
+    account,
     from,
     to,
 }: FetchHomePostsServerParams): Promise<FetchHomePostsResult | FronvoError> {
@@ -36,12 +37,6 @@ async function fetchHomePosts({
             'posts',
         ]);
     }
-
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
 
     // Gather available account data (not private, or followed back)
     const postAccounts = [];
@@ -191,6 +186,7 @@ const fetchHomePostsTemplate: EventTemplate = {
     schema: new StringSchema({
         ...fromToSchema,
     }),
+    fetchAccount: true,
 };
 
 export default fetchHomePostsTemplate;

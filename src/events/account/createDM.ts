@@ -9,25 +9,16 @@ import {
     CreateDMServerParams,
 } from 'interfaces/account/createDM';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    generateError,
-    getAccountSocketId,
-    getSocketAccountId,
-} from 'utilities/global';
+import { generateError, getAccountSocketId } from 'utilities/global';
 import { v4 } from 'uuid';
 import { prismaClient } from 'variables/global';
 
 async function createDM({
     io,
     socket,
+    account,
     profileId,
 }: CreateDMServerParams): Promise<CreateDMResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const targetAccount = await prismaClient.account.findFirst({
         where: {
             profileId,
@@ -127,6 +118,7 @@ const createDMTemplate: EventTemplate = {
     schema: new StringSchema({
         ...profileIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default createDMTemplate;

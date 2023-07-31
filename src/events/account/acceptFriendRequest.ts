@@ -10,7 +10,6 @@ import {
 } from 'interfaces/account/acceptFriendRequest';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
-    getSocketAccountId,
     generateError,
     getAccountSocketId,
     sendFCM,
@@ -22,15 +21,10 @@ async function acceptFriendRequest({
     io,
     socket,
     profileId,
+    account,
 }: AcceptFriendRequestServerParams): Promise<
     AcceptFriendRequestResult | FronvoError
 > {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const targetAccount = await prismaClient.account.findFirst({
         where: {
             profileId,
@@ -141,6 +135,7 @@ const acceptFriendRequestTemplate: EventTemplate = {
     schema: new StringSchema({
         ...profileIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default acceptFriendRequestTemplate;

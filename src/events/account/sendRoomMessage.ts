@@ -20,26 +20,11 @@ import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function sendRoomMessage({
     io,
-    socket,
+    account,
     roomId,
     message,
     replyId,
 }: SendRoomMessageServerParams): Promise<SendRoomMessageResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-
-        select: {
-            avatar: true,
-            banner: true,
-            bio: true,
-            creationDate: true,
-            profileId: true,
-            username: true,
-        },
-    });
-
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -377,6 +362,7 @@ const sendRoomMessageTemplate: EventTemplate = {
             type: 'uuid',
         },
     }),
+    fetchAccount: true,
 };
 
 export default sendRoomMessageTemplate;

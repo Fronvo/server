@@ -10,23 +10,18 @@ import {
     CreateRoomServerParams,
 } from 'interfaces/account/createRoom';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { v4 } from 'uuid';
 import { prismaClient } from 'variables/global';
 
 async function createRoom({
     io,
     socket,
+    account,
     name,
     icon,
 }: CreateRoomServerParams): Promise<CreateRoomResult | FronvoError> {
     name = name.replace(/\n/g, '');
-
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
 
     // Limit to 5 rooms max
     let totalRooms: number;
@@ -92,6 +87,7 @@ const createRoomTemplate: EventTemplate = {
         ...roomNameSchema,
         ...roomIconSchema,
     }),
+    fetchAccount: true,
 };
 
 export default createRoomTemplate;

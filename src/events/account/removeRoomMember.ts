@@ -9,25 +9,15 @@ import {
     AddRoomMemberServerParams,
 } from 'interfaces/account/addRoomMember';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    generateError,
-    getAccountSocketId,
-    getSocketAccountId,
-} from 'utilities/global';
+import { generateError, getAccountSocketId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function removeRoomMember({
     io,
-    socket,
+    account,
     roomId,
     profileId,
 }: AddRoomMemberServerParams): Promise<AddRoomMemberResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -129,6 +119,7 @@ const removeRoomMemberTemplate: EventTemplate = {
         ...profileIdSchema,
         ...roomIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default removeRoomMemberTemplate;

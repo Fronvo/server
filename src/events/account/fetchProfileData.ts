@@ -11,40 +11,38 @@ import {
     FetchProfileDataServerParams,
 } from 'interfaces/account/fetchProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    generateError,
-    getAccountSocketId,
-    getSocketAccountId,
-} from 'utilities/global';
+import { generateError, getAccountSocketId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchProfileData({
-    socket,
     profileId,
+    account,
 }: FetchProfileDataServerParams): Promise<
     FetchProfileDataResult | FronvoError
 > {
-    const account = await prismaClient.account.findFirst({
+    const targetAccount = await prismaClient.account.findFirst({
         where: {
             profileId,
         },
     });
 
-    if (!account) {
-        return generateError('INVALID', undefined, ['profile ID']);
+    if (!targetAccount) {
+        return generateError('ACCOUNT_404');
     }
 
-    const isSelf = getSocketAccountId(socket.id) == profileId;
-    const isFriend = account.friends.includes(getSocketAccountId(socket.id));
+    const isSelf = account.profileId == profileId;
+    const isFriend = account.friends.includes(targetAccount.profileId);
     const isAccessible = isSelf || isFriend;
 
     // ignore given status if set >24 hours
     let showStatus = false;
 
-    if (account.statusUpdatedTime) {
+    if (targetAccount.statusUpdatedTime) {
         if (
-            differenceInHours(new Date(), new Date(account.statusUpdatedTime)) <
-            24
+            differenceInHours(
+                new Date(),
+                new Date(targetAccount.statusUpdatedTime)
+            ) < 24
         ) {
             showStatus = true;
         }
@@ -63,37 +61,37 @@ async function fetchProfileData({
     // Block access to most info if private
     const profileData: FetchedFronvoAccount = {
         isSelf,
-        profileId: account.profileId,
-        username: account.username,
-        bio: account.bio,
-        creationDate: account.creationDate || new Date(),
-        avatar: account.avatar,
-        banner: account.banner,
+        profileId: targetAccount.profileId,
+        username: targetAccount.username,
+        bio: targetAccount.bio,
+        creationDate: targetAccount.creationDate || new Date(),
+        avatar: targetAccount.avatar,
+        banner: targetAccount.banner,
         online: getAccountSocketId(profileId) != '',
-        status: showStatus ? account.status : '',
+        status: showStatus ? targetAccount.status : '',
         totalPosts,
-        isPRO: account.isPRO,
+        isPRO: targetAccount.isPRO,
     };
 
     // More data if our profile
     if (profileData.isSelf) {
         // Unused
         // profileData.email = account.email;
-        profileData.pendingFriendRequests = account.pendingFriendRequests;
+        profileData.pendingFriendRequests = targetAccount.pendingFriendRequests;
         profileData.friends = account.friends;
 
         // Unusable if unsubscribed
-        if (account.isPRO) {
-            if (account.appliedTheme) {
+        if (targetAccount.isPRO) {
+            if (targetAccount.appliedTheme) {
                 const theme = await prismaClient.theme.findFirst({
                     where: {
-                        title: account.appliedTheme,
+                        title: targetAccount.appliedTheme,
                     },
                 });
 
                 // Might have changed title
                 if (theme) {
-                    profileData.appliedTheme = account.appliedTheme;
+                    profileData.appliedTheme = targetAccount.appliedTheme;
                     profileData.bW = theme.brandingWhite;
                     profileData.bDW = theme.brandingDarkenWhite;
                     profileData.bD = theme.brandingDark;
@@ -112,6 +110,7 @@ const fetchProfileDataTemplate: EventTemplate = {
     schema: new StringSchema({
         ...profileIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default fetchProfileDataTemplate;

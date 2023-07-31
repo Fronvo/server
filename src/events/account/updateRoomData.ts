@@ -14,12 +14,12 @@ import {
     UpdateRoomDataServerParams,
 } from 'interfaces/account/updateRoomData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function updateRoomData({
     io,
-    socket,
+    account,
     roomId,
     name,
     icon,
@@ -36,12 +36,6 @@ async function updateRoomData({
     }
 
     // Check if we are in the room, not necessary to be the owner
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     if (!room.members.includes(account.profileId)) {
         return generateError('NOT_IN_ROOM');
     }
@@ -91,6 +85,7 @@ const updateRoomDataTemplate: EventTemplate = {
         ...roomNameOptionalSchema,
         ...roomIconSchema,
     }),
+    fetchAccount: true,
 };
 
 export default updateRoomDataTemplate;

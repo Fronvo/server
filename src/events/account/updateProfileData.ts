@@ -9,12 +9,12 @@ import {
     UpdateProfileDataServerParams,
 } from 'interfaces/account/updateProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function updateProfileData({
     io,
-    socket,
+    account,
     username,
     bio,
     avatar,
@@ -37,12 +37,6 @@ async function updateProfileData({
         };
     }
 
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     // Free limit: No banner update
     if (!account.isPRO && banner) {
         return generateError('PRO_REQUIRED');
@@ -60,7 +54,7 @@ async function updateProfileData({
             },
 
             where: {
-                profileId: getSocketAccountId(socket.id),
+                profileId: account.profileId,
             },
 
             select: {
@@ -75,8 +69,8 @@ async function updateProfileData({
         return generateError('UNKNOWN');
     }
 
-    io.to(getSocketAccountId(socket.id)).emit('profileDataUpdated', {
-        profileId: getSocketAccountId(socket.id),
+    io.to(account.profileId).emit('profileDataUpdated', {
+        profileId: account.profileId,
         username: username ? username : profileData.username,
         bio: bio ? bio : profileData.bio,
         avatar: avatar ? avatar : profileData.avatar,
@@ -117,6 +111,7 @@ const updateProfileDataTemplate: EventTemplate = {
             optional: true,
         },
     }),
+    fetchAccount: true,
 };
 
 export default updateProfileDataTemplate;

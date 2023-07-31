@@ -9,20 +9,15 @@ import {
     LeaveRoomServerParams,
 } from 'interfaces/account/leaveRoom';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function leaveRoom({
     io,
     socket,
+    account,
     roomId,
 }: LeaveRoomServerParams): Promise<LeaveRoomResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -118,6 +113,7 @@ const leaveroomTemplate: EventTemplate = {
     schema: new StringSchema({
         ...roomIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default leaveroomTemplate;

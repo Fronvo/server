@@ -9,20 +9,14 @@ import {
     StartTypingServerParams,
 } from 'interfaces/account/startTyping';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function startTyping({
     io,
-    socket,
+    account,
     roomId,
 }: StartTypingServerParams): Promise<StartTypingResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -54,6 +48,7 @@ const startTypingTemplate: EventTemplate = {
     schema: new StringSchema({
         ...roomIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default startTypingTemplate;

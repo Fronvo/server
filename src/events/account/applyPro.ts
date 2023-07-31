@@ -8,12 +8,12 @@ import {
     ApplyProServerParams,
 } from 'interfaces/account/applyPro';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 import { getEnv } from 'variables/varUtils';
 
 async function applyPro({
-    socket,
+    account,
     secret,
     proCH,
 }: ApplyProServerParams): Promise<ApplyProResult | FronvoError> {
@@ -21,23 +21,13 @@ async function applyPro({
         return generateError('UNKNOWN');
     }
 
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-
-        select: {
-            isPRO: true,
-        },
-    });
-
     if (account.isPRO) {
         return generateError('UNKNOWN');
     }
 
     await prismaClient.account.update({
         where: {
-            profileId: getSocketAccountId(socket.id),
+            profileId: account.profileId,
         },
 
         data: {
@@ -61,6 +51,7 @@ const applyProTemplate: EventTemplate = {
             regex: /^[a-zA-Z0-9_]+/,
         },
     }),
+    fetchAccount: true,
 };
 
 export default applyProTemplate;

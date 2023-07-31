@@ -13,22 +13,15 @@ import {
     generateError,
     getAccountFCM,
     getAccountSocketId,
-    getSocketAccountId,
     sendFCM,
 } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function addFriend({
     io,
-    socket,
+    account,
     profileId,
 }: AddFriendServerParams): Promise<AddFriendResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const targetAccount = await prismaClient.account.findFirst({
         where: {
             profileId,
@@ -105,6 +98,7 @@ const addFriendTemplate: EventTemplate = {
     schema: new StringSchema({
         ...profileIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default addFriendTemplate;

@@ -9,24 +9,15 @@ import {
     RemoveFriendServerParams,
 } from 'interfaces/account/removeFriend';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    generateError,
-    getAccountSocketId,
-    getSocketAccountId,
-} from 'utilities/global';
+import { generateError, getAccountSocketId } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function removeFriend({
     io,
     socket,
+    account,
     profileId,
 }: RemoveFriendServerParams): Promise<RemoveFriendResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const targetAccount = await prismaClient.account.findFirst({
         where: {
             profileId,
@@ -103,6 +94,7 @@ const removeFriendTemplate: EventTemplate = {
     schema: new StringSchema({
         ...profileIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default removeFriendTemplate;

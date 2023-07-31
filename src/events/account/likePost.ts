@@ -9,25 +9,14 @@ import {
     LikePostServerParams,
 } from 'interfaces/account/likePost';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    generateError,
-    getAccountFCM,
-    getSocketAccountId,
-    sendFCM,
-} from 'utilities/global';
+import { generateError, getAccountFCM, sendFCM } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function likePost({
     io,
-    socket,
+    account,
     postId,
 }: LikePostServerParams): Promise<LikePostResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     // Must exist
     const post = await prismaClient.post.findFirst({
         where: {
@@ -121,6 +110,7 @@ const likePostTemplate: EventTemplate = {
     schema: new StringSchema({
         ...postIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default likePostTemplate;

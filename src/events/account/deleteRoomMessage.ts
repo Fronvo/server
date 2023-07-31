@@ -9,23 +9,17 @@ import {
     DeleteRoomMessageServerParams,
 } from 'interfaces/account/deleteRoomMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function deleteRoomMessage({
     io,
-    socket,
+    account,
     roomId,
     messageId,
 }: DeleteRoomMessageServerParams): Promise<
     DeleteRoomMessageResult | FronvoError
 > {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -188,6 +182,7 @@ const deleteRoomMessageTemplate: EventTemplate = {
             type: 'uuid',
         },
     }),
+    fetchAccount: true,
 };
 
 export default deleteRoomMessageTemplate;

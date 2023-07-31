@@ -9,28 +9,15 @@ import {
     DeleteAccountServerParams,
 } from 'interfaces/account/deleteAccount';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId, sendEmail } from 'utilities/global';
+import { generateError, sendEmail } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 import { compareSync } from 'bcrypt';
 
 async function deleteAccount({
     io,
-    socket,
+    account,
     password,
 }: DeleteAccountServerParams): Promise<DeleteAccountResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-
-        select: {
-            email: true,
-            profileId: true,
-            password: true,
-            friends: true,
-        },
-    });
-
     if (!compareSync(password, account.password)) {
         return generateError('INVALID', undefined, ['password']);
     }
@@ -358,6 +345,7 @@ const deleteAccountTemplate: EventTemplate = {
     schema: new StringSchema({
         ...passwordSchema,
     }),
+    fetchAccount: true,
 };
 
 export default deleteAccountTemplate;

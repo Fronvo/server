@@ -8,23 +8,17 @@ import {
     CreateThemeServerParams,
 } from 'interfaces/account/createTheme';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function createTheme({
-    socket,
+    account,
     title,
     brandingWhite,
     brandingDarkenWhite,
     brandingDark,
     brandingDarkenDark,
 }: CreateThemeServerParams): Promise<CreateThemeResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     // Owner-only
     if (account.profileId != 'fronvo') {
         return generateError('NOT_FRONVO');
@@ -79,6 +73,7 @@ const createThemeTemplate: EventTemplate = {
             regex: /[0-9]/,
         },
     }),
+    fetchAccount: true,
 };
 
 export default createThemeTemplate;

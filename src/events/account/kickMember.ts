@@ -9,25 +9,15 @@ import {
     KickMemberServerParams,
 } from 'interfaces/account/kickMember';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    generateError,
-    getAccountSocketId,
-    getSocketAccountId,
-} from 'utilities/global';
+import { generateError, getAccountSocketId } from 'utilities/global';
 import { loggedInSockets, prismaClient } from 'variables/global';
 
 async function kickMember({
     io,
-    socket,
+    account,
     roomId,
     profileId,
 }: KickMemberServerParams): Promise<KickMemberResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -92,6 +82,7 @@ const kickMemberTemplate: EventTemplate = {
         ...roomIdSchema,
         ...profileIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default kickMemberTemplate;

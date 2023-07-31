@@ -3,23 +3,18 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { profileId, roomIdSchema } from 'events/shared';
+import { roomIdSchema } from 'events/shared';
 import { CloseDMResult, CloseDMServerParams } from 'interfaces/account/closeDM';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { getSocketAccountId, generateError } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function closeDM({
     io,
     socket,
+    account,
     roomId,
 }: CloseDMServerParams): Promise<CloseDMResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -74,6 +69,7 @@ const closeDMTemplate: EventTemplate = {
     schema: new StringSchema({
         ...roomIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default closeDMTemplate;

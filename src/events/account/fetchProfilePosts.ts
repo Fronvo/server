@@ -11,18 +11,19 @@ import {
     FetchedFronvoPost,
 } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchProfilePosts({
     socket,
+    account,
     profileId,
     from,
     to,
 }: FetchProfilePostsServerParams): Promise<
     FetchProfilePostsResult | FronvoError
 > {
-    const account = await prismaClient.account.findFirst({
+    const targetAccount = await prismaClient.account.findFirst({
         where: {
             profileId,
         },
@@ -38,13 +39,13 @@ async function fetchProfilePosts({
         },
     });
 
-    if (!account) {
+    if (!targetAccount) {
         return generateError('ACCOUNT_404');
     }
 
-    const isSelf = getSocketAccountId(socket.id) == profileId;
+    const isSelf = targetAccount.profileId == account.profileId;
     const isFriend =
-        !isSelf && account.friends.includes(getSocketAccountId(socket.id));
+        !isSelf && targetAccount.friends.includes(account.profileId);
     const isAccessible = isSelf || isFriend;
 
     if (!isAccessible) {
@@ -113,9 +114,9 @@ async function fetchProfilePosts({
                 ...post,
                 likes: undefined,
                 totalLikes: post.likes.length,
-                isLiked: post.likes.includes(getSocketAccountId(socket.id)),
+                isLiked: post.likes.includes(account.profileId),
             },
-            profileData: account,
+            profileData: targetAccount,
         });
 
         socket.join(post.postId);
@@ -131,6 +132,7 @@ const fetchProfilePostsTemplate: EventTemplate = {
         ...profileIdSchema,
         ...fromToSchema,
     }),
+    fetchAccount: true,
 };
 
 export default fetchProfilePostsTemplate;

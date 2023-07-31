@@ -3,6 +3,7 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { Account } from '@prisma/client';
 import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server, Socket } from 'socket.io';
@@ -38,12 +39,14 @@ export interface PerformanceReport {
 export interface EventArguments {
     io: Server<ClientToServerEvents, ServerToClientEvents>;
     socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+    account?: Partial<Account>;
 }
 
 export interface EventTemplate {
     func: Function;
     template: string[];
     schema?: StringSchema;
+    fetchAccount?: boolean;
 }
 
 export interface EventExportTemplate {

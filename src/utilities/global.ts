@@ -106,7 +106,10 @@ export async function logoutSocket(
 ): Promise<void> {
     const profileId = getSocketAccountId(socket.id);
 
-    delete variables.loggedInSockets[socket.id];
+    // Delay to prevent event errors
+    setTimeout(() => {
+        delete variables.loggedInSockets[socket.id];
+    }, variables.batchUpdatesDelay);
 
     const account = await prismaClient.account.findFirst({
         where: {

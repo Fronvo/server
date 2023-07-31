@@ -9,20 +9,14 @@ import {
     DeletePostServerParams,
 } from 'interfaces/account/deletePost';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function deletePost({
     io,
-    socket,
+    account,
     postId,
 }: DeletePostServerParams): Promise<DeletePostResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const post = await prismaClient.post.findFirst({
         where: {
             postId,
@@ -56,6 +50,7 @@ const deletePostTemplate: EventTemplate = {
     schema: new StringSchema({
         ...postIdSchema,
     }),
+    fetchAccount: true,
 };
 
 export default deletePostTemplate;

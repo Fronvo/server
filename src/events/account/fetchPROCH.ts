@@ -8,28 +8,16 @@ import {
     FetchPROCHServerParams,
 } from 'interfaces/account/fetchPROCH';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
-import { prismaClient } from 'variables/global';
+import { generateError } from 'utilities/global';
 import { getEnv } from 'variables/varUtils';
 
 async function fetchPROCH({
-    socket,
+    account,
     secret,
 }: FetchPROCHServerParams): Promise<FetchPROCHResult | FronvoError> {
     if (secret != getEnv('PRO_SECRET')) {
         return generateError('UNKNOWN');
     }
-
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-
-        select: {
-            isPRO: true,
-            proCH: true,
-        },
-    });
 
     if (!account.isPRO || !account.proCH) {
         return generateError('UNKNOWN');
@@ -46,6 +34,7 @@ const fetchPROCHTemplate: EventTemplate = {
             minLength: 36,
         },
     }),
+    fetchAccount: true,
 };
 
 export default fetchPROCHTemplate;

@@ -5,7 +5,7 @@
 import { StringSchema } from '@ezier/validate';
 import { Account, RoomMessage } from '@prisma/client';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 import { fromToSchema, roomIdSchema } from '../shared';
 import {
@@ -14,19 +14,13 @@ import {
 } from 'interfaces/account/fetchRoomMessages';
 
 async function fetchRoomMessages({
-    socket,
+    account,
     roomId,
     from,
     to,
 }: FetchRoomMessagesServerParams): Promise<
     FetchRoomMessagesResult | FronvoError
 > {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -214,6 +208,7 @@ const fetchRoomMessagesTemplate: EventTemplate = {
         ...roomIdSchema,
         ...fromToSchema,
     }),
+    fetchAccount: true,
 };
 
 export default fetchRoomMessagesTemplate;

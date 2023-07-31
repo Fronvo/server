@@ -9,7 +9,7 @@ import {
     RequestDataServerParams,
 } from 'interfaces/account/requestData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId, sendEmail } from 'utilities/global';
+import { generateError, sendEmail } from 'utilities/global';
 import { v4 } from 'uuid';
 import {
     imagekitEndpoint,
@@ -22,23 +22,11 @@ import {
 } from 'variables/global';
 
 async function requestData({
-    socket,
+    account,
 }: RequestDataServerParams): Promise<RequestDataResult | FronvoError> {
     if (!imagekitEndpoint || !imagekitPublic || !imagekitPrivate) {
         return generateError('UNKNOWN');
     }
-
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-
-        select: {
-            email: true,
-            dataSentTime: true,
-            isPRO: true,
-        },
-    });
 
     if (differenceInMonths(new Date(), new Date(account.dataSentTime)) < 1) {
         return generateError('DO_AGAIN', undefined, [
@@ -49,7 +37,7 @@ async function requestData({
 
     await prismaClient.account.update({
         where: {
-            profileId: getSocketAccountId(socket.id),
+            profileId: account.profileId,
         },
 
         data: {
@@ -69,7 +57,7 @@ async function requestData({
             JSON.stringify(
                 await prismaClient.account.findFirst({
                     where: {
-                        profileId: getSocketAccountId(socket.id),
+                        profileId: account.profileId,
                     },
 
                     select: {
@@ -104,6 +92,7 @@ async function requestData({
 const requestDataTemplate: EventTemplate = {
     func: requestData,
     template: [],
+    fetchAccount: true,
 };
 
 export default requestDataTemplate;

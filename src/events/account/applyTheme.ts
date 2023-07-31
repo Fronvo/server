@@ -8,19 +8,13 @@ import {
     ApplyThemeServerParams,
 } from 'interfaces/account/applyTheme';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function applyTheme({
-    socket,
+    account,
     title,
 }: ApplyThemeServerParams): Promise<ApplyThemeResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     if (!account.isPRO) {
         return generateError('PRO_REQUIRED');
     }
@@ -37,7 +31,7 @@ async function applyTheme({
 
     await prismaClient.account.update({
         where: {
-            profileId: getSocketAccountId(socket.id),
+            profileId: account.profileId,
         },
 
         data: {
@@ -58,6 +52,7 @@ const applyThemeTemplate: EventTemplate = {
             regex: /[a-zA-Z0-9]/,
         },
     }),
+    fetchAccount: true,
 };
 
 export default applyThemeTemplate;

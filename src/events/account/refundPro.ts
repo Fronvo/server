@@ -8,28 +8,17 @@ import {
     RefundProServerParams,
 } from 'interfaces/account/refundPro';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getSocketAccountId } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 import { getEnv } from 'variables/varUtils';
 
 async function refundPro({
-    socket,
+    account,
     secret,
 }: RefundProServerParams): Promise<RefundProResult | FronvoError> {
     if (secret != getEnv('PRO_SECRET')) {
         return generateError('UNKNOWN');
     }
-
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-
-        select: {
-            isPRO: true,
-            proCH: true,
-        },
-    });
 
     if (!account.isPRO || !account.proCH) {
         return generateError('UNKNOWN');
@@ -37,7 +26,7 @@ async function refundPro({
 
     await prismaClient.account.update({
         where: {
-            profileId: getSocketAccountId(socket.id),
+            profileId: account.profileId,
         },
 
         data: {
@@ -57,6 +46,7 @@ const refundProTemplate: EventTemplate = {
             minLength: 36,
         },
     }),
+    fetchAccount: true,
 };
 
 export default refundProTemplate;

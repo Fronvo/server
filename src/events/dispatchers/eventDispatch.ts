@@ -10,7 +10,8 @@ import { ClientToServerEvents } from 'interfaces/events/c2s';
 import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server, Socket } from 'socket.io';
 import utilities from 'utilities/all';
-import { generateError } from 'utilities/global';
+import { generateError, getSocketAccountId } from 'utilities/global';
+import { prismaClient } from 'variables/global';
 
 const funcs: EventExportTemplate = {
     ...noAccountEvents,
@@ -117,7 +118,7 @@ async function fireEvent(
             if (!schemaResult) {
                 await fireCallback();
             } else {
-                sendCallback(callback, schemaResult, socket);
+                sendCallback(callback, schemaResult);
             }
         } else {
             await fireCallback();
@@ -126,8 +127,13 @@ async function fireEvent(
         async function fireCallback(): Promise<void> {
             sendCallback(
                 callback,
-                await runEventFunc(io, socket, eventName, eventArgs),
-                socket
+                await runEventFunc(
+                    io,
+                    socket,
+                    eventName,
+                    funcs[eventName].fetchAccount,
+                    eventArgs
+                )
             );
         }
     }
@@ -137,21 +143,63 @@ async function runEventFunc(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>,
     event: string,
+    fetchAccount: boolean,
     args: { [arg: string]: any } = {}
 ): Promise<{ [key: string]: any }> {
-    let callbackResponse = funcs[event].func({ io, socket, ...args });
+    const finalArgs = {
+        io,
+        socket,
+        account: undefined,
+    };
 
-    if (typeof callbackResponse.then == 'function') {
-        return await callbackResponse;
-    } else {
-        return callbackResponse;
+    // Give account parameter from here, prevent errors / delays
+    if (fetchAccount) {
+        try {
+            finalArgs.account = await prismaClient.account.findFirst({
+                where: {
+                    profileId: getSocketAccountId(socket.id),
+                },
+
+                select: {
+                    appliedTheme: true,
+                    avatar: true,
+                    banner: true,
+                    bio: true,
+                    creationDate: true,
+                    dataSentTime: true,
+                    email: true,
+                    fcm: true,
+                    friends: true,
+                    isPRO: true,
+                    lastPostAt: true,
+                    password: true,
+                    pendingFriendRequests: true,
+                    proCH: true,
+                    profileId: true,
+                    seenStates: true,
+                    status: true,
+                    statusUpdatedTime: true,
+                    username: true,
+                },
+            });
+        } catch (e) {
+            return generateError('UNKNOWN');
+        }
     }
+
+    let callbackResponse = funcs[event].func({ ...finalArgs, ...args });
+
+    if (funcs)
+        if (typeof callbackResponse.then == 'function') {
+            return await callbackResponse;
+        } else {
+            return callbackResponse;
+        }
 }
 
 function sendCallback(
     callback: undefined | Function,
-    callbackResponse: undefined | { [key: string]: any },
-    socket: Socket<ServerToClientEvents, ClientToServerEvents>
+    callbackResponse: undefined | { [key: string]: any }
 ): void {
     if (callback) {
         if (callbackResponse) {
@@ -174,7 +222,7 @@ export default function eventDispatch(
         const callback = findCallback(args);
 
         if (eventPermissionResult) {
-            sendCallback(callback, eventPermissionResult, socket);
+            sendCallback(callback, eventPermissionResult);
             return;
         }
 
@@ -183,11 +231,7 @@ export default function eventDispatch(
         const neededArgs = getNeededArgs(event, eventArgs);
 
         if (neededArgs.length > 0) {
-            sendCallback(
-                callback,
-                generateError('MISSING', { neededArgs }),
-                socket
-            );
+            sendCallback(callback, generateError('MISSING', { neededArgs }));
         } else {
             fireEvent(io, socket, event, callback, eventArgs);
         }

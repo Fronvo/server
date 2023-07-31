@@ -11,22 +11,12 @@ import {
 } from 'interfaces/account/fetchConvos';
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    generateError,
-    getSocketAccountId,
-    isAccountLoggedIn,
-} from 'utilities/global';
+import { generateError, isAccountLoggedIn } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchConvos({
-    socket,
+    account,
 }: FetchConvosServerParams): Promise<FetchConvosResult | FronvoError> {
-    const account = await prismaClient.account.findFirst({
-        where: {
-            profileId: getSocketAccountId(socket.id),
-        },
-    });
-
     let convosRaw: Partial<Room>[];
 
     try {
@@ -210,6 +200,7 @@ async function fetchConvos({
 const fetchConvosTemplate: EventTemplate = {
     func: fetchConvos,
     template: [],
+    fetchAccount: true,
 };
 
 export default fetchConvosTemplate;
