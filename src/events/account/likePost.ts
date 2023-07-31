@@ -99,13 +99,16 @@ async function likePost({
                 likes: post.likes.length + 1,
             });
 
-            sendFCM(
-                [await getAccountFCM(postAuthor.profileId)],
-                'Post liked',
-                `@${account.profileId} liked one of your posts`,
-                true,
-                'like'
-            );
+            /// Prevent sending FCM if ourselves
+            if (post.author != account.profileId) {
+                sendFCM(
+                    [await getAccountFCM(postAuthor.profileId)],
+                    'Post liked',
+                    `@${account.profileId} liked one of your posts`,
+                    true,
+                    'like'
+                );
+            }
         }
     } catch (e) {}
 
