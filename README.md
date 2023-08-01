@@ -1,4 +1,5 @@
-<p align='center'><img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/assets/logo.svg' alt='Fronvo logo'></p>
+<p align='center'><img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/email/fronvo-logo-large.png' alt='Fronvo logo'></p>
+
 <p align='center'><b>The server of Fronvo</b></p>
 <p align='center'><b>Built on socket.io for blazing-fast realtime communication</b></p>
 
@@ -7,18 +8,26 @@
 [![forthebadge](https://forthebadge.com/images/badges/made-with-typescript.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 
-<img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/assets/demo-run-local.svg' alt='Fronvo demo run'>
-  
 </h2>
 
-### Get started
+### Host locally
 
-**[Running](https://github.com/Fronvo/server/blob/master/.github/markdown/RUNNING.md)**
+Here's how to host the latest Fronvo site on your own:
 
-**[Documentation](https://github.com/Fronvo/server/blob/master/.github/markdown/DOCUMENTATION.md)**
+```
+git clone https://github.com/fronvo/server.git
+cd server
+npm i
+```
 
-**[Hosting](https://github.com/Fronvo/server/blob/master/.github/markdown/HOSTING.md)**
+Now fill out the required **[.env](https://github.com/Fronvo/server/blob/master/.env.example)** file
 
-**[Testing](https://github.com/Fronvo/server/blob/master/.github/markdown/TESTING.md)**
+After that:
 
-**[Tools used](https://github.com/Fronvo/server/blob/master/.github/markdown/TOOLS.md)**
+```
+npm start
+```
+
+### Extras
+
+**[Tools](https://github.com/Fronvo/server/blob/master/.github/markdown/TOOLS.md)**
