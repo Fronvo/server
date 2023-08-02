@@ -460,7 +460,7 @@ export async function sendEmail(
             <div class='content'
 
                 <p align='center' id='top'>
-                    <a href='https://fronvo.vercel.app' id='top'>
+                    <a href='https://fronvo.com' id='top'>
                         <img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/email/fronvo-logo-large.png'>
                     </a>
 

@@ -280,23 +280,44 @@ async function sendRoomMessage({
             });
         }
 
-        if (!room.isDM) {
-            sendMulticastFCM(
-                room.members as string[],
-                room.name,
-                finalLastMessage || message,
-                account.profileId,
-                true
-            );
+        if (!isTenor && !isSpotify) {
+            if (!room.isDM) {
+                sendMulticastFCM(
+                    room.members as string[],
+                    room.name,
+                    `${account.username}: ${message}`,
+                    account.profileId,
+                    true
+                );
+            } else {
+                sendMulticastFCM(
+                    room.dmUsers as string[],
+                    `@${account.profileId}`,
+                    `${account.username}: ${message}`,
+                    account.profileId,
+                    true,
+                    'dm'
+                );
+            }
         } else {
-            sendMulticastFCM(
-                room.dmUsers as string[],
-                `@${account.profileId}`,
-                finalLastMessage || message,
-                account.profileId,
-                true,
-                'dm'
-            );
+            if (!room.isDM) {
+                sendMulticastFCM(
+                    room.members as string[],
+                    room.name,
+                    finalLastMessage,
+                    account.profileId,
+                    true
+                );
+            } else {
+                sendMulticastFCM(
+                    room.dmUsers as string[],
+                    `@${account.profileId}`,
+                    finalLastMessage,
+                    account.profileId,
+                    true,
+                    'dm'
+                );
+            }
         }
     } catch (e) {
         return generateError('UNKNOWN');
