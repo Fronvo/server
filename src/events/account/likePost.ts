@@ -110,7 +110,6 @@ const likePostTemplate: EventTemplate = {
     schema: new StringSchema({
         ...postIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default likePostTemplate;

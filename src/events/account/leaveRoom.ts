@@ -113,7 +113,6 @@ const leaveroomTemplate: EventTemplate = {
     schema: new StringSchema({
         ...roomIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default leaveroomTemplate;

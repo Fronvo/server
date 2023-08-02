@@ -69,7 +69,6 @@ const closeDMTemplate: EventTemplate = {
     schema: new StringSchema({
         ...roomIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default closeDMTemplate;

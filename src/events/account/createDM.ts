@@ -118,7 +118,6 @@ const createDMTemplate: EventTemplate = {
     schema: new StringSchema({
         ...profileIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default createDMTemplate;

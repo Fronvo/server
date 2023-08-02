@@ -48,7 +48,6 @@ const startTypingTemplate: EventTemplate = {
     schema: new StringSchema({
         ...roomIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default startTypingTemplate;

@@ -169,7 +169,6 @@ const sendRoomImageTemplate: EventTemplate = {
             regex: /https:\/\/ik.imagekit.io\/fronvo(2)?\/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-4[0-9A-Za-z]{3}-[89ABab][0-9A-Za-z]{3}-[0-9A-Za-z]{12}.+/,
         },
     }),
-    fetchAccount: true,
 };
 
 export default sendRoomImageTemplate;

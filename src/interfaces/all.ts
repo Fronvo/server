@@ -46,7 +46,7 @@ export interface EventTemplate {
     func: Function;
     template: string[];
     schema?: StringSchema;
-    fetchAccount?: boolean;
+    dontFetchAccount?: boolean;
 }
 
 export interface EventExportTemplate {

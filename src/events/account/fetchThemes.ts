@@ -33,7 +33,6 @@ async function fetchThemes({
 const fetchThemesTemplate: EventTemplate = {
     func: fetchThemes,
     template: [],
-    fetchAccount: true,
 };
 
 export default fetchThemesTemplate;

@@ -131,7 +131,7 @@ async function fireEvent(
                     io,
                     socket,
                     eventName,
-                    funcs[eventName].fetchAccount,
+                    funcs[eventName].dontFetchAccount,
                     eventArgs
                 )
             );
@@ -143,7 +143,7 @@ async function runEventFunc(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
     socket: Socket<ServerToClientEvents, ClientToServerEvents>,
     event: string,
-    fetchAccount: boolean,
+    dontFetchAccount: boolean,
     args: { [arg: string]: any } = {}
 ): Promise<{ [key: string]: any }> {
     const finalArgs = {
@@ -153,7 +153,7 @@ async function runEventFunc(
     };
 
     // Give account parameter from here, prevent errors / delays
-    if (fetchAccount) {
+    if (!dontFetchAccount) {
         try {
             finalArgs.account = await prismaClient.account.findFirst({
                 where: {

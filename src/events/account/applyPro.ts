@@ -51,7 +51,6 @@ const applyProTemplate: EventTemplate = {
             regex: /^[a-zA-Z0-9_]+/,
         },
     }),
-    fetchAccount: true,
 };
 
 export default applyProTemplate;

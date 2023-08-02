@@ -111,7 +111,6 @@ const updateProfileDataTemplate: EventTemplate = {
             optional: true,
         },
     }),
-    fetchAccount: true,
 };
 
 export default updateProfileDataTemplate;

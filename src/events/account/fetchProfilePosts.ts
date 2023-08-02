@@ -132,7 +132,6 @@ const fetchProfilePostsTemplate: EventTemplate = {
         ...profileIdSchema,
         ...fromToSchema,
     }),
-    fetchAccount: true,
 };
 
 export default fetchProfilePostsTemplate;

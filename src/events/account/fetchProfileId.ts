@@ -20,6 +20,7 @@ function fetchProfileId({
 const fetchProfileIdTemplate: EventTemplate = {
     func: fetchProfileId,
     template: [],
+    dontFetchAccount: true,
 };
 
 export default fetchProfileIdTemplate;

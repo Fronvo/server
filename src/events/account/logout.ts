@@ -18,6 +18,7 @@ async function logout({
 const logoutTemplate: EventTemplate = {
     func: logout,
     template: [],
+    dontFetchAccount: true,
 };
 
 export default logoutTemplate;

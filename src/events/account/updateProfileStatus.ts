@@ -49,6 +49,7 @@ const updateProfileStatusTemplate: EventTemplate = {
             maxLength: 20,
         },
     }),
+    dontFetchAccount: true,
 };
 
 export default updateProfileStatusTemplate;

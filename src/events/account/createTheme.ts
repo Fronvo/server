@@ -73,7 +73,6 @@ const createThemeTemplate: EventTemplate = {
             regex: /[0-9]/,
         },
     }),
-    fetchAccount: true,
 };
 
 export default createThemeTemplate;

@@ -46,7 +46,6 @@ const refundProTemplate: EventTemplate = {
             minLength: 36,
         },
     }),
-    fetchAccount: true,
 };
 
 export default refundProTemplate;

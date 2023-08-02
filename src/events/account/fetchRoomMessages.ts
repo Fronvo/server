@@ -208,7 +208,6 @@ const fetchRoomMessagesTemplate: EventTemplate = {
         ...roomIdSchema,
         ...fromToSchema,
     }),
-    fetchAccount: true,
 };
 
 export default fetchRoomMessagesTemplate;

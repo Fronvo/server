@@ -110,7 +110,6 @@ const fetchProfileDataTemplate: EventTemplate = {
     schema: new StringSchema({
         ...profileIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default fetchProfileDataTemplate;

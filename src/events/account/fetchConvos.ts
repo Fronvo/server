@@ -200,7 +200,6 @@ async function fetchConvos({
 const fetchConvosTemplate: EventTemplate = {
     func: fetchConvos,
     template: [],
-    fetchAccount: true,
 };
 
 export default fetchConvosTemplate;

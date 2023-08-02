@@ -101,7 +101,6 @@ const addRoomMemberTemplate: EventTemplate = {
         ...profileIdSchema,
         ...roomIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default addRoomMemberTemplate;

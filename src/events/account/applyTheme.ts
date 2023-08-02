@@ -52,7 +52,6 @@ const applyThemeTemplate: EventTemplate = {
             regex: /[a-zA-Z0-9]/,
         },
     }),
-    fetchAccount: true,
 };
 
 export default applyThemeTemplate;

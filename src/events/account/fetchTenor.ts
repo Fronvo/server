@@ -72,6 +72,7 @@ const fetchTenorTemplate: EventTemplate = {
             maxLength: 64,
         },
     }),
+    dontFetchAccount: true,
 };
 
 export default fetchTenorTemplate;

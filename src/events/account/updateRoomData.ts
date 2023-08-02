@@ -85,7 +85,6 @@ const updateRoomDataTemplate: EventTemplate = {
         ...roomNameOptionalSchema,
         ...roomIconSchema,
     }),
-    fetchAccount: true,
 };
 
 export default updateRoomDataTemplate;

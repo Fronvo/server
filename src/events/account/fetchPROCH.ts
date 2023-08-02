@@ -34,7 +34,6 @@ const fetchPROCHTemplate: EventTemplate = {
             minLength: 36,
         },
     }),
-    fetchAccount: true,
 };
 
 export default fetchPROCHTemplate;

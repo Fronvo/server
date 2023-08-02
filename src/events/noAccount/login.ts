@@ -51,6 +51,7 @@ const loginTemplate: EventTemplate = {
         ...emailSchema,
         ...passwordSchema,
     }),
+    dontFetchAccount: true,
 };
 
 export default loginTemplate;

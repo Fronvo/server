@@ -92,7 +92,6 @@ async function requestData({
 const requestDataTemplate: EventTemplate = {
     func: requestData,
     template: [],
-    fetchAccount: true,
 };
 
 export default requestDataTemplate;

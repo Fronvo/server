@@ -98,7 +98,6 @@ const addFriendTemplate: EventTemplate = {
     schema: new StringSchema({
         ...profileIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default addFriendTemplate;

@@ -75,7 +75,6 @@ const rejectFriendRequestTemplate: EventTemplate = {
     schema: new StringSchema({
         ...profileIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default rejectFriendRequestTemplate;

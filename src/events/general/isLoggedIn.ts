@@ -18,6 +18,7 @@ function isLoggedIn({ socket }: isLoggedInServerParams): IsLoggedInResult {
 const isLoggedInTemplate: EventTemplate = {
     func: isLoggedIn,
     template: [],
+    dontFetchAccount: true,
 };
 
 export default isLoggedInTemplate;

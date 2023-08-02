@@ -50,7 +50,6 @@ const deletePostTemplate: EventTemplate = {
     schema: new StringSchema({
         ...postIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default deletePostTemplate;

@@ -186,7 +186,6 @@ const fetchHomePostsTemplate: EventTemplate = {
     schema: new StringSchema({
         ...fromToSchema,
     }),
-    fetchAccount: true,
 };
 
 export default fetchHomePostsTemplate;

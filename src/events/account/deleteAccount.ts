@@ -345,7 +345,6 @@ const deleteAccountTemplate: EventTemplate = {
     schema: new StringSchema({
         ...passwordSchema,
     }),
-    fetchAccount: true,
 };
 
 export default deleteAccountTemplate;

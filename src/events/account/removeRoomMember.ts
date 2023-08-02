@@ -119,7 +119,6 @@ const removeRoomMemberTemplate: EventTemplate = {
         ...profileIdSchema,
         ...roomIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default removeRoomMemberTemplate;

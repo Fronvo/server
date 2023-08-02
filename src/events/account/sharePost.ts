@@ -104,7 +104,6 @@ const sharePostTemplate: EventTemplate = {
             regex: /https:\/\/media.tenor.com\/[a-zA-Z0-9_-]{16}\/[a-zA-Z0-9-_]+.gif/,
         },
     }),
-    fetchAccount: true,
 };
 
 export default sharePostTemplate;

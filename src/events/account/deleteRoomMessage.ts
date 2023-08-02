@@ -182,7 +182,6 @@ const deleteRoomMessageTemplate: EventTemplate = {
             type: 'uuid',
         },
     }),
-    fetchAccount: true,
 };
 
 export default deleteRoomMessageTemplate;

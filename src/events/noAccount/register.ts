@@ -178,6 +178,7 @@ const registerTemplate: EventTemplate = {
         ...emailSchema,
         ...passwordSchema,
     }),
+    dontFetchAccount: true,
 };
 
 export default registerTemplate;

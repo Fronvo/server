@@ -18,6 +18,7 @@ async function fetchLatestVersion({}: FetchLatestVersionServerParams): Promise<
 const fetchLatestVersionTemplate: EventTemplate = {
     func: fetchLatestVersion,
     template: [],
+    dontFetchAccount: true,
 };
 
 export default fetchLatestVersionTemplate;

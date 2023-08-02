@@ -383,7 +383,6 @@ const sendRoomMessageTemplate: EventTemplate = {
             type: 'uuid',
         },
     }),
-    fetchAccount: true,
 };
 
 export default sendRoomMessageTemplate;

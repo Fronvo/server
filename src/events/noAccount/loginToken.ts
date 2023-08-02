@@ -66,6 +66,7 @@ const loginTokenTemplate: EventTemplate = {
             optional: true,
         },
     }),
+    dontFetchAccount: true,
 };
 
 export default loginTokenTemplate;

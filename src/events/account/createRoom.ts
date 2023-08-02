@@ -87,7 +87,6 @@ const createRoomTemplate: EventTemplate = {
         ...roomNameSchema,
         ...roomIconSchema,
     }),
-    fetchAccount: true,
 };
 
 export default createRoomTemplate;

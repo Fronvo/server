@@ -127,6 +127,7 @@ const resetPasswordTemplate: EventTemplate = {
     schema: new StringSchema({
         ...emailSchema,
     }),
+    dontFetchAccount: true,
 };
 
 export default resetPasswordTemplate;

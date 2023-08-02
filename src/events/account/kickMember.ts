@@ -82,7 +82,6 @@ const kickMemberTemplate: EventTemplate = {
         ...roomIdSchema,
         ...profileIdSchema,
     }),
-    fetchAccount: true,
 };
 
 export default kickMemberTemplate;
