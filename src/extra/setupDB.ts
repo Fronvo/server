@@ -194,6 +194,8 @@ async function startup(): Promise<void> {
     loadingSpinner.succeed(
         `Email: ${officialEmail}, Password: ${officialPassword}`
     );
+
+    process.exit();
 }
 
 startup();
