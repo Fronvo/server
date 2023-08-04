@@ -24,16 +24,20 @@ async function refundPro({
         return generateError('UNKNOWN');
     }
 
-    await prismaClient.account.update({
-        where: {
-            profileId: account.profileId,
-        },
+    try {
+        await prismaClient.account.update({
+            where: {
+                profileId: account.profileId,
+            },
 
-        data: {
-            isPRO: false,
-            proCH: '',
-        },
-    });
+            data: {
+                isPRO: false,
+                proCH: '',
+            },
+        });
+    } catch (e) {
+        return generateError('UNKNOWN');
+    }
 
     sendEmail(account.email, 'You left the PRO club', [
         'It was a fun time having you with the other PROs.',

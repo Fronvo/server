@@ -99,7 +99,9 @@ async function likePost({
                 );
             }
         }
-    } catch (e) {}
+    } catch (e) {
+        return generateError('UNKNOWN');
+    }
 
     return {};
 }

@@ -56,17 +56,21 @@ async function createDM({
             const newDmHiddenFor = room.dmHiddenFor;
             newDmHiddenFor.splice(newDmHiddenFor.indexOf(account.profileId), 1);
 
-            await prismaClient.room.update({
-                where: {
-                    roomId: room.roomId,
-                },
-
-                data: {
-                    dmHiddenFor: {
-                        set: newDmHiddenFor,
+            try {
+                await prismaClient.room.update({
+                    where: {
+                        roomId: room.roomId,
                     },
-                },
-            });
+
+                    data: {
+                        dmHiddenFor: {
+                            set: newDmHiddenFor,
+                        },
+                    },
+                });
+            } catch (e) {
+                return generateError('UNKNOWN');
+            }
 
             // Notify sockets about the new dm
             io.to(socket.id).emit('roomCreated', {

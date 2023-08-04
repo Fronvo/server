@@ -45,15 +45,17 @@ async function sharePost({
 
     if (!account.isPRO) {
         setTimeout(async () => {
-            await prismaClient.account.update({
-                where: {
-                    profileId: account.profileId,
-                },
+            try {
+                await prismaClient.account.update({
+                    where: {
+                        profileId: account.profileId,
+                    },
 
-                data: {
-                    lastPostAt: new Date(),
-                },
-            });
+                    data: {
+                        lastPostAt: new Date(),
+                    },
+                });
+            } catch (e) {}
         }, batchUpdatesDelay);
     }
 

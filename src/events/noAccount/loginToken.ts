@@ -38,15 +38,17 @@ async function loginToken({
     // Only on mobile
     if (fcm && getSocketAccountId(socket.id)) {
         setTimeout(async () => {
-            await prismaClient.account.update({
-                where: {
-                    profileId: getSocketAccountId(socket.id),
-                },
+            try {
+                await prismaClient.account.update({
+                    where: {
+                        profileId: getSocketAccountId(socket.id),
+                    },
 
-                data: {
-                    fcm,
-                },
-            });
+                    data: {
+                        fcm,
+                    },
+                });
+            } catch (e) {}
         }, batchUpdatesDelay);
     }
 

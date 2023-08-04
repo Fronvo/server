@@ -65,15 +65,19 @@ async function leaveRoom({
         // Remove current member
         newMembers.splice(newMembers.indexOf(account.profileId), 1);
 
-        await prismaClient.room.update({
-            where: {
-                roomId,
-            },
+        try {
+            await prismaClient.room.update({
+                where: {
+                    roomId,
+                },
 
-            data: {
-                members: newMembers,
-            },
-        });
+                data: {
+                    members: newMembers,
+                },
+            });
+        } catch (e) {
+            return generateError('UNKNOWN');
+        }
 
         // Remove socket from room room
         await socket.leave(room.roomId);
@@ -91,15 +95,19 @@ async function leaveRoom({
             if (roomId in newSeenStates) {
                 delete newSeenStates[roomId];
 
-                await prismaClient.account.update({
-                    where: {
-                        profileId: account.profileId,
-                    },
+                try {
+                    await prismaClient.account.update({
+                        where: {
+                            profileId: account.profileId,
+                        },
 
-                    data: {
-                        seenStates: newSeenStates,
-                    },
-                });
+                        data: {
+                            seenStates: newSeenStates,
+                        },
+                    });
+                } catch (e) {
+                    return generateError('UNKNOWN');
+                }
             }
         }
     }

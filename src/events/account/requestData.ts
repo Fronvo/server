@@ -35,15 +35,19 @@ async function requestData({
         ]);
     }
 
-    await prismaClient.account.update({
-        where: {
-            profileId: account.profileId,
-        },
+    try {
+        await prismaClient.account.update({
+            where: {
+                profileId: account.profileId,
+            },
 
-        data: {
-            dataSentTime: new Date(),
-        },
-    });
+            data: {
+                dataSentTime: new Date(),
+            },
+        });
+    } catch (e) {
+        return generateError('UNKNOWN');
+    }
 
     const imagekit = new ImageKit({
         urlEndpoint: account.isPRO ? imagekitEndpoint : imagekitFreeEndpoint,

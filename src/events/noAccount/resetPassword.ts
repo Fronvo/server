@@ -82,17 +82,20 @@ async function resetPassword({
             // Detach listener
             socket.removeAllListeners('resetPasswordFinal');
 
-            await prismaClient.account.update({
-                where: {
-                    email,
-                },
-                data: {
-                    password: bcrypt.hashSync(
-                        password,
-                        variables.mainBcryptHash
-                    ),
-                },
-            });
+            try {
+            } catch (e) {
+                await prismaClient.account.update({
+                    where: {
+                        email,
+                    },
+                    data: {
+                        password: bcrypt.hashSync(
+                            password,
+                            variables.mainBcryptHash
+                        ),
+                    },
+                });
+            }
 
             // Revoke token (will be regenerated when someone logs in to the account)
             await revokeToken(account.profileId);
