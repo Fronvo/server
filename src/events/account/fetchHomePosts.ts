@@ -12,7 +12,7 @@ import {
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { FetchedFronvoPost } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { decryptAES, generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchHomePosts({
@@ -170,6 +170,7 @@ async function fetchHomePosts({
                 totalLikes: post.likes.length,
                 likes: undefined,
                 isLiked: post.likes.includes(account.profileId),
+                content: post.content ? decryptAES(post.content) : undefined,
             },
             profileData: getProfileData(post.author),
         });

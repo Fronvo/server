@@ -29,15 +29,19 @@ async function applyTheme({
         return generateError('THEME_404');
     }
 
-    await prismaClient.account.update({
-        where: {
-            profileId: account.profileId,
-        },
+    try {
+        await prismaClient.account.update({
+            where: {
+                profileId: account.profileId,
+            },
 
-        data: {
-            appliedTheme: title,
-        },
-    });
+            data: {
+                appliedTheme: title,
+            },
+        });
+    } catch (e) {
+        return generateError('UNKNOWN');
+    }
 
     return {};
 }
