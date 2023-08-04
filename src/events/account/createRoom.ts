@@ -10,7 +10,7 @@ import {
     CreateRoomServerParams,
 } from 'interfaces/account/createRoom';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { encryptAES, generateError } from 'utilities/global';
 import { v4 } from 'uuid';
 import { prismaClient } from 'variables/global';
 
@@ -50,7 +50,7 @@ async function createRoom({
             data: {
                 roomId,
                 ownerId: account.profileId,
-                name,
+                name: encryptAES(name),
                 icon,
                 members: [account.profileId],
             },

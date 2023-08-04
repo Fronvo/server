@@ -9,7 +9,7 @@ import {
     DeleteRoomMessageServerParams,
 } from 'interfaces/account/deleteRoomMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { encryptAES, generateError } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function deleteRoomMessage({
@@ -125,7 +125,9 @@ async function deleteRoomMessage({
                     },
 
                     data: {
-                        lastMessage: `${lastMessageOwner.username} sent a GIF`,
+                        lastMessage: encryptAES(
+                            `${lastMessageOwner.username} sent a GIF`
+                        ),
                         lastMessageAt: lastMessageObj.creationDate,
                         lastMessageFrom: '',
                     },
@@ -137,7 +139,9 @@ async function deleteRoomMessage({
                     },
 
                     data: {
-                        lastMessage: `${lastMessageOwner.username} shared a Spotify song`,
+                        lastMessage: encryptAES(
+                            `${lastMessageOwner.username} shared a Spotify song`
+                        ),
                         lastMessageAt: lastMessageObj.creationDate,
                         lastMessageFrom: '',
                     },
@@ -149,7 +153,9 @@ async function deleteRoomMessage({
                     },
 
                     data: {
-                        lastMessage: `${lastMessageOwner.username} sent an image`,
+                        lastMessage: encryptAES(
+                            `${lastMessageOwner.username} sent an image`
+                        ),
                         lastMessageAt: lastMessageObj.creationDate,
                         lastMessageFrom: '',
                     },
@@ -160,9 +166,13 @@ async function deleteRoomMessage({
                         roomId,
                     },
                     data: {
-                        lastMessage: lastMessageObj.content,
+                        lastMessage: lastMessageObj.content
+                            ? encryptAES(lastMessageObj.content)
+                            : '',
                         lastMessageAt: lastMessageObj.creationDate,
-                        lastMessageFrom: lastMessageOwner.username,
+                        lastMessageFrom: lastMessageOwner.username
+                            ? encryptAES(lastMessageOwner.username)
+                            : '',
                     },
                 });
             }

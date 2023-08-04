@@ -11,7 +11,7 @@ import {
     FetchedFronvoPost,
 } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { decryptAES, generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchProfilePosts({
@@ -112,6 +112,7 @@ async function fetchProfilePosts({
         profilePosts.push({
             post: {
                 ...post,
+                content: post.content ? decryptAES(post.content) : undefined,
                 likes: undefined,
                 totalLikes: post.likes.length,
                 isLiked: post.likes.includes(account.profileId),

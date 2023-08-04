@@ -18,6 +18,8 @@
     "start": "run-s build start:cached",
     "start:cached": "node -r @swc-node/register -r tsconfig-paths/register output/main/server.js",
     "start:dev": "tsnd --ignore-watch generated/ --transpile-only --respawn --exit-child --clear -r tsconfig-paths/register src/main/server.ts",
+    "corrupt": "node -r @swc-node/register -r tsconfig-paths/register src/extra/ensureEncrypted.ts",
+    "encrypt": "node -r @swc-node/register -r tsconfig-paths/register src/extra/convertEncrypted.ts",
     "check": "tsc",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

@@ -58,7 +58,7 @@ export const prismaClient = new PrismaClient({
 // Firebase, filled in server.ts
 const firebaseCredentials = JSON.parse(getEnv('FIREBASE_CREDENTIALS'));
 
-export let firebase = admin.initializeApp({
+export const firebase = admin.initializeApp({
     projectId: firebaseCredentials.project_id,
 
     credential: admin.credential.cert({
@@ -69,22 +69,29 @@ export let firebase = admin.initializeApp({
 });
 
 // Email-related
-export let emailUsername = getEnv('EMAIL_USERNAME');
-export let emailPassword = getEnv('EMAIL_PASSWORD');
+export const emailUsername = getEnv('EMAIL_USERNAME');
+export const emailPassword = getEnv('EMAIL_PASSWORD');
 
 // ImageKit
 // PRO plan
-export let imagekitEndpoint = getEnv('IMAGEKIT_ENDPOINT');
-export let imagekitPublic = getEnv('IMAGEKIT_PUBLIC');
-export let imagekitPrivate = getEnv('IMAGEKIT_PRIVATE');
+export const imagekitEndpoint = getEnv('IMAGEKIT_ENDPOINT');
+export const imagekitPublic = getEnv('IMAGEKIT_PUBLIC');
+export const imagekitPrivate = getEnv('IMAGEKIT_PRIVATE');
 
 // FREE PLAN
-export let imagekitFreeEndpoint = getEnv('IMAGEKIT2_ENDPOINT');
-export let imagekitFreePublic = getEnv('IMAGEKIT2_PUBLIC');
-export let imagekitFreePrivate = getEnv('IMAGEKIT2_PRIVATE');
+export const imagekitFreeEndpoint = getEnv('IMAGEKIT2_ENDPOINT');
+export const imagekitFreePublic = getEnv('IMAGEKIT2_PUBLIC');
+export const imagekitFreePrivate = getEnv('IMAGEKIT2_PRIVATE');
 
 // Tenor
-export let tenorKey = getEnv('TENOR_KEY');
+export const tenorKey = getEnv('TENOR_KEY');
+
+// AES-256-CBC
+export const aesEnc = getEnv('AES_ENC');
+export const aesIV = getEnv('AES_IV');
+export const AES_ENABLED =
+    (aesEnc as string)?.trim().length == 32 &&
+    (aesIV as string)?.trim().length == 16;
 
 // Batch updates delay in ms, preferred range: [100 - 500]ms
 export const batchUpdatesDelay = 250;

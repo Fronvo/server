@@ -19,6 +19,7 @@ export type Errors =
     | 'ROOM_404'
     | 'POST_404'
     | 'THEME_404'
+    | 'THEME_EXISTS'
     | 'NOT_POST_CREATOR'
     | 'POST_BOTH_TYPES'
     | 'ALREADY_IN_ROOM'
@@ -73,4 +74,6 @@ export type EnvValues =
     | 'FIREBASE_CREDENTIALS'
     | 'FIREBASE_PROJECT_ID'
     | 'PRO_SECRET'
-    | 'VERSION';
+    | 'VERSION'
+    | 'AES_ENC'
+    | 'AES_IV';

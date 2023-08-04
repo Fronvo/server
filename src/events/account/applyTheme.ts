@@ -15,7 +15,7 @@ async function applyTheme({
     account,
     title,
 }: ApplyThemeServerParams): Promise<ApplyThemeResult | FronvoError> {
-    if (!account.isPRO) {
+    if (!account.isPRO && account.profileId != 'fronvo') {
         return generateError('PRO_REQUIRED');
     }
 

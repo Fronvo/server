@@ -8,7 +8,7 @@ import {
     ApplyProServerParams,
 } from 'interfaces/account/applyPro';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { encryptAES, generateError, sendEmail } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 import { getEnv } from 'variables/varUtils';
 
@@ -32,9 +32,21 @@ async function applyPro({
 
         data: {
             isPRO: true,
-            proCH,
+            proCH: encryptAES(proCH),
         },
     });
+
+    sendEmail(account.email, 'Welcome to the PRO club', [
+        'We hope you enjoy the added benefits of the PROs, featuring:',
+        '- High-quality images',
+        '- Larger file uploads',
+        '- A personalised banner',
+        '- The Theme Marketplace',
+        '- No post cooldown',
+        '- Up to 100 friends',
+        '- Up to 20 rooms',
+        '- Exclusive PRO palette',
+    ]);
 
     return {};
 }

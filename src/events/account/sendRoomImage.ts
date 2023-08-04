@@ -11,6 +11,7 @@ import {
 
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
+    encryptAES,
     generateError,
     getSocketAccountId,
     sendMulticastFCM,
@@ -88,7 +89,7 @@ async function sendRoomMessage({
             },
 
             data: {
-                lastMessage: `${account.username} sent an image`,
+                lastMessage: encryptAES(`${account.username} sent an image`),
                 lastMessageAt: new Date(),
                 lastMessageFrom: '',
             },

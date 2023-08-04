@@ -13,7 +13,7 @@ import { prismaClient } from 'variables/global';
 async function fetchThemes({
     account,
 }: FetchThemesServerParams): Promise<FetchThemesResult | FronvoError> {
-    if (!account.isPRO) {
+    if (!account.isPRO && account.profileId != 'fronvo') {
         return generateError('PRO_REQUIRED');
     }
 

@@ -8,7 +8,7 @@ import {
     RefundProServerParams,
 } from 'interfaces/account/refundPro';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { generateError, sendEmail } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 import { getEnv } from 'variables/varUtils';
 
@@ -34,6 +34,11 @@ async function refundPro({
             proCH: '',
         },
     });
+
+    sendEmail(account.email, 'You left the PRO club', [
+        'It was a fun time having you with the other PROs.',
+        'We wish you a good time on Fronvo.',
+    ]);
 
     return {};
 }

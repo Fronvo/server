@@ -11,7 +11,7 @@ import {
 } from 'interfaces/account/fetchConvos';
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, isAccountLoggedIn } from 'utilities/global';
+import { decryptAES, generateError, isAccountLoggedIn } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchConvos({
@@ -120,9 +120,13 @@ async function fetchConvos({
                                         roomId: convo.roomId,
                                         isDM: true,
                                         dmUsers: convo.dmUsers,
-                                        lastMessage: convo.lastMessage,
+                                        lastMessage: convo.lastMessage
+                                            ? decryptAES(convo.lastMessage)
+                                            : '',
                                         lastMessageAt: convo.lastMessageAt,
-                                        lastMessageFrom: convo.lastMessageFrom,
+                                        lastMessageFrom: convo.lastMessageFrom
+                                            ? decryptAES(convo.lastMessageFrom)
+                                            : '',
                                         dmUserOnline: targetDMUserData.online,
                                         unreadCount: unread,
                                         dmUser: targetDMUserData,
@@ -135,11 +139,15 @@ async function fetchConvos({
                                         isDM: false,
                                         creationDate: convo.creationDate,
                                         icon: convo.icon,
-                                        lastMessage: convo.lastMessage,
+                                        lastMessage: convo.lastMessage
+                                            ? decryptAES(convo.lastMessage)
+                                            : '',
                                         lastMessageAt: convo.lastMessageAt,
-                                        lastMessageFrom: convo.lastMessageFrom,
+                                        lastMessageFrom: convo.lastMessageFrom
+                                            ? decryptAES(convo.lastMessageFrom)
+                                            : '',
                                         members: convo.members,
-                                        name: convo.name,
+                                        name: decryptAES(convo.name),
                                         ownerId: convo.ownerId,
                                         unreadCount: unread,
                                         totalMessages,

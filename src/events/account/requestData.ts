@@ -51,6 +51,7 @@ async function requestData({
         privateKey: account.isPRO ? imagekitPrivate : imagekitFreePrivate,
     });
 
+    // Send encrypted data, if any
     const res = await imagekit.upload({
         fileName: `${v4()}-data.json`,
         file: btoa(
@@ -81,7 +82,7 @@ async function requestData({
     });
 
     sendEmail(account.email, 'Your data is here!', [
-        "This link includes all of your account's data, no exceptions (apart from your password ofcourse).",
+        "This link includes all of your account's data (as is in our database, some of them encrypted), no exceptions (apart from your password ofcourse).",
         'Do not share it with anyone else, pretty please.',
         res.url,
     ]);

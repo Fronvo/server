@@ -10,6 +10,8 @@ import {
 } from 'interfaces/account/sendRoomMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
+    decryptAES,
+    encryptAES,
     generateError,
     getSocketAccountId,
     sendMulticastFCM,
@@ -173,7 +175,7 @@ async function sendRoomMessage({
                 ownerId: account.profileId,
                 roomId,
                 messageId: v4(),
-                content: message,
+                content: !isTenor && !isSpotify ? encryptAES(message) : '',
                 isReply: Boolean(replyId),
                 replyContent,
                 isSpotify,
@@ -211,7 +213,11 @@ async function sendRoomMessage({
     io.to(roomId).emit('newRoomMessage', {
         roomId,
         newMessageData: {
-            message: newMessageData,
+            message: {
+                ...newMessageData,
+                content: message,
+                replyContent,
+            },
             profileData: account,
         },
     });
@@ -230,7 +236,7 @@ async function sendRoomMessage({
                 },
 
                 data: {
-                    lastMessage: finalLastMessage,
+                    lastMessage: encryptAES(finalLastMessage),
                     lastMessageAt: new Date(),
                     lastMessageFrom: '',
 
@@ -250,7 +256,7 @@ async function sendRoomMessage({
                 },
 
                 data: {
-                    lastMessage: finalLastMessage,
+                    lastMessage: encryptAES(finalLastMessage),
                     lastMessageAt: new Date(),
                     lastMessageFrom: '',
 
@@ -268,9 +274,10 @@ async function sendRoomMessage({
                 },
 
                 data: {
-                    lastMessage: message,
+                    lastMessage:
+                        !isTenor && !isSpotify ? encryptAES(message) : '',
                     lastMessageAt: new Date(),
-                    lastMessageFrom: account.username,
+                    lastMessageFrom: encryptAES(account.username),
 
                     // Reset hidden states
                     dmHiddenFor: {
@@ -303,7 +310,7 @@ async function sendRoomMessage({
             if (!room.isDM) {
                 sendMulticastFCM(
                     room.members as string[],
-                    room.name,
+                    decryptAES(room.name),
                     finalLastMessage,
                     account.profileId,
                     true

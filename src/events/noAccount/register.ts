@@ -15,7 +15,7 @@ import {
     passwordSchema,
     profileIdSchema,
 } from 'events/shared';
-import { validateSchema } from 'utilities/global';
+import { encryptAES, validateSchema } from 'utilities/global';
 import {
     RegisterVerifyParams,
     RegisterVerifyTestResult,
@@ -113,7 +113,7 @@ async function register({
 
             const account2 = await prismaClient.account.findFirst({
                 where: {
-                    profileId: profileId,
+                    profileId,
                 },
             });
 
@@ -125,9 +125,7 @@ async function register({
             // Detach listener
             socket.removeAllListeners('registerVerify');
 
-            const username = `Fronvo user ${
-                (await prismaClient.account.count()) + 1
-            }`;
+            const username = 'Fronvo user';
 
             await prismaClient.account.create({
                 data: {
@@ -137,7 +135,7 @@ async function register({
                         password,
                         variables.mainBcryptHash
                     ),
-                    username,
+                    username: encryptAES(username),
                     friends: [],
                     isPRO: false,
                 },

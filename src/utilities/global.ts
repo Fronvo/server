@@ -14,7 +14,9 @@ import { Server, Socket } from 'socket.io';
 import { format } from 'util';
 import { v4 } from 'uuid';
 import * as variables from 'variables/global';
+import { aesEnc, aesIV } from 'variables/global';
 import { prismaClient } from 'variables/global';
+import { createCipheriv, createDecipheriv } from 'crypto';
 
 export async function loginSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -583,4 +585,30 @@ export function generateChars(length?: number): string {
     );
 
     return randomArray.join('');
+}
+
+export function encryptAES(target: string): string {
+    try {
+        const cipher = createCipheriv('AES-256-CBC', aesEnc, aesIV);
+
+        return Buffer.from(
+            cipher.update(target, 'utf8', 'hex') + cipher.final('hex')
+        ).toString('base64');
+    } catch (e) {
+        return 'CORRUPTED';
+    }
+}
+
+export function decryptAES(target: string): string {
+    try {
+        const buff = Buffer.from(target, 'base64');
+        const decipher = createDecipheriv('AES-256-CBC', aesEnc, aesIV);
+
+        return (
+            decipher.update(buff.toString('utf8'), 'hex', 'utf8') +
+            decipher.final('utf8')
+        );
+    } catch (e) {
+        return 'CORRUPTED';
+    }
 }

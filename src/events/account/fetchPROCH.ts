@@ -8,7 +8,7 @@ import {
     FetchPROCHServerParams,
 } from 'interfaces/account/fetchPROCH';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { decryptAES, generateError } from 'utilities/global';
 import { getEnv } from 'variables/varUtils';
 
 async function fetchPROCH({
@@ -23,7 +23,7 @@ async function fetchPROCH({
         return generateError('UNKNOWN');
     }
 
-    return { proCH: account.proCH };
+    return { proCH: decryptAES(account.proCH) };
 }
 
 const fetchPROCHTemplate: EventTemplate = {

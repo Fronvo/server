@@ -9,7 +9,7 @@ import {
     SharePostServerParams,
 } from 'interfaces/account/sharePost';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, sendMulticastFCM } from 'utilities/global';
+import { encryptAES, generateError, sendMulticastFCM } from 'utilities/global';
 import { v4 } from 'uuid';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
@@ -61,7 +61,7 @@ async function sharePost({
         data: {
             postId: v4(),
             author: account.profileId,
-            content,
+            content: content ? encryptAES(content) : undefined,
             attachment,
             gif,
             likes: [account.profileId],

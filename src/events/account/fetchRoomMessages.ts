@@ -5,7 +5,7 @@
 import { StringSchema } from '@ezier/validate';
 import { Account, RoomMessage } from '@prisma/client';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { decryptAES, generateError } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 import { fromToSchema, roomIdSchema } from '../shared';
 import {
@@ -168,7 +168,13 @@ async function fetchRoomMessages({
         const message = messages[messageIndex];
 
         roomMessages.push({
-            message,
+            message: {
+                ...message,
+                content: message.content ? decryptAES(message.content) : '',
+                replyContent: message.replyContent
+                    ? decryptAES(message.replyContent)
+                    : '',
+            },
             profileData: getProfileData(message.ownerId),
         });
     }

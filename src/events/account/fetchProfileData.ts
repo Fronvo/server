@@ -70,7 +70,7 @@ async function fetchProfileData({
         online: getAccountSocketId(profileId) != '',
         status: showStatus ? targetAccount.status : '',
         totalPosts,
-        isPRO: targetAccount.isPRO,
+        isPRO: targetAccount.isPRO || targetAccount.profileId == 'fronvo',
     };
 
     // More data if our profile
@@ -81,7 +81,7 @@ async function fetchProfileData({
         profileData.friends = account.friends;
 
         // Unusable if unsubscribed
-        if (targetAccount.isPRO) {
+        if (targetAccount.isPRO || targetAccount.profileId == 'fronvo') {
             if (targetAccount.appliedTheme) {
                 const theme = await prismaClient.theme.findFirst({
                     where: {

@@ -24,6 +24,16 @@ async function createTheme({
         return generateError('NOT_FRONVO');
     }
 
+    const existingTheme = await prismaClient.theme.findFirst({
+        where: {
+            title,
+        },
+    });
+
+    if (existingTheme) {
+        return generateError('THEME_EXISTS');
+    }
+
     await prismaClient.theme.create({
         data: {
             title,
@@ -55,22 +65,22 @@ const createThemeTemplate: EventTemplate = {
 
         brandingWhite: {
             length: 6,
-            regex: /[0-9]/,
+            regex: /[a-zA-Z0-9]/,
         },
 
         brandingDarkenWhite: {
             length: 6,
-            regex: /[0-9]/,
+            regex: /[a-zA-Z0-9]/,
         },
 
         brandingDark: {
             length: 6,
-            regex: /[0-9]/,
+            regex: /[a-zA-Z0-9]/,
         },
 
         brandingDarkenDark: {
             length: 6,
-            regex: /[0-9]/,
+            regex: /[a-zA-Z0-9]/,
         },
     }),
 };

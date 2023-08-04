@@ -14,7 +14,7 @@ import {
     UpdateRoomDataServerParams,
 } from 'interfaces/account/updateRoomData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { decryptAES, encryptAES, generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function updateRoomData({
@@ -55,7 +55,7 @@ async function updateRoomData({
             },
 
             data: {
-                name,
+                name: encryptAES(name),
                 icon,
             },
 
@@ -70,7 +70,7 @@ async function updateRoomData({
 
     io.to(roomId).emit('roomDataUpdated', {
         roomId,
-        name: roomData.name,
+        name: decryptAES(roomData.name),
         icon: roomData.icon,
     });
 
