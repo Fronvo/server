@@ -166,9 +166,7 @@ async function deleteRoomMessage({
                         roomId,
                     },
                     data: {
-                        lastMessage: lastMessageObj.content
-                            ? encryptAES(lastMessageObj.content)
-                            : '',
+                        lastMessage: lastMessageObj.content,
                         lastMessageAt: lastMessageObj.creationDate,
                         lastMessageFrom: lastMessageOwner.username
                             ? encryptAES(lastMessageOwner.username)

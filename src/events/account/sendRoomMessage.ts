@@ -216,7 +216,7 @@ async function sendRoomMessage({
             message: {
                 ...newMessageData,
                 content: message,
-                replyContent,
+                replyContent: decryptAES(replyContent),
             },
             profileData: account,
         },
@@ -291,7 +291,7 @@ async function sendRoomMessage({
             if (!room.isDM) {
                 sendMulticastFCM(
                     room.members as string[],
-                    room.name,
+                    decryptAES(room.name),
                     `${account.username}: ${message}`,
                     account.profileId,
                     true
