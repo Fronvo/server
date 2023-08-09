@@ -42,7 +42,7 @@ async function updateRoomData({
 
     // Ensure name is not empty
     if (!name) {
-        name = room.name;
+        name = decryptAES(room.name);
     }
 
     // Not really Partial but roll with it
