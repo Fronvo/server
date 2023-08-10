@@ -169,6 +169,10 @@ import {
     FetchLatestVersionParams,
     FetchLatestVersionTestResult,
 } from 'interfaces/account/fetchLatestVersion';
+import {
+    RemoveFCMParams,
+    RemoveFCMTestResult,
+} from 'interfaces/account/removeFCM';
 
 export interface ClientToServerEvents {
     register: (
@@ -336,5 +340,9 @@ export interface ClientToServerEvents {
     fetchLatestVersion: (
         {}: FetchLatestVersionParams,
         callback?: ({}: FetchLatestVersionTestResult) => void
+    ) => void;
+    removeFCM: (
+        {}: RemoveFCMParams,
+        callback?: ({}: RemoveFCMTestResult) => void
     ) => void;
 }
