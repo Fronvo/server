@@ -11,6 +11,7 @@ import {
 
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
+    decryptAES,
     encryptAES,
     generateError,
     getSocketAccountId,
@@ -98,7 +99,7 @@ async function sendRoomMessage({
         if (!room.isDM) {
             sendMulticastFCM(
                 room.members as string[],
-                room.name,
+                decryptAES(room.name),
                 `${account.username} sent an image`,
                 account.profileId,
                 true
