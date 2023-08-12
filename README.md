@@ -3,12 +3,7 @@
 <p align='center'><b>The server of Fronvo</b></p>
 <p align='center'><b>Built on socket.io for blazing-fast realtime communication</b></p>
 
-<h2 align='center'>
-
-[![forthebadge](https://forthebadge.com/images/badges/made-with-typescript.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
-
-</h2>
+<h2 align='center'></h2>
 
 ### Host locally
 
