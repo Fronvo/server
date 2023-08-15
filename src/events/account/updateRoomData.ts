@@ -61,6 +61,12 @@ async function updateRoomData({
         },
     });
 
+    io.to(roomId).emit('roomDataUpdated', {
+        roomId,
+        name: name ? name : decryptAES(room.name),
+        icon: icon ? icon : room.icon,
+    });
+
     if (icon?.length > 0) {
         deleteImage(room.icon);
     }

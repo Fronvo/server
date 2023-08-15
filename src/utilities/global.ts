@@ -696,7 +696,7 @@ export async function sendRoomNotification(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
     room: Partial<Room>,
     text: string
-): Promise<FronvoError | undefined> {
+): Promise<void> {
     const roomId = room.roomId;
 
     await prismaClient.room.update({
@@ -763,12 +763,6 @@ export async function sendRoomNotification(
                 },
             }),
         },
-    });
-
-    io.to(roomId).emit('roomDataUpdated', {
-        roomId,
-        name: room.name,
-        icon: room.icon,
     });
 
     updateRoomSeen(io, room.roomId);
