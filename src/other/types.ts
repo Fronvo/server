@@ -76,4 +76,5 @@ export type EnvValues =
     | 'PRO_SECRET'
     | 'VERSION'
     | 'AES_ENC'
-    | 'AES_IV';
+    | 'AES_IV'
+    | 'DAILY_RESTARTS';
