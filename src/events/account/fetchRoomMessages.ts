@@ -103,6 +103,8 @@ async function fetchRoomMessages({
             spotifyEmbed: true,
             isTenor: true,
             tenorUrl: true,
+            isNotification: true,
+            notificationText: true,
         },
     });
 
@@ -173,6 +175,9 @@ async function fetchRoomMessages({
                 content: message.content ? decryptAES(message.content) : '',
                 replyContent: message.replyContent
                     ? decryptAES(message.replyContent)
+                    : '',
+                notificationText: message.notificationText
+                    ? decryptAES(message.notificationText)
                     : '',
             },
             profileData: getProfileData(message.ownerId),

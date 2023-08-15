@@ -61,20 +61,22 @@ model Room {
 }
 
 model RoomMessage {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  ownerId      String
-  roomId       String
-  messageId    String   @unique
-  content      String?
-  creationDate DateTime @default(now())
-  isReply      Boolean  @default(false)
-  replyContent String   @default("")
-  isImage      Boolean  @default(false)
-  attachment   String?
-  isSpotify    Boolean? @default(false)
-  spotifyEmbed String?  @default("")
-  isTenor      Boolean  @default(false)
-  tenorUrl     String?  @default("")
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId          String
+  roomId           String
+  messageId        String   @unique
+  content          String?
+  creationDate     DateTime @default(now())
+  isReply          Boolean  @default(false)
+  replyContent     String   @default("")
+  isImage          Boolean  @default(false)
+  attachment       String?
+  isSpotify        Boolean? @default(false)
+  spotifyEmbed     String?  @default("")
+  isTenor          Boolean  @default(false)
+  tenorUrl         String?  @default("")
+  isNotification   Boolean  @default(false)
+  notificationText String?  @default("")
 }
 
 model Token {

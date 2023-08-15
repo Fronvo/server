@@ -9,7 +9,7 @@ import {
     UpdateProfileDataServerParams,
 } from 'interfaces/account/updateProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { deleteImage, generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function updateProfileData({
@@ -40,6 +40,14 @@ async function updateProfileData({
     // Free limit: No banner update
     if (!account.isPRO && banner) {
         return generateError('PRO_REQUIRED');
+    }
+
+    if (account.banner?.length > 0 && banner?.length > 0) {
+        deleteImage(account.banner);
+    }
+
+    if (account.avatar?.length > 0 && avatar?.length > 0) {
+        deleteImage(account.avatar);
     }
 
     let profileData: Partial<Account>;

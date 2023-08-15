@@ -9,7 +9,7 @@ import {
     DeleteRoomMessageServerParams,
 } from 'interfaces/account/deleteRoomMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { encryptAES, generateError } from 'utilities/global';
+import { deleteImage, encryptAES, generateError } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function deleteRoomMessage({
@@ -51,6 +51,8 @@ async function deleteRoomMessage({
         return generateError('NOT_OWNER');
     }
 
+    if (targetMessage.isNotification) return generateError('UNKNOWN');
+
     let deletedMessage: { count: number };
 
     try {
@@ -65,6 +67,10 @@ async function deleteRoomMessage({
 
     if (deletedMessage.count == 0) {
         return generateError('INVALID', undefined, ['message ID']);
+    }
+
+    if (targetMessage.attachment) {
+        deleteImage(targetMessage.attachment);
     }
 
     io.to(room.roomId).emit('roomMessageDeleted', { roomId, messageId });
@@ -86,6 +92,8 @@ async function deleteRoomMessage({
                         isImage: true,
                         isSpotify: true,
                         isTenor: true,
+                        isNotification: true,
+                        notificationText: true,
                     },
 
                     take: -1,
@@ -118,7 +126,19 @@ async function deleteRoomMessage({
                 },
             });
 
-            if (lastMessageObj.isTenor) {
+            if (lastMessageObj.isNotification) {
+                await prismaClient.room.update({
+                    where: {
+                        roomId,
+                    },
+
+                    data: {
+                        lastMessage: lastMessageObj.notificationText,
+                        lastMessageAt: lastMessageObj.creationDate,
+                        lastMessageFrom: '',
+                    },
+                });
+            } else if (lastMessageObj.isTenor) {
                 await prismaClient.room.update({
                     where: {
                         roomId,

@@ -9,7 +9,11 @@ import {
     AddRoomMemberServerParams,
 } from 'interfaces/account/addRoomMember';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getAccountSocketId } from 'utilities/global';
+import {
+    generateError,
+    getAccountSocketId,
+    sendRoomNotification,
+} from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function addRoomMember({
@@ -90,6 +94,12 @@ async function addRoomMember({
     io.sockets.sockets.get(getAccountSocketId(profileId))?.emit('roomAdded', {
         roomId,
     });
+
+    sendRoomNotification(
+        io,
+        room,
+        `${account.profileId} added ${profileId} to the room`
+    );
 
     return {};
 }

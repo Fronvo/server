@@ -16,6 +16,7 @@ import {
     generateError,
     getSocketAccountId,
     sendMulticastFCM,
+    updateRoomSeen,
 } from 'utilities/global';
 import { v4 } from 'uuid';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
@@ -72,8 +73,6 @@ async function sendRoomMessage({
         return generateError('UNKNOWN');
     }
 
-    const targetSockets = await io.in(roomId).fetchSockets();
-
     io.to(roomId).emit('newRoomMessage', {
         roomId,
         newMessageData: {
@@ -117,43 +116,7 @@ async function sendRoomMessage({
         return generateError('UNKNOWN');
     }
 
-    setTimeout(async () => {
-        for (const socketIndex in targetSockets) {
-            const target = targetSockets[socketIndex];
-
-            const newSeenStates = await prismaClient.account.findFirst({
-                where: {
-                    profileId: getSocketAccountId(target.id),
-                },
-
-                select: {
-                    seenStates: true,
-                },
-            });
-
-            if (!newSeenStates.seenStates) {
-                // @ts-ignore
-                newSeenStates.seenStates = {};
-            }
-
-            newSeenStates.seenStates[roomId] =
-                await prismaClient.roomMessage.count({
-                    where: { roomId },
-                });
-
-            try {
-                await prismaClient.account.update({
-                    where: {
-                        profileId: getSocketAccountId(target.id),
-                    },
-
-                    data: {
-                        seenStates: newSeenStates.seenStates,
-                    },
-                });
-            } catch (e) {}
-        }
-    }, batchUpdatesDelay);
+    updateRoomSeen(io, room.roomId);
 
     return {};
 }

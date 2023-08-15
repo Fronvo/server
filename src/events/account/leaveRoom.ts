@@ -9,7 +9,11 @@ import {
     LeaveRoomServerParams,
 } from 'interfaces/account/leaveRoom';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import {
+    deleteImage,
+    generateError,
+    sendRoomNotification,
+} from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function leaveRoom({
@@ -35,12 +39,23 @@ async function leaveRoom({
     // Leave / delete the room
     if (account.profileId == room.ownerId) {
         try {
-            // Finally, remove all messages
+            const deletedMessages = await prismaClient.roomMessage.findMany({
+                where: {
+                    roomId,
+                },
+            });
+
             await prismaClient.roomMessage.deleteMany({
                 where: {
                     roomId,
                 },
             });
+
+            for (const messageIndex in deletedMessages) {
+                const message = deletedMessages[messageIndex];
+
+                deleteImage(message.attachment);
+            }
 
             // Then, delete the room
             await prismaClient.room.delete({
@@ -58,6 +73,8 @@ async function leaveRoom({
 
         // Clear room
         io.socketsLeave(room.roomId);
+
+        deleteImage(room.icon);
     } else {
         // Set in-place
         const newMembers = room.members;
@@ -87,6 +104,8 @@ async function leaveRoom({
             roomId,
             profileId: account.profileId,
         });
+
+        sendRoomNotification(io, room, `${account.profileId} left the room`);
 
         // Update seen states
         const newSeenStates = account.seenStates as {};

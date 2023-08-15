@@ -9,7 +9,7 @@ import {
     DeletePostServerParams,
 } from 'interfaces/account/deletePost';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { deleteImage, generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function deletePost({
@@ -29,6 +29,10 @@ async function deletePost({
 
     if (post.author != account.profileId) {
         return generateError('NOT_POST_CREATOR');
+    }
+
+    if (post.attachment?.length > 0) {
+        deleteImage(post.attachment);
     }
 
     await prismaClient.post.delete({

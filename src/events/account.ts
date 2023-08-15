@@ -12,7 +12,6 @@ import leaveRoom from 'events/account/leaveRoom';
 import sendRoomMessage from 'events/account/sendRoomMessage';
 import fetchRoomMessages from 'events/account/fetchRoomMessages';
 import deleteRoomMessage from 'events/account/deleteRoomMessage';
-import kickMember from 'events/account/kickMember';
 import updateProfileStatus from 'events/account/updateProfileStatus';
 import fetchConvos from 'events/account/fetchConvos';
 import startTyping from 'events/account/startTyping';
@@ -56,7 +55,6 @@ const accountTemplate: EventExportTemplate = {
     sendRoomMessage,
     fetchRoomMessages,
     deleteRoomMessage,
-    kickMember,
     updateProfileStatus,
     fetchConvos,
     startTyping,

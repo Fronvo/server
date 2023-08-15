@@ -9,7 +9,7 @@ import {
     DeleteAccountServerParams,
 } from 'interfaces/account/deleteAccount';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, sendEmail } from 'utilities/global';
+import { deleteImage, generateError, sendEmail } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 import { compareSync } from 'bcrypt';
 
@@ -140,9 +140,18 @@ async function deleteAccount({
                     },
                 });
 
+                deleteImage(account.avatar);
+                deleteImage(account.banner);
+
                 await prismaClient.token.delete({
                     where: {
                         profileId: account.profileId,
+                    },
+                });
+
+                const deletedPosts = await prismaClient.post.findMany({
+                    where: {
+                        author: account.profileId,
                     },
                 });
 
@@ -152,12 +161,31 @@ async function deleteAccount({
                     },
                 });
 
-                // Room-related
+                for (const postIndex in deletedPosts) {
+                    const post = deletedPosts[postIndex];
+
+                    deleteImage(post.attachment);
+                }
+
+                const deletedMessages = await prismaClient.roomMessage.findMany(
+                    {
+                        where: {
+                            ownerId: account.profileId,
+                        },
+                    }
+                );
+
                 await prismaClient.roomMessage.deleteMany({
                     where: {
                         ownerId: account.profileId,
                     },
                 });
+
+                for (const messageIndex in deletedMessages) {
+                    const message = deletedMessages[messageIndex];
+
+                    deleteImage(message.attachment);
+                }
             }
 
             async function deleteOwnedRooms(): Promise<void> {
@@ -169,6 +197,7 @@ async function deleteAccount({
 
                         select: {
                             roomId: true,
+                            icon: true,
                         },
                     });
 
@@ -198,6 +227,8 @@ async function deleteAccount({
                                     })
                                     .then(() => {
                                         deletedRooms += 1;
+
+                                        deleteImage(room.icon);
 
                                         if (
                                             deletedRooms == roomsToDelete.length

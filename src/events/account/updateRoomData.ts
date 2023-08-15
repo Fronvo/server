@@ -3,7 +3,6 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Room } from '@prisma/client';
 import {
     roomIconSchema,
     roomIdSchema,
@@ -14,7 +13,13 @@ import {
     UpdateRoomDataServerParams,
 } from 'interfaces/account/updateRoomData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { decryptAES, encryptAES, generateError } from 'utilities/global';
+import {
+    decryptAES,
+    deleteImage,
+    encryptAES,
+    generateError,
+    sendRoomNotification,
+} from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function updateRoomData({
@@ -45,34 +50,44 @@ async function updateRoomData({
         name = decryptAES(room.name);
     }
 
-    // Not really Partial but roll with it
-    let roomData: Partial<Room>;
+    await prismaClient.room.update({
+        where: {
+            roomId,
+        },
 
-    try {
-        roomData = await prismaClient.room.update({
-            where: {
-                roomId,
-            },
+        data: {
+            name: encryptAES(name),
+            icon,
+        },
+    });
 
-            data: {
-                name: encryptAES(name),
-                icon,
-            },
-
-            select: {
-                name: true,
-                icon: true,
-            },
-        });
-    } catch (e) {
-        return generateError('UNKNOWN');
+    if (icon?.length > 0) {
+        deleteImage(room.icon);
     }
 
-    io.to(roomId).emit('roomDataUpdated', {
-        roomId,
-        name: decryptAES(roomData.name),
-        icon: roomData.icon,
-    });
+    if (name?.length > 0) {
+        sendRoomNotification(
+            io,
+            {
+                ...room,
+                name: name ? name : decryptAES(room.name),
+                icon: icon ? icon : room.icon,
+            },
+            `${account.profileId} changed the room name to ${name}`
+        );
+    }
+
+    if (icon?.length > 0) {
+        sendRoomNotification(
+            io,
+            {
+                ...room,
+                name: name ? name : decryptAES(room.name),
+                icon: icon ? icon : room.icon,
+            },
+            `${account.profileId} changed the room icon`
+        );
+    }
 
     return {};
 }

@@ -17,6 +17,8 @@ import * as variables from 'variables/global';
 import { aesEnc, aesIV } from 'variables/global';
 import { prismaClient } from 'variables/global';
 import { createCipheriv, createDecipheriv } from 'crypto';
+import ImageKit from 'imagekit';
+import { Room, RoomMessage } from '@prisma/client';
 
 export async function loginSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -611,4 +613,163 @@ export function decryptAES(target: string): string {
     } catch (e) {
         return 'CORRUPTED';
     }
+}
+
+export async function deleteImage(image: string): Promise<void> {
+    if (!image || image?.length == 0) return;
+
+    const imagekit = new ImageKit({
+        urlEndpoint: image.includes(variables.imagekitFreeEndpoint)
+            ? variables.imagekitFreeEndpoint
+            : variables.imagekitEndpoint,
+        publicKey: image.includes(variables.imagekitFreeEndpoint)
+            ? variables.imagekitFreePublic
+            : variables.imagekitPublic,
+        privateKey: image.includes(variables.imagekitFreeEndpoint)
+            ? variables.imagekitFreePrivate
+            : variables.imagekitPrivate,
+    });
+
+    const targetEndpoint = image.includes(variables.imagekitFreeEndpoint)
+        ? variables.imagekitFreeEndpoint
+        : variables.imagekitEndpoint;
+
+    const prevResult = await imagekit.listFiles({
+        name: image
+            .replace(targetEndpoint + '/', '')
+            .replace(/\?updatedAt=[a-z0-9]+/, '')
+            .replace(/\?tr=[a-zA-Z0-9%-]+/, ''),
+        limit: 1,
+    });
+
+    if (prevResult.length > 0) {
+        await imagekit.deleteFile(prevResult[0].fileId);
+    }
+}
+
+export async function updateRoomSeen(
+    io: Server<ClientToServerEvents, ServerToClientEvents>,
+    roomId: string
+): Promise<void> {
+    setTimeout(async () => {
+        const targetSockets = await io.in(roomId).fetchSockets();
+
+        for (const socketIndex in targetSockets) {
+            const target = targetSockets[socketIndex];
+
+            const newSeenStates = await prismaClient.account.findFirst({
+                where: {
+                    profileId: getSocketAccountId(target.id),
+                },
+
+                select: {
+                    seenStates: true,
+                },
+            });
+
+            if (!newSeenStates.seenStates) {
+                // @ts-ignore
+                newSeenStates.seenStates = {};
+            }
+
+            newSeenStates.seenStates[roomId] =
+                await prismaClient.roomMessage.count({
+                    where: { roomId },
+                });
+
+            try {
+                await prismaClient.account.update({
+                    where: {
+                        profileId: getSocketAccountId(target.id),
+                    },
+
+                    data: {
+                        seenStates: newSeenStates.seenStates,
+                    },
+                });
+            } catch (e) {}
+        }
+    }, variables.batchUpdatesDelay);
+}
+
+export async function sendRoomNotification(
+    io: Server<ClientToServerEvents, ServerToClientEvents>,
+    room: Partial<Room>,
+    text: string
+): Promise<FronvoError | undefined> {
+    const roomId = room.roomId;
+
+    await prismaClient.room.update({
+        where: {
+            roomId,
+        },
+
+        data: {
+            lastMessage: encryptAES(text),
+            lastMessageAt: new Date(),
+            lastMessageFrom: '',
+
+            // Reset hidden states
+            dmHiddenFor: {
+                set: [],
+            },
+        },
+    });
+
+    let newMessageData: Partial<RoomMessage>;
+
+    try {
+        newMessageData = await prismaClient.roomMessage.create({
+            data: {
+                ownerId: 'fronvo',
+                roomId,
+                messageId: v4(),
+                isNotification: true,
+                notificationText: encryptAES(text),
+            },
+
+            select: {
+                ownerId: true,
+                roomId: true,
+                content: true,
+                creationDate: true,
+                messageId: true,
+                isReply: true,
+                replyContent: true,
+                isSpotify: true,
+                spotifyEmbed: true,
+                isTenor: true,
+                tenorUrl: true,
+                isNotification: true,
+                notificationText: true,
+            },
+        });
+    } catch (e) {}
+
+    io.to(roomId).emit('newRoomMessage', {
+        roomId,
+        newMessageData: {
+            message: {
+                ...newMessageData,
+                notificationText: text,
+            },
+            profileData: await prismaClient.account.findFirst({
+                where: {
+                    profileId: 'fronvo',
+                },
+
+                select: {
+                    profileId: true,
+                },
+            }),
+        },
+    });
+
+    io.to(roomId).emit('roomDataUpdated', {
+        roomId,
+        name: room.name,
+        icon: room.icon,
+    });
+
+    updateRoomSeen(io, room.roomId);
 }

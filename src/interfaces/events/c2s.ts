@@ -52,17 +52,9 @@ import {
     ResetPasswordTestResult,
 } from 'interfaces/noAccount/resetPassword';
 import {
-    ResetPasswordFinalParams,
-    ResetPasswordFinalTestResult,
-} from 'interfaces/noAccount/resetPasswordFinal';
-import {
     ResetPasswordVerifyParams,
     ResetPasswordVerifyTestResult,
 } from 'interfaces/noAccount/resetPasswordVerify';
-import {
-    KickMemberParams,
-    KickMemberTestResult,
-} from 'interfaces/account/kickMember';
 import {
     UpdateProfileStatusParams,
     UpdateProfileStatusTestResult,
@@ -227,10 +219,6 @@ export interface ClientToServerEvents {
     deleteRoomMessage: (
         {}: DeleteRoomMessageParams,
         callback?: ({}: DeleteRoomMessageTestResult) => void
-    ) => void;
-    kickMember: (
-        {}: KickMemberParams,
-        callback?: ({}: KickMemberTestResult) => void
     ) => void;
     updateProfileStatus: (
         {}: UpdateProfileStatusParams,
