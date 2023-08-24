@@ -36,8 +36,6 @@ async function fetchConvos({
                 ],
             },
 
-            take: 20,
-
             orderBy: {
                 lastMessageAt: 'desc',
             },
