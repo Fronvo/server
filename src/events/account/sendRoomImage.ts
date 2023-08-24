@@ -89,9 +89,7 @@ async function sendRoomMessage({
             },
 
             data: {
-                lastMessage: encryptAES(`${account.username} sent an image`),
                 lastMessageAt: new Date(),
-                lastMessageFrom: '',
             },
         });
 

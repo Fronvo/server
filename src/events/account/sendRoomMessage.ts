@@ -225,9 +225,7 @@ async function sendRoomMessage({
     let finalLastMessage: string;
 
     try {
-        if (isTenor) {
-            finalLastMessage = `${account.username} sent a GIF`;
-
+        setTimeout(async () => {
             // Update ordering of message lists
             await prismaClient.room.update({
                 where: {
@@ -235,9 +233,7 @@ async function sendRoomMessage({
                 },
 
                 data: {
-                    lastMessage: encryptAES(finalLastMessage),
                     lastMessageAt: new Date(),
-                    lastMessageFrom: '',
 
                     // Reset hidden states
                     dmHiddenFor: {
@@ -245,86 +241,53 @@ async function sendRoomMessage({
                     },
                 },
             });
-        } else if (isSpotify) {
-            finalLastMessage = `${account.username} shared a Spotify song`;
 
-            // Update ordering of message lists
-            await prismaClient.room.update({
-                where: {
-                    roomId,
-                },
-
-                data: {
-                    lastMessage: encryptAES(finalLastMessage),
-                    lastMessageAt: new Date(),
-                    lastMessageFrom: '',
-
-                    // Reset hidden states
-                    dmHiddenFor: {
-                        set: [],
-                    },
-                },
-            });
-        } else {
-            // Update ordering of message lists
-            await prismaClient.room.update({
-                where: {
-                    roomId,
-                },
-
-                data: {
-                    lastMessage:
-                        !isTenor && !isSpotify ? encryptAES(message) : '',
-                    lastMessageAt: new Date(),
-                    lastMessageFrom: encryptAES(account.username),
-
-                    // Reset hidden states
-                    dmHiddenFor: {
-                        set: [],
-                    },
-                },
-            });
-        }
-
-        if (!isTenor && !isSpotify) {
-            if (!room.isDM) {
-                sendMulticastFCM(
-                    room.members as string[],
-                    decryptAES(room.name),
-                    `${account.username}: ${message}`,
-                    account.profileId,
-                    true
-                );
-            } else {
-                sendMulticastFCM(
-                    room.dmUsers as string[],
-                    `@${account.profileId}`,
-                    `${account.username}: ${message}`,
-                    account.profileId,
-                    true,
-                    'dm'
-                );
+            if (isTenor) {
+                finalLastMessage = `${account.username} sent a GIF`;
+            } else if (isSpotify) {
+                finalLastMessage = `${account.username} shared a Spotify song`;
             }
-        } else {
-            if (!room.isDM) {
-                sendMulticastFCM(
-                    room.members as string[],
-                    decryptAES(room.name),
-                    finalLastMessage,
-                    account.profileId,
-                    true
-                );
+
+            if (!isTenor && !isSpotify) {
+                if (!room.isDM) {
+                    sendMulticastFCM(
+                        room.members as string[],
+                        decryptAES(room.name),
+                        `${account.username}: ${message}`,
+                        account.profileId,
+                        true
+                    );
+                } else {
+                    sendMulticastFCM(
+                        room.dmUsers as string[],
+                        `@${account.profileId}`,
+                        `${account.username}: ${message}`,
+                        account.profileId,
+                        true,
+                        'dm'
+                    );
+                }
             } else {
-                sendMulticastFCM(
-                    room.dmUsers as string[],
-                    `@${account.profileId}`,
-                    finalLastMessage,
-                    account.profileId,
-                    true,
-                    'dm'
-                );
+                if (!room.isDM) {
+                    sendMulticastFCM(
+                        room.members as string[],
+                        decryptAES(room.name),
+                        finalLastMessage,
+                        account.profileId,
+                        true
+                    );
+                } else {
+                    sendMulticastFCM(
+                        room.dmUsers as string[],
+                        `@${account.profileId}`,
+                        finalLastMessage,
+                        account.profileId,
+                        true,
+                        'dm'
+                    );
+                }
             }
-        }
+        }, batchUpdatesDelay);
     } catch (e) {
         return generateError('UNKNOWN');
     }

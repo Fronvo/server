@@ -699,22 +699,22 @@ export async function sendRoomNotification(
 ): Promise<void> {
     const roomId = room.roomId;
 
-    await prismaClient.room.update({
-        where: {
-            roomId,
-        },
-
-        data: {
-            lastMessage: encryptAES(text),
-            lastMessageAt: new Date(),
-            lastMessageFrom: '',
-
-            // Reset hidden states
-            dmHiddenFor: {
-                set: [],
+    setTimeout(async () => {
+        await prismaClient.room.update({
+            where: {
+                roomId,
             },
-        },
-    });
+
+            data: {
+                lastMessageAt: new Date(),
+
+                // Reset hidden states
+                dmHiddenFor: {
+                    set: [],
+                },
+            },
+        });
+    }, variables.batchUpdatesDelay);
 
     let newMessageData: Partial<RoomMessage>;
 

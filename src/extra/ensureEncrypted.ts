@@ -27,48 +27,6 @@ async function checkPostsAES(): Promise<void> {
     console.log(`Corrupted posts: ${corruptedPosts}/${posts.length}`);
 }
 
-async function checkRoomsAES(): Promise<void> {
-    let corruptedRooms = 0;
-
-    const rooms = await variables.prismaClient.room.findMany({
-        select: {
-            name: true,
-            lastMessage: true,
-            lastMessageFrom: true,
-        },
-    });
-
-    for (const roomIndex in rooms) {
-        const target = rooms[roomIndex];
-
-        let nameRes: string;
-        let lastMessageRes: string;
-        let lastMessageFromRes: string;
-
-        if (target.name) {
-            nameRes = decryptAES(target.name);
-        }
-
-        if (target.lastMessage) {
-            lastMessageRes = decryptAES(target.lastMessage);
-        }
-
-        if (target.lastMessageFrom) {
-            lastMessageFromRes = decryptAES(target.lastMessageFrom);
-        }
-
-        if (
-            nameRes == 'CORRUPTED' ||
-            lastMessageRes == 'CORRUPTED' ||
-            lastMessageFromRes == 'CORRUPTED'
-        ) {
-            corruptedRooms += 1;
-        }
-    }
-
-    console.log(`Corrupted rooms: ${corruptedRooms}/${rooms.length}`);
-}
-
 async function checkMessagesAES(): Promise<void> {
     let corruptedMessages = 0;
 
@@ -103,4 +61,3 @@ async function checkMessagesAES(): Promise<void> {
 
 checkMessagesAES();
 checkPostsAES();
-checkRoomsAES();

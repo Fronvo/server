@@ -9,7 +9,7 @@ import {
     DeleteRoomMessageServerParams,
 } from 'interfaces/account/deleteRoomMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { deleteImage, encryptAES, generateError } from 'utilities/global';
+import { deleteImage, generateError } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function deleteRoomMessage({
@@ -75,126 +75,16 @@ async function deleteRoomMessage({
 
     io.to(room.roomId).emit('roomMessageDeleted', { roomId, messageId });
 
-    // Don't block
     setTimeout(async () => {
-        try {
-            // Update last message
-            const lastMessageObj = (
-                await prismaClient.roomMessage.findMany({
-                    where: {
-                        roomId,
-                    },
+        await prismaClient.room.update({
+            where: {
+                roomId: room.roomId,
+            },
 
-                    select: {
-                        content: true,
-                        creationDate: true,
-                        ownerId: true,
-                        isImage: true,
-                        isSpotify: true,
-                        isTenor: true,
-                        isNotification: true,
-                        notificationText: true,
-                    },
-
-                    take: -1,
-                })
-            )[0];
-
-            if (!lastMessageObj) {
-                await prismaClient.room.update({
-                    where: {
-                        roomId,
-                    },
-
-                    data: {
-                        lastMessage: '',
-                        lastMessageAt: undefined,
-                        lastMessageFrom: '',
-                    },
-                });
-
-                return;
-            }
-
-            const lastMessageOwner = await prismaClient.account.findFirst({
-                where: {
-                    profileId: lastMessageObj.ownerId,
-                },
-
-                select: {
-                    username: true,
-                },
-            });
-
-            if (lastMessageObj.isNotification) {
-                await prismaClient.room.update({
-                    where: {
-                        roomId,
-                    },
-
-                    data: {
-                        lastMessage: lastMessageObj.notificationText,
-                        lastMessageAt: lastMessageObj.creationDate,
-                        lastMessageFrom: '',
-                    },
-                });
-            } else if (lastMessageObj.isTenor) {
-                await prismaClient.room.update({
-                    where: {
-                        roomId,
-                    },
-
-                    data: {
-                        lastMessage: encryptAES(
-                            `${lastMessageOwner.username} sent a GIF`
-                        ),
-                        lastMessageAt: lastMessageObj.creationDate,
-                        lastMessageFrom: '',
-                    },
-                });
-            } else if (lastMessageObj.isSpotify) {
-                await prismaClient.room.update({
-                    where: {
-                        roomId,
-                    },
-
-                    data: {
-                        lastMessage: encryptAES(
-                            `${lastMessageOwner.username} shared a Spotify song`
-                        ),
-                        lastMessageAt: lastMessageObj.creationDate,
-                        lastMessageFrom: '',
-                    },
-                });
-            } else if (lastMessageObj.isImage) {
-                await prismaClient.room.update({
-                    where: {
-                        roomId,
-                    },
-
-                    data: {
-                        lastMessage: encryptAES(
-                            `${lastMessageOwner.username} sent an image`
-                        ),
-                        lastMessageAt: lastMessageObj.creationDate,
-                        lastMessageFrom: '',
-                    },
-                });
-            } else {
-                await prismaClient.room.update({
-                    where: {
-                        roomId,
-                    },
-                    data: {
-                        lastMessage: lastMessageObj.content,
-                        lastMessageAt: lastMessageObj.creationDate,
-                        lastMessageFrom: lastMessageOwner.username
-                            ? encryptAES(lastMessageOwner.username)
-                            : '',
-                    },
-                });
-            }
-        } catch (e) {}
+            data: {
+                lastMessageAt: new Date(),
+            },
+        });
     }, batchUpdatesDelay);
 
     return {};

@@ -45,19 +45,17 @@ model Post {
 }
 
 model Room {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  ownerId         String?
-  roomId          String    @unique
-  name            String?
-  creationDate    DateTime? @default(now())
-  icon            String?   @default("")
-  members         Json[]
-  lastMessage     String?
-  lastMessageAt   DateTime  @default(now())
-  lastMessageFrom String?
-  isDM            Boolean?  @default(false)
-  dmUsers         Json[]
-  dmHiddenFor     Json[]
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId       String?
+  roomId        String    @unique
+  name          String?
+  creationDate  DateTime? @default(now())
+  icon          String?   @default("")
+  members       Json[]
+  lastMessageAt DateTime  @default(now())
+  isDM          Boolean?  @default(false)
+  dmUsers       Json[]
+  dmHiddenFor   Json[]
 }
 
 model RoomMessage {

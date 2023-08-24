@@ -118,13 +118,6 @@ async function fetchConvos({
                                         roomId: convo.roomId,
                                         isDM: true,
                                         dmUsers: convo.dmUsers,
-                                        lastMessage: convo.lastMessage
-                                            ? decryptAES(convo.lastMessage)
-                                            : '',
-                                        lastMessageAt: convo.lastMessageAt,
-                                        lastMessageFrom: convo.lastMessageFrom
-                                            ? decryptAES(convo.lastMessageFrom)
-                                            : '',
                                         dmUserOnline: targetDMUserData.online,
                                         unreadCount: unread,
                                         dmUser: targetDMUserData,
@@ -137,13 +130,6 @@ async function fetchConvos({
                                         isDM: false,
                                         creationDate: convo.creationDate,
                                         icon: convo.icon,
-                                        lastMessage: convo.lastMessage
-                                            ? decryptAES(convo.lastMessage)
-                                            : '',
-                                        lastMessageAt: convo.lastMessageAt,
-                                        lastMessageFrom: convo.lastMessageFrom
-                                            ? decryptAES(convo.lastMessageFrom)
-                                            : '',
                                         members: convo.members,
                                         name: decryptAES(convo.name),
                                         ownerId: convo.ownerId,
