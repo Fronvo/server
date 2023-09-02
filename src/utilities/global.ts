@@ -700,20 +700,22 @@ export async function sendRoomNotification(
     const roomId = room.roomId;
 
     setTimeout(async () => {
-        await prismaClient.room.update({
-            where: {
-                roomId,
-            },
-
-            data: {
-                lastMessageAt: new Date(),
-
-                // Reset hidden states
-                dmHiddenFor: {
-                    set: [],
+        try {
+            await prismaClient.room.update({
+                where: {
+                    roomId,
                 },
-            },
-        });
+
+                data: {
+                    lastMessageAt: new Date(),
+
+                    // Reset hidden states
+                    dmHiddenFor: {
+                        set: [],
+                    },
+                },
+            });
+        } catch (e) {}
     }, variables.batchUpdatesDelay);
 
     let newMessageData: Partial<RoomMessage>;

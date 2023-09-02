@@ -191,7 +191,11 @@ async function runEventFunc(
 
     if (funcs)
         if (typeof callbackResponse.then == 'function') {
-            return await callbackResponse;
+            try {
+                return await callbackResponse;
+            } catch (e) {
+                return generateError('UNKNOWN');
+            }
         } else {
             return callbackResponse;
         }

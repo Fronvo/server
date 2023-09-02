@@ -36,6 +36,8 @@ async function updateRoomData({
         },
     });
 
+    let nameGiven = name;
+
     if (!room) {
         return generateError('ROOM_404');
     }
@@ -50,16 +52,20 @@ async function updateRoomData({
         name = decryptAES(room.name);
     }
 
-    await prismaClient.room.update({
-        where: {
-            roomId,
-        },
+    try {
+        await prismaClient.room.update({
+            where: {
+                roomId,
+            },
 
-        data: {
-            name: encryptAES(name),
-            icon,
-        },
-    });
+            data: {
+                name: encryptAES(name),
+                icon,
+            },
+        });
+    } catch (e) {
+        return generateError('UNKNOWN');
+    }
 
     io.to(roomId).emit('roomDataUpdated', {
         roomId,
@@ -71,16 +77,18 @@ async function updateRoomData({
         deleteImage(room.icon);
     }
 
-    if (name?.length > 0) {
-        sendRoomNotification(
-            io,
-            {
-                ...room,
-                name: name ? name : decryptAES(room.name),
-                icon: icon ? icon : room.icon,
-            },
-            `${account.profileId} changed the room name to ${name}`
-        );
+    if (nameGiven) {
+        if (name?.length > 0) {
+            sendRoomNotification(
+                io,
+                {
+                    ...room,
+                    name: name ? name : decryptAES(room.name),
+                    icon: icon ? icon : room.icon,
+                },
+                `${account.profileId} changed the room name to ${name}`
+            );
+        }
     }
 
     if (icon?.length > 0) {
