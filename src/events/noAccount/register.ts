@@ -135,7 +135,7 @@ async function register({
                         password,
                         variables.mainBcryptHash
                     ),
-                    username: encryptAES(username),
+                    username,
                     friends: [],
                     isPRO: false,
                 },
