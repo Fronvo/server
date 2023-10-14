@@ -37,13 +37,13 @@ function preStartupChecks(): void {
         if (variables.silentLogging) console.log = () => {};
     }
 
-    function checkDailyRestarts() {
-        if (variables.dailyRestarts)
-            setTimeout(process.exit, 60 * 60 * 24 * 1000);
+    function checkWeeklyRestarts() {
+        if (variables.weeklyRestarts)
+            setTimeout(process.exit, 7 * (60 * 60 * 24) * 1000);
     }
 
     checkSilentLogging();
-    checkDailyRestarts();
+    checkWeeklyRestarts();
 }
 
 async function setupPrisma(): Promise<void> {

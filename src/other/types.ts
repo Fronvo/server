@@ -77,4 +77,4 @@ export type EnvValues =
     | 'VERSION'
     | 'AES_ENC'
     | 'AES_IV'
-    | 'DAILY_RESTARTS';
+    | 'WEEKLY_RESTARTS';

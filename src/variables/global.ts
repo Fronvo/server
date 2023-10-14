@@ -96,4 +96,4 @@ export const AES_ENABLED =
 // Batch updates delay in ms, preferred range: [100 - 500]ms
 export const batchUpdatesDelay = 250;
 
-export const dailyRestarts = getEnvBoolean('DAILY_RESTARTS', false);
+export const weeklyRestarts = getEnvBoolean('WEEKLY_RESTARTS', false);
