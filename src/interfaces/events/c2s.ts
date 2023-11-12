@@ -165,6 +165,7 @@ import {
     RemoveFCMParams,
     RemoveFCMTestResult,
 } from 'interfaces/account/removeFCM';
+import { CanPostParams, CanPostTestResult } from 'interfaces/account/canPost';
 
 export interface ClientToServerEvents {
     register: (
@@ -332,5 +333,9 @@ export interface ClientToServerEvents {
     removeFCM: (
         {}: RemoveFCMParams,
         callback?: ({}: RemoveFCMTestResult) => void
+    ) => void;
+    canPost: (
+        {}: CanPostParams,
+        callback?: ({}: CanPostTestResult) => void
     ) => void;
 }

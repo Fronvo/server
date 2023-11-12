@@ -41,6 +41,7 @@ import refundPro from 'events/account/refundPro';
 import fetchPROCH from 'events/account/fetchPROCH';
 import fetchLatestVersion from 'events/account/fetchLatestVersion';
 import removeFCM from 'events/account/removeFCM';
+import canPost from 'events/account/canPost';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -84,6 +85,7 @@ const accountTemplate: EventExportTemplate = {
     fetchPROCH,
     fetchLatestVersion,
     removeFCM,
+    canPost,
 };
 
 export default accountTemplate;
