@@ -1,0 +1,15 @@
+# Node
+node_modules/
+
+# DotEnv
+.env
+
+# Fronvo
+logs.txt
+generated/*
+
+# Local work
+testing/
+
+# TypeScript Output
+output/

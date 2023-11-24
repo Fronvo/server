@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("FRONVO_PRISMA_URL")
+}
+
+model Account {
+  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
+  profileId             String    @unique
+  email                 String    @unique
+  username              String
+  bio                   String    @default("")
+  password              String
+  avatar                String    @default("")
+  banner                String    @default("")
+  creationDate          DateTime  @default(now())
+  status                String    @default("")
+  statusUpdatedTime     DateTime?
+  pendingFriendRequests Json[]
+  friends               Json[]
+  seenStates            Json?     @default("{}")
+  dataSentTime          DateTime?
+  isPRO                 Boolean?  @default(false)
+  proCH                 String?
+  lastPostAt            DateTime?
+  fcm                   String?   @default("")
+  appliedTheme          String?   @default("Fronvo")
+}
+
+model Post {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  postId       String   @unique
+  author       String
+  content      String?  @default("")
+  attachment   String?  @default("")
+  gif          String?  @default("")
+  creationDate DateTime @default(now())
+  likes        Json[]
+}
+
+model Room {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId       String?
+  roomId        String    @unique
+  name          String?
+  creationDate  DateTime? @default(now())
+  icon          String?   @default("")
+  members       Json[]
+  lastMessageAt DateTime  @default(now())
+  isDM          Boolean?  @default(false)
+  dmUsers       Json[]
+  dmHiddenFor   Json[]
+}
+
+model RoomMessage {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId          String
+  roomId           String
+  messageId        String   @unique
+  content          String?
+  creationDate     DateTime @default(now())
+  isReply          Boolean  @default(false)
+  replyContent     String   @default("")
+  isImage          Boolean  @default(false)
+  attachment       String?
+  isSpotify        Boolean? @default(false)
+  spotifyEmbed     String?  @default("")
+  isTenor          Boolean  @default(false)
+  tenorUrl         String?  @default("")
+  isNotification   Boolean  @default(false)
+  notificationText String?  @default("")
+}
+
+model Token {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  token     String @unique
+  profileId String @unique
+}
+
+model Theme {
+  id                  String @id @default(auto()) @map("_id") @db.ObjectId
+  title               String @unique
+  brandingWhite       String
+  brandingDarkenWhite String
+  brandingDark        String
+  brandingDarkenDark  String
+}
+
+// what could this possibly mean!?
+model Bot {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String   @unique
+  description  String   @default("")
+  icon         String   @default("")
+  creationDate DateTime @default(now())
+}
+
+model Log {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  info      String
+  timestamp DateTime @default(now())
+}

@@ -1,0 +1,65 @@
+{
+  "name": "fronvo-server2",
+  "version": "1.0.0",
+  "description": "The server of the open-source free-convo chat app.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fronvo/server.git"
+  },
+  "author": "@Shadofer",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Fronvo/server/issues"
+  },
+  "homepage": "https://github.com/Fronvo/server#readme",
+  "private": true,
+  "scripts": {
+    "build": "swc src -d output && copyfiles generated/* generated/local/** output",
+    "start": "run-s build start:cached",
+    "start:cached": "node -r @swc-node/register -r tsconfig-paths/register output/main/server.js",
+    "start:dev": "tsnd --ignore-watch generated/ --transpile-only --respawn --exit-child --clear -r tsconfig-paths/register src/main/server.ts",
+    "corrupt": "node -r @swc-node/register -r tsconfig-paths/register src/extra/ensureEncrypted.ts",
+    "encrypt": "node -r @swc-node/register -r tsconfig-paths/register src/extra/convertEncrypted.ts",
+    "check": "tsc",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky install",
+    "setup": "cross-env FRONVO_SETUP_MODE=true FRONVO_TEST_MODE=true FRONVO_BINARY_PARSER=false node -r @swc-node/register -r tsconfig-paths/register src/extra/setupDB.ts"
+  },
+  "dependencies": {
+    "@ezier/validate": "^0.2.3",
+    "@prisma/client": "^3.12.0",
+    "@socket.io/admin-ui": "^0.5.1",
+    "@swc-node/register": "^1.4.2",
+    "@swc/cli": "^0.1.57",
+    "bcrypt": "^5.1.0",
+    "copyfiles": "^2.4.1",
+    "cross-env": "^7.0.3",
+    "date-fns": "^2.30.0",
+    "dotenv": "^10.0.0",
+    "firebase-admin": "^11.10.1",
+    "gmail-send": "^1.8.14",
+    "gradient-string": "^1.2.0",
+    "imagekit": "^4.1.3",
+    "node-fetch": "^2.6.12",
+    "npm-run-all": "^4.1.5",
+    "ora": "^5.4.1",
+    "socket.io": "^4.4.1",
+    "socket.io-msgpack-parser": "^3.0.1",
+    "ts-node": "^10.7.0",
+    "tsconfig-paths": "^3.14.1",
+    "tslib": "^2.4.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.4.11",
+    "@types/gradient-string": "^1.1.2",
+    "@types/uuid": "^8.3.4",
+    "husky": "^7.0.4",
+    "prettier": "^2.6.2",
+    "prisma": "^3.12.0",
+    "socket.io-client": "^4.4.1",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.6.4"
+  }
+}
