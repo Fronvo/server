@@ -3,17 +3,16 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { RoomMessage } from '@prisma/client';
+import { Message } from '@prisma/client';
 import {
-    SendRoomMessageResult,
-    SendRoomMessageServerParams,
-} from 'interfaces/account/sendRoomMessage';
+    SendMessageResult,
+    SendMessageServerParams,
+} from 'interfaces/account/sendMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     decryptAES,
     encryptAES,
     generateError,
-    getSocketAccountId,
     sendMulticastFCM,
     updateRoomSeen,
     validateSchema,
@@ -21,13 +20,13 @@ import {
 import { v4 } from 'uuid';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
-async function sendRoomMessage({
+async function sendMessage({
     io,
     account,
     roomId,
     message,
     replyId,
-}: SendRoomMessageServerParams): Promise<SendRoomMessageResult | FronvoError> {
+}: SendMessageServerParams): Promise<SendMessageResult | FronvoError> {
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -81,7 +80,7 @@ async function sendRoomMessage({
         return newSchemaResult;
     }
 
-    let newMessageData: Partial<RoomMessage>;
+    let newMessageData: Partial<Message>;
 
     // Check for Spotify link (track or playlist)
     let isSpotify = false;
@@ -143,7 +142,7 @@ async function sendRoomMessage({
     let replyContent = '';
 
     if (replyId) {
-        const replyMessage = await prismaClient.roomMessage.findFirst({
+        const replyMessage = await prismaClient.message.findFirst({
             where: {
                 messageId: replyId,
             },
@@ -171,7 +170,7 @@ async function sendRoomMessage({
     }
 
     try {
-        newMessageData = await prismaClient.roomMessage.create({
+        newMessageData = await prismaClient.message.create({
             data: {
                 ownerId: account.profileId,
                 roomId,
@@ -209,7 +208,7 @@ async function sendRoomMessage({
         profileId: account.profileId,
     });
 
-    io.to(roomId).emit('newRoomMessage', {
+    io.to(roomId).emit('newMessage', {
         roomId,
         newMessageData: {
             message: {
@@ -298,8 +297,8 @@ async function sendRoomMessage({
     return {};
 }
 
-const sendRoomMessageTemplate: EventTemplate = {
-    func: sendRoomMessage,
+const sendMessageTemplate: EventTemplate = {
+    func: sendMessage,
     template: ['roomId', 'message', 'replyId'],
     schema: new StringSchema({
         roomId: {
@@ -318,4 +317,4 @@ const sendRoomMessageTemplate: EventTemplate = {
     }),
 };
 
-export default sendRoomMessageTemplate;
+export default sendMessageTemplate;

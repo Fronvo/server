@@ -71,7 +71,7 @@ async function fetchConvos({
             for (const convoIndex in convosRaw) {
                 const convo = convosRaw[convoIndex];
 
-                prismaClient.roomMessage
+                prismaClient.message
                     .count({
                         where: {
                             roomId: convo.roomId,

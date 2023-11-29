@@ -58,7 +58,39 @@ model Room {
   dmHiddenFor   Json[]
 }
 
-model RoomMessage {
+// TODO: Completely seperate from previous room model
+model Server {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId      String?
+  serverId     String    @unique
+  name         String?
+  description  String?
+  icon         String?   @default("")
+  creationDate DateTime? @default(now())
+  members      Json[]
+  channels     Json[]
+  roles        Json[]
+}
+
+model Channel {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String?
+  serverId     String?
+  roomId       String   @unique
+  creationDate DateTime @default(now())
+}
+
+// TODO: Permissions
+model Role {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  serverId     String?
+  roleId       String   @unique
+  creationDate DateTime @default(now())
+  color        String
+}
+
+model Message {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
   ownerId          String
   roomId           String

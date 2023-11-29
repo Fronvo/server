@@ -18,7 +18,7 @@ import { aesEnc, aesIV } from 'variables/global';
 import { prismaClient } from 'variables/global';
 import { createCipheriv, createDecipheriv } from 'crypto';
 import ImageKit from 'imagekit';
-import { Room, RoomMessage } from '@prisma/client';
+import { Room, Message } from '@prisma/client';
 
 export async function loginSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -672,10 +672,11 @@ export async function updateRoomSeen(
                 newSeenStates.seenStates = {};
             }
 
-            newSeenStates.seenStates[roomId] =
-                await prismaClient.roomMessage.count({
+            newSeenStates.seenStates[roomId] = await prismaClient.message.count(
+                {
                     where: { roomId },
-                });
+                }
+            );
 
             try {
                 await prismaClient.account.update({
@@ -718,10 +719,10 @@ export async function sendRoomNotification(
         } catch (e) {}
     }, variables.batchUpdatesDelay);
 
-    let newMessageData: Partial<RoomMessage>;
+    let newMessageData: Partial<Message>;
 
     try {
-        newMessageData = await prismaClient.roomMessage.create({
+        newMessageData = await prismaClient.message.create({
             data: {
                 ownerId: 'fronvo',
                 roomId,
@@ -748,7 +749,7 @@ export async function sendRoomNotification(
         });
     } catch (e) {}
 
-    io.to(roomId).emit('newRoomMessage', {
+    io.to(roomId).emit('newMessage', {
         roomId,
         newMessageData: {
             message: {

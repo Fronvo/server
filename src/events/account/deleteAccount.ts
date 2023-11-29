@@ -167,15 +167,13 @@ async function deleteAccount({
                     deleteImage(post.attachment);
                 }
 
-                const deletedMessages = await prismaClient.roomMessage.findMany(
-                    {
-                        where: {
-                            ownerId: account.profileId,
-                        },
-                    }
-                );
+                const deletedMessages = await prismaClient.message.findMany({
+                    where: {
+                        ownerId: account.profileId,
+                    },
+                });
 
-                await prismaClient.roomMessage.deleteMany({
+                await prismaClient.message.deleteMany({
                     where: {
                         ownerId: account.profileId,
                     },
@@ -219,7 +217,7 @@ async function deleteAccount({
                                 },
                             })
                             .then(() => {
-                                prismaClient.roomMessage
+                                prismaClient.message
                                     .deleteMany({
                                         where: {
                                             roomId: room.roomId,

@@ -3,24 +3,22 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Account, RoomMessage } from '@prisma/client';
+import { Account, Message } from '@prisma/client';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { decryptAES, generateError } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 import { fromToSchema, roomIdSchema } from '../shared';
 import {
-    FetchRoomMessagesResult,
-    FetchRoomMessagesServerParams,
-} from 'interfaces/account/fetchRoomMessages';
+    FetchMessagesResult,
+    FetchMessagesServerParams,
+} from 'interfaces/account/fetchMessages';
 
-async function fetchRoomMessages({
+async function fetchMessages({
     account,
     roomId,
     from,
     to,
-}: FetchRoomMessagesServerParams): Promise<
-    FetchRoomMessagesResult | FronvoError
-> {
+}: FetchMessagesServerParams): Promise<FetchMessagesResult | FronvoError> {
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -76,7 +74,7 @@ async function fetchRoomMessages({
         }
     }
 
-    const messages = await prismaClient.roomMessage.findMany({
+    const messages = await prismaClient.message.findMany({
         where: {
             roomId,
         },
@@ -161,7 +159,7 @@ async function fetchRoomMessages({
     await getMessageAccounts();
 
     const roomMessages: {
-        message: Partial<RoomMessage>;
+        message: Partial<Message>;
         profileData: Partial<Account>;
     }[] = [];
 
@@ -188,7 +186,7 @@ async function fetchRoomMessages({
         // Update seen state
         const newSeenStates = account.seenStates || {};
 
-        const totalMessages = await prismaClient.roomMessage.count({
+        const totalMessages = await prismaClient.message.count({
             where: { roomId },
         });
 
@@ -212,8 +210,8 @@ async function fetchRoomMessages({
     return { roomMessages };
 }
 
-const fetchRoomMessagesTemplate: EventTemplate = {
-    func: fetchRoomMessages,
+const fetchMessagesTemplate: EventTemplate = {
+    func: fetchMessages,
     template: ['roomId', 'from', 'to'],
     schema: new StringSchema({
         ...roomIdSchema,
@@ -221,4 +219,4 @@ const fetchRoomMessagesTemplate: EventTemplate = {
     }),
 };
 
-export default fetchRoomMessagesTemplate;
+export default fetchMessagesTemplate;

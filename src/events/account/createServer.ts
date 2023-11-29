@@ -1,26 +1,24 @@
 // ******************** //
-// The createRoom account-only event file.
+// The createServer account event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Room } from '@prisma/client';
-import { roomIconSchema, roomNameSchema } from 'events/shared';
 import {
-    CreateRoomResult,
-    CreateRoomServerParams,
-} from 'interfaces/account/createRoom';
+    CreateServerResult,
+    CreateServerServerParams,
+} from 'interfaces/account/createServer';
 import { EventTemplate, FronvoError } from 'interfaces/all';
+import { roomNameSchema } from 'events/shared';
+import { prismaClient } from 'variables/global';
 import { encryptAES, generateError } from 'utilities/global';
 import { v4 } from 'uuid';
-import { prismaClient } from 'variables/global';
 
-async function createRoom({
+async function createServer({
     io,
     socket,
     account,
     name,
-    icon,
-}: CreateRoomServerParams): Promise<CreateRoomResult | FronvoError> {
+}: CreateServerServerParams): Promise<CreateServerResult | FronvoError> {
     name = name.replace(/\n/g, '');
 
     // Limit to 5 rooms max
@@ -41,50 +39,48 @@ async function createRoom({
         return generateError('OVER_LIMIT');
     }
 
-    const roomId = v4();
+    const serverId = v4();
 
     try {
-        await prismaClient.room.create({
+        await prismaClient.server.create({
             data: {
-                roomId,
+                serverId,
                 ownerId: account.profileId,
                 name: encryptAES(name),
-                icon,
                 members: [account.profileId],
             },
 
             select: {
-                roomId: true,
+                serverId: true,
                 ownerId: true,
                 name: true,
-                creationDate: true,
                 icon: true,
+                description: true,
+                creationDate: true,
                 members: true,
-                lastMessageAt: true,
-                dmUsers: true,
-                isDM: true,
+                channels: true,
+                roles: true,
             },
         });
     } catch (e) {
         return generateError('UNKNOWN');
     }
 
-    await socket.join(roomId);
+    await socket.join(serverId);
 
-    io.to(socket.id).emit('roomCreated', {
-        roomId,
+    io.to(socket.id).emit('serverCreated', {
+        serverId,
     });
 
     return {};
 }
 
-const createRoomTemplate: EventTemplate = {
-    func: createRoom,
-    template: ['name', 'icon'],
+const createServerTemplate: EventTemplate = {
+    func: createServer,
+    template: ['name'],
     schema: new StringSchema({
         ...roomNameSchema,
-        ...roomIconSchema,
     }),
 };
 
-export default createRoomTemplate;
+export default createServerTemplate;

@@ -1,8 +1,8 @@
 // ******************** //
-// Interfaces for the roomMessageDeleted event file.
+// Interfaces for the messageDeleted event file.
 // ******************** //
 
-export interface RoomMessageDeletedParams {
+export interface MessageDeletedParams {
     roomId: string;
     messageId: string;
 }

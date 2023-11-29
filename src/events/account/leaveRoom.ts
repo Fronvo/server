@@ -39,13 +39,13 @@ async function leaveRoom({
     // Leave / delete the room
     if (account.profileId == room.ownerId) {
         try {
-            const deletedMessages = await prismaClient.roomMessage.findMany({
+            const deletedMessages = await prismaClient.message.findMany({
                 where: {
                     roomId,
                 },
             });
 
-            await prismaClient.roomMessage.deleteMany({
+            await prismaClient.message.deleteMany({
                 where: {
                     roomId,
                 },
@@ -134,7 +134,7 @@ async function leaveRoom({
     return {};
 }
 
-const leaveroomTemplate: EventTemplate = {
+const leaveRoomTemplate: EventTemplate = {
     func: leaveRoom,
     template: ['roomId'],
     schema: new StringSchema({
@@ -142,4 +142,4 @@ const leaveroomTemplate: EventTemplate = {
     }),
 };
 
-export default leaveroomTemplate;
+export default leaveRoomTemplate;

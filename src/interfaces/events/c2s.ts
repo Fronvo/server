@@ -7,13 +7,13 @@ import {
     CreateRoomTestResult,
 } from 'interfaces/account/createRoom';
 import {
-    DeleteRoomMessageParams,
-    DeleteRoomMessageTestResult,
-} from 'interfaces/account/deleteRoomMessage';
+    DeleteMessageParams,
+    DeleteMessageTestResult,
+} from 'interfaces/account/deleteMessage';
 import {
-    FetchRoomMessagesParams,
-    FetchRoomMessagesTestResult,
-} from 'interfaces/account/fetchRoomMessages';
+    FetchMessagesParams,
+    FetchMessagesTestResult,
+} from 'interfaces/account/fetchMessages';
 import {
     FetchProfileDataParams,
     FetchProfileDataTestResult,
@@ -22,9 +22,9 @@ import { FetchProfileIdTestResult } from 'interfaces/account/fetchProfileId';
 import { LeaveRoomTestResult } from 'interfaces/account/leaveRoom';
 import { LogoutTestResult } from 'interfaces/account/logout';
 import {
-    SendRoomMessageParams,
-    SendRoomMessageTestResult,
-} from 'interfaces/account/sendRoomMessage';
+    SendMessageParams,
+    SendMessageTestResult,
+} from 'interfaces/account/sendMessage';
 import {
     UpdateRoomDataParams,
     UpdateRoomDataTestResult,
@@ -100,9 +100,9 @@ import {
     CreateDMTestResult,
 } from 'interfaces/account/createDM';
 import {
-    SendRoomImageParams,
-    SendRoomImageTestResult,
-} from 'interfaces/account/sendRoomImage';
+    SendImageParams,
+    SendImageTestResult,
+} from 'interfaces/account/sendImage';
 import {
     FetchHomePostsParams,
     FetchHomePostsTestResult,
@@ -166,6 +166,14 @@ import {
     RemoveFCMTestResult,
 } from 'interfaces/account/removeFCM';
 import { CanPostParams, CanPostTestResult } from 'interfaces/account/canPost';
+import {
+    CreateServerParams,
+    CreateServerTestResult,
+} from 'interfaces/account/createServer';
+import {
+    DeleteServerParams,
+    DeleteServerTestResult,
+} from 'interfaces/account/deleteServer';
 
 export interface ClientToServerEvents {
     register: (
@@ -209,17 +217,17 @@ export interface ClientToServerEvents {
         callback?: ({}: UpdateRoomDataTestResult) => void
     ) => void;
     leaveRoom: (callback?: ({}: LeaveRoomTestResult) => void) => void;
-    sendRoomMessage: (
-        {}: SendRoomMessageParams,
-        callback?: ({}: SendRoomMessageTestResult) => void
+    sendMessage: (
+        {}: SendMessageParams,
+        callback?: ({}: SendMessageTestResult) => void
     ) => void;
-    fetchRoomMessages: (
-        {}: FetchRoomMessagesParams,
-        callback?: ({}: FetchRoomMessagesTestResult) => void
+    fetchMessages: (
+        {}: FetchMessagesParams,
+        callback?: ({}: FetchMessagesTestResult) => void
     ) => void;
-    deleteRoomMessage: (
-        {}: DeleteRoomMessageParams,
-        callback?: ({}: DeleteRoomMessageTestResult) => void
+    deleteMessage: (
+        {}: DeleteMessageParams,
+        callback?: ({}: DeleteMessageTestResult) => void
     ) => void;
     updateProfileStatus: (
         {}: UpdateProfileStatusParams,
@@ -265,9 +273,9 @@ export interface ClientToServerEvents {
         {}: CreateDMParams,
         callback?: ({}: CreateDMTestResult) => void
     ) => void;
-    sendRoomImage: (
-        {}: SendRoomImageParams,
-        callback?: ({}: SendRoomImageTestResult) => void
+    sendImage: (
+        {}: SendImageParams,
+        callback?: ({}: SendImageTestResult) => void
     ) => void;
     fetchHomePosts: (
         {}: FetchHomePostsParams,
@@ -337,5 +345,13 @@ export interface ClientToServerEvents {
     canPost: (
         {}: CanPostParams,
         callback?: ({}: CanPostTestResult) => void
+    ) => void;
+    createServer: (
+        {}: CreateServerParams,
+        callback?: ({}: CreateServerTestResult) => void
+    ) => void;
+    deleteServer: (
+        {}: DeleteServerParams,
+        callback?: ({}: DeleteServerTestResult) => void
     ) => void;
 }

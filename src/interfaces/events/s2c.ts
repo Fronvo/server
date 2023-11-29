@@ -7,7 +7,7 @@ import { FriendRemovedParams } from 'interfaces/account/friendRemoved';
 import { MemberJoinedParams } from 'interfaces/account/memberJoined';
 import { MemberLeftParams } from 'interfaces/account/memberLeft';
 import { NewFriendRequestParams } from 'interfaces/account/newFriendRequest';
-import { NewRoomMessageParams } from 'interfaces/account/newRoomMessage';
+import { NewMessageParams } from 'interfaces/account/newMessage';
 import { OnlineStatusUpdatedParams } from 'interfaces/account/onlineStatusUpdated';
 import { PendingFriendRemovedParams } from 'interfaces/account/pendingFriendRemoved';
 import { PostLikesChangedParams } from 'interfaces/account/postLikesChanged';
@@ -19,8 +19,10 @@ import { RoomAddedParams } from 'interfaces/account/roomAdded';
 import { RoomCreatedParams } from 'interfaces/account/roomCreated';
 import { RoomDataUpdatedParams } from 'interfaces/account/roomDataUpdated';
 import { RoomDeletedParams } from 'interfaces/account/roomDeleted';
-import { RoomMessageDeletedParams } from 'interfaces/account/roomMessageDeleted';
+import { MessageDeletedParams } from 'interfaces/account/messageDeleted';
 import { RoomRemovedParams } from 'interfaces/account/roomRemoved';
+import { ServerCreatedParams } from 'interfaces/account/serverCreated';
+import { ServerDeletedParams } from 'interfaces/account/serverDeleted';
 import { TypingEndedParams } from 'interfaces/account/typingEnded';
 import { TypingStartedParams } from 'interfaces/account/typingStarted';
 import {
@@ -44,9 +46,9 @@ export interface ServerToClientEvents {
         callback?: ({}: ResetPasswordVerifyTestResult) => void
     ) => void;
 
-    newRoomMessage: ({}: NewRoomMessageParams) => void;
+    newMessage: ({}: NewMessageParams) => void;
 
-    roomMessageDeleted: ({}: RoomMessageDeletedParams) => void;
+    roomMessageDeleted: ({}: MessageDeletedParams) => void;
 
     roomCreated: ({}: RoomCreatedParams) => void;
 
@@ -85,4 +87,8 @@ export interface ServerToClientEvents {
     postShared: ({}: PostSharedParams) => void;
 
     postRemoved: ({}: PostRemovedParams) => void;
+
+    serverCreated: ({}: ServerCreatedParams) => void;
+
+    serverDeleted: ({}: ServerDeletedParams) => void;
 }

@@ -30,7 +30,7 @@ async function checkPostsAES(): Promise<void> {
 async function checkMessagesAES(): Promise<void> {
     let corruptedMessages = 0;
 
-    const messages = await variables.prismaClient.roomMessage.findMany({
+    const messages = await variables.prismaClient.message.findMany({
         select: {
             content: true,
             replyContent: true,

@@ -2,7 +2,7 @@ import { encryptAES } from 'utilities/global';
 import * as variables from 'variables/global';
 
 async function convertMessagesAES(): Promise<void> {
-    const roomIds = await variables.prismaClient.roomMessage.findMany({
+    const roomIds = await variables.prismaClient.message.findMany({
         select: {
             messageId: true,
             content: true,
@@ -20,7 +20,7 @@ async function convertMessagesAES(): Promise<void> {
     for (const roomIndex in roomIds) {
         const target = roomIds[roomIndex];
 
-        variables.prismaClient.roomMessage
+        variables.prismaClient.message
             .update({
                 where: {
                     messageId: target.messageId,

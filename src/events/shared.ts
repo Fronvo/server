@@ -49,6 +49,17 @@ export const roomIdSchema: {
     roomId,
 };
 
+// Server id
+const serverId: EzierValidatorStringSchema = {
+    type: 'uuid',
+};
+
+export const serverIdSchema: {
+    serverId: EzierValidatorStringSchema;
+} = {
+    serverId,
+};
+
 // Room name
 const roomName: EzierValidatorStringSchema = {
     minLength: 1,

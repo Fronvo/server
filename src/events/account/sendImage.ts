@@ -3,30 +3,28 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { RoomMessage } from '@prisma/client';
+import { Message } from '@prisma/client';
 import {
-    SendRoomImageResult,
-    SendRoomImageServerParams,
-} from 'interfaces/account/sendRoomImage';
+    SendImageResult,
+    SendImageServerParams,
+} from 'interfaces/account/sendImage';
 
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     decryptAES,
-    encryptAES,
     generateError,
-    getSocketAccountId,
     sendMulticastFCM,
     updateRoomSeen,
 } from 'utilities/global';
 import { v4 } from 'uuid';
-import { batchUpdatesDelay, prismaClient } from 'variables/global';
+import { prismaClient } from 'variables/global';
 
-async function sendRoomMessage({
+async function sendImage({
     io,
     account,
     roomId,
     attachment,
-}: SendRoomImageServerParams): Promise<SendRoomImageResult | FronvoError> {
+}: SendImageServerParams): Promise<SendImageResult | FronvoError> {
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -45,10 +43,10 @@ async function sendRoomMessage({
         return generateError('NOT_IN_ROOM');
     }
 
-    let newMessageData: Partial<RoomMessage>;
+    let newMessageData: Partial<Message>;
 
     try {
-        newMessageData = await prismaClient.roomMessage.create({
+        newMessageData = await prismaClient.message.create({
             data: {
                 ownerId: account.profileId,
                 roomId,
@@ -73,7 +71,7 @@ async function sendRoomMessage({
         return generateError('UNKNOWN');
     }
 
-    io.to(roomId).emit('newRoomMessage', {
+    io.to(roomId).emit('newMessage', {
         roomId,
         newMessageData: {
             message: newMessageData,
@@ -119,8 +117,8 @@ async function sendRoomMessage({
     return {};
 }
 
-const sendRoomImageTemplate: EventTemplate = {
-    func: sendRoomMessage,
+const sendImageTemplate: EventTemplate = {
+    func: sendImage,
     template: ['roomId', 'attachment'],
     schema: new StringSchema({
         roomId: {
@@ -134,4 +132,4 @@ const sendRoomImageTemplate: EventTemplate = {
     }),
 };
 
-export default sendRoomImageTemplate;
+export default sendImageTemplate;

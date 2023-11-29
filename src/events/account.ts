@@ -9,9 +9,9 @@ import updateProfileData from 'events/account/updateProfileData';
 import createRoom from 'events/account/createRoom';
 import updateRoomData from 'events/account/updateRoomData';
 import leaveRoom from 'events/account/leaveRoom';
-import sendRoomMessage from 'events/account/sendRoomMessage';
-import fetchRoomMessages from 'events/account/fetchRoomMessages';
-import deleteRoomMessage from 'events/account/deleteRoomMessage';
+import sendMessage from 'events/account/sendMessage';
+import fetchMessages from 'events/account/fetchMessages';
+import deleteMessage from 'events/account/deleteMessage';
 import updateProfileStatus from 'events/account/updateProfileStatus';
 import fetchConvos from 'events/account/fetchConvos';
 import startTyping from 'events/account/startTyping';
@@ -23,7 +23,7 @@ import rejectFriendRequest from 'events/account/rejectFriendRequest';
 import addRoomMember from 'events/account/addRoomMember';
 import removeRoomMember from 'events/account/removeRoomMember';
 import createDM from 'events/account/createDM';
-import sendRoomImage from 'events/account/sendRoomImage';
+import sendImage from 'events/account/sendImage';
 import fetchHomePosts from 'events/account/fetchHomePosts';
 import fetchProfilePosts from 'events/account/fetchProfilePosts';
 import closeDM from 'events/account/closeDM';
@@ -42,6 +42,8 @@ import fetchPROCH from 'events/account/fetchPROCH';
 import fetchLatestVersion from 'events/account/fetchLatestVersion';
 import removeFCM from 'events/account/removeFCM';
 import canPost from 'events/account/canPost';
+import createServer from 'events/account/createServer';
+import deleteServer from 'events/account/deleteServer';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -53,9 +55,9 @@ const accountTemplate: EventExportTemplate = {
     createRoom,
     updateRoomData,
     leaveRoom,
-    sendRoomMessage,
-    fetchRoomMessages,
-    deleteRoomMessage,
+    sendMessage,
+    fetchMessages,
+    deleteMessage,
     updateProfileStatus,
     fetchConvos,
     startTyping,
@@ -67,7 +69,7 @@ const accountTemplate: EventExportTemplate = {
     addRoomMember,
     removeRoomMember,
     createDM,
-    sendRoomImage,
+    sendImage,
     fetchHomePosts,
     fetchProfilePosts,
     closeDM,
@@ -86,6 +88,8 @@ const accountTemplate: EventExportTemplate = {
     fetchLatestVersion,
     removeFCM,
     canPost,
+    createServer,
+    deleteServer,
 };
 
 export default accountTemplate;

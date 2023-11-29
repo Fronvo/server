@@ -1,25 +1,23 @@
 // ******************** //
-// The deleteRoomMessage account-only event file.
+// The deleteMessage account-only event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
 import { roomIdSchema } from 'events/shared';
 import {
-    DeleteRoomMessageResult,
-    DeleteRoomMessageServerParams,
-} from 'interfaces/account/deleteRoomMessage';
+    DeleteMessageResult,
+    DeleteMessageServerParams,
+} from 'interfaces/account/deleteMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { deleteImage, generateError } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
-async function deleteRoomMessage({
+async function deleteMessage({
     io,
     account,
     roomId,
     messageId,
-}: DeleteRoomMessageServerParams): Promise<
-    DeleteRoomMessageResult | FronvoError
-> {
+}: DeleteMessageServerParams): Promise<DeleteMessageResult | FronvoError> {
     const room = await prismaClient.room.findFirst({
         where: {
             roomId,
@@ -37,7 +35,7 @@ async function deleteRoomMessage({
         return generateError('NOT_IN_ROOM');
     }
 
-    const targetMessage = await prismaClient.roomMessage.findFirst({
+    const targetMessage = await prismaClient.message.findFirst({
         where: {
             messageId,
         },
@@ -56,7 +54,7 @@ async function deleteRoomMessage({
     let deletedMessage: { count: number };
 
     try {
-        deletedMessage = await prismaClient.roomMessage.deleteMany({
+        deletedMessage = await prismaClient.message.deleteMany({
             where: {
                 messageId,
             },
@@ -90,8 +88,8 @@ async function deleteRoomMessage({
     return {};
 }
 
-const deleteRoomMessageTemplate: EventTemplate = {
-    func: deleteRoomMessage,
+const deleteMessageTemplate: EventTemplate = {
+    func: deleteMessage,
     template: ['roomId', 'messageId'],
     schema: new StringSchema({
         ...roomIdSchema,
@@ -102,4 +100,4 @@ const deleteRoomMessageTemplate: EventTemplate = {
     }),
 };
 
-export default deleteRoomMessageTemplate;
+export default deleteMessageTemplate;
