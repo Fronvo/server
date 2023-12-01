@@ -24,7 +24,7 @@ import addRoomMember from 'events/account/addRoomMember';
 import removeRoomMember from 'events/account/removeRoomMember';
 import createDM from 'events/account/createDM';
 import sendImage from 'events/account/sendImage';
-import fetchHomePosts from 'events/account/fetchHomePosts';
+import fetchDashboard from 'events/account/fetchDashboard';
 import fetchProfilePosts from 'events/account/fetchProfilePosts';
 import closeDM from 'events/account/closeDM';
 import likePost from 'events/account/likePost';
@@ -70,7 +70,7 @@ const accountTemplate: EventExportTemplate = {
     removeRoomMember,
     createDM,
     sendImage,
-    fetchHomePosts,
+    fetchDashboard,
     fetchProfilePosts,
     closeDM,
     likePost,

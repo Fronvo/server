@@ -1,26 +1,26 @@
 // ******************** //
-// The fetchHomePosts account-only event file.
+// The fetchDashboard account-only event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
 import { Account } from '@prisma/client';
 import { fromToSchema } from 'events/shared';
 import {
-    FetchHomePostsResult,
-    FetchHomePostsServerParams,
-} from 'interfaces/account/fetchHomePosts';
+    FetchDashboardResult,
+    FetchDashboardServerParams,
+} from 'interfaces/account/fetchDashboard';
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { FetchedFronvoPost } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { decryptAES, generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
-async function fetchHomePosts({
+async function fetchDashboard({
     socket,
     account,
     from,
     to,
-}: FetchHomePostsServerParams): Promise<FetchHomePostsResult | FronvoError> {
+}: FetchDashboardServerParams): Promise<FetchDashboardResult | FronvoError> {
     const fromNumber = Number(from);
     const toNumber = Number(to);
 
@@ -113,7 +113,7 @@ async function fetchHomePosts({
 
     await getFriendsAccounts();
 
-    const homePosts: {
+    const dashboard: {
         post: FetchedFronvoPost;
         profileData: Partial<Account>;
     }[] = [];
@@ -164,7 +164,7 @@ async function fetchHomePosts({
     for (const postIndex in posts) {
         const post = posts[postIndex];
 
-        homePosts.push({
+        dashboard.push({
             post: {
                 ...post,
                 totalLikes: post.likes.length,
@@ -178,15 +178,15 @@ async function fetchHomePosts({
         socket.join(post.postId);
     }
 
-    return { homePosts: homePosts.reverse(), totalPosts };
+    return { dashboard: dashboard.reverse(), totalPosts };
 }
 
-const fetchHomePostsTemplate: EventTemplate = {
-    func: fetchHomePosts,
+const fetchDashboardTemplate: EventTemplate = {
+    func: fetchDashboard,
     template: ['from', 'to'],
     schema: new StringSchema({
         ...fromToSchema,
     }),
 };
 
-export default fetchHomePostsTemplate;
+export default fetchDashboardTemplate;

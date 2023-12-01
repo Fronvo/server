@@ -104,9 +104,9 @@ import {
     SendImageTestResult,
 } from 'interfaces/account/sendImage';
 import {
-    FetchHomePostsParams,
-    FetchHomePostsTestResult,
-} from 'interfaces/account/fetchHomePosts';
+    FetchDashboardParams,
+    FetchDashboardTestResult,
+} from 'interfaces/account/fetchDashboard';
 import {
     FetchProfilePostsParams,
     FetchProfilePostsTestResult,
@@ -277,9 +277,9 @@ export interface ClientToServerEvents {
         {}: SendImageParams,
         callback?: ({}: SendImageTestResult) => void
     ) => void;
-    fetchHomePosts: (
-        {}: FetchHomePostsParams,
-        callback?: ({}: FetchHomePostsTestResult) => void
+    fetchDashboard: (
+        {}: FetchDashboardParams,
+        callback?: ({}: FetchDashboardTestResult) => void
     ) => void;
     fetchProfilePosts: (
         {}: FetchProfilePostsParams,

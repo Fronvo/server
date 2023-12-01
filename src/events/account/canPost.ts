@@ -12,6 +12,7 @@ async function canPost({
     return {
         canPost:
             account.isPRO ||
+            !account.lastPostAt ||
             differenceInMinutes(new Date(), account.lastPostAt) > 10,
     };
 }
