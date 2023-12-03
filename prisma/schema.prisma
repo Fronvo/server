@@ -75,6 +75,7 @@ model Server {
 model Channel {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String?
+  description  String?
   serverId     String?
   roomId       String   @unique
   creationDate DateTime @default(now())

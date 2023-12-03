@@ -181,11 +181,6 @@ async function fetchConvos({
     await gatherConvos();
     removeHiddenConvos();
 
-    // Premature for empty array
-    if (convos.length == 0) {
-        return { convos };
-    }
-
     return { convos };
 }
 

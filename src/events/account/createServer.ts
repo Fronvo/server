@@ -10,7 +10,7 @@ import {
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { roomNameSchema } from 'events/shared';
 import { prismaClient } from 'variables/global';
-import { encryptAES, generateError } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { v4 } from 'uuid';
 
 async function createServer({
@@ -25,7 +25,7 @@ async function createServer({
     let totalRooms: number;
 
     try {
-        totalRooms = await prismaClient.room.count({
+        totalRooms = await prismaClient.server.count({
             where: {
                 ownerId: account.profileId,
             },
@@ -46,7 +46,7 @@ async function createServer({
             data: {
                 serverId,
                 ownerId: account.profileId,
-                name: encryptAES(name),
+                name,
                 members: [account.profileId],
             },
 

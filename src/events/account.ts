@@ -44,6 +44,7 @@ import removeFCM from 'events/account/removeFCM';
 import canPost from 'events/account/canPost';
 import createServer from 'events/account/createServer';
 import deleteServer from 'events/account/deleteServer';
+import fetchServers from 'events/account/fetchServers';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -90,6 +91,7 @@ const accountTemplate: EventExportTemplate = {
     canPost,
     createServer,
     deleteServer,
+    fetchServers,
 };
 
 export default accountTemplate;

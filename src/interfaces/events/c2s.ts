@@ -174,6 +174,7 @@ import {
     DeleteServerParams,
     DeleteServerTestResult,
 } from 'interfaces/account/deleteServer';
+import { FetchServersParams, FetchServersTestResult } from 'interfaces/account/fetchServers';
 
 export interface ClientToServerEvents {
     register: (
@@ -353,5 +354,9 @@ export interface ClientToServerEvents {
     deleteServer: (
         {}: DeleteServerParams,
         callback?: ({}: DeleteServerTestResult) => void
+    ) => void;
+    fetchServers: (
+        {}: FetchServersParams,
+        callback?: ({}: FetchServersTestResult) => void
     ) => void;
 }
