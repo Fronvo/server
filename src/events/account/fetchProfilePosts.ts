@@ -11,7 +11,7 @@ import {
     FetchedFronvoPost,
 } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { decryptAES, generateError } from 'utilities/global';
+import { generateError, getTransformedImage } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchProfilePosts({
@@ -97,11 +97,9 @@ async function fetchProfilePosts({
         select: {
             postId: true,
             author: true,
-            content: true,
             attachment: true,
             creationDate: true,
             likes: true,
-            gif: true,
         },
     });
 
@@ -112,12 +110,14 @@ async function fetchProfilePosts({
         profilePosts.push({
             post: {
                 ...post,
-                content: post.content ? decryptAES(post.content) : undefined,
                 likes: undefined,
                 totalLikes: post.likes.length,
                 isLiked: post.likes.includes(account.profileId),
             },
-            profileData: targetAccount,
+            profileData: {
+                ...targetAccount,
+                avatar: getTransformedImage(targetAccount.avatar, 72),
+            },
         });
 
         socket.join(post.postId);

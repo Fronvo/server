@@ -5,9 +5,7 @@
 import { FronvoError, EventArguments } from 'interfaces/all';
 
 export interface SharePostParams {
-    content: string;
     attachment?: string;
-    gif?: string;
 }
 
 export interface SharePostServerParams

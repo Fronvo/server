@@ -770,3 +770,8 @@ export async function sendRoomNotification(
 
     updateRoomSeen(io, room.roomId);
 }
+
+export function getTransformedImage(url: string, width: number): string {
+    // 1:1
+    return `${url}/tr:w-${width}:h-${width}`;
+}

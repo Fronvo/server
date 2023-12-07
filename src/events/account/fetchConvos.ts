@@ -11,7 +11,12 @@ import {
 } from 'interfaces/account/fetchConvos';
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { decryptAES, generateError, isAccountLoggedIn } from 'utilities/global';
+import {
+    decryptAES,
+    generateError,
+    getTransformedImage,
+    isAccountLoggedIn,
+} from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchConvos({
@@ -120,7 +125,15 @@ async function fetchConvos({
                                         dmUsers: convo.dmUsers,
                                         dmUserOnline: targetDMUserData.online,
                                         unreadCount: unread,
-                                        dmUser: targetDMUserData,
+                                        dmUser: {
+                                            ...targetDMUserData,
+                                            avatar:
+                                                targetDMUserData.avatar &&
+                                                getTransformedImage(
+                                                    targetDMUserData.avatar,
+                                                    72
+                                                ),
+                                        },
                                         dmHiddenFor: convo.dmHiddenFor,
                                         totalMessages,
                                     };
@@ -129,7 +142,9 @@ async function fetchConvos({
                                         roomId: convo.roomId,
                                         isDM: false,
                                         creationDate: convo.creationDate,
-                                        icon: convo.icon,
+                                        icon:
+                                            convo.icon &&
+                                            getTransformedImage(convo.icon, 72),
                                         members: convo.members,
                                         name: decryptAES(convo.name),
                                         ownerId: convo.ownerId,

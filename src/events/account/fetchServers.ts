@@ -8,7 +8,7 @@ import {
     FetchServersServerParams,
 } from 'interfaces/account/fetchServers';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError } from 'utilities/global';
+import { generateError, getTransformedImage } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchServers({
@@ -43,7 +43,7 @@ async function fetchServers({
                     serverId: server.serverId,
                     ownerId: server.ownerId,
                     creationDate: server.creationDate,
-                    icon: server.icon,
+                    icon: server.icon && getTransformedImage(server.icon, 96),
                     members: server.members,
                     name: server.name,
                     description: server.description,

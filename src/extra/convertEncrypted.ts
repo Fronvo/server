@@ -63,34 +63,8 @@ async function convertRoomsAES(): Promise<void> {
     }
 }
 
-async function convertPostsAES(): Promise<void> {
-    const roomIds = await variables.prismaClient.post.findMany({
-        select: {
-            postId: true,
-            content: true,
-        },
-    });
-
-    for (const roomIndex in roomIds) {
-        const target = roomIds[roomIndex];
-
-        variables.prismaClient.post
-            .update({
-                where: {
-                    postId: target.postId,
-                },
-
-                data: {
-                    content: encryptAES(target.content),
-                },
-            })
-            .then(() => {});
-    }
-}
-
 async function convertAll(): Promise<void> {
     await convertRoomsAES();
-    await convertPostsAES();
     await convertMessagesAES();
 }
 

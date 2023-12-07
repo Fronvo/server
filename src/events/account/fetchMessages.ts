@@ -5,7 +5,11 @@
 import { StringSchema } from '@ezier/validate';
 import { Account, Message } from '@prisma/client';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { decryptAES, generateError } from 'utilities/global';
+import {
+    decryptAES,
+    generateError,
+    getTransformedImage,
+} from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 import { fromToSchema, roomIdSchema } from '../shared';
 import {
@@ -167,6 +171,8 @@ async function fetchMessages({
     for (const messageIndex in messages) {
         const message = messages[messageIndex];
 
+        const profileData = getProfileData(message.ownerId);
+
         roomMessages.push({
             message: {
                 ...message,
@@ -178,7 +184,12 @@ async function fetchMessages({
                     ? decryptAES(message.notificationText)
                     : '',
             },
-            profileData: getProfileData(message.ownerId),
+            profileData: {
+                ...profileData,
+                avatar:
+                    profileData.avatar &&
+                    getTransformedImage(profileData.avatar, 84),
+            },
         });
     }
 

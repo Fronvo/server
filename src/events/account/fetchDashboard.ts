@@ -12,7 +12,7 @@ import {
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { FetchedFronvoPost } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { decryptAES, generateError } from 'utilities/global';
+import { generateError, getTransformedImage } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchDashboard({
@@ -151,12 +151,10 @@ async function fetchDashboard({
 
         select: {
             postId: true,
-            content: true,
             author: true,
             attachment: true,
             creationDate: true,
             likes: true,
-            gif: true,
         },
     });
 
@@ -164,15 +162,21 @@ async function fetchDashboard({
     for (const postIndex in posts) {
         const post = posts[postIndex];
 
+        const profileData = getProfileData(post.author);
+
         dashboard.push({
             post: {
                 ...post,
                 totalLikes: post.likes.length,
                 likes: undefined,
                 isLiked: post.likes.includes(account.profileId),
-                content: post.content ? decryptAES(post.content) : undefined,
             },
-            profileData: getProfileData(post.author),
+            profileData: {
+                ...profileData,
+                avatar:
+                    profileData.avatar &&
+                    getTransformedImage(profileData.avatar, 72),
+            },
         });
 
         socket.join(post.postId);

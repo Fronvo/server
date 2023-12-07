@@ -37,9 +37,7 @@ model Post {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   postId       String   @unique
   author       String
-  content      String?  @default("")
   attachment   String?  @default("")
-  gif          String?  @default("")
   creationDate DateTime @default(now())
   likes        Json[]
 }
