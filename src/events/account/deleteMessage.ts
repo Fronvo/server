@@ -18,7 +18,7 @@ async function deleteMessage({
     roomId,
     messageId,
 }: DeleteMessageServerParams): Promise<DeleteMessageResult | FronvoError> {
-    const room = await prismaClient.room.findFirst({
+    const room = await prismaClient.dm.findFirst({
         where: {
             roomId,
         },
@@ -28,10 +28,7 @@ async function deleteMessage({
         return generateError('ROOM_404');
     }
 
-    if (
-        !room.members.includes(account.profileId) &&
-        !room.dmUsers.includes(account.profileId)
-    ) {
+    if (!room.dmUsers.includes(account.profileId)) {
         return generateError('NOT_IN_ROOM');
     }
 
@@ -42,10 +39,7 @@ async function deleteMessage({
     });
 
     // Must be the message author / room owner
-    if (
-        account.profileId != room.ownerId &&
-        account.profileId != targetMessage.ownerId
-    ) {
+    if (account.profileId != targetMessage.ownerId) {
         return generateError('NOT_OWNER');
     }
 
@@ -74,7 +68,7 @@ async function deleteMessage({
     io.to(room.roomId).emit('roomMessageDeleted', { roomId, messageId });
 
     setTimeout(async () => {
-        await prismaClient.room.update({
+        await prismaClient.dm.update({
             where: {
                 roomId: room.roomId,
             },

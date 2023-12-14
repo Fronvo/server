@@ -38,7 +38,7 @@ async function updateProfileData({
     }
 
     // Free limit: No banner update
-    if (!account.isPRO && banner) {
+    if (!account.turbo && banner) {
         return generateError('PRO_REQUIRED');
     }
 

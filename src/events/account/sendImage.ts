@@ -25,7 +25,7 @@ async function sendImage({
     roomId,
     attachment,
 }: SendImageServerParams): Promise<SendImageResult | FronvoError> {
-    const room = await prismaClient.room.findFirst({
+    const room = await prismaClient.dm.findFirst({
         where: {
             roomId,
         },
@@ -36,10 +36,7 @@ async function sendImage({
     }
 
     // Must be in the room
-    if (
-        !room.members.includes(account.profileId) &&
-        !room.dmUsers.includes(account.profileId)
-    ) {
+    if (!room.dmUsers.includes(account.profileId)) {
         return generateError('NOT_IN_ROOM');
     }
 
@@ -81,7 +78,7 @@ async function sendImage({
 
     try {
         // Update ordering of message lists
-        await prismaClient.room.update({
+        await prismaClient.dm.update({
             where: {
                 roomId,
             },
@@ -91,23 +88,13 @@ async function sendImage({
             },
         });
 
-        if (!room.isDM) {
-            sendMulticastFCM(
-                room.members as string[],
-                decryptAES(room.name),
-                `${account.username} sent an image`,
-                account.profileId,
-                true
-            );
-        } else {
-            sendMulticastFCM(
-                room.dmUsers as string[],
-                `@${account.profileId}`,
-                `${account.username} sent an image`,
-                account.profileId,
-                true
-            );
-        }
+        sendMulticastFCM(
+            room.dmUsers as string[],
+            `@${account.profileId}`,
+            `${account.username} sent an image`,
+            account.profileId,
+            true
+        );
     } catch (e) {
         return generateError('UNKNOWN');
     }

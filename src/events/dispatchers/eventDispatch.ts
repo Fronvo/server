@@ -161,7 +161,6 @@ async function runEventFunc(
                 },
 
                 select: {
-                    appliedTheme: true,
                     avatar: true,
                     banner: true,
                     bio: true,
@@ -170,11 +169,10 @@ async function runEventFunc(
                     email: true,
                     fcm: true,
                     friends: true,
-                    isPRO: true,
-                    lastPostAt: true,
+                    turbo: true,
                     password: true,
                     pendingFriendRequests: true,
-                    proCH: true,
+                    turboCH: true,
                     profileId: true,
                     seenStates: true,
                     status: true,

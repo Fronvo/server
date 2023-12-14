@@ -27,7 +27,7 @@ async function sendMessage({
     message,
     replyId,
 }: SendMessageServerParams): Promise<SendMessageResult | FronvoError> {
-    const room = await prismaClient.room.findFirst({
+    const room = await prismaClient.dm.findFirst({
         where: {
             roomId,
         },
@@ -38,29 +38,24 @@ async function sendMessage({
     }
 
     // Must be in the room
-    if (
-        !room.members.includes(account.profileId) &&
-        !room.dmUsers.includes(account.profileId)
-    ) {
+    if (!room.dmUsers.includes(account.profileId)) {
         return generateError('NOT_IN_ROOM');
     }
 
     // Check if other user is still friended
-    if (room.isDM) {
-        const otherUser =
-            room.dmUsers[0] != account.profileId
-                ? room.dmUsers[0]
-                : room.dmUsers[1];
+    const otherUser =
+        room.dmUsers[0] != account.profileId
+            ? room.dmUsers[0]
+            : room.dmUsers[1];
 
-        const otherDMUser = await prismaClient.account.findFirst({
-            where: {
-                profileId: otherUser as string,
-            },
-        });
+    const otherDMUser = await prismaClient.account.findFirst({
+        where: {
+            profileId: otherUser as string,
+        },
+    });
 
-        if (!otherDMUser.friends.includes(account.profileId)) {
-            return generateError('NOT_FRIEND');
-        }
+    if (!otherDMUser.friends.includes(account.profileId)) {
+        return generateError('NOT_FRIEND');
     }
 
     // Remove unnecessary whitespace, dont allow 3 new lines in a row
@@ -226,7 +221,7 @@ async function sendMessage({
     try {
         setTimeout(async () => {
             // Update ordering of message lists
-            await prismaClient.room.update({
+            await prismaClient.dm.update({
                 where: {
                     roomId,
                 },
@@ -248,43 +243,23 @@ async function sendMessage({
             }
 
             if (!isTenor && !isSpotify) {
-                if (!room.isDM) {
-                    sendMulticastFCM(
-                        room.members as string[],
-                        decryptAES(room.name),
-                        `${account.username}: ${message}`,
-                        account.profileId,
-                        true
-                    );
-                } else {
-                    sendMulticastFCM(
-                        room.dmUsers as string[],
-                        `@${account.profileId}`,
-                        `${account.username}: ${message}`,
-                        account.profileId,
-                        true,
-                        'dm'
-                    );
-                }
+                sendMulticastFCM(
+                    room.dmUsers as string[],
+                    `@${account.profileId}`,
+                    `${account.username}: ${message}`,
+                    account.profileId,
+                    true,
+                    'dm'
+                );
             } else {
-                if (!room.isDM) {
-                    sendMulticastFCM(
-                        room.members as string[],
-                        decryptAES(room.name),
-                        finalLastMessage,
-                        account.profileId,
-                        true
-                    );
-                } else {
-                    sendMulticastFCM(
-                        room.dmUsers as string[],
-                        `@${account.profileId}`,
-                        finalLastMessage,
-                        account.profileId,
-                        true,
-                        'dm'
-                    );
-                }
+                sendMulticastFCM(
+                    room.dmUsers as string[],
+                    `@${account.profileId}`,
+                    finalLastMessage,
+                    account.profileId,
+                    true,
+                    'dm'
+                );
             }
         }, batchUpdatesDelay);
     } catch (e) {

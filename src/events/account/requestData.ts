@@ -50,9 +50,9 @@ async function requestData({
     }
 
     const imagekit = new ImageKit({
-        urlEndpoint: account.isPRO ? imagekitEndpoint : imagekitFreeEndpoint,
-        publicKey: account.isPRO ? imagekitPublic : imagekitFreePublic,
-        privateKey: account.isPRO ? imagekitPrivate : imagekitFreePrivate,
+        urlEndpoint: account.turbo ? imagekitEndpoint : imagekitFreeEndpoint,
+        publicKey: account.turbo ? imagekitPublic : imagekitFreePublic,
+        privateKey: account.turbo ? imagekitPrivate : imagekitFreePrivate,
     });
 
     // Send encrypted data, if any

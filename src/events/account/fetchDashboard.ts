@@ -76,7 +76,7 @@ async function fetchDashboard({
                                 creationDate: true,
                                 profileId: true,
                                 username: true,
-                                isPRO: true,
+                                turbo: true,
                             },
                         })
                         .then((friendData) => {

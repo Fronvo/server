@@ -21,7 +21,7 @@ async function applyPro({
         return generateError('UNKNOWN');
     }
 
-    if (account.isPRO) {
+    if (account.turbo) {
         return generateError('UNKNOWN');
     }
 
@@ -31,21 +31,16 @@ async function applyPro({
         },
 
         data: {
-            isPRO: true,
-            proCH: encryptAES(proCH),
+            turbo: true,
+            turboCH: encryptAES(proCH),
         },
     });
 
-    sendEmail(account.email, 'Welcome to the PRO club', [
+    sendEmail(account.email, 'Welcome to the TURBO club', [
         'We hope you enjoy the added benefits of the PROs, featuring:',
         '- High-quality images',
         '- Larger file uploads',
         '- A personalised banner',
-        '- The Theme Marketplace',
-        '- No post cooldown',
-        '- Up to 100 friends',
-        '- Up to 20 rooms',
-        '- Exclusive PRO palette',
     ]);
 
     return {};
@@ -53,7 +48,7 @@ async function applyPro({
 
 const applyProTemplate: EventTemplate = {
     func: applyPro,
-    template: ['secret', 'proCH'],
+    template: ['secret', 'turboC'],
     schema: new StringSchema({
         secret: {
             minLength: 36,

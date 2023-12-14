@@ -34,7 +34,7 @@ async function createDM({
         return generateError('NOT_FRIEND');
     }
 
-    const room = await prismaClient.room.findFirst({
+    const room = await prismaClient.dm.findFirst({
         where: {
             AND: [
                 {
@@ -57,7 +57,7 @@ async function createDM({
             newDmHiddenFor.splice(newDmHiddenFor.indexOf(account.profileId), 1);
 
             try {
-                await prismaClient.room.update({
+                await prismaClient.dm.update({
                     where: {
                         roomId: room.roomId,
                     },
@@ -86,13 +86,12 @@ async function createDM({
     const roomId = v4();
 
     try {
-        await prismaClient.room.create({
+        await prismaClient.dm.create({
             data: {
                 roomId,
                 dmUsers: {
                     set: [profileId, account.profileId],
                 },
-                isDM: true,
             },
         });
     } catch (e) {

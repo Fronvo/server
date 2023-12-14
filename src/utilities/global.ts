@@ -18,7 +18,7 @@ import { aesEnc, aesIV } from 'variables/global';
 import { prismaClient } from 'variables/global';
 import { createCipheriv, createDecipheriv } from 'crypto';
 import ImageKit from 'imagekit';
-import { Room, Message } from '@prisma/client';
+import { Dm, Message } from '@prisma/client';
 
 export async function loginSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -41,36 +41,13 @@ export async function loginSocket(
     });
 
     // Add to all of the available rooms
-    const availableRooms = await prismaClient.room.findMany({
-        where: {
-            members: {
-                has: account.profileId,
-            },
-        },
-    });
-
-    const availableDMS = await prismaClient.room.findMany({
+    const availableDMS = await prismaClient.dm.findMany({
         where: {
             dmUsers: {
                 has: account.profileId,
             },
         },
     });
-
-    for (const roomIndex in availableRooms) {
-        const room = availableRooms[roomIndex];
-
-        // This works
-        socket.join(room.roomId);
-
-        for (const memberIndex in room.members) {
-            const member = room.members[memberIndex];
-
-            if (member == account.profileId) continue;
-
-            socket.join(member as string);
-        }
-    }
 
     for (const dmIndex in availableDMS) {
         const dm = availableDMS[dmIndex];
@@ -695,14 +672,14 @@ export async function updateRoomSeen(
 
 export async function sendRoomNotification(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
-    room: Partial<Room>,
+    room: Partial<Dm>,
     text: string
 ): Promise<void> {
     const roomId = room.roomId;
 
     setTimeout(async () => {
         try {
-            await prismaClient.room.update({
+            await prismaClient.dm.update({
                 where: {
                     roomId,
                 },

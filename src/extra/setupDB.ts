@@ -153,37 +153,7 @@ async function setupDB(): Promise<void> {
         });
     }
 
-    async function createOfficialRoom(): Promise<void> {
-        return new Promise((resolve) => {
-            socket.emit(
-                'createRoom',
-                {
-                    name: 'Fronvo',
-                },
-                () => resolve()
-            );
-        });
-    }
-
-    async function createOfficialTheme(): Promise<void> {
-        return new Promise((resolve) => {
-            socket.emit(
-                'createTheme',
-                {
-                    title: 'Fronvo',
-                    brandingWhite: '0082FF',
-                    brandingDarkenWhite: '006EFF',
-                    brandingDark: '5A96FF',
-                    brandingDarkenDark: '5A82FF',
-                },
-                () => resolve()
-            );
-        });
-    }
-
     await createOfficialAccount();
-    await createOfficialRoom();
-    await createOfficialTheme();
 }
 
 async function startup(): Promise<void> {

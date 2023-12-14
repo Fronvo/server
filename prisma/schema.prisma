@@ -26,11 +26,9 @@ model Account {
   friends               Json[]
   seenStates            Json?     @default("{}")
   dataSentTime          DateTime?
-  isPRO                 Boolean?  @default(false)
-  proCH                 String?
-  lastPostAt            DateTime?
+  turbo                 Boolean?  @default(false)
+  turboCH               String?
   fcm                   String?   @default("")
-  appliedTheme          String?   @default("Fronvo")
 }
 
 model Post {
@@ -42,16 +40,12 @@ model Post {
   likes        Json[]
 }
 
-model Room {
+model Dm {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  ownerId       String?
   roomId        String    @unique
-  name          String?
   creationDate  DateTime? @default(now())
   icon          String?   @default("")
-  members       Json[]
   lastMessageAt DateTime  @default(now())
-  isDM          Boolean?  @default(false)
   dmUsers       Json[]
   dmHiddenFor   Json[]
 }
@@ -112,15 +106,6 @@ model Token {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
   token     String @unique
   profileId String @unique
-}
-
-model Theme {
-  id                  String @id @default(auto()) @map("_id") @db.ObjectId
-  title               String @unique
-  brandingWhite       String
-  brandingDarkenWhite String
-  brandingDark        String
-  brandingDarkenDark  String
 }
 
 // what could this possibly mean!?

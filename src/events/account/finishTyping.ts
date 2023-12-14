@@ -17,7 +17,7 @@ async function finishTyping({
     account,
     roomId,
 }: FinishTypingServerParams): Promise<FinishTypingResult | FronvoError> {
-    const room = await prismaClient.room.findFirst({
+    const room = await prismaClient.dm.findFirst({
         where: {
             roomId,
         },
@@ -27,10 +27,7 @@ async function finishTyping({
         return generateError('ROOM_404');
     }
 
-    if (
-        !room.members.includes(account.profileId) &&
-        !room.dmUsers.includes(account.profileId)
-    ) {
+    if (!room.dmUsers.includes(account.profileId)) {
         return generateError('NOT_IN_ROOM');
     }
 

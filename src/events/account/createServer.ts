@@ -35,7 +35,7 @@ async function createServer({
     }
 
     // Free limit: < 5 rooms, PRO limit: < 20 rooms
-    if (totalRooms >= (account.isPRO ? 20 : 5)) {
+    if (totalRooms >= (account.turbo ? 20 : 5)) {
         return generateError('OVER_LIMIT');
     }
 

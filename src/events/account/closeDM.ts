@@ -15,7 +15,7 @@ async function closeDM({
     account,
     roomId,
 }: CloseDMServerParams): Promise<CloseDMResult | FronvoError> {
-    const room = await prismaClient.room.findFirst({
+    const room = await prismaClient.dm.findFirst({
         where: {
             roomId,
         },
@@ -23,10 +23,6 @@ async function closeDM({
 
     if (!room) {
         return generateError('ROOM_404');
-    }
-
-    if (!room.isDM) {
-        return generateError('ROOM_NOT_DM');
     }
 
     if (!room.dmUsers.includes(account.profileId)) {
@@ -38,7 +34,7 @@ async function closeDM({
     }
 
     try {
-        await prismaClient.room.update({
+        await prismaClient.dm.update({
             where: {
                 roomId,
             },

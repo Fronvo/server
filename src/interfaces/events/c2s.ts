@@ -3,10 +3,6 @@
 // ******************** //
 
 import {
-    CreateRoomParams,
-    CreateRoomTestResult,
-} from 'interfaces/account/createRoom';
-import {
     DeleteMessageParams,
     DeleteMessageTestResult,
 } from 'interfaces/account/deleteMessage';
@@ -19,16 +15,11 @@ import {
     FetchProfileDataTestResult,
 } from 'interfaces/account/fetchProfileData';
 import { FetchProfileIdTestResult } from 'interfaces/account/fetchProfileId';
-import { LeaveRoomTestResult } from 'interfaces/account/leaveRoom';
 import { LogoutTestResult } from 'interfaces/account/logout';
 import {
     SendMessageParams,
     SendMessageTestResult,
 } from 'interfaces/account/sendMessage';
-import {
-    UpdateRoomDataParams,
-    UpdateRoomDataTestResult,
-} from 'interfaces/account/updateRoomData';
 import {
     UpdateProfileDataParams,
     UpdateProfileDataTestResult,
@@ -88,14 +79,6 @@ import {
     RejectFriendRequestTestResult,
 } from 'interfaces/account/rejectFriendRequest';
 import {
-    AddRoomMemberParams,
-    AddRoomMemberTestResult,
-} from 'interfaces/account/addRoomMember';
-import {
-    RemoveRoomMemberParams,
-    RemoveRoomMemberTestResult,
-} from 'interfaces/account/removeRoomMember';
-import {
     CreateDMParams,
     CreateDMTestResult,
 } from 'interfaces/account/createDM';
@@ -134,18 +117,6 @@ import {
     FetchTenorTestResult,
 } from 'interfaces/account/fetchTenor';
 import {
-    FetchThemesParams,
-    FetchThemesTestResult,
-} from 'interfaces/account/fetchThemes';
-import {
-    ApplyThemeParams,
-    ApplyThemeTestResult,
-} from 'interfaces/account/applyTheme';
-import {
-    CreateThemeParams,
-    CreateThemeTestResult,
-} from 'interfaces/account/createTheme';
-import {
     ApplyProParams,
     ApplyProTestResult,
 } from 'interfaces/account/applyPro';
@@ -165,7 +136,6 @@ import {
     RemoveFCMParams,
     RemoveFCMTestResult,
 } from 'interfaces/account/removeFCM';
-import { CanPostParams, CanPostTestResult } from 'interfaces/account/canPost';
 import {
     CreateServerParams,
     CreateServerTestResult,
@@ -174,7 +144,10 @@ import {
     DeleteServerParams,
     DeleteServerTestResult,
 } from 'interfaces/account/deleteServer';
-import { FetchServersParams, FetchServersTestResult } from 'interfaces/account/fetchServers';
+import {
+    FetchServersParams,
+    FetchServersTestResult,
+} from 'interfaces/account/fetchServers';
 
 export interface ClientToServerEvents {
     register: (
@@ -209,15 +182,6 @@ export interface ClientToServerEvents {
         {}: UpdateProfileDataParams,
         callback?: ({}: UpdateProfileDataTestResult) => void
     ) => void;
-    createRoom: (
-        {}: CreateRoomParams,
-        callback?: ({}: CreateRoomTestResult) => void
-    ) => void;
-    updateRoomData: (
-        {}: UpdateRoomDataParams,
-        callback?: ({}: UpdateRoomDataTestResult) => void
-    ) => void;
-    leaveRoom: (callback?: ({}: LeaveRoomTestResult) => void) => void;
     sendMessage: (
         {}: SendMessageParams,
         callback?: ({}: SendMessageTestResult) => void
@@ -262,14 +226,6 @@ export interface ClientToServerEvents {
         {}: RejectFriendRequestParams,
         callback?: ({}: RejectFriendRequestTestResult) => void
     ) => void;
-    addRoomMember: (
-        {}: AddRoomMemberParams,
-        callback?: ({}: AddRoomMemberTestResult) => void
-    ) => void;
-    removeRoomMember: (
-        {}: RemoveRoomMemberParams,
-        callback?: ({}: RemoveRoomMemberTestResult) => void
-    ) => void;
     createDM: (
         {}: CreateDMParams,
         callback?: ({}: CreateDMTestResult) => void
@@ -311,18 +267,6 @@ export interface ClientToServerEvents {
         {}: FetchTenorParams,
         callback?: ({}: FetchTenorTestResult) => void
     ) => void;
-    fetchThemes: (
-        {}: FetchThemesParams,
-        callback?: ({}: FetchThemesTestResult) => void
-    ) => void;
-    applyTheme: (
-        {}: ApplyThemeParams,
-        callback?: ({}: ApplyThemeTestResult) => void
-    ) => void;
-    createTheme: (
-        {}: CreateThemeParams,
-        callback?: ({}: CreateThemeTestResult) => void
-    ) => void;
     applyPro: (
         {}: ApplyProParams,
         callback?: ({}: ApplyProTestResult) => void
@@ -342,10 +286,6 @@ export interface ClientToServerEvents {
     removeFCM: (
         {}: RemoveFCMParams,
         callback?: ({}: RemoveFCMTestResult) => void
-    ) => void;
-    canPost: (
-        {}: CanPostParams,
-        callback?: ({}: CanPostTestResult) => void
     ) => void;
     createServer: (
         {}: CreateServerParams,

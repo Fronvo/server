@@ -127,8 +127,8 @@ async function deleteAccount({
         }
 
         async function deleteAccountData(): Promise<void> {
-            await deleteOwnedRooms();
-            await leaveRooms();
+            await deleteServers();
+            await leaveServers();
             await deleteLikes();
             await deleteAccount();
 
@@ -186,62 +186,26 @@ async function deleteAccount({
                 }
             }
 
-            async function deleteOwnedRooms(): Promise<void> {
+            async function deleteServers(): Promise<void> {
                 return new Promise(async (resolve) => {
-                    const roomsToDelete = await prismaClient.room.findMany({
+                    await prismaClient.server.findMany({
                         where: {
                             ownerId: account.profileId,
                         },
 
                         select: {
-                            roomId: true,
+                            serverId: true,
                             icon: true,
                         },
                     });
 
-                    if (roomsToDelete.length == 0) {
-                        resolve();
-                        return;
-                    }
-
-                    let deletedRooms = 0;
-
-                    for (const roomIndex in roomsToDelete) {
-                        const room = roomsToDelete[roomIndex];
-
-                        // Delete rooms and all related messages
-                        prismaClient.room
-                            .delete({
-                                where: {
-                                    roomId: room.roomId,
-                                },
-                            })
-                            .then(() => {
-                                prismaClient.message
-                                    .deleteMany({
-                                        where: {
-                                            roomId: room.roomId,
-                                        },
-                                    })
-                                    .then(() => {
-                                        deletedRooms += 1;
-
-                                        deleteImage(room.icon);
-
-                                        if (
-                                            deletedRooms == roomsToDelete.length
-                                        ) {
-                                            resolve();
-                                        }
-                                    });
-                            });
-                    }
+                    resolve();
                 });
             }
 
-            async function leaveRooms(): Promise<void> {
+            async function leaveServers(): Promise<void> {
                 return new Promise(async (resolve) => {
-                    const roomsToLeave = await prismaClient.room.findMany({
+                    const roomsToLeave = await prismaClient.server.findMany({
                         where: {
                             members: {
                                 has: account.profileId,
@@ -249,7 +213,7 @@ async function deleteAccount({
                         },
 
                         select: {
-                            roomId: true,
+                            serverId: true,
                             members: true,
                         },
                     });
@@ -271,10 +235,10 @@ async function deleteAccount({
                         );
 
                         // Delete rooms and all related messages
-                        prismaClient.room
+                        prismaClient.server
                             .update({
                                 where: {
-                                    roomId: room.roomId,
+                                    serverId: room.serverId,
                                 },
 
                                 data: {
@@ -285,8 +249,8 @@ async function deleteAccount({
                             })
                             .then(() => {
                                 // Member left, update members
-                                io.to(room.roomId).emit('memberLeft', {
-                                    roomId: room.roomId,
+                                io.to(room.serverId).emit('memberLeft', {
+                                    roomId: room.serverId,
                                     profileId: account.profileId,
                                 });
 

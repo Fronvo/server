@@ -3,7 +3,6 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { differenceInMinutes } from 'date-fns';
 import {
     SharePostResult,
     SharePostServerParams,
@@ -11,7 +10,7 @@ import {
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, sendMulticastFCM } from 'utilities/global';
 import { v4 } from 'uuid';
-import { batchUpdatesDelay, prismaClient } from 'variables/global';
+import { prismaClient } from 'variables/global';
 
 async function sharePost({
     io,
@@ -21,32 +20,6 @@ async function sharePost({
     // Must have content if not an attachment inside
     if (!attachment) {
         return generateError('REQUIRED', undefined, ['attachment']);
-    }
-
-    // Free limit: Post cooldown for 10 minutes, PRO limit: none
-    if (!account.isPRO) {
-        if (differenceInMinutes(new Date(), account.lastPostAt) < 10) {
-            return generateError('DO_AGAIN', undefined, [
-                10 - differenceInMinutes(new Date(), account.lastPostAt),
-                'minutes',
-            ]);
-        } else {
-            if (!account.isPRO) {
-                setTimeout(async () => {
-                    try {
-                        await prismaClient.account.update({
-                            where: {
-                                profileId: account.profileId,
-                            },
-
-                            data: {
-                                lastPostAt: new Date(),
-                            },
-                        });
-                    } catch (e) {}
-                }, batchUpdatesDelay);
-            }
-        }
     }
 
     const createdPost = await prismaClient.post.create({

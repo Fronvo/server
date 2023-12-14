@@ -23,7 +23,7 @@ async function fetchMessages({
     from,
     to,
 }: FetchMessagesServerParams): Promise<FetchMessagesResult | FronvoError> {
-    const room = await prismaClient.room.findFirst({
+    const room = await prismaClient.dm.findFirst({
         where: {
             roomId,
         },
@@ -33,17 +33,12 @@ async function fetchMessages({
         return generateError('ROOM_404');
     }
 
-    if (
-        !room.members.includes(account.profileId) &&
-        !room.dmUsers.includes(account.profileId)
-    ) {
+    if (!room.dmUsers.includes(account.profileId)) {
         return generateError('NOT_IN_ROOM');
     }
 
-    if (room.isDM) {
-        if (room.dmHiddenFor.includes(account.profileId)) {
-            return generateError('DM_HIDDEN');
-        }
+    if (room.dmHiddenFor.includes(account.profileId)) {
+        return generateError('DM_HIDDEN');
     }
 
     const fromNumber = Number(from);
@@ -140,7 +135,7 @@ async function fetchMessages({
                                 creationDate: true,
                                 profileId: true,
                                 username: true,
-                                isPRO: true,
+                                turbo: true,
                             },
                         })
                         .then((data) => {

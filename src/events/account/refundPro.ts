@@ -20,7 +20,7 @@ async function refundPro({
         return generateError('UNKNOWN');
     }
 
-    if (!account.isPRO || !account.proCH) {
+    if (!account.turbo || !account.turboCH) {
         return generateError('UNKNOWN');
     }
 
@@ -31,16 +31,16 @@ async function refundPro({
             },
 
             data: {
-                isPRO: false,
-                proCH: '',
+                turbo: false,
+                turboCH: '',
             },
         });
     } catch (e) {
         return generateError('UNKNOWN');
     }
 
-    sendEmail(account.email, 'You left the PRO club', [
-        'It was a fun time having you with the other PROs.',
+    sendEmail(account.email, 'You left the TURBO club', [
+        'It was a fun time having you with the other TURBOs.',
         'We wish you a good time on Fronvo.',
     ]);
 

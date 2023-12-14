@@ -2,17 +2,15 @@
 // The fetchConvos account event file.
 // ******************** //
 
-import { Room } from '@prisma/client';
+import { Dm } from '@prisma/client';
 import {
     FetchConvosResult,
     FetchConvosServerParams,
     FetchedDM,
-    FetchedRoom,
 } from 'interfaces/account/fetchConvos';
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
-    decryptAES,
     generateError,
     getTransformedImage,
     isAccountLoggedIn,
@@ -22,23 +20,14 @@ import { prismaClient } from 'variables/global';
 async function fetchConvos({
     account,
 }: FetchConvosServerParams): Promise<FetchConvosResult | FronvoError> {
-    let convosRaw: Partial<Room>[];
+    let convosRaw: Partial<Dm>[];
 
     try {
-        convosRaw = await prismaClient.room.findMany({
+        convosRaw = await prismaClient.dm.findMany({
             where: {
-                OR: [
-                    {
-                        members: {
-                            has: account.profileId,
-                        },
-                    },
-                    {
-                        dmUsers: {
-                            has: account.profileId,
-                        },
-                    },
-                ],
+                dmUsers: {
+                    has: account.profileId,
+                },
             },
 
             orderBy: {
@@ -63,7 +52,7 @@ async function fetchConvos({
         return totalMessages - seenStates[roomId];
     }
 
-    let convos: Partial<FetchedDM | FetchedRoom>[] = [];
+    let convos: Partial<FetchedDM>[] = [];
     let hiddenConvos = 0;
 
     async function gatherConvos(): Promise<void> {
@@ -85,73 +74,54 @@ async function fetchConvos({
                     .then((totalMessages) => {
                         getUnreadCount(totalMessages, convo.roomId).then(
                             async (unread) => {
-                                if (convo.isDM) {
-                                    const targetDMUser =
-                                        convo.dmUsers[0] != account.profileId
-                                            ? (convo.dmUsers[0] as string)
-                                            : (convo.dmUsers[1] as string);
+                                const targetDMUser =
+                                    convo.dmUsers[0] != account.profileId
+                                        ? (convo.dmUsers[0] as string)
+                                        : (convo.dmUsers[1] as string);
 
-                                    const targetDMUserData: Partial<FetchedFronvoAccount> =
-                                        {
-                                            ...(await prismaClient.account.findFirst(
-                                                {
-                                                    where: {
-                                                        profileId: targetDMUser,
-                                                    },
+                                const targetDMUserData: Partial<FetchedFronvoAccount> =
+                                    {
+                                        ...(await prismaClient.account.findFirst(
+                                            {
+                                                where: {
+                                                    profileId: targetDMUser,
+                                                },
 
-                                                    select: {
-                                                        profileId: true,
-                                                        username: true,
-                                                        avatar: true,
-                                                        banner: true,
-                                                        bio: true,
-                                                        creationDate: true,
-                                                        isPRO: true,
-                                                    },
-                                                }
-                                            )),
+                                                select: {
+                                                    profileId: true,
+                                                    username: true,
+                                                    avatar: true,
+                                                    banner: true,
+                                                    bio: true,
+                                                    creationDate: true,
+                                                    turbo: true,
+                                                },
+                                            }
+                                        )),
 
-                                            isSelf: false,
-                                            online: isAccountLoggedIn(
-                                                targetDMUser
+                                        isSelf: false,
+                                        online: isAccountLoggedIn(targetDMUser),
+                                    };
+
+                                // Keep Room / DM only attributes
+                                // Clients MUST be able to differentiate from isDM
+                                convos[convoIndex] = {
+                                    roomId: convo.roomId,
+                                    dmUsers: convo.dmUsers,
+                                    dmUserOnline: targetDMUserData.online,
+                                    unreadCount: unread,
+                                    dmUser: {
+                                        ...targetDMUserData,
+                                        avatar:
+                                            targetDMUserData.avatar &&
+                                            getTransformedImage(
+                                                targetDMUserData.avatar,
+                                                72
                                             ),
-                                        };
-
-                                    // Keep Room / DM only attributes
-                                    // Clients MUST be able to differentiate from isDM
-                                    convos[convoIndex] = {
-                                        roomId: convo.roomId,
-                                        isDM: true,
-                                        dmUsers: convo.dmUsers,
-                                        dmUserOnline: targetDMUserData.online,
-                                        unreadCount: unread,
-                                        dmUser: {
-                                            ...targetDMUserData,
-                                            avatar:
-                                                targetDMUserData.avatar &&
-                                                getTransformedImage(
-                                                    targetDMUserData.avatar,
-                                                    72
-                                                ),
-                                        },
-                                        dmHiddenFor: convo.dmHiddenFor,
-                                        totalMessages,
-                                    };
-                                } else {
-                                    convos[convoIndex] = {
-                                        roomId: convo.roomId,
-                                        isDM: false,
-                                        creationDate: convo.creationDate,
-                                        icon:
-                                            convo.icon &&
-                                            getTransformedImage(convo.icon, 72),
-                                        members: convo.members,
-                                        name: decryptAES(convo.name),
-                                        ownerId: convo.ownerId,
-                                        unreadCount: unread,
-                                        totalMessages,
-                                    };
-                                }
+                                    },
+                                    dmHiddenFor: convo.dmHiddenFor,
+                                    totalMessages,
+                                };
 
                                 checkLoadingDone();
                             }
@@ -176,18 +146,16 @@ async function fetchConvos({
     }
 
     function removeHiddenConvos(): void {
-        let finalConvos: Partial<FetchedDM | FetchedRoom>[] = [];
+        let finalConvos: Partial<FetchedDM>[] = [];
 
         for (const convoIndex in convos) {
             const convo = convos[convoIndex];
 
-            if (convo.isDM) {
-                if (!convo.dmHiddenFor?.includes(account?.profileId)) {
-                    finalConvos.push(convo);
-                }
-            } else {
+            if (!convo.dmHiddenFor?.includes(account?.profileId)) {
                 finalConvos.push(convo);
             }
+
+            finalConvos.push(convo);
         }
 
         convos = finalConvos;

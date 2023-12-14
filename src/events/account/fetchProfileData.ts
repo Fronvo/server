@@ -70,7 +70,7 @@ async function fetchProfileData({
         online: getAccountSocketId(profileId) != '',
         status: showStatus ? targetAccount.status : '',
         totalPosts,
-        isPRO: targetAccount.isPRO || targetAccount.profileId == 'fronvo',
+        turbo: targetAccount.turbo || targetAccount.profileId == 'fronvo',
     };
 
     // More data if our profile
@@ -79,26 +79,6 @@ async function fetchProfileData({
         // profileData.email = account.email;
         profileData.pendingFriendRequests = targetAccount.pendingFriendRequests;
         profileData.friends = account.friends;
-
-        // Unusable if unsubscribed
-        if (targetAccount.isPRO || targetAccount.profileId == 'fronvo') {
-            if (targetAccount.appliedTheme) {
-                const theme = await prismaClient.theme.findFirst({
-                    where: {
-                        title: targetAccount.appliedTheme,
-                    },
-                });
-
-                // Might have changed title
-                if (theme) {
-                    profileData.appliedTheme = targetAccount.appliedTheme;
-                    profileData.bW = theme.brandingWhite;
-                    profileData.bDW = theme.brandingDarkenWhite;
-                    profileData.bD = theme.brandingDark;
-                    profileData.bDD = theme.brandingDarkenDark;
-                }
-            }
-        }
     }
 
     return { profileData };

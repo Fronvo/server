@@ -19,11 +19,11 @@ async function fetchPROCH({
         return generateError('UNKNOWN');
     }
 
-    if (!account.isPRO || !account.proCH) {
+    if (!account.turbo || !account.turboCH) {
         return generateError('UNKNOWN');
     }
 
-    return { proCH: decryptAES(account.proCH) };
+    return { proCH: decryptAES(account.turboCH) };
 }
 
 const fetchPROCHTemplate: EventTemplate = {

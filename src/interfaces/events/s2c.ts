@@ -17,7 +17,6 @@ import { ProfileDataUpdatedParams } from 'interfaces/account/profileDataUpdated'
 import { ProfileStatusUpdatedParams } from 'interfaces/account/profileStatusUpdated';
 import { RoomAddedParams } from 'interfaces/account/roomAdded';
 import { RoomCreatedParams } from 'interfaces/account/roomCreated';
-import { RoomDataUpdatedParams } from 'interfaces/account/roomDataUpdated';
 import { RoomDeletedParams } from 'interfaces/account/roomDeleted';
 import { MessageDeletedParams } from 'interfaces/account/messageDeleted';
 import { RoomRemovedParams } from 'interfaces/account/roomRemoved';
@@ -63,8 +62,6 @@ export interface ServerToClientEvents {
     memberLeft: ({}: MemberLeftParams) => void;
 
     onlineStatusUpdated: ({}: OnlineStatusUpdatedParams) => void;
-
-    roomDataUpdated: ({}: RoomDataUpdatedParams) => void;
 
     profileDataUpdated: ({}: ProfileDataUpdatedParams) => void;
 
