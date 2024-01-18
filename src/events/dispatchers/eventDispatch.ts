@@ -65,7 +65,7 @@ function getNeededArgs(
         // Check for optional params aswell
         if (
             !(neededArg in givenArgs) &&
-            !funcs[eventName].schema.schema[neededArg].optional
+            !funcs[eventName].schema.schema[neededArg]?.optional
         ) {
             finalNeededArgs.push(neededArg);
         }

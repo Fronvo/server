@@ -18,7 +18,6 @@ import { aesEnc, aesIV } from 'variables/global';
 import { prismaClient } from 'variables/global';
 import { createCipheriv, createDecipheriv } from 'crypto';
 import ImageKit from 'imagekit';
-import { Dm, Message } from '@prisma/client';
 
 export async function loginSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -39,6 +38,8 @@ export async function loginSocket(
             pendingFriendRequests: true,
         },
     });
+
+    // TODO: Async
 
     // Add to all of the available rooms
     const availableDMS = await prismaClient.dm.findMany({
@@ -62,6 +63,36 @@ export async function loginSocket(
         socket.join(targetDMUser as string);
 
         socket.join(availableDMS[dmIndex].roomId);
+    }
+
+    // Add to all of the available servers
+    const availableServers = await prismaClient.server.findMany({
+        where: {
+            members: {
+                has: account.profileId,
+            },
+        },
+    });
+
+    for (const serverIndex in availableServers) {
+        const server = availableServers[serverIndex];
+
+        // Server room for general details
+        socket.join(server.serverId);
+
+        // All server member rooms
+        for (const memberIndex in server.members) {
+            const member = server.members[memberIndex];
+
+            if (member != accountId) {
+                socket.join(server.members[memberIndex] as string);
+            }
+        }
+
+        // All server channel rooms
+        for (const channelIndex in server.channels) {
+            socket.join(server.channels[channelIndex] as string);
+        }
     }
 
     // All friend rooms too
@@ -668,84 +699,6 @@ export async function updateRoomSeen(
             } catch (e) {}
         }
     }, variables.batchUpdatesDelay);
-}
-
-export async function sendRoomNotification(
-    io: Server<ClientToServerEvents, ServerToClientEvents>,
-    room: Partial<Dm>,
-    text: string
-): Promise<void> {
-    const roomId = room.roomId;
-
-    setTimeout(async () => {
-        try {
-            await prismaClient.dm.update({
-                where: {
-                    roomId,
-                },
-
-                data: {
-                    lastMessageAt: new Date(),
-
-                    // Reset hidden states
-                    dmHiddenFor: {
-                        set: [],
-                    },
-                },
-            });
-        } catch (e) {}
-    }, variables.batchUpdatesDelay);
-
-    let newMessageData: Partial<Message>;
-
-    try {
-        newMessageData = await prismaClient.message.create({
-            data: {
-                ownerId: 'fronvo',
-                roomId,
-                messageId: v4(),
-                isNotification: true,
-                notificationText: encryptAES(text),
-            },
-
-            select: {
-                ownerId: true,
-                roomId: true,
-                content: true,
-                creationDate: true,
-                messageId: true,
-                isReply: true,
-                replyContent: true,
-                isSpotify: true,
-                spotifyEmbed: true,
-                isTenor: true,
-                tenorUrl: true,
-                isNotification: true,
-                notificationText: true,
-            },
-        });
-    } catch (e) {}
-
-    io.to(roomId).emit('newMessage', {
-        roomId,
-        newMessageData: {
-            message: {
-                ...newMessageData,
-                notificationText: text,
-            },
-            profileData: await prismaClient.account.findFirst({
-                where: {
-                    profileId: 'fronvo',
-                },
-
-                select: {
-                    profileId: true,
-                },
-            }),
-        },
-    });
-
-    updateRoomSeen(io, room.roomId);
 }
 
 export function getTransformedImage(url: string, width: number): string {

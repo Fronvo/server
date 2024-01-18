@@ -55,7 +55,6 @@ async function createServer({
                 ownerId: true,
                 name: true,
                 icon: true,
-                description: true,
                 creationDate: true,
                 members: true,
                 channels: true,
@@ -70,6 +69,7 @@ async function createServer({
 
     io.to(socket.id).emit('serverCreated', {
         serverId,
+        name,
     });
 
     return {};

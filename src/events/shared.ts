@@ -60,6 +60,17 @@ export const serverIdSchema: {
     serverId,
 };
 
+// Channel id
+const channelId: EzierValidatorStringSchema = {
+    type: 'uuid',
+};
+
+export const channelIdSchema: {
+    channelId: EzierValidatorStringSchema;
+} = {
+    channelId,
+};
+
 // Room name
 const roomName: EzierValidatorStringSchema = {
     minLength: 1,

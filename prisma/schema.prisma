@@ -41,22 +41,19 @@ model Post {
 }
 
 model Dm {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  roomId        String    @unique
-  creationDate  DateTime? @default(now())
-  icon          String?   @default("")
-  lastMessageAt DateTime  @default(now())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  roomId        String   @unique
+  icon          String?  @default("")
+  lastMessageAt DateTime @default(now())
   dmUsers       Json[]
   dmHiddenFor   Json[]
 }
 
-// TODO: Completely seperate from previous room model
 model Server {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
   ownerId      String?
   serverId     String    @unique
   name         String?
-  description  String?
   icon         String?   @default("")
   creationDate DateTime? @default(now())
   members      Json[]
@@ -66,10 +63,8 @@ model Server {
 
 model Channel {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  channelId    String   @unique
   name         String?
-  description  String?
-  serverId     String?
-  roomId       String   @unique
   creationDate DateTime @default(now())
 }
 
@@ -84,22 +79,37 @@ model Role {
 }
 
 model Message {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  ownerId          String
-  roomId           String
-  messageId        String   @unique
-  content          String?
-  creationDate     DateTime @default(now())
-  isReply          Boolean  @default(false)
-  replyContent     String   @default("")
-  isImage          Boolean  @default(false)
-  attachment       String?
-  isSpotify        Boolean? @default(false)
-  spotifyEmbed     String?  @default("")
-  isTenor          Boolean  @default(false)
-  tenorUrl         String?  @default("")
-  isNotification   Boolean  @default(false)
-  notificationText String?  @default("")
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId      String
+  roomId       String
+  messageId    String   @unique
+  content      String?
+  creationDate DateTime @default(now())
+  isReply      Boolean  @default(false)
+  replyContent String   @default("")
+  isImage      Boolean  @default(false)
+  attachment   String?
+  isSpotify    Boolean? @default(false)
+  spotifyEmbed String?  @default("")
+  isTenor      Boolean  @default(false)
+  tenorUrl     String?  @default("")
+}
+
+model ChannelMessage {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId      String
+  channelId    String
+  messageId    String   @unique
+  content      String?
+  creationDate DateTime @default(now())
+  isReply      Boolean  @default(false)
+  replyContent String   @default("")
+  isImage      Boolean  @default(false)
+  attachment   String?
+  isSpotify    Boolean? @default(false)
+  spotifyEmbed String?  @default("")
+  isTenor      Boolean  @default(false)
+  tenorUrl     String?  @default("")
 }
 
 model Token {

@@ -48,13 +48,13 @@ async function applyPro({
 
 const applyProTemplate: EventTemplate = {
     func: applyPro,
-    template: ['secret', 'turboC'],
+    template: ['secret', 'turboCh'],
     schema: new StringSchema({
         secret: {
             minLength: 36,
         },
 
-        proCH: {
+        turboCh: {
             regex: /^[a-zA-Z0-9_]+/,
         },
     }),

@@ -70,7 +70,7 @@ async function fetchProfileData({
         online: getAccountSocketId(profileId) != '',
         status: showStatus ? targetAccount.status : '',
         totalPosts,
-        turbo: targetAccount.turbo || targetAccount.profileId == 'fronvo',
+        isTurbo: targetAccount.turbo || targetAccount.profileId == 'fronvo',
     };
 
     // More data if our profile

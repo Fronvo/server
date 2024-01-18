@@ -173,9 +173,7 @@ async function fetchDashboard({
             },
             profileData: {
                 ...profileData,
-                avatar:
-                    profileData.avatar &&
-                    getTransformedImage(profileData.avatar, 72),
+                avatar: profileData.avatar,
             },
         });
 

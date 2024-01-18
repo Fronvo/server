@@ -36,6 +36,11 @@ import removeFCM from 'events/account/removeFCM';
 import createServer from 'events/account/createServer';
 import deleteServer from 'events/account/deleteServer';
 import fetchServers from 'events/account/fetchServers';
+import createChannel from 'events/account/createChannel';
+import deleteChannel from 'events/account/deleteChannel';
+import fetchChannelMessages from 'events/account/fetchChannelMessages';
+import sendChannelMessage from 'events/account/sendChannelMessage';
+import sendChannelImage from 'events/account/sendChannelImage';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -74,6 +79,11 @@ const accountTemplate: EventExportTemplate = {
     createServer,
     deleteServer,
     fetchServers,
+    createChannel,
+    deleteChannel,
+    fetchChannelMessages,
+    sendChannelMessage,
+    sendChannelImage,
 };
 
 export default accountTemplate;

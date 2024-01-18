@@ -148,6 +148,23 @@ import {
     FetchServersParams,
     FetchServersTestResult,
 } from 'interfaces/account/fetchServers';
+import {
+    CreateChannelParams,
+    CreateChannelTestResult,
+} from 'interfaces/account/createChannel';
+import {
+    DeleteChannelParams,
+    DeleteChannelTestResult,
+} from 'interfaces/account/deleteChannel';
+import {
+    FetchChannelMessagesParams,
+    FetchChannelMessagesTestResult,
+} from 'interfaces/account/fetchChannelMessages';
+import {
+    SendChannelMessageParams,
+    SendChannelMessageTestResult,
+} from 'interfaces/account/sendChannelMessage';
+import { SendChannelImageParams, SendChannelImageTestResult } from 'interfaces/account/sendChannelImage';
 
 export interface ClientToServerEvents {
     register: (
@@ -298,5 +315,25 @@ export interface ClientToServerEvents {
     fetchServers: (
         {}: FetchServersParams,
         callback?: ({}: FetchServersTestResult) => void
+    ) => void;
+    createChannel: (
+        {}: CreateChannelParams,
+        callback?: ({}: CreateChannelTestResult) => void
+    ) => void;
+    deleteChannel: (
+        {}: DeleteChannelParams,
+        callback?: ({}: DeleteChannelTestResult) => void
+    ) => void;
+    fetchChannelMessages: (
+        {}: FetchChannelMessagesParams,
+        callback?: ({}: FetchChannelMessagesTestResult) => void
+    ) => void;
+    sendChannelMessage: (
+        {}: SendChannelMessageParams,
+        callback?: ({}: SendChannelMessageTestResult) => void
+    ) => void;
+    sendChannelImage: (
+        {}: SendChannelImageParams,
+        callback?: ({}: SendChannelImageTestResult) => void
     ) => void;
 }

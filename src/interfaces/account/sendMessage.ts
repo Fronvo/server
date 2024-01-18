@@ -8,7 +8,6 @@ export interface SendMessageParams {
     roomId: string;
     message?: string;
     replyId?: string;
-    attachment?: string;
 }
 
 export interface SendMessageServerParams

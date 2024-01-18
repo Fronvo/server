@@ -1,61 +1,57 @@
 // ******************** //
-// The sendRoomMessage account-only event file.
+// The sendChannelMessage account event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Message } from '@prisma/client';
+import { ChannelMessage } from '@prisma/client';
+import { channelIdSchema, serverIdSchema } from 'events/shared';
 import {
-    SendMessageResult,
-    SendMessageServerParams,
-} from 'interfaces/account/sendMessage';
+    SendChannelMessageResult,
+    SendChannelMessageServerParams,
+} from 'interfaces/account/sendChannelMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     decryptAES,
     encryptAES,
     generateError,
     sendMulticastFCM,
-    updateRoomSeen,
     validateSchema,
 } from 'utilities/global';
 import { v4 } from 'uuid';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
-async function sendMessage({
+async function sendChannelMessage({
     io,
     account,
-    roomId,
+    serverId,
+    channelId,
     message,
     replyId,
-}: SendMessageServerParams): Promise<SendMessageResult | FronvoError> {
-    const room = await prismaClient.dm.findFirst({
+}: SendChannelMessageServerParams): Promise<
+    SendChannelMessageResult | FronvoError
+> {
+    const server = await prismaClient.server.findFirst({
         where: {
-            roomId,
+            serverId,
         },
     });
 
-    if (!room) {
+    if (!server) {
+        return generateError('SERVER_404');
+    }
+
+    if (!server.members.includes(account.profileId)) {
+        return generateError('NOT_IN_SERVER');
+    }
+
+    const channel = await prismaClient.channel.findFirst({
+        where: {
+            channelId,
+        },
+    });
+
+    if (!channel) {
         return generateError('ROOM_404');
-    }
-
-    // Must be in the room
-    if (!room.dmUsers.includes(account.profileId)) {
-        return generateError('NOT_IN_ROOM');
-    }
-
-    // Check if other user is still friended
-    const otherUser =
-        room.dmUsers[0] != account.profileId
-            ? room.dmUsers[0]
-            : room.dmUsers[1];
-
-    const otherDMUser = await prismaClient.account.findFirst({
-        where: {
-            profileId: otherUser as string,
-        },
-    });
-
-    if (!otherDMUser.friends.includes(account.profileId)) {
-        return generateError('NOT_FRIEND');
     }
 
     // Remove unnecessary whitespace, dont allow 3 new lines in a row
@@ -75,7 +71,7 @@ async function sendMessage({
         return newSchemaResult;
     }
 
-    let newMessageData: Partial<Message>;
+    let newMessageData: Partial<ChannelMessage>;
 
     // Check for Spotify link (track or playlist)
     let isSpotify = false;
@@ -137,7 +133,7 @@ async function sendMessage({
     let replyContent = '';
 
     if (replyId) {
-        const replyMessage = await prismaClient.message.findFirst({
+        const replyMessage = await prismaClient.channelMessage.findFirst({
             where: {
                 messageId: replyId,
             },
@@ -165,10 +161,10 @@ async function sendMessage({
     }
 
     try {
-        newMessageData = await prismaClient.message.create({
+        newMessageData = await prismaClient.channelMessage.create({
             data: {
                 ownerId: account.profileId,
-                roomId,
+                channelId,
                 messageId: v4(),
                 content: !isTenor && !isSpotify ? encryptAES(message) : '',
                 isReply: Boolean(replyId),
@@ -181,7 +177,7 @@ async function sendMessage({
 
             select: {
                 ownerId: true,
-                roomId: true,
+                channelId: true,
                 content: true,
                 creationDate: true,
                 messageId: true,
@@ -198,13 +194,13 @@ async function sendMessage({
     }
 
     // Force end typing
-    io.to(roomId).emit('typingEnded', {
-        roomId,
+    io.to(channelId).emit('typingEnded', {
+        roomId: channelId,
         profileId: account.profileId,
     });
 
-    io.to(roomId).emit('newMessage', {
-        roomId,
+    io.to(channelId).emit('newMessage', {
+        roomId: channelId,
         newMessageData: {
             message: {
                 ...newMessageData,
@@ -220,22 +216,6 @@ async function sendMessage({
             // For FCM
             let finalLastMessage: string;
 
-            // Update ordering of message lists
-            await prismaClient.dm.update({
-                where: {
-                    roomId,
-                },
-
-                data: {
-                    lastMessageAt: new Date(),
-
-                    // Reset hidden states
-                    dmHiddenFor: {
-                        set: [],
-                    },
-                },
-            });
-
             if (isTenor) {
                 finalLastMessage = `${account.username} sent a GIF`;
             } else if (isSpotify) {
@@ -244,21 +224,21 @@ async function sendMessage({
 
             if (!isTenor && !isSpotify) {
                 sendMulticastFCM(
-                    room.dmUsers as string[],
+                    server.members as string[],
                     `@${account.profileId}`,
                     `${account.username}: ${message}`,
                     account.profileId,
                     true,
-                    'dm'
+                    'server'
                 );
             } else {
                 sendMulticastFCM(
-                    room.dmUsers as string[],
+                    server.members as string[],
                     `@${account.profileId}`,
                     finalLastMessage,
                     account.profileId,
                     true,
-                    'dm'
+                    'server'
                 );
             }
         }, batchUpdatesDelay);
@@ -266,19 +246,15 @@ async function sendMessage({
         return generateError('UNKNOWN');
     }
 
-    // Don't delay messages for these
-    updateRoomSeen(io, room.roomId);
-
     return {};
 }
 
-const sendMessageTemplate: EventTemplate = {
-    func: sendMessage,
-    template: ['roomId', 'message', 'replyId'],
+const sendChannelMessageTemplate: EventTemplate = {
+    func: sendChannelMessage,
+    template: ['serverId', 'channelId', 'message', 'replyId'],
     schema: new StringSchema({
-        roomId: {
-            type: 'uuid',
-        },
+        ...serverIdSchema,
+        ...channelIdSchema,
 
         message: {
             minLength: 1,
@@ -292,4 +268,4 @@ const sendMessageTemplate: EventTemplate = {
     }),
 };
 
-export default sendMessageTemplate;
+export default sendChannelMessageTemplate;

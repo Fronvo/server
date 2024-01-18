@@ -33,6 +33,8 @@ import {
     ResetPasswordVerifyParams,
     ResetPasswordVerifyTestResult,
 } from 'interfaces/noAccount/resetPasswordVerify';
+import { ChannelCreatedParams } from 'interfaces/account/channelCreated';
+import { ChannelDeletedParams } from 'interfaces/account/channelDeleted';
 
 export interface ServerToClientEvents {
     registerVerify: (
@@ -88,4 +90,8 @@ export interface ServerToClientEvents {
     serverCreated: ({}: ServerCreatedParams) => void;
 
     serverDeleted: ({}: ServerDeletedParams) => void;
+
+    channelCreated: ({}: ChannelCreatedParams) => void;
+
+    channelDeleted: ({}: ChannelDeletedParams) => void;
 }

@@ -2,7 +2,7 @@
 // The fetchServers account event file.
 // ******************** //
 
-import { Server } from '@prisma/client';
+import { Channel, Server } from '@prisma/client';
 import {
     FetchServersResult,
     FetchServersServerParams,
@@ -28,6 +28,25 @@ async function fetchServers({
         return generateError('UNKNOWN');
     }
 
+    async function gatherChannels(channels: any[]): Promise<Channel[]> {
+        return new Promise(async (resolve) => {
+            if (channels.length == 0) {
+                resolve([]);
+                return;
+            }
+
+            resolve(
+                await prismaClient.channel.findMany({
+                    where: {
+                        channelId: {
+                            in: channels,
+                        },
+                    },
+                })
+            );
+        });
+    }
+
     let servers: Partial<Server>[] = [];
     async function gatherServers(): Promise<void> {
         return new Promise((resolve) => {
@@ -39,19 +58,21 @@ async function fetchServers({
             for (const serverIndex in serversRaw) {
                 const server = serversRaw[serverIndex];
 
-                servers[serverIndex] = {
-                    serverId: server.serverId,
-                    ownerId: server.ownerId,
-                    creationDate: server.creationDate,
-                    icon: server.icon && getTransformedImage(server.icon, 96),
-                    members: server.members,
-                    name: server.name,
-                    description: server.description,
-                    channels: server.channels,
-                    roles: server.roles,
-                };
+                gatherChannels(server.channels).then((channels) => {
+                    servers[serverIndex] = {
+                        serverId: server.serverId,
+                        ownerId: server.ownerId,
+                        creationDate: server.creationDate,
+                        icon:
+                            server.icon && getTransformedImage(server.icon, 96),
+                        members: server.members,
+                        name: server.name,
+                        channels: channels as [],
+                        roles: server.roles,
+                    };
 
-                checkLoadingDone();
+                    checkLoadingDone();
+                });
             }
 
             function checkLoadingDone() {

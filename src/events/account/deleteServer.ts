@@ -42,13 +42,13 @@ async function deleteServer({
             try {
                 const deletedMessages = await prismaClient.message.findMany({
                     where: {
-                        roomId: channel.roomId,
+                        roomId: channel.channelId,
                     },
                 });
 
                 await prismaClient.message.deleteMany({
                     where: {
-                        roomId: channel.roomId,
+                        roomId: channel.channelId,
                     },
                 });
 
@@ -61,7 +61,7 @@ async function deleteServer({
                 // Then, delete the channel
                 await prismaClient.channel.delete({
                     where: {
-                        roomId: channel.roomId,
+                        channelId: channel.channelId,
                     },
                 });
             } catch (e) {
@@ -69,7 +69,7 @@ async function deleteServer({
             }
 
             // Clear room
-            io.socketsLeave(channel.roomId);
+            io.socketsLeave(channel.channelId);
         }
 
         for (const roleIndex in server.roles) {

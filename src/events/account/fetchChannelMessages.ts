@@ -1,9 +1,14 @@
 // ******************** //
-// The fetchRoomMessages account-only event file.
+// The fetchChannelMessages account event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Account, Message } from '@prisma/client';
+import { Account, ChannelMessage } from '@prisma/client';
+import { channelIdSchema, fromToSchema, serverIdSchema } from 'events/shared';
+import {
+    FetchChannelMessagesResult,
+    FetchChannelMessagesServerParams,
+} from 'interfaces/account/fetchChannelMessages';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
     decryptAES,
@@ -11,34 +16,38 @@ import {
     getTransformedImage,
 } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
-import { fromToSchema, roomIdSchema } from '../shared';
-import {
-    FetchMessagesResult,
-    FetchMessagesServerParams,
-} from 'interfaces/account/fetchMessages';
 
-async function fetchMessages({
+async function fetchChannelMessages({
     account,
-    roomId,
+    serverId,
+    channelId,
     from,
     to,
-}: FetchMessagesServerParams): Promise<FetchMessagesResult | FronvoError> {
-    const room = await prismaClient.dm.findFirst({
+}: FetchChannelMessagesServerParams): Promise<
+    FetchChannelMessagesResult | FronvoError
+> {
+    const server = await prismaClient.server.findFirst({
         where: {
-            roomId,
+            serverId,
         },
     });
 
-    if (!room) {
+    if (!server) {
+        return generateError('SERVER_404');
+    }
+
+    if (!server.members.includes(account.profileId)) {
+        return generateError('NOT_IN_SERVER');
+    }
+
+    const channel = await prismaClient.channel.findFirst({
+        where: {
+            channelId,
+        },
+    });
+
+    if (!channel) {
         return generateError('ROOM_404');
-    }
-
-    if (!room.dmUsers.includes(account.profileId)) {
-        return generateError('NOT_IN_ROOM');
-    }
-
-    if (room.dmHiddenFor.includes(account.profileId)) {
-        return generateError('DM_HIDDEN');
     }
 
     const fromNumber = Number(from);
@@ -73,9 +82,9 @@ async function fetchMessages({
         }
     }
 
-    const messages = await prismaClient.message.findMany({
+    const messages = await prismaClient.channelMessage.findMany({
         where: {
-            roomId,
+            channelId,
         },
 
         // Last shown first
@@ -88,7 +97,7 @@ async function fetchMessages({
         take: -(Number(to) - Number(from)),
         select: {
             ownerId: true,
-            roomId: true,
+            channelId: true,
             content: true,
             creationDate: true,
             messageId: true,
@@ -155,8 +164,8 @@ async function fetchMessages({
 
     await getMessageAccounts();
 
-    const roomMessages: {
-        message: Partial<Message>;
+    const channelMessages: {
+        message: Partial<ChannelMessage>;
         profileData: Partial<Account>;
     }[] = [];
 
@@ -166,7 +175,7 @@ async function fetchMessages({
 
         const profileData = getProfileData(message.ownerId);
 
-        roomMessages.push({
+        channelMessages.push({
             message: {
                 ...message,
                 content: message.content ? decryptAES(message.content) : '',
@@ -187,12 +196,12 @@ async function fetchMessages({
         // Update seen state
         const newSeenStates = account.seenStates || {};
 
-        const totalMessages = await prismaClient.message.count({
-            where: { roomId },
+        const totalMessages = await prismaClient.channelMessage.count({
+            where: { channelId },
         });
 
-        if (newSeenStates[roomId] != totalMessages) {
-            newSeenStates[roomId] = totalMessages;
+        if (newSeenStates[channelId] != totalMessages) {
+            newSeenStates[channelId] = totalMessages;
 
             try {
                 await prismaClient.account.update({
@@ -208,16 +217,16 @@ async function fetchMessages({
         }
     }, batchUpdatesDelay);
 
-    return { roomMessages };
+    return { channelMessages };
 }
 
-const fetchMessagesTemplate: EventTemplate = {
-    func: fetchMessages,
-    template: ['roomId', 'from', 'to'],
+const fetchChannelMessagesTemplate: EventTemplate = {
+    func: fetchChannelMessages,
+    template: ['serverId', 'channelId', 'from', 'to'],
     schema: new StringSchema({
-        ...roomIdSchema,
+        ...serverIdSchema,
+        ...channelIdSchema,
         ...fromToSchema,
     }),
 };
-
-export default fetchMessagesTemplate;
+export default fetchChannelMessagesTemplate;

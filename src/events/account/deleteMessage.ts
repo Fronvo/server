@@ -43,8 +43,6 @@ async function deleteMessage({
         return generateError('NOT_OWNER');
     }
 
-    if (targetMessage.isNotification) return generateError('UNKNOWN');
-
     let deletedMessage: { count: number };
 
     try {

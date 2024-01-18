@@ -1,51 +1,59 @@
 // ******************** //
-// The sendRoomMessage account-only event file.
+// The sendChannelImage account event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { Message } from '@prisma/client';
+import { ChannelMessage } from '@prisma/client';
+import { channelIdSchema, serverIdSchema } from 'events/shared';
 import {
-    SendImageResult,
-    SendImageServerParams,
-} from 'interfaces/account/sendImage';
-
+    SendChannelImageResult,
+    SendChannelImageServerParams,
+} from 'interfaces/account/sendChannelImage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    generateError,
-    sendMulticastFCM,
-    updateRoomSeen,
-} from 'utilities/global';
+import { generateError, sendMulticastFCM } from 'utilities/global';
 import { v4 } from 'uuid';
 import { prismaClient } from 'variables/global';
 
-async function sendImage({
+async function sendChannelImage({
     io,
     account,
-    roomId,
+    serverId,
+    channelId,
     attachment,
-}: SendImageServerParams): Promise<SendImageResult | FronvoError> {
-    const room = await prismaClient.dm.findFirst({
+}: SendChannelImageServerParams): Promise<
+    SendChannelImageResult | FronvoError
+> {
+    const server = await prismaClient.server.findFirst({
         where: {
-            roomId,
+            serverId,
         },
     });
 
-    if (!room) {
+    if (!server) {
+        return generateError('SERVER_404');
+    }
+
+    if (!server.members.includes(account.profileId)) {
+        return generateError('NOT_IN_SERVER');
+    }
+
+    const channel = await prismaClient.channel.findFirst({
+        where: {
+            channelId,
+        },
+    });
+
+    if (!channel) {
         return generateError('ROOM_404');
     }
 
-    // Must be in the room
-    if (!room.dmUsers.includes(account.profileId)) {
-        return generateError('NOT_IN_ROOM');
-    }
-
-    let newMessageData: Partial<Message>;
+    let newMessageData: Partial<ChannelMessage>;
 
     try {
-        newMessageData = await prismaClient.message.create({
+        newMessageData = await prismaClient.channelMessage.create({
             data: {
                 ownerId: account.profileId,
-                roomId,
+                channelId,
                 messageId: v4(),
                 isImage: true,
                 attachment,
@@ -53,7 +61,7 @@ async function sendImage({
 
             select: {
                 ownerId: true,
-                roomId: true,
+                channelId: true,
                 content: true,
                 creationDate: true,
                 messageId: true,
@@ -67,8 +75,8 @@ async function sendImage({
         return generateError('UNKNOWN');
     }
 
-    io.to(roomId).emit('newMessage', {
-        roomId,
+    io.to(channelId).emit('newMessage', {
+        roomId: channelId,
         newMessageData: {
             message: newMessageData,
             profileData: account,
@@ -76,19 +84,8 @@ async function sendImage({
     });
 
     try {
-        // Update ordering of message lists
-        await prismaClient.dm.update({
-            where: {
-                roomId,
-            },
-
-            data: {
-                lastMessageAt: new Date(),
-            },
-        });
-
         sendMulticastFCM(
-            room.dmUsers as string[],
+            server.members as string[],
             `@${account.profileId}`,
             `${account.username} sent an image`,
             account.profileId,
@@ -98,18 +95,15 @@ async function sendImage({
         return generateError('UNKNOWN');
     }
 
-    updateRoomSeen(io, room.roomId);
-
     return {};
 }
 
-const sendImageTemplate: EventTemplate = {
-    func: sendImage,
-    template: ['roomId', 'attachment'],
+const sendChannelImageTemplate: EventTemplate = {
+    func: sendChannelImage,
+    template: ['serverId', 'channelId', 'attachment'],
     schema: new StringSchema({
-        roomId: {
-            type: 'uuid',
-        },
+        ...serverIdSchema,
+        ...channelIdSchema,
 
         attachment: {
             // Ensure https
@@ -118,4 +112,4 @@ const sendImageTemplate: EventTemplate = {
     }),
 };
 
-export default sendImageTemplate;
+export default sendChannelImageTemplate;
