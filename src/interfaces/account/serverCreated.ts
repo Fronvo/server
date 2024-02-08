@@ -5,4 +5,5 @@
 export interface ServerCreatedParams {
     serverId: string;
     name: string;
+    invite: string;
 }

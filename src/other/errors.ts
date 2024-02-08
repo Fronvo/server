@@ -36,6 +36,7 @@ const errors: { [Error in Errors] } = {
     POST_BOTH_TYPES: 'Choose one attachment type.',
 
     ALREADY_IN_ROOM: 'You are already in this room.',
+    ALREADY_IN_SERVER: 'You are already in this server.',
     USER_IN_ROOM: 'User already in this room.',
     USER_NOT_IN_ROOM: 'User not in this room.',
     NOT_IN_ROOM: 'Not in this room.',
@@ -64,6 +65,8 @@ const errors: { [Error in Errors] } = {
 
     PRO_REQUIRED: "You aren't a PRO",
     NOT_FRONVO: "You aren't that guy.",
+
+    SERVER_INVITES_DISABLED: 'This server has turned invites off.',
 };
 
 export default errors;

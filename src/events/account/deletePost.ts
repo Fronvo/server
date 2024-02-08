@@ -14,6 +14,7 @@ import { prismaClient } from 'variables/global';
 
 async function deletePost({
     io,
+    socket,
     account,
     postId,
 }: DeletePostServerParams): Promise<DeletePostResult | FronvoError> {
@@ -42,6 +43,10 @@ async function deletePost({
     });
 
     io.to(account.profileId).emit('postRemoved', {
+        postId,
+    });
+
+    io.to(socket.id).emit('postRemoved', {
         postId,
     });
 

@@ -28,6 +28,7 @@ export interface FronvoError {
 export interface LoggedInSocket {
     accountId: string;
     socket: Socket;
+    currentRoomId?: string;
     fcm?: string;
 }
 

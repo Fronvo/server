@@ -3,13 +3,20 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
+import { differenceInHours } from 'date-fns';
 import { profileIdSchema } from 'events/shared';
 import {
     CreateDMResult,
     CreateDMServerParams,
 } from 'interfaces/account/createDM';
+import { FetchedDM } from 'interfaces/account/fetchConvos';
+import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getAccountSocketId } from 'utilities/global';
+import {
+    generateError,
+    getAccountSocketId,
+    isAccountLoggedIn,
+} from 'utilities/global';
 import { v4 } from 'uuid';
 import { prismaClient } from 'variables/global';
 
@@ -34,7 +41,7 @@ async function createDM({
         return generateError('NOT_FRIEND');
     }
 
-    const room = await prismaClient.dm.findFirst({
+    let room = await prismaClient.dm.findFirst({
         where: {
             AND: [
                 {
@@ -51,7 +58,23 @@ async function createDM({
         },
     });
 
-    if (room) {
+    let unhidDm = false;
+
+    // Make if new dm, otherwise set to visible if hidden
+    if (!room) {
+        try {
+            room = await prismaClient.dm.create({
+                data: {
+                    roomId: v4(),
+                    dmUsers: {
+                        set: [profileId, account.profileId],
+                    },
+                },
+            });
+        } catch (e) {
+            return generateError('UNKNOWN');
+        }
+    } else {
         if (room.dmHiddenFor?.includes(account.profileId)) {
             const newDmHiddenFor = room.dmHiddenFor;
             newDmHiddenFor.splice(newDmHiddenFor.indexOf(account.profileId), 1);
@@ -68,51 +91,91 @@ async function createDM({
                         },
                     },
                 });
+
+                unhidDm = true;
             } catch (e) {
                 return generateError('UNKNOWN');
             }
-
-            // Notify sockets about the new dm
-            io.to(socket.id).emit('roomCreated', {
-                roomId: room.roomId,
-            });
-
-            return { roomId: room.roomId };
         } else {
-            return generateError('DM_EXISTS');
+            return { roomId: room.roomId };
         }
     }
 
-    const roomId = v4();
-
-    try {
-        await prismaClient.dm.create({
-            data: {
-                roomId,
-                dmUsers: {
-                    set: [profileId, account.profileId],
-                },
+    // Give real room data
+    const targetDMUserData: Partial<FetchedFronvoAccount> = {
+        ...(await prismaClient.account.findFirst({
+            where: {
+                profileId: targetAccount.profileId,
             },
-        });
-    } catch (e) {
-        return generateError('UNKNOWN');
-    }
+
+            select: {
+                profileId: true,
+                username: true,
+                avatar: true,
+                banner: true,
+                bio: true,
+                creationDate: true,
+                turbo: true,
+                status: true,
+                statusUpdatedTime: true,
+            },
+        })),
+
+        isSelf: false,
+        online: isAccountLoggedIn(targetAccount.profileId),
+    };
+
+    // Keep Room / DM only attributes
+    // Clients MUST be able to differentiate from isDM
+    const dm: Partial<FetchedDM> = {
+        roomId: room.roomId,
+        dmUsers: room.dmUsers,
+        unreadCount: 0,
+        dmUser: {
+            profileId: targetDMUserData.profileId,
+            username: targetDMUserData.username,
+            bio: targetDMUserData.bio,
+            creationDate: targetDMUserData.creationDate,
+            avatar: targetDMUserData.avatar,
+            banner: targetDMUserData.banner,
+            status:
+                differenceInHours(
+                    new Date(),
+                    new Date(targetDMUserData.statusUpdatedTime)
+                ) < 24
+                    ? targetDMUserData.status
+                    : '',
+            online: targetDMUserData.online,
+        },
+        dmHiddenFor: room.dmHiddenFor,
+        totalMessages: await prismaClient.message.count({
+            where: {
+                roomId: room.roomId,
+            },
+        }),
+    };
 
     // Notify both sockets about the new dm
-    io.to(socket.id).emit('roomCreated', {
-        roomId,
+    io.to(socket.id).emit('dmCreated', {
+        dm,
     });
 
-    io.sockets.sockets.get(getAccountSocketId(profileId))?.emit('roomCreated', {
-        roomId,
-    });
+    // Only target socket knows about this
+    if (!unhidDm) {
+        io.sockets.sockets
+            .get(getAccountSocketId(profileId))
+            ?.emit('dmCreated', {
+                dm,
+            });
+        io.sockets.sockets
+            .get(getAccountSocketId(profileId))
+            ?.join(room.roomId);
+    }
 
     // Put target accounts to the dm's room
-    io.sockets.sockets.get(socket.id).join(roomId);
+    io.sockets.sockets.get(socket.id).join(room.roomId);
 
-    io.sockets.sockets.get(getAccountSocketId(profileId))?.join(roomId);
-
-    return { roomId };
+    return { roomId: room.roomId };
 }
 
 const createDMTemplate: EventTemplate = {

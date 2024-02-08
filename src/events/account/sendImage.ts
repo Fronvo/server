@@ -98,7 +98,7 @@ async function sendImage({
         return generateError('UNKNOWN');
     }
 
-    updateRoomSeen(io, room.roomId);
+    updateRoomSeen(room.roomId);
 
     return {};
 }

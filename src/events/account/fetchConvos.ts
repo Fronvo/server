@@ -3,6 +3,7 @@
 // ******************** //
 
 import { Dm } from '@prisma/client';
+import { differenceInHours } from 'date-fns';
 import {
     FetchConvosResult,
     FetchConvosServerParams,
@@ -10,11 +11,7 @@ import {
 } from 'interfaces/account/fetchConvos';
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    generateError,
-    getTransformedImage,
-    isAccountLoggedIn,
-} from 'utilities/global';
+import { generateError, isAccountLoggedIn } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchConvos({
@@ -79,6 +76,9 @@ async function fetchConvos({
                                         ? (convo.dmUsers[0] as string)
                                         : (convo.dmUsers[1] as string);
 
+                                const isFriend =
+                                    account.friends.includes(targetDMUser);
+
                                 const targetDMUserData: Partial<FetchedFronvoAccount> =
                                     {
                                         ...(await prismaClient.account.findFirst(
@@ -95,6 +95,8 @@ async function fetchConvos({
                                                     bio: true,
                                                     creationDate: true,
                                                     turbo: true,
+                                                    status: true,
+                                                    statusUpdatedTime: true,
                                                 },
                                             }
                                         )),
@@ -103,21 +105,29 @@ async function fetchConvos({
                                         online: isAccountLoggedIn(targetDMUser),
                                     };
 
-                                // Keep Room / DM only attributes
-                                // Clients MUST be able to differentiate from isDM
                                 convos[convoIndex] = {
                                     roomId: convo.roomId,
-                                    dmUsers: convo.dmUsers,
-                                    dmUserOnline: targetDMUserData.online,
                                     unreadCount: unread,
                                     dmUser: {
-                                        ...targetDMUserData,
-                                        avatar:
-                                            targetDMUserData.avatar &&
-                                            getTransformedImage(
-                                                targetDMUserData.avatar,
-                                                72
-                                            ),
+                                        profileId: targetDMUserData.profileId,
+                                        username: targetDMUserData.username,
+                                        bio: targetDMUserData.bio,
+                                        creationDate:
+                                            targetDMUserData.creationDate,
+                                        avatar: targetDMUserData.avatar,
+                                        banner: targetDMUserData.banner,
+                                        status:
+                                            isFriend &&
+                                            differenceInHours(
+                                                new Date(),
+                                                new Date(
+                                                    targetDMUserData.statusUpdatedTime
+                                                )
+                                            ) < 24
+                                                ? targetDMUserData.status
+                                                : '',
+                                        online:
+                                            isFriend && targetDMUserData.online,
                                     },
                                     dmHiddenFor: convo.dmHiddenFor,
                                     totalMessages,
@@ -152,10 +162,11 @@ async function fetchConvos({
             const convo = convos[convoIndex];
 
             if (!convo.dmHiddenFor?.includes(account?.profileId)) {
+                // Remove properties we dont wanna expose to client
+                delete convo.dmHiddenFor;
+
                 finalConvos.push(convo);
             }
-
-            finalConvos.push(convo);
         }
 
         convos = finalConvos;

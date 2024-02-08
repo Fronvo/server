@@ -137,7 +137,7 @@ async function startup(): Promise<void> {
     preStartupChecks();
 
     // Gradient shenanigans
-    console.log(gradient(['#1047fe', '#1047fe'])(`Fronvo server v1.0`));
+    console.log(gradient(['#CC013F', '#CD00D5'])(`Fronvo server v1.0`));
 
     // Special check because ora doesnt care
     if (!variables.silentLogging) {
@@ -145,7 +145,7 @@ async function startup(): Promise<void> {
             text: loadingSpinnerDefaultText,
             spinner: 'dots12', // wonky windows 10 style
             interval: 40,
-            color: 'blue',
+            color: 'magenta',
         }).start();
     }
 

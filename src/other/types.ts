@@ -24,6 +24,7 @@ export type Errors =
     | 'NOT_POST_CREATOR'
     | 'POST_BOTH_TYPES'
     | 'ALREADY_IN_ROOM'
+    | 'ALREADY_IN_SERVER'
     | 'USER_IN_ROOM'
     | 'USER_NOT_IN_ROOM'
     | 'NOT_IN_ROOM'
@@ -47,7 +48,8 @@ export type Errors =
     | 'NOT_IN_BETA'
     | 'DISABLED_IN_BETA'
     | 'PRO_REQUIRED'
-    | 'NOT_FRONVO';
+    | 'NOT_FRONVO'
+    | 'SERVER_INVITES_DISABLED';
 
 export type TestAssertTypes =
     | 'string'
@@ -75,7 +77,7 @@ export type EnvValues =
     | 'TENOR_KEY'
     | 'FIREBASE_CREDENTIALS'
     | 'FIREBASE_PROJECT_ID'
-    | 'PRO_SECRET'
+    | 'TURBO_SECRET'
     | 'VERSION'
     | 'AES_ENC'
     | 'AES_IV'

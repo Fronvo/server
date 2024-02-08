@@ -40,6 +40,7 @@ async function createServer({
     }
 
     const serverId = v4();
+    const invite = v4().replace(/-/g, '').substring(0, 8);
 
     try {
         await prismaClient.server.create({
@@ -47,6 +48,7 @@ async function createServer({
                 serverId,
                 ownerId: account.profileId,
                 name,
+                invite,
                 members: [account.profileId],
             },
 
@@ -55,6 +57,8 @@ async function createServer({
                 ownerId: true,
                 name: true,
                 icon: true,
+                invite: true,
+                invitesDisabled: true,
                 creationDate: true,
                 members: true,
                 channels: true,
@@ -70,6 +74,7 @@ async function createServer({
     io.to(socket.id).emit('serverCreated', {
         serverId,
         name,
+        invite,
     });
 
     return {};

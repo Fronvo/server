@@ -10,14 +10,11 @@ import {
     FetchChannelMessagesServerParams,
 } from 'interfaces/account/fetchChannelMessages';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    decryptAES,
-    generateError,
-    getTransformedImage,
-} from 'utilities/global';
+import { decryptAES, generateError, setSocketRoomId } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function fetchChannelMessages({
+    socket,
     account,
     serverId,
     channelId,
@@ -185,12 +182,13 @@ async function fetchChannelMessages({
             },
             profileData: {
                 ...profileData,
-                avatar:
-                    profileData.avatar &&
-                    getTransformedImage(profileData.avatar, 84),
+                avatar: profileData.avatar,
             },
         });
     }
+
+    // Update seen states functionality
+    setSocketRoomId(socket.id, channelId);
 
     setTimeout(async () => {
         // Update seen state

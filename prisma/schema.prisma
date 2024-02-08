@@ -43,22 +43,23 @@ model Post {
 model Dm {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   roomId        String   @unique
-  icon          String?  @default("")
   lastMessageAt DateTime @default(now())
   dmUsers       Json[]
   dmHiddenFor   Json[]
 }
 
 model Server {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  ownerId      String?
-  serverId     String    @unique
-  name         String?
-  icon         String?   @default("")
-  creationDate DateTime? @default(now())
-  members      Json[]
-  channels     Json[]
-  roles        Json[]
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  ownerId         String?
+  serverId        String    @unique
+  name            String?
+  icon            String?   @default("")
+  invite          String?   @unique
+  invitesDisabled Boolean?  @default(false)
+  creationDate    DateTime? @default(now())
+  members         Json[]
+  channels        Json[]
+  roles           Json[]
 }
 
 model Channel {
@@ -68,7 +69,6 @@ model Channel {
   creationDate DateTime @default(now())
 }
 
-// TODO: Permissions
 model Role {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   title        String
@@ -93,6 +93,8 @@ model Message {
   spotifyEmbed String?  @default("")
   isTenor      Boolean  @default(false)
   tenorUrl     String?  @default("")
+  isPost       Boolean? @default(false)
+  postId       String?  @default("")
 }
 
 model ChannelMessage {

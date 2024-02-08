@@ -3,7 +3,8 @@
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
-import { roomIdSchema } from 'events/shared';
+import { Channel, Dm } from '@prisma/client';
+import { roomIdSchema, serverIdSchemaOptional } from 'events/shared';
 import {
     StartTypingResult,
     StartTypingServerParams,
@@ -14,24 +15,50 @@ import { prismaClient } from 'variables/global';
 
 async function startTyping({
     io,
+    socket,
     account,
+    serverId,
     roomId,
 }: StartTypingServerParams): Promise<StartTypingResult | FronvoError> {
-    const room = await prismaClient.dm.findFirst({
-        where: {
-            roomId,
-        },
-    });
+    let room: Dm | Channel;
 
-    if (!room) {
-        return generateError('ROOM_404');
+    if (serverId) {
+        const server = await prismaClient.server.findFirst({
+            where: {
+                serverId,
+            },
+        });
+
+        if (!server) {
+            return generateError('SERVER_404');
+        }
+
+        if (!server.members.includes(account.profileId)) {
+            return generateError('NOT_IN_SERVER');
+        }
+
+        room = await prismaClient.channel.findFirst({
+            where: {
+                channelId: roomId,
+            },
+        });
+    } else {
+        room = await prismaClient.dm.findFirst({
+            where: {
+                roomId,
+            },
+        });
+
+        if (!room) {
+            return generateError('ROOM_404');
+        }
+
+        if (!room.dmUsers.includes(account.profileId)) {
+            return generateError('NOT_IN_ROOM');
+        }
     }
 
-    if (!room.dmUsers.includes(account.profileId)) {
-        return generateError('NOT_IN_ROOM');
-    }
-
-    io.to(roomId).emit('typingStarted', {
+    io.to(roomId).except(socket.id).emit('typingStarted', {
         roomId,
         profileId: account.profileId,
     });
@@ -41,8 +68,9 @@ async function startTyping({
 
 const startTypingTemplate: EventTemplate = {
     func: startTyping,
-    template: ['roomId'],
+    template: ['serverId', 'roomId'],
     schema: new StringSchema({
+        ...serverIdSchemaOptional,
         ...roomIdSchema,
     }),
 };

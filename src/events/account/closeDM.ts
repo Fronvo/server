@@ -50,7 +50,7 @@ async function closeDM({
     }
 
     // Notify both sockets about the new dm
-    io.to(socket.id).emit('roomRemoved', {
+    io.to(socket.id).emit('dmHidden', {
         roomId,
     });
 

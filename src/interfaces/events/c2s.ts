@@ -117,18 +117,6 @@ import {
     FetchTenorTestResult,
 } from 'interfaces/account/fetchTenor';
 import {
-    ApplyProParams,
-    ApplyProTestResult,
-} from 'interfaces/account/applyPro';
-import {
-    RefundProParams,
-    RefundProTestResult,
-} from 'interfaces/account/refundPro';
-import {
-    FetchPROCHParams,
-    FetchPROCHTestResult,
-} from 'interfaces/account/fetchPROCH';
-import {
     FetchLatestVersionParams,
     FetchLatestVersionTestResult,
 } from 'interfaces/account/fetchLatestVersion';
@@ -164,7 +152,54 @@ import {
     SendChannelMessageParams,
     SendChannelMessageTestResult,
 } from 'interfaces/account/sendChannelMessage';
-import { SendChannelImageParams, SendChannelImageTestResult } from 'interfaces/account/sendChannelImage';
+import {
+    SendChannelImageParams,
+    SendChannelImageTestResult,
+} from 'interfaces/account/sendChannelImage';
+import {
+    JoinServerParams,
+    JoinServerTestResult,
+} from 'interfaces/account/joinServer';
+import {
+    ToggleServerInvitesParams,
+    ToggleServerInvitesTestResult,
+} from 'interfaces/account/toggleServerInvites';
+import {
+    RegenerateServerInviteParams,
+    RegenerateServerInviteTestResult,
+} from 'interfaces/account/regenerateServerInvite';
+import {
+    ApplyTurboParams,
+    ApplyTurboTestResult,
+} from 'interfaces/account/applyTurbo';
+import {
+    RefundTurboParams,
+    RefundTurboTestResult,
+} from 'interfaces/account/refundTurbo';
+import {
+    FetchTurboCHParams,
+    FetchTurboCHTestResult,
+} from 'interfaces/account/fetchTurboCH';
+import {
+    DeleteChannelMessageParams,
+    DeleteChannelMessageTestResult,
+} from 'interfaces/account/deleteChannelMessage';
+import {
+    RenameChannelParams,
+    RenameChannelTestResult,
+} from 'interfaces/account/renameChannel';
+import {
+    SendPostParams,
+    SendPostTestResult,
+} from 'interfaces/account/sendPost';
+import {
+    FetchPostParams,
+    FetchPostTestResult,
+} from 'interfaces/account/fetchPost';
+import {
+    LeaveServerParams,
+    LeaveServerTestResult,
+} from 'interfaces/account/leaveServer';
 
 export interface ClientToServerEvents {
     register: (
@@ -284,17 +319,17 @@ export interface ClientToServerEvents {
         {}: FetchTenorParams,
         callback?: ({}: FetchTenorTestResult) => void
     ) => void;
-    applyPro: (
-        {}: ApplyProParams,
-        callback?: ({}: ApplyProTestResult) => void
+    applyTurbo: (
+        {}: ApplyTurboParams,
+        callback?: ({}: ApplyTurboTestResult) => void
     ) => void;
-    refundPro: (
-        {}: RefundProParams,
-        callback?: ({}: RefundProTestResult) => void
+    refundTurbo: (
+        {}: RefundTurboParams,
+        callback?: ({}: RefundTurboTestResult) => void
     ) => void;
-    fetchPROCH: (
-        {}: FetchPROCHParams,
-        callback?: ({}: FetchPROCHTestResult) => void
+    fetchTurboCH: (
+        {}: FetchTurboCHParams,
+        callback?: ({}: FetchTurboCHTestResult) => void
     ) => void;
     fetchLatestVersion: (
         {}: FetchLatestVersionParams,
@@ -335,5 +370,37 @@ export interface ClientToServerEvents {
     sendChannelImage: (
         {}: SendChannelImageParams,
         callback?: ({}: SendChannelImageTestResult) => void
+    ) => void;
+    joinServer: (
+        {}: JoinServerParams,
+        callback?: ({}: JoinServerTestResult) => void
+    ) => void;
+    toggleServerInvites: (
+        {}: ToggleServerInvitesParams,
+        callback?: ({}: ToggleServerInvitesTestResult) => void
+    ) => void;
+    regenerateServerInvite: (
+        {}: RegenerateServerInviteParams,
+        callback?: ({}: RegenerateServerInviteTestResult) => void
+    ) => void;
+    deleteChannelMessage: (
+        {}: DeleteChannelMessageParams,
+        callback?: ({}: DeleteChannelMessageTestResult) => void
+    ) => void;
+    renameChannel: (
+        {}: RenameChannelParams,
+        callback?: ({}: RenameChannelTestResult) => void
+    ) => void;
+    sendPost: (
+        {}: SendPostParams,
+        callback?: ({}: SendPostTestResult) => void
+    ) => void;
+    fetchPost: (
+        {}: FetchPostParams,
+        callback?: ({}: FetchPostTestResult) => void
+    ) => void;
+    leaveServer: (
+        {}: LeaveServerParams,
+        callback?: ({}: LeaveServerTestResult) => void
     ) => void;
 }

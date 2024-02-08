@@ -4,19 +4,19 @@
 
 import { StringSchema } from '@ezier/validate';
 import {
-    RefundProResult,
-    RefundProServerParams,
-} from 'interfaces/account/refundPro';
+    RefundTurboResult,
+    RefundTurboServerParams,
+} from 'interfaces/account/refundTurbo';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { generateError, sendEmail } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 import { getEnv } from 'variables/varUtils';
 
-async function refundPro({
+async function refundTurbo({
     account,
     secret,
-}: RefundProServerParams): Promise<RefundProResult | FronvoError> {
-    if (secret != getEnv('PRO_SECRET')) {
+}: RefundTurboServerParams): Promise<RefundTurboResult | FronvoError> {
+    if (secret != getEnv('TURBO_SECRET')) {
         return generateError('UNKNOWN');
     }
 
@@ -48,7 +48,7 @@ async function refundPro({
 }
 
 const refundProTemplate: EventTemplate = {
-    func: refundPro,
+    func: refundTurbo,
     template: ['secret'],
     schema: new StringSchema({
         secret: {

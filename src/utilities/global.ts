@@ -39,72 +39,106 @@ export async function loginSocket(
         },
     });
 
-    // TODO: Async
+    let dmsFinished = false;
+    let serversFinished = false;
+    let friendsFinished = false;
 
-    // Add to all of the available rooms
-    const availableDMS = await prismaClient.dm.findMany({
-        where: {
-            dmUsers: {
-                has: account.profileId,
+    async function subscribeToDMS(): Promise<void> {
+        const availableDMS = await prismaClient.dm.findMany({
+            where: {
+                dmUsers: {
+                    has: account.profileId,
+                },
             },
-        },
-    });
+        });
 
-    for (const dmIndex in availableDMS) {
-        const dm = availableDMS[dmIndex];
+        for (const dmIndex in availableDMS) {
+            const dm = availableDMS[dmIndex];
 
-        // Find the correct profile room to join, not ours
-        let targetDMUser = dm.dmUsers[0];
+            // Find the correct profile room to join, not ours
+            let targetDMUser = dm.dmUsers[0];
 
-        if (targetDMUser == account.profileId) {
-            targetDMUser = dm.dmUsers[1];
+            if (targetDMUser == account.profileId) {
+                targetDMUser = dm.dmUsers[1];
+            }
+
+            // Must be a friend
+            if (!account.friends.includes(targetDMUser)) continue;
+
+            socket.join(targetDMUser as string);
+
+            socket.join(availableDMS[dmIndex].roomId);
         }
 
-        socket.join(targetDMUser as string);
-
-        socket.join(availableDMS[dmIndex].roomId);
+        dmsFinished = true;
     }
 
-    // Add to all of the available servers
-    const availableServers = await prismaClient.server.findMany({
-        where: {
-            members: {
-                has: account.profileId,
+    async function subscribeToServers(): Promise<void> {
+        // Add to all of the available servers
+        const availableServers = await prismaClient.server.findMany({
+            where: {
+                members: {
+                    has: account.profileId,
+                },
             },
-        },
-    });
+        });
 
-    for (const serverIndex in availableServers) {
-        const server = availableServers[serverIndex];
+        for (const serverIndex in availableServers) {
+            const server = availableServers[serverIndex];
 
-        // Server room for general details
-        socket.join(server.serverId);
+            // Server room for general details
+            socket.join(server.serverId);
 
-        // All server member rooms
-        for (const memberIndex in server.members) {
-            const member = server.members[memberIndex];
+            // All server member rooms
+            for (const memberIndex in server.members) {
+                const member = server.members[memberIndex];
 
-            if (member != accountId) {
-                socket.join(server.members[memberIndex] as string);
+                if (member != accountId) {
+                    socket.join(server.members[memberIndex] as string);
+                }
+            }
+
+            // All server channel rooms
+            for (const channelIndex in server.channels) {
+                socket.join(server.channels[channelIndex] as string);
             }
         }
 
-        // All server channel rooms
-        for (const channelIndex in server.channels) {
-            socket.join(server.channels[channelIndex] as string);
+        serversFinished = true;
+    }
+
+    async function subscribeToFriends(): Promise<void> {
+        // All friend rooms too
+        for (const friendIndex in account.friends) {
+            socket.join(account.friends[friendIndex] as string);
         }
+
+        for (const pendingFriendIndex in account.pendingFriendRequests) {
+            socket.join(
+                account.pendingFriendRequests[pendingFriendIndex] as string
+            );
+        }
+
+        friendsFinished = true;
     }
 
-    // All friend rooms too
-    for (const friendIndex in account.friends) {
-        socket.join(account.friends[friendIndex] as string);
+    async function queueSubscribing(): Promise<void> {
+        subscribeToDMS();
+        subscribeToServers();
+        subscribeToFriends();
+
+        return new Promise((resolve) => {
+            let interval = setInterval(() => {
+                if (dmsFinished && serversFinished && friendsFinished) {
+                    clearInterval(interval);
+
+                    resolve();
+                }
+            }, 20);
+        });
     }
 
-    for (const pendingFriendIndex in account.pendingFriendRequests) {
-        socket.join(
-            account.pendingFriendRequests[pendingFriendIndex] as string
-        );
-    }
+    await queueSubscribing();
 
     io.to(account.profileId).emit('onlineStatusUpdated', {
         profileId: account.profileId,
@@ -174,6 +208,24 @@ export function getSocketAccountId(socketId: string): string {
 
 export function getLoggedInSockets(): { [socketId: string]: LoggedInSocket } {
     return variables.loggedInSockets;
+}
+
+export function setSocketRoomId(socketId: string, roomId: string): void {
+    variables.loggedInSockets[socketId].currentRoomId = roomId;
+}
+
+export function getSocketsInRoomId(roomId: string): LoggedInSocket[] {
+    const sockets: LoggedInSocket[] = [];
+
+    for (const socketIndex in variables.loggedInSockets) {
+        const socket = variables.loggedInSockets[socketIndex];
+
+        if (socket.currentRoomId == roomId) {
+            sockets.push(socket);
+        }
+    }
+
+    return sockets;
 }
 
 export async function sendFCM(
@@ -391,36 +443,36 @@ export async function sendEmail(
     <head>
         <style>
             body {
-                background: gray;
+                background: rgb(255, 255, 255);
             }
 
             .main {
                 width: 100%;
-                background: rgb(230, 230, 230);
-                padding: 15px;
+                background: white;
+                padding: 10px;
             }
 
             .content {
                 width: 40%;
                 margin: auto;
                 border-radius: 10px;
-                background: white;
-                box-shadow: rgb(10, 10, 10);
-                padding-top: 20px;
+                background: black;
+                box-shadow: black;
+                padding-top: 15px;
             }
 
             hr {
                 width: 100%;
                 opacity: 25%;
                 border-width: 1px;
-                border-color: rgb(0, 0, 0);
+                border-color: rgb(255, 255, 255);
             }
 
             p {
                 font-family: Arial;
                 margin-top: 5px;
                 margin-bottom: 5px;
-                color: rgb(20, 20, 20);
+                color: white;
                 font-size: 1.1rem;
                 padding-right: 50px;
                 padding-left: 50px;
@@ -438,7 +490,7 @@ export async function sendEmail(
             }
 
             #colored {
-                color: black;
+                color: white;
                 font-size: 1.4rem;
                 margin-top: 0;
                 margin-bottom: 20px;
@@ -655,48 +707,46 @@ export async function deleteImage(image: string): Promise<void> {
     }
 }
 
-export async function updateRoomSeen(
-    io: Server<ClientToServerEvents, ServerToClientEvents>,
-    roomId: string
-): Promise<void> {
+export async function updateRoomSeen(roomId: string): Promise<void> {
     setTimeout(async () => {
-        const targetSockets = await io.in(roomId).fetchSockets();
+        const targetSockets = getSocketsInRoomId(roomId);
 
         for (const socketIndex in targetSockets) {
             const target = targetSockets[socketIndex];
 
-            const newSeenStates = await prismaClient.account.findFirst({
-                where: {
-                    profileId: getSocketAccountId(target.id),
-                },
-
-                select: {
-                    seenStates: true,
-                },
-            });
-
-            if (!newSeenStates.seenStates) {
-                // @ts-ignore
-                newSeenStates.seenStates = {};
-            }
-
-            newSeenStates.seenStates[roomId] = await prismaClient.message.count(
-                {
-                    where: { roomId },
-                }
-            );
-
-            try {
-                await prismaClient.account.update({
+            prismaClient.account
+                .findFirst({
                     where: {
-                        profileId: getSocketAccountId(target.id),
+                        profileId: getSocketAccountId(target.socket.id),
                     },
 
-                    data: {
-                        seenStates: newSeenStates.seenStates,
+                    select: {
+                        seenStates: true,
                     },
+                })
+                .then(async (newSeenStates) => {
+                    if (!newSeenStates.seenStates) {
+                        // @ts-ignore
+                        newSeenStates.seenStates = {};
+                    }
+
+                    newSeenStates.seenStates[roomId] =
+                        await prismaClient.message.count({
+                            where: { roomId },
+                        });
+
+                    try {
+                        await prismaClient.account.update({
+                            where: {
+                                profileId: getSocketAccountId(target.socket.id),
+                            },
+
+                            data: {
+                                seenStates: newSeenStates.seenStates,
+                            },
+                        });
+                    } catch (e) {}
                 });
-            } catch (e) {}
         }
     }, variables.batchUpdatesDelay);
 }

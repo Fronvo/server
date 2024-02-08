@@ -37,18 +37,19 @@ async function deleteServer({
         // Loop over channel messages, icons etc prob schedule in bg, cron?
         for (const channelIndex in server.channels) {
             // @ts-ignore type mismatch as always with JsonValue
-            const channel = server.channels[channelIndex] as Channel;
+            const channelId = server.channels[channelIndex] as string;
 
             try {
-                const deletedMessages = await prismaClient.message.findMany({
-                    where: {
-                        roomId: channel.channelId,
-                    },
-                });
+                const deletedMessages =
+                    await prismaClient.channelMessage.findMany({
+                        where: {
+                            channelId,
+                        },
+                    });
 
-                await prismaClient.message.deleteMany({
+                await prismaClient.channelMessage.deleteMany({
                     where: {
-                        roomId: channel.channelId,
+                        channelId,
                     },
                 });
 
@@ -61,7 +62,7 @@ async function deleteServer({
                 // Then, delete the channel
                 await prismaClient.channel.delete({
                     where: {
-                        channelId: channel.channelId,
+                        channelId,
                     },
                 });
             } catch (e) {
@@ -69,7 +70,7 @@ async function deleteServer({
             }
 
             // Clear room
-            io.socketsLeave(channel.channelId);
+            io.socketsLeave(channelId);
         }
 
         for (const roleIndex in server.roles) {
@@ -88,8 +89,19 @@ async function deleteServer({
             }
         }
 
+        io.to(server.serverId).emit('serverDeleted', {
+            serverId: server.serverId,
+        });
+
         // Clear server
         io.socketsLeave(server.serverId);
+
+        // Delete server
+        await prismaClient.server.delete({
+            where: {
+                serverId,
+            },
+        });
     } else {
         return generateError('NOT_OWNER');
     }

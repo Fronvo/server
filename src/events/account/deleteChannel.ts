@@ -14,7 +14,6 @@ import { prismaClient } from 'variables/global';
 
 async function deleteChannel({
     io,
-    socket,
     account,
     serverId,
     channelId,
@@ -37,29 +36,11 @@ async function deleteChannel({
         return generateError('NOT_OWNER');
     }
 
-    await prismaClient.channel.delete({
-        where: {
-            channelId,
-        },
-    });
-
-    // Remove channel
-    const newChannels = server.channels;
-    newChannels.splice(newChannels.indexOf(channelId), 1);
-
-    await prismaClient.server.update({
-        where: {
-            serverId,
-        },
-
-        data: {
-            channels: {
-                set: newChannels,
-            },
-        },
-    });
+    // Make all server sockets leave the channel room
+    io.in(serverId).socketsLeave(channelId);
 
     try {
+        // Delete messages and attachments
         const deletedMessages = await prismaClient.message.findMany({
             where: {
                 roomId: channelId,
@@ -84,17 +65,48 @@ async function deleteChannel({
                 channelId: channelId,
             },
         });
+
+        io.to(serverId).emit('channelDeleted', {
+            serverId,
+            channelId,
+        });
+
+        // Remove channel from server aswell
+        const newChannels = server.channels;
+        newChannels.splice(newChannels.indexOf(channelId), 1);
+
+        await prismaClient.server.update({
+            where: {
+                serverId,
+            },
+
+            data: {
+                channels: {
+                    set: [],
+                },
+            },
+        });
+
+        // need channels immediately dont even batch
+        setTimeout(async () => {
+            // Prisma is stupid, add one by one again
+            for (const channelIndex in server.channels) {
+                await prismaClient.server.update({
+                    where: {
+                        serverId,
+                    },
+
+                    data: {
+                        channels: {
+                            push: server.channels[channelIndex],
+                        },
+                    },
+                });
+            }
+        }, 0);
     } catch (e) {
         return generateError('UNKNOWN');
     }
-
-    // Make all server sockets leave the channel room
-    socket.in(serverId).socketsLeave(channelId);
-
-    io.to(serverId).emit('channelDeleted', {
-        serverId,
-        channelId,
-    });
 
     return {};
 }

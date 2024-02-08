@@ -5,11 +5,7 @@
 import { StringSchema } from '@ezier/validate';
 import { Account, Message } from '@prisma/client';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import {
-    decryptAES,
-    generateError,
-    getTransformedImage,
-} from 'utilities/global';
+import { decryptAES, generateError, setSocketRoomId } from 'utilities/global';
 import { batchUpdatesDelay, prismaClient } from 'variables/global';
 import { fromToSchema, roomIdSchema } from '../shared';
 import {
@@ -18,6 +14,7 @@ import {
 } from 'interfaces/account/fetchMessages';
 
 async function fetchMessages({
+    socket,
     account,
     roomId,
     from,
@@ -176,12 +173,13 @@ async function fetchMessages({
             },
             profileData: {
                 ...profileData,
-                avatar:
-                    profileData.avatar &&
-                    getTransformedImage(profileData.avatar, 84),
+                avatar: profileData.avatar,
             },
         });
     }
+
+    // Update seen states functionality
+    setSocketRoomId(socket.id, roomId);
 
     setTimeout(async () => {
         // Update seen state

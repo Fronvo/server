@@ -19,7 +19,6 @@ export interface FetchConvosResult {
 export interface FetchedDM extends Dm {
     unreadCount: number;
     totalMessages: number;
-    dmUserOnline: boolean;
     dmUser: Partial<FetchedFronvoAccount>;
 }
 

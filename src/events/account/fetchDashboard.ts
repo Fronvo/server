@@ -12,7 +12,7 @@ import {
 import { FetchedFronvoAccount } from 'interfaces/account/fetchProfileData';
 import { FetchedFronvoPost } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getTransformedImage } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchDashboard({

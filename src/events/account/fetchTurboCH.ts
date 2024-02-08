@@ -1,21 +1,21 @@
 // ******************** //
-// The fetchPROCH account event file.
+// The fetchTurboCH account event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
 import {
-    FetchPROCHResult,
-    FetchPROCHServerParams,
-} from 'interfaces/account/fetchPROCH';
+    FetchTurboCHResult,
+    FetchTurboCHServerParams,
+} from 'interfaces/account/fetchTurboCH';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { decryptAES, generateError } from 'utilities/global';
 import { getEnv } from 'variables/varUtils';
 
-async function fetchPROCH({
+async function fetchTurboCH({
     account,
     secret,
-}: FetchPROCHServerParams): Promise<FetchPROCHResult | FronvoError> {
-    if (secret != getEnv('PRO_SECRET')) {
+}: FetchTurboCHServerParams): Promise<FetchTurboCHResult | FronvoError> {
+    if (secret != getEnv('TURBO_SECRET')) {
         return generateError('UNKNOWN');
     }
 
@@ -23,11 +23,11 @@ async function fetchPROCH({
         return generateError('UNKNOWN');
     }
 
-    return { proCH: decryptAES(account.turboCH) };
+    return { turboCH: decryptAES(account.turboCH) };
 }
 
 const fetchPROCHTemplate: EventTemplate = {
-    func: fetchPROCH,
+    func: fetchTurboCH,
     template: ['secret'],
     schema: new StringSchema({
         secret: {

@@ -60,6 +60,27 @@ export const serverIdSchema: {
     serverId,
 };
 
+export const serverIdSchemaOptional: {
+    serverId: EzierValidatorStringSchema;
+} = {
+    serverId: {
+        ...serverId,
+        optional: true,
+    },
+};
+
+// Server invite
+const serverInvite: EzierValidatorStringSchema = {
+    length: 8,
+    regex: /[a-zA-Z0-9]{8}/,
+};
+
+export const serverInviteSchema: {
+    invite: EzierValidatorStringSchema;
+} = {
+    invite: serverInvite,
+};
+
 // Channel id
 const channelId: EzierValidatorStringSchema = {
     type: 'uuid',

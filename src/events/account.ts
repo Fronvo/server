@@ -28,9 +28,9 @@ import deleteAccount from 'events/account/deleteAccount';
 import sharePost from 'events/account/sharePost';
 import deletePost from 'events/account/deletePost';
 import fetchTenor from 'events/account/fetchTenor';
-import applyPro from 'events/account/applyPro';
-import refundPro from 'events/account/refundPro';
-import fetchPROCH from 'events/account/fetchPROCH';
+import applyTurbo from 'events/account/applyTurbo';
+import refundTurbo from 'events/account/refundTurbo';
+import fetchTurboCH from 'events/account/fetchTurboCH';
 import fetchLatestVersion from 'events/account/fetchLatestVersion';
 import removeFCM from 'events/account/removeFCM';
 import createServer from 'events/account/createServer';
@@ -41,6 +41,14 @@ import deleteChannel from 'events/account/deleteChannel';
 import fetchChannelMessages from 'events/account/fetchChannelMessages';
 import sendChannelMessage from 'events/account/sendChannelMessage';
 import sendChannelImage from 'events/account/sendChannelImage';
+import joinServer from 'events/account/joinServer';
+import toggleServerInvites from 'events/account/toggleServerInvites';
+import regenerateServerInvite from 'events/account/regenerateServerInvite';
+import deleteChannelMessage from 'events/account/deleteChannelMessage';
+import renameChannel from 'events/account/renameChannel';
+import sendPost from 'events/account/sendPost';
+import fetchPost from 'events/account/fetchPost';
+import leaveServer from 'events/account/leaveServer';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -71,9 +79,9 @@ const accountTemplate: EventExportTemplate = {
     sharePost,
     deletePost,
     fetchTenor,
-    applyPro,
-    refundPro,
-    fetchPROCH,
+    applyTurbo,
+    refundTurbo,
+    fetchTurboCH,
     fetchLatestVersion,
     removeFCM,
     createServer,
@@ -84,6 +92,14 @@ const accountTemplate: EventExportTemplate = {
     fetchChannelMessages,
     sendChannelMessage,
     sendChannelImage,
+    joinServer,
+    toggleServerInvites,
+    regenerateServerInvite,
+    deleteChannelMessage,
+    renameChannel,
+    sendPost,
+    fetchPost,
+    leaveServer,
 };
 
 export default accountTemplate;

@@ -5,6 +5,7 @@
 import { FronvoError, EventArguments } from 'interfaces/all';
 
 export interface FinishTypingParams {
+    serverId?: string;
     roomId: string;
 }
 

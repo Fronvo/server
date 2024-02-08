@@ -63,7 +63,7 @@ async function deleteMessage({
         deleteImage(targetMessage.attachment);
     }
 
-    io.to(room.roomId).emit('roomMessageDeleted', { roomId, messageId });
+    io.to(room.roomId).emit('messageDeleted', { roomId, messageId });
 
     setTimeout(async () => {
         await prismaClient.dm.update({

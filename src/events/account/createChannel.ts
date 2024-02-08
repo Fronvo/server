@@ -15,7 +15,6 @@ import { v4 } from 'uuid';
 
 async function createChannel({
     io,
-    socket,
     account,
     serverId,
     name,
@@ -60,7 +59,7 @@ async function createChannel({
     });
 
     // Make all server sockets join the channel room
-    socket.in(serverId).socketsJoin(channelId);
+    io.in(serverId).socketsJoin(channelId);
 
     io.to(serverId).emit('channelCreated', {
         serverId,

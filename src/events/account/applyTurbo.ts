@@ -1,23 +1,24 @@
 // ******************** //
-// The applyPro account event file.
+// The applyTurbo account event file.
 // ******************** //
 
 import { StringSchema } from '@ezier/validate';
 import {
-    ApplyProResult,
-    ApplyProServerParams,
-} from 'interfaces/account/applyPro';
+    ApplyTurboResult,
+    ApplyTurboServerParams,
+} from 'interfaces/account/applyTurbo';
+
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { encryptAES, generateError, sendEmail } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 import { getEnv } from 'variables/varUtils';
 
-async function applyPro({
+async function applyTurbo({
     account,
     secret,
-    proCH,
-}: ApplyProServerParams): Promise<ApplyProResult | FronvoError> {
-    if (secret != getEnv('PRO_SECRET')) {
+    turboCH,
+}: ApplyTurboServerParams): Promise<ApplyTurboResult | FronvoError> {
+    if (secret != getEnv('TURBO_SECRET')) {
         return generateError('UNKNOWN');
     }
 
@@ -32,29 +33,30 @@ async function applyPro({
 
         data: {
             turbo: true,
-            turboCH: encryptAES(proCH),
+            turboCH: encryptAES(turboCH),
         },
     });
 
     sendEmail(account.email, 'Welcome to the TURBO club', [
-        'We hope you enjoy the added benefits of the PROs, featuring:',
+        'We hope you enjoy the added benefits of the club, featuring:',
         '- High-quality images',
         '- Larger file uploads',
-        '- A personalised banner',
+        '- Higher server creation limits',
+        '- Higher friend limits',
     ]);
 
     return {};
 }
 
 const applyProTemplate: EventTemplate = {
-    func: applyPro,
-    template: ['secret', 'turboCh'],
+    func: applyTurbo,
+    template: ['secret', 'turboCH'],
     schema: new StringSchema({
         secret: {
             minLength: 36,
         },
 
-        turboCh: {
+        turboCH: {
             regex: /^[a-zA-Z0-9_]+/,
         },
     }),

@@ -15,11 +15,9 @@ import { PostRemovedParams } from 'interfaces/account/postRemoved';
 import { PostSharedParams } from 'interfaces/account/postShared';
 import { ProfileDataUpdatedParams } from 'interfaces/account/profileDataUpdated';
 import { ProfileStatusUpdatedParams } from 'interfaces/account/profileStatusUpdated';
-import { RoomAddedParams } from 'interfaces/account/roomAdded';
-import { RoomCreatedParams } from 'interfaces/account/roomCreated';
-import { RoomDeletedParams } from 'interfaces/account/roomDeleted';
+import { DmCreatedParams } from 'interfaces/account/dmCreated';
 import { MessageDeletedParams } from 'interfaces/account/messageDeleted';
-import { RoomRemovedParams } from 'interfaces/account/roomRemoved';
+import { DmHiddenParams } from 'interfaces/account/dmHidden';
 import { ServerCreatedParams } from 'interfaces/account/serverCreated';
 import { ServerDeletedParams } from 'interfaces/account/serverDeleted';
 import { TypingEndedParams } from 'interfaces/account/typingEnded';
@@ -35,6 +33,10 @@ import {
 } from 'interfaces/noAccount/resetPasswordVerify';
 import { ChannelCreatedParams } from 'interfaces/account/channelCreated';
 import { ChannelDeletedParams } from 'interfaces/account/channelDeleted';
+import { ServerJoinedParams } from 'interfaces/account/serverJoined';
+import { ServerInvitesToggledParams } from 'interfaces/account/serverInvitesToggled';
+import { ServerInviteRegeneratedParams } from 'interfaces/account/serverInviteRegenerated';
+import { ChannelRenamedParams } from 'interfaces/account/channelRenamed';
 
 export interface ServerToClientEvents {
     registerVerify: (
@@ -49,15 +51,11 @@ export interface ServerToClientEvents {
 
     newMessage: ({}: NewMessageParams) => void;
 
-    roomMessageDeleted: ({}: MessageDeletedParams) => void;
+    messageDeleted: ({}: MessageDeletedParams) => void;
 
-    roomCreated: ({}: RoomCreatedParams) => void;
+    dmCreated: ({}: DmCreatedParams) => void;
 
-    roomDeleted: ({}: RoomDeletedParams) => void;
-
-    roomAdded: ({}: RoomAddedParams) => void;
-
-    roomRemoved: ({}: RoomRemovedParams) => void;
+    dmHidden: ({}: DmHiddenParams) => void;
 
     memberJoined: ({}: MemberJoinedParams) => void;
 
@@ -89,9 +87,17 @@ export interface ServerToClientEvents {
 
     serverCreated: ({}: ServerCreatedParams) => void;
 
+    serverJoined: ({}: ServerJoinedParams) => void;
+
     serverDeleted: ({}: ServerDeletedParams) => void;
 
     channelCreated: ({}: ChannelCreatedParams) => void;
 
+    channelRenamed: ({}: ChannelRenamedParams) => void;
+
     channelDeleted: ({}: ChannelDeletedParams) => void;
+
+    serverInvitesToggled: ({}: ServerInvitesToggledParams) => void;
+
+    serverInviteRegenerated: ({}: ServerInviteRegeneratedParams) => void;
 }

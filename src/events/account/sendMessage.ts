@@ -22,6 +22,7 @@ import { batchUpdatesDelay, prismaClient } from 'variables/global';
 
 async function sendMessage({
     io,
+    socket,
     account,
     roomId,
     message,
@@ -53,6 +54,10 @@ async function sendMessage({
             profileId: otherUser as string,
         },
     });
+
+    if (otherDMUser.profileId == account.profileId) {
+        return generateError('NOT_YOURSELF');
+    }
 
     if (!otherDMUser.friends.includes(account.profileId)) {
         return generateError('NOT_FRIEND');
@@ -198,7 +203,7 @@ async function sendMessage({
     }
 
     // Force end typing
-    io.to(roomId).emit('typingEnded', {
+    io.to(roomId).except(socket.id).emit('typingEnded', {
         roomId,
         profileId: account.profileId,
     });
@@ -217,9 +222,6 @@ async function sendMessage({
 
     try {
         setTimeout(async () => {
-            // For FCM
-            let finalLastMessage: string;
-
             // Update ordering of message lists
             await prismaClient.dm.update({
                 where: {
@@ -228,13 +230,11 @@ async function sendMessage({
 
                 data: {
                     lastMessageAt: new Date(),
-
-                    // Reset hidden states
-                    dmHiddenFor: {
-                        set: [],
-                    },
                 },
             });
+
+            // For FCM
+            let finalLastMessage: string;
 
             if (isTenor) {
                 finalLastMessage = `${account.username} sent a GIF`;
@@ -267,7 +267,7 @@ async function sendMessage({
     }
 
     // Don't delay messages for these
-    updateRoomSeen(io, room.roomId);
+    updateRoomSeen(room.roomId);
 
     return {};
 }

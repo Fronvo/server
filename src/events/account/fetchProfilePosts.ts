@@ -11,7 +11,7 @@ import {
     FetchedFronvoPost,
 } from 'interfaces/account/fetchProfilePosts';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { generateError, getTransformedImage } from 'utilities/global';
+import { generateError } from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
 async function fetchProfilePosts({
@@ -116,7 +116,7 @@ async function fetchProfilePosts({
             },
             profileData: {
                 ...targetAccount,
-                avatar: getTransformedImage(targetAccount.avatar, 72),
+                avatar: targetAccount.avatar,
             },
         });
 

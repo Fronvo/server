@@ -11,6 +11,14 @@ async function checkMessagesAES(): Promise<void> {
         },
     });
 
+    const channelMessages =
+        await variables.prismaClient.channelMessage.findMany({
+            select: {
+                content: true,
+                replyContent: true,
+            },
+        });
+
     for (const messageIndex in messages) {
         const target = messages[messageIndex];
 
@@ -30,7 +38,30 @@ async function checkMessagesAES(): Promise<void> {
         }
     }
 
-    console.log(`Corrupted messages: ${corruptedMessages}/${messages.length}`);
+    for (const messageIndex in channelMessages) {
+        const target = messages[messageIndex];
+
+        let contentRes: string;
+        let replyContentRes: string;
+
+        if (target.content) {
+            contentRes = decryptAES(target.content);
+        }
+
+        if (target.replyContent) {
+            replyContentRes = decryptAES(target.replyContent);
+        }
+
+        if (contentRes == 'CORRUPTED' || replyContentRes == 'CORRUPTED') {
+            corruptedMessages += 1;
+        }
+    }
+
+    console.log(
+        `Corrupted messages: ${corruptedMessages}/${
+            messages.length + channelMessages.length
+        }`
+    );
 }
 
 checkMessagesAES();

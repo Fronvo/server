@@ -9,7 +9,12 @@ import {
     DeleteAccountServerParams,
 } from 'interfaces/account/deleteAccount';
 import { EventTemplate, FronvoError } from 'interfaces/all';
-import { deleteImage, generateError, sendEmail } from 'utilities/global';
+import {
+    deleteImage,
+    generateError,
+    getAccountSocketId,
+    sendEmail,
+} from 'utilities/global';
 import { prismaClient } from 'variables/global';
 import { compareSync } from 'bcrypt';
 
@@ -80,6 +85,16 @@ async function deleteAccount({
                             },
                         })
                         .then(() => {
+                            const socketId = getAccountSocketId(
+                                targetAccount.profileId
+                            );
+
+                            if (socketId) {
+                                io.to(socketId).emit('pendingFriendRemoved', {
+                                    profileId: account.profileId,
+                                });
+                            }
+
                             completedPending += 1;
 
                             if (
@@ -116,6 +131,17 @@ async function deleteAccount({
                             },
                         })
                         .then(() => {
+                            const socketId = getAccountSocketId(
+                                targetAccount.profileId
+                            );
+
+                            // Update clients in realtime
+                            if (socketId) {
+                                io.to(socketId).emit('friendRemoved', {
+                                    profileId: account.profileId,
+                                });
+                            }
+
                             completedFriends += 1;
 
                             if (completedFriends == accountFriends.length) {
