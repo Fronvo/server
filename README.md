@@ -1,4 +1,4 @@
-<p align='center'><img src='https://raw.githubusercontent.com/Fronvo/server/v2/.github/email/fronvo-logo-large.png' alt='Fronvo logo'></p>
+<p align='center'><img src='https://github.com/Fronvo/server/blob/v2/.github/email/email-logo-large.png?raw=true' alt='Fronvo logo'></p>
 
 <p align='center'><b>The server of Fronvo</b></p>
 <p align='center'><b>Built on socket.io for blazing-fast realtime communication</b></p>
