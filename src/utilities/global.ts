@@ -479,6 +479,10 @@ export async function sendEmail(
                 margin-bottom: 10px;
             }
 
+            a {
+                color: white;
+            }
+
             #logo {
                 margin-bottom: 20px;
                 padding-bottom: 10px;
@@ -525,7 +529,7 @@ export async function sendEmail(
 
                 <p align='center' id='top'>
                     <a href='https://fronvo.com' id='top'>
-                        <img src='https://raw.githubusercontent.com/Fronvo/server/master/.github/email/fronvo-logo-large.png'>
+                        <img src='https://github.com/Fronvo/server/blob/v2/.github/email/email-logo-large.png?raw=true'>
                     </a>
 
                     <hr />
