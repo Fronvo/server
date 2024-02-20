@@ -63,10 +63,12 @@ const errors: { [Error in Errors] } = {
     NOT_IN_BETA: "You haven't joined the BETA account list.",
     DISABLED_IN_BETA: 'This feature is disabled while in BETA.',
 
-    PRO_REQUIRED: "You aren't a PRO",
+    TURBO_REQUIRED: "You aren't a TURBO member",
     NOT_FRONVO: "You aren't that guy.",
 
     SERVER_INVITES_DISABLED: 'This server has turned invites off.',
+    SERVER_BANNED: 'You have been banned from this server.',
+    NOT_BANNED: 'This user has not been banned from this server.',
 };
 
 export default errors;

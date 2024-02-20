@@ -47,9 +47,11 @@ export type Errors =
     | 'OVER_LIMIT'
     | 'NOT_IN_BETA'
     | 'DISABLED_IN_BETA'
-    | 'PRO_REQUIRED'
+    | 'TURBO_REQUIRED'
     | 'NOT_FRONVO'
-    | 'SERVER_INVITES_DISABLED';
+    | 'SERVER_INVITES_DISABLED'
+    | 'SERVER_BANNED'
+    | 'NOT_BANNED';
 
 export type TestAssertTypes =
     | 'string'

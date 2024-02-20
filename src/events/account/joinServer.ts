@@ -34,6 +34,7 @@ async function joinServer({
             members: true,
             channels: true,
             roles: true,
+            bannedMembers: true,
         },
     });
 
@@ -49,6 +50,9 @@ async function joinServer({
         return generateError('SERVER_INVITES_DISABLED');
     }
 
+    if (server.bannedMembers.includes(account.profileId)) {
+        return generateError('SERVER_BANNED');
+    }
     // Add to server
     const server2 = await prismaClient.server.update({
         where: {
@@ -59,6 +63,20 @@ async function joinServer({
             members: {
                 push: account.profileId,
             },
+        },
+
+        select: {
+            serverId: true,
+            ownerId: true,
+            name: true,
+            icon: true,
+            invite: true,
+            invitesDisabled: true,
+            creationDate: true,
+            members: true,
+            // TODO: Channel permission check when roles are done
+            channels: true,
+            roles: true,
         },
     });
 

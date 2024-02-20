@@ -60,6 +60,7 @@ model Server {
   members         Json[]
   channels        Json[]
   roles           Json[]
+  bannedMembers   Json[]
 }
 
 model Channel {

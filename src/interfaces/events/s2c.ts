@@ -37,6 +37,8 @@ import { ServerJoinedParams } from 'interfaces/account/serverJoined';
 import { ServerInvitesToggledParams } from 'interfaces/account/serverInvitesToggled';
 import { ServerInviteRegeneratedParams } from 'interfaces/account/serverInviteRegenerated';
 import { ChannelRenamedParams } from 'interfaces/account/channelRenamed';
+import { MemberBannedParams } from 'interfaces/account/memberBanned';
+import { MemberUnbannedParams } from 'interfaces/account/memberUnbanned';
 
 export interface ServerToClientEvents {
     registerVerify: (
@@ -60,6 +62,10 @@ export interface ServerToClientEvents {
     memberJoined: ({}: MemberJoinedParams) => void;
 
     memberLeft: ({}: MemberLeftParams) => void;
+
+    memberBanned: ({}: MemberBannedParams) => void;
+
+    memberUnbanned: ({}: MemberUnbannedParams) => void;
 
     onlineStatusUpdated: ({}: OnlineStatusUpdatedParams) => void;
 

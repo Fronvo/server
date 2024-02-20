@@ -70,6 +70,10 @@ async function fetchServers({
                         name: server.name,
                         channels: channels as [],
                         roles: server.roles,
+                        bannedMembers:
+                            account.profileId == server.ownerId
+                                ? server.bannedMembers
+                                : [],
                     };
 
                     checkLoadingDone();

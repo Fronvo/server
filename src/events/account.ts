@@ -49,6 +49,9 @@ import renameChannel from 'events/account/renameChannel';
 import sendPost from 'events/account/sendPost';
 import fetchPost from 'events/account/fetchPost';
 import leaveServer from 'events/account/leaveServer';
+import kickMember from 'events/account/kickMember';
+import banMember from 'events/account/banMember';
+import unbanMember from 'events/account/unbanMember';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -100,6 +103,9 @@ const accountTemplate: EventExportTemplate = {
     sendPost,
     fetchPost,
     leaveServer,
+    kickMember,
+    banMember,
+    unbanMember,
 };
 
 export default accountTemplate;

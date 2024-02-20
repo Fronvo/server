@@ -200,6 +200,18 @@ import {
     LeaveServerParams,
     LeaveServerTestResult,
 } from 'interfaces/account/leaveServer';
+import {
+    KickMemberParams,
+    KickMemberTestResult,
+} from 'interfaces/account/kickMember';
+import {
+    BanMemberParams,
+    BanMemberTestResult,
+} from 'interfaces/account/banMember';
+import {
+    UnbanMemberParams,
+    UnbanMemberTestResult,
+} from 'interfaces/account/unbanMember';
 
 export interface ClientToServerEvents {
     register: (
@@ -402,5 +414,17 @@ export interface ClientToServerEvents {
     leaveServer: (
         {}: LeaveServerParams,
         callback?: ({}: LeaveServerTestResult) => void
+    ) => void;
+    kickMember: (
+        {}: KickMemberParams,
+        callback?: ({}: KickMemberTestResult) => void
+    ) => void;
+    banMember: (
+        {}: BanMemberParams,
+        callback?: ({}: BanMemberTestResult) => void
+    ) => void;
+    unbanMember: (
+        {}: UnbanMemberParams,
+        callback?: ({}: UnbanMemberTestResult) => void
     ) => void;
 }
