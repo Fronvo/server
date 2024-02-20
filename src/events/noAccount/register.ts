@@ -15,7 +15,7 @@ import {
     passwordSchema,
     profileIdSchema,
 } from 'events/shared';
-import { encryptAES, validateSchema } from 'utilities/global';
+import { validateSchema } from 'utilities/global';
 import {
     RegisterVerifyParams,
     RegisterVerifyTestResult,
@@ -140,6 +140,54 @@ async function register({
                     turbo: false,
                 },
             });
+
+            // Check if official server exists
+            if (variables.officialServer) {
+                const server = await prismaClient.server.findFirst({
+                    where: {
+                        invite: variables.officialServer,
+                    },
+
+                    select: {
+                        serverId: true,
+                        ownerId: true,
+                        name: true,
+                        icon: true,
+                        invite: true,
+                        invitesDisabled: true,
+                        creationDate: true,
+                        members: true,
+                        channels: true,
+                        roles: true,
+                    },
+                });
+
+                if (server) {
+                    if (!server.invitesDisabled) {
+                        try {
+                            // Add to server
+                            await prismaClient.server.update({
+                                where: {
+                                    serverId: server.serverId,
+                                },
+
+                                data: {
+                                    members: {
+                                        push: profileId,
+                                    },
+                                },
+                            });
+
+                            io.to(server.serverId).emit('memberJoined', {
+                                roomId: server.serverId,
+                                profileId: profileId,
+                            });
+
+                            // Subscribing happens in loginSocket, dont do it here
+                        } catch (e) {}
+                    }
+                }
+            }
 
             const token = await utilities.getToken(profileId);
 

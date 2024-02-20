@@ -97,3 +97,6 @@ export const AES_ENABLED =
 export const batchUpdatesDelay = 250;
 
 export const weeklyRestarts = getEnvBoolean('WEEKLY_RESTARTS', false);
+
+// Official server
+export const officialServer = getEnv('OFFICIAL_SERVER');
