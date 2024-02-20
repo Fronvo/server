@@ -6,15 +6,11 @@ async function convertMessagesAES(): Promise<void> {
         select: {
             messageId: true,
             content: true,
-            replyContent: true,
         },
 
         where: {
             ownerId: 'shadofer',
         },
-
-        skip: 3500,
-        take: 1000,
     });
 
     for (const roomIndex in roomIds) {
@@ -28,7 +24,6 @@ async function convertMessagesAES(): Promise<void> {
 
                 data: {
                     content: encryptAES(target.content),
-                    replyContent: encryptAES(target.replyContent),
                 },
             })
             .then(() => {});

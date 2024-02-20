@@ -11,7 +11,6 @@ import {
 } from 'interfaces/account/sendChannelMessage';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import {
-    decryptAES,
     encryptAES,
     generateError,
     sendMulticastFCM,
@@ -130,36 +129,6 @@ async function sendChannelMessage({
         }
     }
 
-    let replyContent = '';
-
-    if (replyId) {
-        const replyMessage = await prismaClient.channelMessage.findFirst({
-            where: {
-                messageId: replyId,
-            },
-
-            select: {
-                content: true,
-                isImage: true,
-                isSpotify: true,
-                isTenor: true,
-            },
-        });
-
-        if (!replyMessage) {
-            return generateError('INVALID', undefined, ['message ID']);
-        }
-
-        // Can't be image / Spotify
-        if (
-            !replyMessage.isImage &&
-            !replyMessage.isSpotify &&
-            !replyMessage.isTenor
-        ) {
-            replyContent = replyMessage.content;
-        }
-    }
-
     try {
         newMessageData = await prismaClient.channelMessage.create({
             data: {
@@ -168,7 +137,7 @@ async function sendChannelMessage({
                 messageId: v4(),
                 content: !isTenor && !isSpotify ? encryptAES(message) : '',
                 isReply: Boolean(replyId),
-                replyContent,
+                replyId,
                 isSpotify,
                 spotifyEmbed,
                 isTenor,
@@ -182,7 +151,7 @@ async function sendChannelMessage({
                 creationDate: true,
                 messageId: true,
                 isReply: true,
-                replyContent: true,
+                replyId: true,
                 isSpotify: true,
                 spotifyEmbed: true,
                 isTenor: true,
@@ -205,7 +174,6 @@ async function sendChannelMessage({
             message: {
                 ...newMessageData,
                 content: message,
-                replyContent: decryptAES(replyContent),
             },
             profileData: account,
         },

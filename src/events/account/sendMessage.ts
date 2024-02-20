@@ -139,36 +139,6 @@ async function sendMessage({
         }
     }
 
-    let replyContent = '';
-
-    if (replyId) {
-        const replyMessage = await prismaClient.message.findFirst({
-            where: {
-                messageId: replyId,
-            },
-
-            select: {
-                content: true,
-                isImage: true,
-                isSpotify: true,
-                isTenor: true,
-            },
-        });
-
-        if (!replyMessage) {
-            return generateError('INVALID', undefined, ['message ID']);
-        }
-
-        // Can't be image / Spotify
-        if (
-            !replyMessage.isImage &&
-            !replyMessage.isSpotify &&
-            !replyMessage.isTenor
-        ) {
-            replyContent = replyMessage.content;
-        }
-    }
-
     try {
         newMessageData = await prismaClient.message.create({
             data: {
@@ -177,7 +147,7 @@ async function sendMessage({
                 messageId: v4(),
                 content: !isTenor && !isSpotify ? encryptAES(message) : '',
                 isReply: Boolean(replyId),
-                replyContent,
+                replyId,
                 isSpotify,
                 spotifyEmbed,
                 isTenor,
@@ -191,7 +161,7 @@ async function sendMessage({
                 creationDate: true,
                 messageId: true,
                 isReply: true,
-                replyContent: true,
+                replyId: true,
                 isSpotify: true,
                 spotifyEmbed: true,
                 isTenor: true,
@@ -214,7 +184,6 @@ async function sendMessage({
             message: {
                 ...newMessageData,
                 content: message,
-                replyContent: decryptAES(replyContent),
             },
             profileData: account,
         },

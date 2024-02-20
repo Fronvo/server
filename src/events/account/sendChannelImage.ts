@@ -66,7 +66,7 @@ async function sendChannelImage({
                 creationDate: true,
                 messageId: true,
                 isReply: true,
-                replyContent: true,
+                replyId: true,
                 isImage: true,
                 attachment: true,
             },

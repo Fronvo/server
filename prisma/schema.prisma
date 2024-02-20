@@ -86,7 +86,7 @@ model Message {
   content      String?
   creationDate DateTime @default(now())
   isReply      Boolean  @default(false)
-  replyContent String   @default("")
+  replyId      String   @default("")
   isImage      Boolean  @default(false)
   attachment   String?
   isSpotify    Boolean? @default(false)
@@ -105,7 +105,7 @@ model ChannelMessage {
   content      String?
   creationDate DateTime @default(now())
   isReply      Boolean  @default(false)
-  replyContent String   @default("")
+  replyId      String   @default("")
   isImage      Boolean  @default(false)
   attachment   String?
   isSpotify    Boolean? @default(false)

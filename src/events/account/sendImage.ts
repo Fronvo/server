@@ -58,7 +58,7 @@ async function sendImage({
                 creationDate: true,
                 messageId: true,
                 isReply: true,
-                replyContent: true,
+                replyId: true,
                 isImage: true,
                 attachment: true,
             },

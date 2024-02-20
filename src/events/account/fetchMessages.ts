@@ -90,7 +90,7 @@ async function fetchMessages({
             creationDate: true,
             messageId: true,
             isReply: true,
-            replyContent: true,
+            replyId: true,
             isImage: true,
             attachment: true,
             isSpotify: true,
@@ -167,9 +167,6 @@ async function fetchMessages({
             message: {
                 ...message,
                 content: message.content ? decryptAES(message.content) : '',
-                replyContent: message.replyContent
-                    ? decryptAES(message.replyContent)
-                    : '',
             },
             profileData: {
                 ...profileData,

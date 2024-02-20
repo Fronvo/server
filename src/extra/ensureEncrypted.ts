@@ -7,7 +7,6 @@ async function checkMessagesAES(): Promise<void> {
     const messages = await variables.prismaClient.message.findMany({
         select: {
             content: true,
-            replyContent: true,
         },
     });
 
@@ -15,7 +14,6 @@ async function checkMessagesAES(): Promise<void> {
         await variables.prismaClient.channelMessage.findMany({
             select: {
                 content: true,
-                replyContent: true,
             },
         });
 
@@ -23,17 +21,12 @@ async function checkMessagesAES(): Promise<void> {
         const target = messages[messageIndex];
 
         let contentRes: string;
-        let replyContentRes: string;
 
         if (target.content) {
             contentRes = decryptAES(target.content);
         }
 
-        if (target.replyContent) {
-            replyContentRes = decryptAES(target.replyContent);
-        }
-
-        if (contentRes == 'CORRUPTED' || replyContentRes == 'CORRUPTED') {
+        if (contentRes == 'CORRUPTED') {
             corruptedMessages += 1;
         }
     }
@@ -42,17 +35,12 @@ async function checkMessagesAES(): Promise<void> {
         const target = messages[messageIndex];
 
         let contentRes: string;
-        let replyContentRes: string;
 
         if (target.content) {
             contentRes = decryptAES(target.content);
         }
 
-        if (target.replyContent) {
-            replyContentRes = decryptAES(target.replyContent);
-        }
-
-        if (contentRes == 'CORRUPTED' || replyContentRes == 'CORRUPTED') {
+        if (contentRes == 'CORRUPTED') {
             corruptedMessages += 1;
         }
     }
