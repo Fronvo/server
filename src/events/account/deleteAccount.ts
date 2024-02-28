@@ -210,6 +210,26 @@ async function deleteAccount({
 
                     deleteImage(message.attachment);
                 }
+
+                // Channel messages too
+                const deletedMessagesChannels =
+                    await prismaClient.channelMessage.findMany({
+                        where: {
+                            ownerId: account.profileId,
+                        },
+                    });
+
+                await prismaClient.channelMessage.deleteMany({
+                    where: {
+                        ownerId: account.profileId,
+                    },
+                });
+
+                for (const messageIndex in deletedMessagesChannels) {
+                    const message = deletedMessagesChannels[messageIndex];
+
+                    deleteImage(message.attachment);
+                }
             }
 
             async function deleteServers(): Promise<void> {
