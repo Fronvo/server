@@ -52,7 +52,10 @@ async function deleteChannelMessage({
     });
 
     // Must be the message author / room owner
-    if (account.profileId != targetMessage.ownerId) {
+    if (
+        account.profileId != targetMessage.ownerId &&
+        account.profileId != server.ownerId
+    ) {
         return generateError('NOT_OWNER');
     }
 
