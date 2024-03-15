@@ -212,6 +212,14 @@ import {
     UnbanMemberParams,
     UnbanMemberTestResult,
 } from 'interfaces/account/unbanMember';
+import {
+    UpdateConnectionSpotifyParams,
+    UpdateConnectionSpotifyTestResult,
+} from 'interfaces/account/updateConnectionSpotify';
+import {
+    RemoveConnectionSpotifyParams,
+    RemoveConnectionSpotifyTestResult,
+} from 'interfaces/account/removeConnectionSpotify';
 
 export interface ClientToServerEvents {
     register: (
@@ -426,5 +434,13 @@ export interface ClientToServerEvents {
     unbanMember: (
         {}: UnbanMemberParams,
         callback?: ({}: UnbanMemberTestResult) => void
+    ) => void;
+    updateConnectionSpotify: (
+        {}: UpdateConnectionSpotifyParams,
+        callback?: ({}: UpdateConnectionSpotifyTestResult) => void
+    ) => void;
+    removeConnectionSpotify: (
+        {}: RemoveConnectionSpotifyParams,
+        callback?: ({}: RemoveConnectionSpotifyTestResult) => void
     ) => void;
 }

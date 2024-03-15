@@ -71,6 +71,9 @@ async function fetchProfileData({
         status: showStatus ? targetAccount.status : '',
         totalPosts,
         isTurbo: targetAccount.turbo || targetAccount.profileId == 'fronvo',
+        hasSpotify: targetAccount.hasSpotify,
+        spotifyName: targetAccount.spotifyName,
+        spotifyURL: targetAccount.spotifyURL,
     };
 
     // More data if our profile

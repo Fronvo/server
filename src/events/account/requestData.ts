@@ -79,6 +79,11 @@ async function requestData({
                         friends: true,
                         seenStates: true,
                         dataSentTime: true,
+                        fcm: true,
+                        hasSpotify: true,
+                        spotifyName: true,
+                        spotifyURL: true,
+                        turbo: true,
                     },
                 })
             )

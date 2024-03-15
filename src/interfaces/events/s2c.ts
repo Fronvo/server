@@ -39,6 +39,7 @@ import { ServerInviteRegeneratedParams } from 'interfaces/account/serverInviteRe
 import { ChannelRenamedParams } from 'interfaces/account/channelRenamed';
 import { MemberBannedParams } from 'interfaces/account/memberBanned';
 import { MemberUnbannedParams } from 'interfaces/account/memberUnbanned';
+import { ConnectionsUpdatedParams } from 'interfaces/account/connectionsUpdated';
 
 export interface ServerToClientEvents {
     registerVerify: (
@@ -106,4 +107,6 @@ export interface ServerToClientEvents {
     serverInvitesToggled: ({}: ServerInvitesToggledParams) => void;
 
     serverInviteRegenerated: ({}: ServerInviteRegeneratedParams) => void;
+
+    connectionsUpdated: ({}: ConnectionsUpdatedParams) => void;
 }

@@ -178,6 +178,11 @@ async function runEventFunc(
                     status: true,
                     statusUpdatedTime: true,
                     username: true,
+                    hasSpotify: true,
+                    spotifyAccessToken: true,
+                    spotifyName: true,
+                    spotifyTokenType: true,
+                    spotifyURL: true,
                 },
             });
         } catch (e) {

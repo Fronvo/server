@@ -29,6 +29,12 @@ model Account {
   turbo                 Boolean?  @default(false)
   turboCH               String?
   fcm                   String?   @default("")
+  hasSpotify            Boolean?  @default(false)
+  spotifyName           String?   @default("")
+  spotifyURL            String?   @default("")
+  spotifyRefreshToken   String?   @default("")
+  spotifyAccessToken    String?   @default("")
+  spotifyTokenType      String?   @default("")
 }
 
 model Post {

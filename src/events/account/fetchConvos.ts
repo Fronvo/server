@@ -97,6 +97,9 @@ async function fetchConvos({
                                                     turbo: true,
                                                     status: true,
                                                     statusUpdatedTime: true,
+                                                    hasSpotify: true,
+                                                    spotifyName: true,
+                                                    spotifyURL: true,
                                                 },
                                             }
                                         )),
@@ -128,6 +131,10 @@ async function fetchConvos({
                                                 : '',
                                         online:
                                             isFriend && targetDMUserData.online,
+                                        hasSpotify: targetDMUserData.hasSpotify,
+                                        spotifyName:
+                                            targetDMUserData.spotifyName,
+                                        spotifyURL: targetDMUserData.spotifyURL,
                                     },
                                     dmHiddenFor: convo.dmHiddenFor,
                                     totalMessages,

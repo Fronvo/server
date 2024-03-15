@@ -52,6 +52,8 @@ import leaveServer from 'events/account/leaveServer';
 import kickMember from 'events/account/kickMember';
 import banMember from 'events/account/banMember';
 import unbanMember from 'events/account/unbanMember';
+import updateConnectionSpotify from 'events/account/updateConnectionSpotify';
+import removeConnectionSpotify from 'events/account/removeConnectionSpotify';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -106,6 +108,8 @@ const accountTemplate: EventExportTemplate = {
     kickMember,
     banMember,
     unbanMember,
+    updateConnectionSpotify,
+    removeConnectionSpotify,
 };
 
 export default accountTemplate;

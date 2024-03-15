@@ -80,8 +80,11 @@ export type EnvValues =
     | 'FIREBASE_CREDENTIALS'
     | 'FIREBASE_PROJECT_ID'
     | 'TURBO_SECRET'
+    | 'GENERAL_SECRET'
     | 'VERSION'
     | 'AES_ENC'
     | 'AES_IV'
     | 'WEEKLY_RESTARTS'
-    | 'OFFICIAL_SERVER';
+    | 'OFFICIAL_SERVER'
+    | 'SPOTIFY_CLIENT_ID'
+    | 'SPOTIFY_CLIENT_SECRET';

@@ -42,11 +42,7 @@ async function deletePost({
         },
     });
 
-    io.to(account.profileId).emit('postRemoved', {
-        postId,
-    });
-
-    io.to(socket.id).emit('postRemoved', {
+    io.to(account.profileId).to(socket.id).emit('postRemoved', {
         postId,
     });
 
