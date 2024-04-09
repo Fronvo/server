@@ -47,10 +47,9 @@ export const silentLogging = getEnvBoolean('SILENT_LOGGING', false);
 export const prismaClient = new PrismaClient({
     datasources: {
         db: {
-            url:
-                !setupMode && (getEnv('PRISMA_URL') as string).includes('+srv')
-                    ? getEnv('PRISMA_URL')
-                    : 'mongodb://localhost:27017/fronvo',
+            url: (getEnv('PRISMA_URL') as string).includes('+srv')
+                ? getEnv('PRISMA_URL')
+                : 'mongodb://localhost:27017/fronvo',
         },
     },
 });
