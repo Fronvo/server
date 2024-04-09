@@ -56,17 +56,21 @@ export const prismaClient = new PrismaClient({
 });
 
 // Firebase, filled in server.ts
-const firebaseCredentials = JSON.parse(getEnv('FIREBASE_CREDENTIALS'));
+const firebaseCredentials = JSON.parse(getEnv('FIREBASE_CREDENTIALS') || '{}');
 
-export const firebase = admin.initializeApp({
-    projectId: firebaseCredentials.project_id,
+export let firebase: admin.app.App;
 
-    credential: admin.credential.cert({
-        clientEmail: firebaseCredentials.client_email,
-        privateKey: firebaseCredentials.private_key,
+if (firebaseCredentials.project_id) {
+    firebase = admin.initializeApp({
         projectId: firebaseCredentials.project_id,
-    }),
-});
+
+        credential: admin.credential.cert({
+            clientEmail: firebaseCredentials.client_email,
+            privateKey: firebaseCredentials.private_key,
+            projectId: firebaseCredentials.project_id,
+        }),
+    });
+}
 
 // Email-related
 export const emailUsername = getEnv('EMAIL_USERNAME');
