@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+    fronvo-server:
+        build: .
+        env_file:
+            - ./.env
+        ports:
+            - '3001:3001'
+        volumes:
+            - .:/usr/app/server:rw
+        command: npm run start:dev
+        depends_on:
+            - mongodb
+        container_name: fronvo-server
+
+    mongodb:
+        image: mongo:latest
+        ports:
+            - '27017:27017'
+        volumes:
+            - ./data:/data/db
+        container_name: mongodb
+
+    redis:
+        image: redis:latest
+        ports:
+            - '6379:6379'
+        container_name: redis
