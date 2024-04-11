@@ -18,6 +18,9 @@ import { aesEnc, aesIV } from 'variables/global';
 import { prismaClient } from 'variables/global';
 import { createCipheriv, createDecipheriv } from 'crypto';
 import ImageKit from 'imagekit';
+import jwt from 'jsonwebtoken';
+import { client } from 'main/server';
+const secret = process.env.FRONVO_SECRET_KEY;
 
 export async function loginSocket(
     io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -169,6 +172,8 @@ export async function logoutSocket(
 
     // Possibol
     if (!account) return;
+
+    await client.del(account.profileId)
 
     io.to(account.profileId).emit('onlineStatusUpdated', {
         profileId: account.profileId,
@@ -366,26 +371,49 @@ export function generateError(
 }
 
 export async function getToken(profileId: string): Promise<string> {
-    const tokenItem = await prismaClient.token.findFirst({
-        where: {
-            profileId,
-        },
-    });
+    const tokenItem = createToken({ account: profileId });
+    client.set(profileId, tokenItem);
+
+    console.log({ profileId: tokenItem });
 
     if (tokenItem) {
-        return tokenItem.token;
+        return tokenItem;
     }
 
     const token = v4();
 
-    await prismaClient.token.create({
-        data: {
-            profileId,
-            token,
-        },
-    });
+    await prismaClient.token
+        .create({
+            data: {
+                profileId,
+                token,
+            },
+        })
+        .then(() => {
+            console.log('token created');
+        });
 
     return token;
+}
+
+export function createToken(payload) {
+    const secret = process.env.FRONVO_SECRET_KEY;
+
+    var token = jwt.sign(payload, secret, {
+        algorithm: 'HS256',
+        allowInsecureKeySizes: true,
+        expiresIn: 1020, // around 15 mins
+    });
+    return token;
+}
+
+export async function verifyToken(token: string) {
+    try {
+        const user = jwt.verify(token, secret);
+        if (user) console.log('User is verified');
+    } catch (err) {
+        console.log({ error: 'Unauthorized' });
+    }
 }
 
 export async function revokeToken(profileId: string): Promise<void> {

@@ -4,18 +4,16 @@
 
 import { StringSchema } from '@ezier/validate';
 import { compareSync } from 'bcrypt';
-import { emailSchema, passwordSchema } from 'events/shared';
+import { emailSchema, passwordSchema, profileId } from 'events/shared';
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { LoginResult, LoginServerParams } from 'interfaces/noAccount/login';
 import * as utilities from 'utilities/global';
 import { prismaClient } from 'variables/global';
 
-async function login({
-    io,
-    socket,
-    email,
-    password,
-}: LoginServerParams): Promise<LoginResult | FronvoError> {
+async function login(
+    { io, socket, email, password }: LoginServerParams,
+    res: any
+): Promise<LoginResult | FronvoError> {
     const account = await prismaClient.account.findFirst({
         where: {
             email,

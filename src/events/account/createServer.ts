@@ -10,8 +10,9 @@ import {
 import { EventTemplate, FronvoError } from 'interfaces/all';
 import { roomNameSchema } from 'events/shared';
 import { prismaClient } from 'variables/global';
-import { generateError } from 'utilities/global';
+import { generateError, verifyToken } from 'utilities/global';
 import { v4 } from 'uuid';
+import { client } from 'main/server';
 
 async function createServer({
     io,
@@ -20,6 +21,12 @@ async function createServer({
     name,
 }: CreateServerServerParams): Promise<CreateServerResult | FronvoError> {
     name = name.replace(/\n/g, '');
+
+    // initiates a check to see if the token is valid
+    // if it aint valid, it just returns otherwise the rest of the functions get executeds
+
+    const token = await client.get(account.profileId);
+    if (!verifyToken(token)) return;
 
     // Limit to 5 rooms max
     let totalRooms: number;

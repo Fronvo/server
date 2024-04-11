@@ -21,11 +21,18 @@ import { ServerToClientEvents } from 'interfaces/events/s2c';
 import { Server } from 'socket.io';
 import * as variables from 'variables/global';
 import { getEnv, getEnvBoolean } from 'variables/varUtils';
+import { createClient } from 'redis';
 
 // Variables
 let io: Server<ClientToServerEvents, ServerToClientEvents>;
 let loadingSpinner: Ora;
 const loadingSpinnerDefaultText = 'Starting server';
+let client = createClient({
+    url: 'redis://redis:6379',
+});
+client.on('error', (err) => console.log('Redis Client Error', err));
+
+client.connect();
 
 function setLoading(currProcText: string): void {
     if (!variables.silentLogging)
@@ -132,6 +139,24 @@ function setupAdminPanel(): void {
     }
 }
 
+async function checkRedis() {
+    await client.del('fronvo');
+    try {
+        let keys = await client.keys('*');
+        if (!keys || keys.length === 0) {
+            console.log('No tokens were found in Redis.');
+        } else {
+            console.log('All key-value pairs in Redis:');
+            for (let key of keys) {
+                let value = await client.get(key); // Assuming simple key-value pairs, adjust accordingly for hashes, sets, etc.
+                console.log({ key, value });
+            }
+        }
+    } catch (error) {
+        console.error('Error retrieving keys from Redis:', error);
+    }
+}
+
 async function startup(): Promise<void> {
     // Prevent startup logging, too
     preStartupChecks();
@@ -154,6 +179,7 @@ async function startup(): Promise<void> {
     setupServer();
     setupServerEvents();
     setupAdminPanel();
+    await checkRedis();
 
     // Finally, display successful server run
     if (!variables.silentLogging) {
@@ -162,3 +188,4 @@ async function startup(): Promise<void> {
 }
 
 startup();
+export { client };

@@ -21,12 +21,10 @@ import {
     RegisterVerifyTestResult,
 } from 'interfaces/noAccount/registerVerify';
 
-async function register({
-    io,
-    socket,
-    email,
-    password,
-}): Promise<RegisterResult | FronvoError> {
+async function register(
+    { io, socket, email, password },
+    res: any
+): Promise<RegisterResult | FronvoError> {
     // Check if the email is from a dummy (blacklisted) domain, if applicable
     if (variables.blacklistedEmailDomainsEnabled) {
         if (
@@ -58,9 +56,9 @@ async function register({
         sentCode = '123456';
     }
 
-    utilities.sendEmail(email, 'Fronvo email verification code', [
-        `Your verification code is ${sentCode}`,
-    ]);
+    // utilities.sendEmail(email, 'Fronvo email verification code', [
+    //     `Your verification code is ${sentCode}`,
+    // ]);
 
     // Attach registerVerify now, will be detached after verification / discarded
     socket.on(
