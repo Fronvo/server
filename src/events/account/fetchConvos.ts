@@ -135,6 +135,9 @@ async function fetchConvos({
                                         spotifyName:
                                             targetDMUserData.spotifyName,
                                         spotifyURL: targetDMUserData.spotifyURL,
+                                        hasGithub: targetDMUserData.hasGithub,
+                                        githubName: targetDMUserData.githubName,
+                                        githubURL: targetDMUserData.githubURL,
                                     },
                                     dmHiddenFor: convo.dmHiddenFor,
                                     totalMessages,

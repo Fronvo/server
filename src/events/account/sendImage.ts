@@ -23,6 +23,8 @@ async function sendImage({
     account,
     roomId,
     attachment,
+    width,
+    height,
 }: SendImageServerParams): Promise<SendImageResult | FronvoError> {
     const room = await prismaClient.dm.findFirst({
         where: {
@@ -49,6 +51,8 @@ async function sendImage({
                 messageId: v4(),
                 isImage: true,
                 attachment,
+                width: Number(width),
+                height: Number(height),
             },
 
             select: {
@@ -61,6 +65,8 @@ async function sendImage({
                 replyId: true,
                 isImage: true,
                 attachment: true,
+                width: true,
+                height: true,
             },
         });
     } catch (e) {
@@ -105,7 +111,7 @@ async function sendImage({
 
 const sendImageTemplate: EventTemplate = {
     func: sendImage,
-    template: ['roomId', 'attachment'],
+    template: ['roomId', 'attachment', 'width', 'height'],
     schema: new StringSchema({
         roomId: {
             type: 'uuid',
@@ -114,6 +120,16 @@ const sendImageTemplate: EventTemplate = {
         attachment: {
             // Ensure https
             regex: /https:\/\/ik.imagekit.io\/fronvo(2)?\/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-4[0-9A-Za-z]{3}-[89ABab][0-9A-Za-z]{3}-[0-9A-Za-z]{12}.+/,
+        },
+
+        width: {
+            minLength: 2,
+            maxLength: 4,
+        },
+
+        height: {
+            minLength: 2,
+            maxLength: 4,
         },
     }),
 };

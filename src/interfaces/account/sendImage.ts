@@ -7,6 +7,8 @@ import { FronvoError, EventArguments } from 'interfaces/all';
 export interface SendImageParams {
     roomId: string;
     attachment: string;
+    width: number;
+    height: number;
 }
 
 export interface SendImageServerParams

@@ -93,6 +93,8 @@ async function fetchMessages({
             replyId: true,
             isImage: true,
             attachment: true,
+            width: true,
+            height: true,
             isSpotify: true,
             spotifyEmbed: true,
             isTenor: true,

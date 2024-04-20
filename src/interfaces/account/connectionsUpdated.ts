@@ -5,9 +5,15 @@
 export interface ConnectionsUpdatedParams {
     profileId: string;
 
-    spotify: {
+    spotify?: {
         hasSpotify: boolean;
         spotifyName: string;
         spotifyURL: string;
+    };
+
+    github?: {
+        hasGithub: boolean;
+        githubName: string;
+        githubURL: string;
     };
 }

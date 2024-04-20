@@ -220,6 +220,14 @@ import {
     RemoveConnectionSpotifyParams,
     RemoveConnectionSpotifyTestResult,
 } from 'interfaces/account/removeConnectionSpotify';
+import {
+    RemoveConnectionGithubParams,
+    RemoveConnectionGithubTestResult,
+} from 'interfaces/account/removeConnectionGithub';
+import {
+    UpdateConnectionGithubParams,
+    UpdateConnectionGithubTestResult,
+} from 'interfaces/account/updateConnectionGithub';
 
 export interface ClientToServerEvents {
     register: (
@@ -442,5 +450,13 @@ export interface ClientToServerEvents {
     removeConnectionSpotify: (
         {}: RemoveConnectionSpotifyParams,
         callback?: ({}: RemoveConnectionSpotifyTestResult) => void
+    ) => void;
+    removeConnectionGithub: (
+        {}: RemoveConnectionGithubParams,
+        callback?: ({}: RemoveConnectionGithubTestResult) => void
+    ) => void;
+    updateConnectionGithub: (
+        {}: UpdateConnectionGithubParams,
+        callback?: ({}: UpdateConnectionGithubTestResult) => void
     ) => void;
 }

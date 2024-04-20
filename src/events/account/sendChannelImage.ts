@@ -20,6 +20,8 @@ async function sendChannelImage({
     serverId,
     channelId,
     attachment,
+    width,
+    height,
 }: SendChannelImageServerParams): Promise<
     SendChannelImageResult | FronvoError
 > {
@@ -57,6 +59,8 @@ async function sendChannelImage({
                 messageId: v4(),
                 isImage: true,
                 attachment,
+                width: Number(width),
+                height: Number(height),
             },
 
             select: {
@@ -69,6 +73,8 @@ async function sendChannelImage({
                 replyId: true,
                 isImage: true,
                 attachment: true,
+                width: true,
+                height: true,
             },
         });
     } catch (e) {
@@ -100,7 +106,7 @@ async function sendChannelImage({
 
 const sendChannelImageTemplate: EventTemplate = {
     func: sendChannelImage,
-    template: ['serverId', 'channelId', 'attachment'],
+    template: ['serverId', 'channelId', 'attachment', 'width', 'height'],
     schema: new StringSchema({
         ...serverIdSchema,
         ...channelIdSchema,
@@ -108,6 +114,16 @@ const sendChannelImageTemplate: EventTemplate = {
         attachment: {
             // Ensure https
             regex: /https:\/\/ik.imagekit.io\/fronvo(2)?\/[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-4[0-9A-Za-z]{3}-[89ABab][0-9A-Za-z]{3}-[0-9A-Za-z]{12}.+/,
+        },
+
+        width: {
+            minLength: 2,
+            maxLength: 4,
+        },
+
+        height: {
+            minLength: 2,
+            maxLength: 4,
         },
     }),
 };

@@ -35,6 +35,9 @@ model Account {
   spotifyRefreshToken   String?   @default("")
   spotifyAccessToken    String?   @default("")
   spotifyTokenType      String?   @default("")
+  hasGithub             Boolean?  @default(false)
+  githubName            String?   @default("")
+  githubURL             String?   @default("")
 }
 
 model Post {
@@ -96,6 +99,8 @@ model Message {
   replyId      String   @default("")
   isImage      Boolean  @default(false)
   attachment   String?
+  width        Int?     @default(0)
+  height       Int?     @default(0)
   isSpotify    Boolean? @default(false)
   spotifyEmbed String?  @default("")
   isTenor      Boolean  @default(false)
@@ -115,6 +120,8 @@ model ChannelMessage {
   replyId      String   @default("")
   isImage      Boolean  @default(false)
   attachment   String?
+  width        Int?     @default(0)
+  height       Int?     @default(0)
   isSpotify    Boolean? @default(false)
   spotifyEmbed String?  @default("")
   isTenor      Boolean  @default(false)

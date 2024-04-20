@@ -54,6 +54,8 @@ import banMember from 'events/account/banMember';
 import unbanMember from 'events/account/unbanMember';
 import updateConnectionSpotify from 'events/account/updateConnectionSpotify';
 import removeConnectionSpotify from 'events/account/removeConnectionSpotify';
+import removeConnectionGithub from 'events/account/removeConnectionGithub';
+import updateConnectionGithub from 'events/account/updateConnectionGithub';
 
 import { EventExportTemplate } from 'interfaces/all';
 
@@ -110,6 +112,8 @@ const accountTemplate: EventExportTemplate = {
     unbanMember,
     updateConnectionSpotify,
     removeConnectionSpotify,
+    removeConnectionGithub,
+    updateConnectionGithub,
 };
 
 export default accountTemplate;

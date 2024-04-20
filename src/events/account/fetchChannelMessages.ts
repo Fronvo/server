@@ -102,6 +102,8 @@ async function fetchChannelMessages({
             replyId: true,
             isImage: true,
             attachment: true,
+            width: true,
+            height: true,
             isSpotify: true,
             spotifyEmbed: true,
             isTenor: true,

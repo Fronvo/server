@@ -74,6 +74,9 @@ async function fetchProfileData({
         hasSpotify: targetAccount.hasSpotify,
         spotifyName: targetAccount.spotifyName,
         spotifyURL: targetAccount.spotifyURL,
+        hasGithub: targetAccount.hasGithub,
+        githubName: targetAccount.githubName,
+        githubURL: targetAccount.githubURL,
     };
 
     // More data if our profile
