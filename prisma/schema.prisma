@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model accounts {
+  profile_id  String    @id @db.VarChar(30)
+  email       String    @unique @db.VarChar(255)
+  username    String    @db.VarChar(30)
+  bio         String?   @default("") @db.VarChar(128)
+  password    String    @db.VarChar(255)
+  avatar      String?   @default("") @db.VarChar(255)
+  banner      String?   @default("") @db.VarChar(255)
+  created_at  DateTime  @default(now()) @db.Date
+  last_status Int       @default(0) @db.SmallInt
+  last_note   String?   @default("") @db.VarChar(255)
+  last_note_d DateTime? @default(now()) @db.Date
+  posts       posts[]
+}
+
+model posts {
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  text         String    @default("") @db.VarChar(255)
+  attachments  String[]
+  tags         String[]  @db.VarChar
+  created_at   DateTime  @default(now()) @db.Date
+  post_creator String?   @db.VarChar(30)
+  accounts     accounts? @relation(fields: [post_creator], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
+}

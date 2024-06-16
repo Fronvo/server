@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "./output",
+    "target": "es6",
+    "removeComments": false,
+    "pretty": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "baseUrl": "src",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "strictFunctionTypes": true,
+    "noEmit": true
+  },
+  "include": ["src/**/*"],
+  "ts-node": {
+    "swc": true
+  }
+}
