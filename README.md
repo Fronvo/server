@@ -10,14 +10,14 @@
 
 ## Setup
 
-- `npm i`
+- `pnpm i`
 
 - Fill out `.env.example` and rename to `.env`
 
-- `docker compose up -d` to start the Mongo instance locally
+- `docker compose up -d` to start the PostgreSQL instance locally
 
-- `npm start`, starts at port 3001
+- `pnpm start`, starts at port 3001
 
 ## Testing
 
-- `npm test` while running the docker compose instance
+- `pnpm test` while running the docker compose instance
