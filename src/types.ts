@@ -1,5 +1,16 @@
 export type LastStatus = 0 | 1 | 2 | 3;
-
 export type OnlineStatus = "Online" | "Do Not Disturb" | "Idle" | "Offline";
 
-export type SocketEvents = "statusUpdated" | "noteUpdated" | "postCreated";
+export type DMOption = 0 | 1;
+export type DMSetting = "Everyone" | "Friends";
+
+export type FilterOption = 0 | 1;
+export type FilterSetting = "Everything" | "Nothing";
+
+export type Namespaces = "profiles" | "servers" | "dms";
+
+export type SocketEvents =
+  | "statusUpdated"
+  | "noteUpdated"
+  | "postShared"
+  | "serverCreated";

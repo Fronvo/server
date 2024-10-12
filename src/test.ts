@@ -3,6 +3,7 @@ import server from "./api";
 import supertest from "supertest";
 import defaults from "superagent-defaults";
 import { getNormalisedV4 } from "./utils";
+import { channels, roles, servers } from "@prisma/client";
 
 const request = defaults(supertest(server));
 
@@ -12,6 +13,9 @@ const email = `${v4()}@gmail.com`;
 const password = v4();
 let accessToken = "";
 let refreshToken = "";
+let serverId = "";
+let channelId = "";
+let roleId = "";
 
 describe("Authentication", () => {
   it("Register", async () => {
@@ -51,7 +55,7 @@ describe("Authentication", () => {
   });
 
   it("Regenerate access token", async () => {
-    const res = await request.get("/accessToken");
+    const res = await request.get("/token");
 
     expect(res.status).toEqual(200);
     expect(res.type).toEqual(expect.stringContaining("json"));
@@ -80,7 +84,7 @@ describe("Profiles", () => {
   });
 
   it("Update self status", async () => {
-    const res = await request.post("/me/updateStatus").send({
+    const res = await request.post("/me/status").send({
       status: 1,
     });
 
@@ -90,13 +94,177 @@ describe("Profiles", () => {
   });
 
   it("Update self note", async () => {
-    const res = await request.post("/me/updateNote").send({
+    const res = await request.post("/me/note").send({
       note: "Example note",
     });
 
     expect(res.status).toEqual(200);
     expect(res.type).toEqual(expect.stringContaining("json"));
     expect(res.body).toHaveProperty("note");
+  });
+
+  it("Share post", async () => {
+    const res = await request.post("/me/post").send({
+      text: "Example post",
+      attachment: `https://ik.imagekit.io/fronvo2/folder/user/3e1d39b5-1790-474b-88a2-728aa8342e89/`,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("post");
+  });
+
+  it("Update DM preference", async () => {
+    const res = await request.post("/me/dm").send({
+      dmOption: 0,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("success");
+  });
+
+  it("Update filter preference", async () => {
+    const res = await request.post("/me/filter").send({
+      filterOption: 0,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("success");
+  });
+});
+
+describe("Servers", () => {
+  it("Create server", async () => {
+    const res = await request.post("/servers/create").send({
+      name: "Example server",
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    const serverData = res.body.serverData as servers;
+
+    serverId = serverData.id;
+  });
+
+  it("Join server", async () => {
+    const res = await request.post("/servers/join").send({
+      id: serverId,
+    });
+
+    expect(res.status).toEqual(400);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+  });
+
+  it("Edit server", async () => {
+    const res = await request.post("/servers/edit").send({
+      id: serverId,
+      name: "edited name",
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+  });
+});
+
+describe("Invites", () => {
+  it("Regenerate invite", async () => {
+    const res = await request.post("/invites/regenerate").send({
+      id: serverId,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    expect(res.body).toHaveProperty("invite");
+  });
+
+  it("Disable invite", async () => {
+    const res = await request.post("/invites/disable").send({
+      id: serverId,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("success");
+  });
+
+  it("Enable invite", async () => {
+    const res = await request.post("/invites/enable").send({
+      id: serverId,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("success");
+  });
+});
+
+describe("Channels", () => {
+  it("Create channel", async () => {
+    const res = await request.post("/channels/create").send({
+      id: serverId,
+      name: "general",
+      description: "Channel description amazing",
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    const channelData = res.body.channelData as channels;
+    channelId = channelData.id;
+  });
+
+  it("Edit channel", async () => {
+    const res = await request.post("/channels/edit").send({
+      id: serverId,
+      channelId,
+      name: "general",
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+  });
+});
+
+describe("Roles", () => {
+  it("Create role", async () => {
+    const res = await request.post("/roles/create").send({
+      id: serverId,
+      name: "test",
+      color: "#123456",
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    const roleData = res.body.roleData as roles;
+    roleId = roleData.id;
+  });
+
+  it("Edit role", async () => {
+    const res = await request.post("/roles/edit").send({
+      id: serverId,
+      roleId,
+      name: "Admin",
+      color: "#ffffff",
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+  });
+
+  it("Assign role", async () => {
+    const res = await request.post("/roles/assign").send({
+      id: serverId,
+      roleId,
+      members: [profileId],
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
   });
 });
 
@@ -109,7 +277,39 @@ describe("Other", () => {
 });
 
 describe("Finalise", () => {
-  it("Terminate account", async () => {
+  it("Delete role", async () => {
+    const res = await request.delete("/roles/delete").send({
+      id: serverId,
+      roleId,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("success");
+  });
+
+  it("Delete channel", async () => {
+    const res = await request.delete("/channels/delete").send({
+      id: serverId,
+      channelId,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("success");
+  });
+
+  it("Delete server", async () => {
+    const res = await request.delete("/servers/delete").send({
+      id: serverId,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("success");
+  });
+
+  it("Delete account", async () => {
     const res = await request.delete("/login").send({
       password,
     });

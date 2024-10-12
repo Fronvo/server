@@ -1,26 +1,54 @@
 import { Request, Response } from "express";
-import { getParams, informProfile, sendError, sendSuccess } from "../utils";
-import { prismaClient } from "../vars";
-import { accounts } from "@prisma/client";
-import { LastStatus } from "types";
-import { differenceInHours } from "date-fns";
+import {
+  getParams,
+  informProfile,
+  sendEmail,
+  sendError,
+  sendSuccess,
+} from "../utils";
+import { imagekit, prismaClient } from "../vars";
+import { accounts, servers } from "@prisma/client";
+import { DMOption, FilterOption, LastStatus } from "types";
+import { differenceInHours, differenceInMonths } from "date-fns";
 import { object } from "zod";
-import { attachments, note, status, tags, text } from "../schemas";
+import {
+  attachment,
+  dmOption,
+  filterOption,
+  note,
+  status,
+  text,
+} from "../schemas";
+import { v4 } from "uuid";
+
+interface FetchedDM {
+  id: string;
+  last_message_at: string;
+  other_user: accounts;
+}
 
 interface FetchedAccount extends accounts {
   status: LastStatus;
   note: string;
+  dm_option: DMOption;
+  filter_option: FilterOption;
+  dms: FetchedDM[];
+  servers: servers[];
 }
 
 const updateStatusSchema = object({ status });
 
 const updateNoteSchema = object({ note });
 
-const createPostSchema = object({ text, attachments, tags });
+const sharePostSchema = object({ text, attachment });
+
+const updateDMOptionSchema = object({ dmOption });
+
+const updateFilterOptionSchema = object({ filterOption });
 
 export async function fetchMe(req: Request, res: Response) {
   const {
-    profile_id,
+    id,
     username,
     bio,
     avatar,
@@ -29,13 +57,16 @@ export async function fetchMe(req: Request, res: Response) {
     last_note,
     last_note_d,
     last_status,
+    dm_option,
+    filter_option,
+    last_data_req,
   } = await prismaClient.accounts.findFirst({
     where: {
-      profile_id: req.userId,
+      id: req.userId,
     },
 
     select: {
-      profile_id: true,
+      id: true,
       username: true,
       bio: true,
       avatar: true,
@@ -44,17 +75,23 @@ export async function fetchMe(req: Request, res: Response) {
       last_note: true,
       last_note_d: true,
       last_status: true,
+      dm_option: true,
+      filter_option: true,
+      last_data_req: true,
     },
   });
 
   const profileData: Partial<FetchedAccount> = {
-    profile_id,
+    id,
     username,
     bio,
     avatar,
     banner,
     created_at,
     status: last_status as LastStatus,
+    dm_option: dm_option as DMOption,
+    filter_option: filter_option as FilterOption,
+    last_data_req,
   };
 
   // Note expires after 24 hours
@@ -66,6 +103,148 @@ export async function fetchMe(req: Request, res: Response) {
     profileData.note = last_note;
   }
 
+  // const dms = await prismaClient.dms.findMany({
+  //   where: {
+  //     users: {
+  //       has: id,
+  //     },
+  //   },
+
+  //   orderBy: {
+  //     last_message_at: "desc",
+  //   },
+  // });
+
+  // profileData.dms = await Promise.all(
+  //   dms.map(async (v) => {
+  //     return {
+  //       id: v.id,
+  //       last_message_at: v.last_message_at.toString(),
+  //       other_user: await prismaClient.accounts.findFirst({
+  //         where: {
+  //           id: v.users.find((v2) => v2 !== id),
+  //         },
+  //       }),
+  //     };
+  //   })
+  // );
+
+  const profileServersIds = (
+    await prismaClient.member_servers.findMany({
+      where: {
+        profile_id: profileData.id,
+      },
+
+      select: {
+        server_id: true,
+      },
+    })
+  ).map((v) => v.server_id);
+
+  profileData.servers = await prismaClient.servers.findMany({
+    where: {
+      id: {
+        in: profileServersIds,
+      },
+    },
+
+    orderBy: {
+      created_at: "desc",
+    },
+
+    include: {
+      channels: {
+        orderBy: {
+          created_at: "asc",
+        },
+      },
+      roles: {
+        orderBy: {
+          created_at: "asc",
+        },
+      },
+      member_servers: {
+        include: {
+          accounts: {
+            select: {
+              avatar: true,
+              banner: true,
+              username: true,
+              bio: true,
+              created_at: true,
+            },
+          },
+        },
+        orderBy: {
+          joined_at: "desc",
+        },
+      },
+      member_servers_banned: {
+        include: {
+          accounts: {
+            select: {
+              avatar: true,
+              banner: true,
+              username: true,
+              bio: true,
+              created_at: true,
+            },
+          },
+        },
+        orderBy: {
+          banned_at: "desc",
+        },
+      },
+    },
+  });
+
+  profileData.servers = profileData.servers.map(
+    // @ts-ignore
+    ({ member_servers_banned, member_servers, ...v }) => {
+      return {
+        ...v,
+        members: (
+          member_servers as {
+            id: string;
+            server_username: string;
+            server_avatar: string;
+            joined_at: string;
+            profile_id: string;
+            server_id: string;
+            accounts: {
+              avatar: string;
+              banner: string;
+              username: string;
+              bio: string;
+              created_at: string;
+            };
+          }[]
+        ).map(({ id, server_id, profile_id, accounts, ...member }) => {
+          return { ...member, ...accounts, id: profile_id };
+        }),
+        banned_members: (
+          member_servers_banned as {
+            id: string;
+            server_username: string;
+            server_avatar: string;
+            banned_at: string;
+            profile_id: string;
+            server_id: string;
+            accounts: {
+              avatar: string;
+              banner: string;
+              username: string;
+              bio: string;
+              created_at: string;
+            };
+          }[]
+        ).map(({ id, server_id, profile_id, accounts, ...member }) => {
+          return { ...member, ...accounts, id: profile_id };
+        }),
+      };
+    }
+  );
+
   return sendSuccess(
     res,
     {
@@ -74,6 +253,19 @@ export async function fetchMe(req: Request, res: Response) {
     true
   );
 }
+
+// TODO
+// export async function fetchHomePosts(req: Request, res: Response) {
+//   const homePosts = await prismaClient.posts.findMany({
+//     where: {
+//       post_creator: {
+//         in: req.user.following,
+//       },
+//     },
+//   });
+
+//   return sendSuccess(res, { homePosts }, true);
+// }
 
 export async function updateStatus(req: Request, res: Response) {
   const { status } = getParams(req, ["status"]);
@@ -86,7 +278,7 @@ export async function updateStatus(req: Request, res: Response) {
 
   await prismaClient.accounts.update({
     where: {
-      profile_id: req.userId,
+      id: req.userId,
     },
 
     data: {
@@ -110,7 +302,7 @@ export async function updateNote(req: Request, res: Response) {
 
   await prismaClient.accounts.update({
     where: {
-      profile_id: req.userId,
+      id: req.userId,
     },
 
     data: {
@@ -124,44 +316,137 @@ export async function updateNote(req: Request, res: Response) {
   return sendSuccess(res, { note }, true);
 }
 
-export async function createPost(req: Request, res: Response) {
-  const { text, attachments, tags } = getParams(req, [
-    "text",
-    "attachments",
-    "tags",
-  ]);
+export async function sharePost(req: Request, res: Response) {
+  const { text, attachment } = getParams(req, ["text", "attachment"]);
 
-  const schemaResult = createPostSchema.safeParse({ text, attachments, tags });
+  const schemaResult = sharePostSchema.safeParse({ text, attachment });
 
   if (!schemaResult.success) {
     return sendError(400, res, schemaResult.error.errors, true);
   }
 
-  // Must contain either of the 2, tags optional
-  if (!text && !attachments) {
-    return sendError(400, res, "Text or attachment required.");
-  }
-
   const post = await prismaClient.posts.create({
     data: {
-      // Defaults
       text,
-      attachments: attachments || [],
-      tags: tags || [],
-      post_creator: req.userId,
+      attachment,
+      profile_id: req.userId,
     },
 
     select: {
       id: true,
       text: true,
-      attachments: true,
-      tags: true,
-      created_at: true,
-      post_creator: true,
+      attachment: true,
+      posted_at: true,
+      profile_id: true,
     },
   });
 
-  informProfile(req.userId, "postCreated", { post });
+  informProfile(req.userId, "postShared", { post });
 
   return sendSuccess(res, { post }, true);
+}
+
+export async function updateDM(req: Request, res: Response) {
+  const { dmOption } = getParams(req, ["dmOption"]);
+
+  const schemaResult = updateDMOptionSchema.safeParse({ dmOption });
+
+  if (!schemaResult.success) {
+    return sendError(400, res, schemaResult.error.errors, true);
+  }
+
+  await prismaClient.accounts.update({
+    where: {
+      id: req.userId,
+    },
+
+    data: {
+      dm_option: dmOption as DMOption,
+    },
+  });
+
+  return sendSuccess(res, "DM Option updated.");
+}
+
+export async function updateFilter(req: Request, res: Response) {
+  const { filterOption } = getParams(req, ["filterOption"]);
+
+  const schemaResult = updateFilterOptionSchema.safeParse({ filterOption });
+
+  if (!schemaResult.success) {
+    return sendError(400, res, schemaResult.error.errors, true);
+  }
+
+  await prismaClient.accounts.update({
+    where: {
+      id: req.userId,
+    },
+
+    data: {
+      filter_option: filterOption as FilterOption,
+    },
+  });
+
+  return sendSuccess(res, "Filter Option updated.");
+}
+
+export async function data(req: Request, res: Response) {
+  const profileData = await prismaClient.accounts.findFirst({
+    where: {
+      id: req.userId,
+    },
+
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      bio: true,
+      avatar: true,
+      banner: true,
+      created_at: true,
+      last_note: true,
+      last_note_d: true,
+      last_status: true,
+      dm_option: true,
+      filter_option: true,
+      last_data_req: true,
+      posts: true,
+      servers: true,
+    },
+  });
+
+  if (profileData.last_data_req) {
+    if (differenceInMonths(new Date(), profileData.last_data_req) === 0) {
+      return sendError(
+        400,
+        res,
+        "You have requested your data in the past 30 days."
+      );
+    }
+  }
+
+  // Upload to imagekit
+  const file = await imagekit.upload({
+    file: btoa(JSON.stringify(profileData)),
+    fileName: `${v4()}.json`,
+    folder: "data",
+    useUniqueFileName: false,
+  });
+
+  sendEmail(profileData.email, "Your Fronvo data", [
+    `Your profile data is located at: ${file.url}`,
+    "Remember not to share this link elsewhere!",
+  ]);
+
+  await prismaClient.accounts.update({
+    where: {
+      id: profileData.id,
+    },
+
+    data: {
+      last_data_req: new Date(),
+    },
+  });
+
+  return sendSuccess(res, "Data sent");
 }

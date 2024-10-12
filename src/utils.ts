@@ -1,6 +1,8 @@
-import { LastStatus, OnlineStatus, SocketEvents } from "./types";
+import { LastStatus, Namespaces, OnlineStatus, SocketEvents } from "./types";
 import { v4 } from "uuid";
-import { associatedSockets, server } from "./vars";
+import { associatedSockets, prismaClient, server } from "./vars";
+import gmail from "gmail-send";
+import * as crypto from "node:crypto";
 
 export function getNormalisedV4(): string {
   return v4().replace(/-/, "");
@@ -74,5 +76,274 @@ export function informProfile(
       .to(userId)
       .except(getAccountSocketId(userId))
       .emit(event, { ...data, userId });
+  }
+}
+
+export function informCustom(
+  userId: string,
+  event: SocketEvents,
+  namespace: Namespaces,
+  data: {}
+): void {
+  if (getConnectedAccountSockets(userId) > 1) {
+    server
+      .of(namespace)
+      .to(userId)
+      .emit(event, { ...data, userId });
+  } else {
+    server
+      .of(namespace)
+      .to(userId)
+      .except(getAccountSocketId(userId))
+      .emit(event, { ...data, userId });
+  }
+}
+
+export async function sendEmail(
+  to: string,
+  subject: string,
+  content: string[]
+): Promise<void> {
+  if (!process.env.EMAIL_USERNAME || !process.env.EMAIL_PASSWORD) {
+    return;
+  }
+
+  let finalHtml = "";
+
+  for (const contentStrIndex in content) {
+    finalHtml += `<p align='start'>
+    ${content[contentStrIndex]}
+</p>`;
+  }
+
+  const send = gmail({
+    user: process.env.EMAIL_USERNAME,
+    pass: process.env.EMAIL_PASSWORD,
+    to,
+    subject,
+    html: `
+<html>
+    <head>
+        <style>
+            .main {
+                width: 100%;
+                background: white;
+                padding: 10px;
+            }
+
+            .content {
+                width: 40%;
+                margin: auto;
+                border-radius: 10px;
+                background: black;
+                box-shadow: black;
+                padding-top: 15px;
+            }
+
+            hr {
+                width: 100%;
+                opacity: 25%;
+                border-width: 1px;
+                border-color: rgb(125, 125, 125);
+            }
+
+            p {
+                font-family: Arial;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                font-size: 1.1rem;
+                padding-right: 50px;
+                padding-left: 50px;
+                margin-bottom: 10px;
+                color: white;
+            }
+
+            #logo {
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+            }
+
+            #top {
+                margin-top: 0;
+                margin-bottom: 5px;
+            }
+
+            #colored {
+                font-size: 1.4rem;
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+
+            #footer {
+                margin-top: 10px;
+                white-space: pre-wrap;
+            }
+
+            @media screen and (max-width: 1400px) {
+                .main {
+                    padding: 0;
+                }
+
+                .content {
+                    border-radius: 0;
+                    width: 100%;
+                }
+
+                p {
+                    padding-left: 25px;
+                    padding-right: 25px;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class='main'>
+            <div class='content'>
+
+                <p align='center' id='top'>
+                    <a href='https://fronvo.com' id='top'>
+                        <img src='https://github.com/Fronvo/server/blob/v2/.github/email/email-logo-large.png?raw=true'>
+                    </a>
+
+                    <hr />
+                </p>
+
+                <p align='center' id='colored'>Hello there,</p>
+
+                ${finalHtml}
+
+                <p align='start' id='footer'>
+Sincerely,
+The Fronvo team
+                </p>
+
+            </div>
+        </div>
+    </body>
+</html>
+`,
+  });
+
+  await send();
+}
+
+export function generateChars(chars: number) {
+  return crypto.randomBytes(20).toString("hex").substring(0, chars);
+}
+
+export async function addServerMember(serverId: string, memberId: string) {
+  return await prismaClient.member_servers.create({
+    data: {
+      profile_id: memberId,
+      server_id: serverId,
+    },
+  });
+}
+
+export async function getServerMember(serverId: string, memberId: string) {
+  return await prismaClient.member_servers.findFirst({
+    where: {
+      profile_id: memberId,
+      server_id: serverId,
+    },
+  });
+}
+
+export async function removeServerMember(serverId: string, memberId: string) {
+  return await prismaClient.member_servers.deleteMany({
+    where: {
+      profile_id: memberId,
+      server_id: serverId,
+    },
+  });
+}
+
+export async function getBannedServerMember(
+  serverId: string,
+  memberId: string
+) {
+  return await prismaClient.member_servers_banned.findFirst({
+    where: {
+      profile_id: memberId,
+      server_id: serverId,
+    },
+  });
+}
+
+export async function deleteMemberServerRoles(memberId: string) {
+  await prismaClient.member_roles.deleteMany({
+    where: { profile_id: memberId },
+  });
+}
+
+export async function deleteServerRoles(serverId: string) {
+  await prismaClient.member_roles.deleteMany({
+    where: { server_id: serverId },
+  });
+
+  await prismaClient.roles.deleteMany({
+    where: { server_id: serverId },
+  });
+}
+
+export async function deleteServerChannels(serverId: string) {
+  await prismaClient.channels.deleteMany({
+    where: { server_id: serverId },
+  });
+}
+
+export async function deleteMemberServerMessages(memberId: string) {
+  await prismaClient.member_messages.deleteMany({
+    where: { profile_id: memberId },
+  });
+}
+
+export async function deleteServerMessages(serverId: string) {
+  await prismaClient.member_messages.deleteMany({
+    where: { server_id: serverId },
+  });
+}
+
+export async function deleteMemberServers(memberId: string) {
+  await prismaClient.member_servers.deleteMany({
+    where: { profile_id: memberId },
+  });
+}
+
+export async function deleteServerMembers(serverId: string) {
+  await prismaClient.member_servers.deleteMany({
+    where: { server_id: serverId },
+  });
+}
+
+export async function deleteMemberServerBans(memberId: string) {
+  await prismaClient.member_servers_banned.deleteMany({
+    where: { profile_id: memberId },
+  });
+}
+
+export async function deleteServerBans(serverId: string) {
+  await prismaClient.member_servers_banned.deleteMany({
+    where: { server_id: serverId },
+  });
+}
+
+export async function deleteServer(serverId: string) {
+  await Promise.all([
+    deleteServerRoles(serverId),
+    deleteServerChannels(serverId),
+    deleteServerMessages(serverId),
+    deleteServerBans(serverId),
+    deleteServerMembers(serverId),
+    deleteServerObject(),
+  ]);
+
+  async function deleteServerObject() {
+    await prismaClient.servers.delete({
+      where: {
+        id: serverId,
+      },
+    });
   }
 }

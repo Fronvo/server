@@ -1,6 +1,15 @@
 import { compareSync, hashSync } from "bcrypt";
-import { getParams, sendError, sendSuccess } from "../utils";
-import { prismaClient } from "../vars";
+import {
+  deleteMemberServerBans,
+  deleteMemberServerMessages,
+  deleteMemberServerRoles,
+  deleteMemberServers,
+  deleteServer,
+  getParams,
+  sendError,
+  sendSuccess,
+} from "../utils";
+import { imagekit, prismaClient } from "../vars";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { v4 } from "uuid";
@@ -12,6 +21,8 @@ const registerSchema = object({ username, profileId, email, password });
 const loginSchema = object({ email, password });
 
 const deleteAccountSchema = object({ password });
+
+const changePasswordSchema = object({ password, newPassword: password });
 
 export async function register(req: Request, res: Response) {
   const { username, profileId, email, password } = getParams(req, [
@@ -44,13 +55,11 @@ export async function register(req: Request, res: Response) {
     return sendError(400, res, "Email in use");
   }
 
-  const identifier = v4();
-
   // Create the account
   await prismaClient.accounts.create({
     data: {
+      id: profileId,
       username,
-      profile_id: profileId,
       email,
       password: hashSync(password, 10),
     },
@@ -70,7 +79,7 @@ export async function register(req: Request, res: Response) {
 
   // Info for tests
   if (process.env.NODE_ENV === "test") {
-    finalDict["id"] = identifier;
+    finalDict["id"] = profileId;
   }
 
   return sendSuccess(res, finalDict, true);
@@ -96,8 +105,8 @@ export async function login(req: Request, res: Response) {
     },
 
     select: {
+      id: true,
       password: true,
-      profile_id: true,
     },
   });
 
@@ -109,48 +118,60 @@ export async function login(req: Request, res: Response) {
   }
 
   // Send JWT token
-  const accessToken = jwt.sign(
-    { id: accountObj.profile_id },
-    process.env.JWT_SECRET,
-    {
-      algorithm: "HS256",
-      expiresIn: "1h",
-    }
-  );
+  const accessToken = jwt.sign({ id: accountObj.id }, process.env.JWT_SECRET, {
+    algorithm: "HS256",
+    expiresIn: "1h",
+  });
 
-  const refreshToken = jwt.sign(
-    { id: accountObj.profile_id },
-    process.env.JWT_SECRET,
-    {
-      algorithm: "HS256",
-      expiresIn: "7d",
-    }
-  );
+  const refreshToken = jwt.sign({ id: accountObj.id }, process.env.JWT_SECRET, {
+    algorithm: "HS256",
+    expiresIn: "7d",
+  });
 
   const finalDict = { accessToken, refreshToken };
 
   // Info for tests
   if (process.env.NODE_ENV === "test") {
-    finalDict["id"] = accountObj.profile_id;
+    finalDict["id"] = accountObj.id;
   }
 
   return sendSuccess(res, finalDict, true);
 }
 
-export async function deleteAccount(req: Request, res: Response) {
-  // Match password
-  const accountObj = await prismaClient.accounts.findFirst({
+export async function changePassword(req: Request, res: Response) {
+  const { password, newPassword } = getParams(req, ["password", "newPassword"]);
+
+  // Validate params
+  const schemaResult = changePasswordSchema.safeParse({
+    password,
+    newPassword,
+  });
+
+  if (!schemaResult.success) {
+    return sendError(400, res, schemaResult.error.errors, true);
+  }
+
+  // Validate the password
+  if (!compareSync(password, req.user.password)) {
+    return sendError(400, res, "Invalid password");
+  }
+
+  // Finally, update the account
+  await prismaClient.accounts.update({
     where: {
-      profile_id: req.userId,
+      id: req.userId,
     },
 
-    select: {
-      profile_id: true,
-      password: true,
+    data: {
+      password: hashSync(newPassword, 10),
     },
   });
 
-  const password = req.body.password;
+  return sendSuccess(res, "Password updated");
+}
+
+export async function deleteAccount(req: Request, res: Response) {
+  const { password } = getParams(req, ["password"]);
 
   // Validate params
   const schemaResult = deleteAccountSchema.safeParse({
@@ -162,16 +183,39 @@ export async function deleteAccount(req: Request, res: Response) {
   }
 
   // Validate the password
-  if (!compareSync(password, accountObj.password)) {
+  if (!compareSync(password, req.user.password)) {
     return sendError(400, res, "Invalid password");
   }
 
-  // Finally, delete the account
-  await prismaClient.accounts.delete({
-    where: {
-      profile_id: accountObj.profile_id,
-    },
-  });
+  // Delete related servers & their channels
+  const ownedServerIds = (
+    await prismaClient.servers.findMany({
+      where: {
+        owner_id: req.userId,
+      },
+
+      select: {
+        id: true,
+      },
+    })
+  ).map((v) => v.id);
+
+  await Promise.all(
+    ownedServerIds.map(async (v) => {
+      await deleteServer(v);
+    })
+  );
+
+  // Remove from other servers
+  await deleteMemberServers(req.userId);
+  await deleteMemberServerMessages(req.userId);
+  await deleteMemberServerRoles(req.userId);
+  await deleteMemberServerBans(req.userId);
+
+  // Maybe no posts / testing
+  try {
+    await imagekit.deleteFolder(`posts/${req.user.id}`);
+  } catch (e) {}
 
   return sendSuccess(res, "Account deleted");
 }

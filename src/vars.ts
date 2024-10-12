@@ -20,14 +20,11 @@ export const imagekit = new ImageKit({
 });
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const maxFolders = 25;
-export const maxFolderFiles = 200;
-
-// 25 MB
-export const imagekitMaxSize = 25 * 1024 * 1024;
-
-// 500 MB
-export const maxSize = 500 * 1024 * 1024;
+// Other
+export const MAX_SERVERS = 10;
+export const MAX_CONCURRENT_SERVERS = 50;
+export const MAX_CHANNELS = 20;
+export const MAX_ROLES = 15;
 
 // Socket.IO
 export let server: Server;

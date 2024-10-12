@@ -4,21 +4,57 @@ import { configDotenv } from "dotenv";
 configDotenv();
 
 import express from "express";
-import { createServer } from "http";
+import { createServer as createServerHTTP } from "http";
 
 // Endpoints
 import {
+  changePassword,
   deleteAccount,
   generateAccessToken,
   login,
   register,
 } from "./endpoints/auth";
-import { fetchMe, updateNote, updateStatus } from "./endpoints/profiles";
+import {
+  fetchMe,
+  data,
+  sharePost,
+  updateDM,
+  updateFilter,
+  updateNote,
+  updateStatus,
+} from "./endpoints/profiles";
+import {
+  createServer,
+  deleteServer,
+  editServer,
+  joinServer,
+  transferServer,
+} from "./endpoints/servers";
+import {
+  regenerateInvite,
+  disableInvite,
+  enableInvite,
+} from "./endpoints/invites";
+import {
+  createChannel,
+  deleteChannel,
+  editChannel,
+} from "./endpoints/channels";
+import {
+  assignRole,
+  createRole,
+  deleteRole,
+  editRole,
+} from "./endpoints/roles";
+import { banMember, kickMember, unbanMember } from "./endpoints/members";
 import { getVersion, keepAlive } from "./endpoints/other";
 
 // Middleware
 import verifyJWT from "./middleware/verifyJWT";
 import performanceChecker from "./middleware/performanceChecker";
+import checkServerAdmin from "./middleware/checkServerOwner";
+import checkChannelOwner from "./middleware/checkChannelOwner";
+import checkRoleOwner from "./middleware/checkRoleOwner";
 
 // Helpers
 import setupSocketIO from "./other/setupSocketIO";
@@ -31,7 +67,7 @@ const PORT = process.env.PORT || 3001;
 startupChecks();
 
 const app = express();
-const httpServer = createServer(app);
+const httpServer = createServerHTTP(app);
 setupSocketIO(httpServer);
 
 // Keep alive
@@ -55,12 +91,45 @@ app.post("/login", login);
 app.use(verifyJWT);
 
 // Generate access token with refresh token
-app.get("/accessToken", generateAccessToken);
+app.get("/token", generateAccessToken);
 
 // Profiles
+app.post("/me/password", changePassword);
 app.get("/me", fetchMe);
-app.post("/me/updateStatus", updateStatus);
-app.post("/me/updateNote", updateNote);
+app.post("/me/status", updateStatus);
+app.post("/me/note", updateNote);
+app.post("/me/post", sharePost);
+app.post("/me/dm", updateDM);
+app.post("/me/filter", updateFilter);
+app.post("/me/data", data);
+
+// Servers
+app.post("/servers/create", createServer);
+app.post("/servers/join", joinServer);
+app.post("/servers/edit", checkServerAdmin, editServer);
+app.delete("/servers/delete", checkServerAdmin, deleteServer);
+app.post("/servers/transfer", checkServerAdmin, transferServer);
+
+// Invites
+app.post("/invites/regenerate", checkServerAdmin, regenerateInvite);
+app.post("/invites/disable", checkServerAdmin, disableInvite);
+app.post("/invites/enable", checkServerAdmin, enableInvite);
+
+// Channels
+app.post("/channels/create", checkServerAdmin, createChannel);
+app.post("/channels/edit", checkChannelOwner, editChannel);
+app.delete("/channels/delete", checkChannelOwner, deleteChannel);
+
+// Roles
+app.post("/roles/create", checkServerAdmin, createRole);
+app.post("/roles/edit", checkRoleOwner, editRole);
+app.post("/roles/assign", checkRoleOwner, assignRole);
+app.delete("/roles/delete", checkRoleOwner, deleteRole);
+
+// Members
+app.post("/members/kick", checkServerAdmin, kickMember);
+app.post("/members/ban", checkServerAdmin, banMember);
+app.post("/members/unban", checkServerAdmin, unbanMember);
 
 // Other
 app.delete("/login", deleteAccount);

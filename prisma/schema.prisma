@@ -8,26 +8,156 @@ datasource db {
 }
 
 model accounts {
-  profile_id  String    @id @db.VarChar(30)
-  email       String    @unique @db.VarChar(255)
-  username    String    @db.VarChar(30)
-  bio         String?   @default("") @db.VarChar(128)
-  password    String    @db.VarChar(255)
-  avatar      String?   @default("") @db.VarChar(255)
-  banner      String?   @default("") @db.VarChar(255)
-  created_at  DateTime  @default(now()) @db.Date
-  last_status Int       @default(0) @db.SmallInt
-  last_note   String?   @default("") @db.VarChar(255)
-  last_note_d DateTime? @default(now()) @db.Date
-  posts       posts[]
+  id                     String                   @id @db.VarChar(30)
+  email                  String                   @unique @db.VarChar(255)
+  username               String                   @db.VarChar(30)
+  bio                    String?                  @default("") @db.VarChar(128)
+  password               String                   @db.VarChar(255)
+  avatar                 String?                  @default("")
+  banner                 String?                  @default("")
+  created_at             DateTime                 @default(now()) @db.Timestamp(6)
+  last_status            Int                      @default(0) @db.SmallInt
+  last_note              String?                  @default("") @db.VarChar(255)
+  last_note_d            DateTime?                @default(now()) @db.Timestamp(6)
+  dm_option              Int                      @default(0) @db.SmallInt
+  filter_option          Int                      @default(0) @db.SmallInt
+  last_data_req          DateTime?                @db.Timestamp(6)
+  member_messages        member_messages[]
+  member_roles           member_roles[]
+  member_servers         member_servers[]
+  member_servers_banned  member_servers_banned[]
+  posts                  posts[]
+  private_messages       private_messages[]
+  private_messages_users private_messages_users[]
+  servers                servers[]
 }
 
 model posts {
-  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  text         String    @default("") @db.VarChar(255)
-  attachments  String[]
-  tags         String[]  @db.VarChar
-  created_at   DateTime  @default(now()) @db.Date
-  post_creator String?   @db.VarChar(30)
-  accounts     accounts? @relation(fields: [post_creator], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
+  id               String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  text             String             @default("") @db.VarChar(50)
+  attachment       String
+  posted_at        DateTime           @default(now()) @db.Timestamp(6)
+  profile_id       String?            @db.VarChar(30)
+  accounts         accounts?          @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  private_messages private_messages[]
+}
+
+model channels {
+  id              String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name            String            @db.VarChar(20)
+  description     String?           @default("")
+  created_at      DateTime          @default(now()) @db.Timestamp(6)
+  server_id       String?           @db.Uuid
+  servers         servers?          @relation(fields: [server_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  member_messages member_messages[]
+}
+
+model private_messages {
+  id                     String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  content                String
+  created_at             DateTime           @default(now()) @db.Timestamp(6)
+  attachments            String[]
+  spotify_embeds         String[]
+  tenor_urls             String[]
+  post_id                String?            @db.Uuid
+  reply_id               String?            @db.Uuid
+  profile_id             String?            @db.VarChar(30)
+  dm_id                  String?            @db.Uuid
+  member_messages        member_messages[]
+  private_rooms          private_rooms?     @relation(fields: [dm_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  posts                  posts?             @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  accounts               accounts?          @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  private_messages       private_messages?  @relation("private_messagesToprivate_messages", fields: [reply_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_private_messages private_messages[] @relation("private_messagesToprivate_messages")
+}
+
+model roles {
+  id           String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name         String         @db.VarChar(20)
+  hex_color    String         @db.VarChar(8)
+  created_at   DateTime       @default(now()) @db.Timestamp(6)
+  server_id    String?        @db.Uuid
+  member_roles member_roles[]
+  servers      servers?       @relation(fields: [server_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model servers {
+  id                    String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name                  String                  @db.VarChar(30)
+  avatar                String                  @default("")
+  banner                String                  @default("")
+  invite                String                  @db.Char(8)
+  invites_disabled      Boolean                 @default(false)
+  created_at            DateTime                @default(now()) @db.Timestamp(6)
+  owner_id              String?                 @db.VarChar(30)
+  channels              channels[]
+  member_messages       member_messages[]
+  member_roles          member_roles[]
+  member_servers        member_servers[]
+  member_servers_banned member_servers_banned[]
+  roles                 roles[]
+  accounts              accounts?               @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model member_messages {
+  id               String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  content          String
+  created_at       DateTime          @default(now()) @db.Timestamp(6)
+  attachments      String[]
+  spotify_embeds   String[]
+  tenor_urls       String[]
+  reply_id         String?           @db.Uuid
+  profile_id       String?           @db.VarChar(30)
+  channel_id       String?           @db.Uuid
+  server_id        String?           @db.Uuid
+  channels         channels?         @relation(fields: [channel_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  accounts         accounts?         @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  private_messages private_messages? @relation(fields: [reply_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  servers          servers?          @relation(fields: [server_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model member_roles {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  assigned_at DateTime? @default(now()) @db.Timestamp(6)
+  profile_id  String?   @db.VarChar(30)
+  role_id     String?   @db.Uuid
+  server_id   String?   @db.Uuid
+  accounts    accounts? @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  roles       roles?    @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  servers     servers?  @relation(fields: [server_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model member_servers {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  server_username String?   @default("") @db.VarChar(30)
+  server_avatar   String?   @default("")
+  joined_at       DateTime? @default(now()) @db.Timestamp(6)
+  profile_id      String?   @db.VarChar(30)
+  server_id       String?   @db.Uuid
+  accounts        accounts? @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  servers         servers?  @relation(fields: [server_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model member_servers_banned {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  banned_at  DateTime? @default(now()) @db.Timestamp(6)
+  profile_id String?   @db.VarChar(30)
+  server_id  String?   @db.Uuid
+  accounts   accounts? @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  servers    servers?  @relation(fields: [server_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model private_messages_users {
+  id            String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  profile_id    String?        @db.VarChar(30)
+  room_id       String?        @db.Uuid
+  accounts      accounts?      @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  private_rooms private_rooms? @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model private_rooms {
+  id                     String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  last_message_at        DateTime?                @db.Timestamp(6)
+  private_messages       private_messages[]
+  private_messages_users private_messages_users[]
 }

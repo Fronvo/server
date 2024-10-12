@@ -44,14 +44,14 @@ async function authenticateSocket(
 
         const id = (decoded as { id: string }).id;
 
-        const userObj = await prismaClient.accounts.findUnique({
+        const user = await prismaClient.accounts.findUnique({
           where: {
-            profile_id: id,
+            id: id,
           },
         });
 
         // Deleted account most likely, reject
-        if (!userObj) {
+        if (!user) {
           console.log(`[${path}]: Account not found`);
 
           socket.disconnect();
@@ -84,6 +84,34 @@ export default function setupSocketIO(httpServer: any): void {
   // Profile-related updates
   server.of("/profiles").on("connection", async (socket) => {
     const userId = await authenticateSocket(socket, "/profiles");
+
+    if (!userId) return;
+
+    // Self channel for when over 1 socket is on the same account
+    socket.join(userId);
+
+    socket.on("disconnect", async () => {
+      removeAssociatedSocket(socket.id);
+    });
+  });
+
+  // Server-related updates
+  server.of("/servers").on("connection", async (socket) => {
+    const userId = await authenticateSocket(socket, "/servers");
+
+    if (!userId) return;
+
+    // Self channel for when over 1 socket is on the same account
+    socket.join(userId);
+
+    socket.on("disconnect", async () => {
+      removeAssociatedSocket(socket.id);
+    });
+  });
+
+  // DM-related updates
+  server.of("/dms").on("connection", async (socket) => {
+    const userId = await authenticateSocket(socket, "/dms");
 
     if (!userId) return;
 

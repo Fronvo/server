@@ -29,14 +29,14 @@ export default async function verifyJWT(
       const id = (decoded as { id: string }).id;
 
       req.userId = id;
-      req.userObj = await prismaClient.accounts.findUnique({
+      req.user = await prismaClient.accounts.findUnique({
         where: {
-          profile_id: id,
+          id: id,
         },
       });
 
       // Deleted account most likely, reject
-      if (!req.userObj) {
+      if (!req.user) {
         return sendError(401, res, "Invalid token");
       }
 
