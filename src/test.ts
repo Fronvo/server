@@ -196,6 +196,27 @@ describe("Servers", () => {
     expect(res.type).toEqual(expect.stringContaining("json"));
   });
 
+  it("Transfer server", async () => {
+    const res = await request.post("/servers/transfer").send({
+      id: serverId,
+      memberId: profileId2,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    const res2 = await request
+      .post("/servers/transfer")
+      .send({
+        id: serverId,
+        memberId: profileId,
+      })
+      .set({ Authorization: accessToken2 });
+
+    expect(res2.status).toEqual(200);
+    expect(res2.type).toEqual(expect.stringContaining("json"));
+  });
+
   it("Leave server", async () => {
     const res = await request
       .delete("/servers/leave")

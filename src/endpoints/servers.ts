@@ -3,9 +3,9 @@ import { Request, Response } from "express";
 import {
   avatar,
   banner,
-  id,
   invite,
   name,
+  profileId,
   resetAvatar,
   resetBanner,
 } from "../schemas";
@@ -27,7 +27,7 @@ const createServerSchema = object({ name, avatar, banner });
 
 const joinServerSchema = object({ invite });
 
-const transferServerSchema = object({ memberId: id });
+const transferServerSchema = object({ memberId: profileId });
 
 const editServerSchema = object({
   name,
