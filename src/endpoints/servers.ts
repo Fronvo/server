@@ -115,7 +115,7 @@ export async function joinServer(req: Request, res: Response) {
   }
 
   const totalServers = await prismaClient.member_servers.count({
-    where: { id: req.userId },
+    where: { profile_id: req.userId },
   });
 
   if (totalServers >= MAX_CONCURRENT_SERVERS) {
@@ -126,7 +126,7 @@ export async function joinServer(req: Request, res: Response) {
     );
   }
 
-  await addServerMember(req.serverId, req.userId);
+  await addServerMember(server.id, req.userId);
 
   return sendSuccess(res, "Server joined.");
 }

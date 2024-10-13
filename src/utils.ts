@@ -336,8 +336,10 @@ export async function deleteServer(serverId: string) {
     deleteServerMessages(serverId),
     deleteServerBans(serverId),
     deleteServerMembers(serverId),
-    deleteServerObject(),
   ]);
+
+  // Once all constraints have been removed
+  await deleteServerObject();
 
   async function deleteServerObject() {
     await prismaClient.servers.delete({

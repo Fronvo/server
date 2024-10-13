@@ -7,15 +7,24 @@ import { channels, roles, servers } from "@prisma/client";
 
 const request = defaults(supertest(server));
 
-const username = `${v4().substring(0, 30)}`;
-const profileId = `${getNormalisedV4().substring(0, 30)}`;
+// Account 1
+const username = v4().substring(0, 30);
+const profileId = getNormalisedV4().substring(0, 30);
 const email = `${v4()}@gmail.com`;
 const password = v4();
 let accessToken = "";
 let refreshToken = "";
 let serverId = "";
+let serverInvite = "";
 let channelId = "";
 let roleId = "";
+
+// Account 2
+const username2 = v4().substring(0, 30);
+const profileId2 = getNormalisedV4().substring(0, 30);
+const email2 = `${v4()}@gmail.com`;
+const password2 = v4();
+let accessToken2 = "";
 
 describe("Authentication", () => {
   it("Register", async () => {
@@ -31,6 +40,21 @@ describe("Authentication", () => {
     expect(res.body).toHaveProperty("accessToken");
     expect(res.body).toHaveProperty("refreshToken");
     expect(res.body).toHaveProperty("id");
+
+    const res2 = await request.post("/register").send({
+      username: username2,
+      profileId: profileId2,
+      email: email2,
+      password: password2,
+    });
+
+    expect(res2.status).toEqual(200);
+    expect(res2.type).toEqual(expect.stringContaining("json"));
+    expect(res2.body).toHaveProperty("accessToken");
+    expect(res2.body).toHaveProperty("refreshToken");
+    expect(res2.body).toHaveProperty("id");
+
+    accessToken2 = `Bearer ${res2.body.accessToken}`;
   });
 
   it("Login", async () => {
@@ -147,14 +171,18 @@ describe("Servers", () => {
     const serverData = res.body.serverData as servers;
 
     serverId = serverData.id;
+    serverInvite = serverData.invite;
   });
 
   it("Join server", async () => {
-    const res = await request.post("/servers/join").send({
-      id: serverId,
-    });
+    const res = await request
+      .post("/servers/join")
+      .send({
+        invite: serverInvite,
+      })
+      .set({ Authorization: accessToken2 });
 
-    expect(res.status).toEqual(400);
+    expect(res.status).toEqual(200);
     expect(res.type).toEqual(expect.stringContaining("json"));
   });
 
@@ -179,6 +207,8 @@ describe("Invites", () => {
     expect(res.type).toEqual(expect.stringContaining("json"));
 
     expect(res.body).toHaveProperty("invite");
+
+    serverInvite = res.body.invite;
   });
 
   it("Disable invite", async () => {
@@ -268,6 +298,48 @@ describe("Roles", () => {
   });
 });
 
+describe("Members", () => {
+  it("Kick member", async () => {
+    const res = await request.post("/members/kick").send({
+      id: serverId,
+      memberId: profileId2,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    const res2 = await request
+      .post("/servers/join")
+      .send({
+        invite: serverInvite,
+      })
+      .set({ Authorization: accessToken2 });
+
+    expect(res2.status).toEqual(200);
+    expect(res2.type).toEqual(expect.stringContaining("json"));
+  });
+
+  it("Ban member", async () => {
+    const res = await request.post("/members/ban").send({
+      id: serverId,
+      memberId: profileId2,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+  });
+
+  it("Unban member", async () => {
+    const res = await request.post("/members/unban").send({
+      id: serverId,
+      memberId: profileId2,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+  });
+});
+
 describe("Other", () => {
   it("Get version", async () => {
     const res = await request.get("/version");
@@ -309,7 +381,7 @@ describe("Finalise", () => {
     expect(res.body).toHaveProperty("success");
   });
 
-  it("Delete account", async () => {
+  it("Delete accounts", async () => {
     const res = await request.delete("/login").send({
       password,
     });
@@ -317,5 +389,16 @@ describe("Finalise", () => {
     expect(res.status).toEqual(200);
     expect(res.type).toEqual(expect.stringContaining("json"));
     expect(res.body).toHaveProperty("success");
+
+    const res2 = await request
+      .delete("/login")
+      .send({
+        password: password2,
+      })
+      .set({ Authorization: accessToken2 });
+
+    expect(res2.status).toEqual(200);
+    expect(res2.type).toEqual(expect.stringContaining("json"));
+    expect(res2.body).toHaveProperty("success");
   });
 });
