@@ -17,6 +17,7 @@ import {
   addServerMember,
   getServerMember,
   getBannedServerMember,
+  removeServerMember,
 } from "../utils";
 import { MAX_CONCURRENT_SERVERS, MAX_SERVERS, prismaClient } from "../vars";
 import { object } from "zod";
@@ -177,6 +178,12 @@ export async function deleteServer(req: Request, res: Response) {
   await deleteServerFunc(req.serverId);
 
   return sendSuccess(res, "Server deleted.");
+}
+
+export async function leaveServer(req: Request, res: Response) {
+  await removeServerMember(req.serverId, req.userId);
+
+  return sendSuccess(res, "Left server.");
 }
 
 export async function transferServer(req: Request, res: Response) {

@@ -251,12 +251,19 @@ export async function getServerMember(serverId: string, memberId: string) {
 }
 
 export async function removeServerMember(serverId: string, memberId: string) {
-  return await prismaClient.member_servers.deleteMany({
-    where: {
-      profile_id: memberId,
-      server_id: serverId,
-    },
-  });
+  await Promise.all([
+    deleteMemberServerRoles(memberId),
+    removeServerMemberObject(),
+  ]);
+
+  async function removeServerMemberObject() {
+    return await prismaClient.member_servers.deleteMany({
+      where: {
+        profile_id: memberId,
+        server_id: serverId,
+      },
+    });
+  }
 }
 
 export async function getBannedServerMember(

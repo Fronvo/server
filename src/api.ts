@@ -28,6 +28,7 @@ import {
   deleteServer,
   editServer,
   joinServer,
+  leaveServer,
   transferServer,
 } from "./endpoints/servers";
 import {
@@ -52,6 +53,7 @@ import { getVersion, keepAlive } from "./endpoints/other";
 // Middleware
 import verifyJWT from "./middleware/verifyJWT";
 import performanceChecker from "./middleware/performanceChecker";
+import checkServer from "./middleware/checkServer";
 import checkServerAdmin from "./middleware/checkServerOwner";
 import checkChannelOwner from "./middleware/checkChannelOwner";
 import checkRoleOwner from "./middleware/checkRoleOwner";
@@ -108,6 +110,7 @@ app.post("/servers/create", createServer);
 app.post("/servers/join", joinServer);
 app.post("/servers/edit", checkServerAdmin, editServer);
 app.delete("/servers/delete", checkServerAdmin, deleteServer);
+app.delete("/servers/leave", checkServer, leaveServer);
 app.post("/servers/transfer", checkServerAdmin, transferServer);
 
 // Invites
