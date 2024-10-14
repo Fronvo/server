@@ -333,7 +333,7 @@ describe("Roles", () => {
     const res = await request.post("/roles/assign").send({
       id: serverId,
       roleId,
-      members: [profileId],
+      members: [profileId, profileId2],
     });
 
     expect(res.status).toEqual(200);
@@ -386,6 +386,12 @@ describe("Members", () => {
 describe("Other", () => {
   it("Get version", async () => {
     const res = await request.get("/version");
+
+    expect(res.status).toEqual(200);
+  });
+
+  it("Keep alive", async () => {
+    const res = await request.get("/keep-alive");
 
     expect(res.status).toEqual(200);
   });
