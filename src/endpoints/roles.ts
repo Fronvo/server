@@ -11,9 +11,9 @@ const editRoleSchema = object({ name: roleName, color: roleColor });
 const assignRoleSchema = object({ members });
 
 export async function createRole(req: Request, res: Response) {
-  const { name } = getParams(req, ["name"]);
+  const { name, color } = getParams(req, ["name", "color"]);
 
-  const schemaResult = createRoleSchema.safeParse({ name });
+  const schemaResult = createRoleSchema.safeParse({ name, color });
 
   if (!schemaResult.success) {
     return sendError(400, res, schemaResult.error.errors, true);
@@ -30,7 +30,7 @@ export async function createRole(req: Request, res: Response) {
   const roleData = await prismaClient.roles.create({
     data: {
       name,
-      hex_color: "#000000",
+      hex_color: color || "#000000",
       server_id: req.serverId,
     },
 
