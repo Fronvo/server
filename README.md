@@ -21,3 +21,7 @@
 ## Testing
 
 - `pnpm test` while running the docker compose instance
+
+## Roadmap
+
+- https://trello.com/b/21K2NFIM/fronvo-v3
