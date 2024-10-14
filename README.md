@@ -16,7 +16,7 @@
 
 - `docker compose up -d` to start the PostgreSQL instance locally
 
-- `pnpm start`, starts at port 3001
+- `pnpm start` starts at port 3001
 
 ## Testing
 
