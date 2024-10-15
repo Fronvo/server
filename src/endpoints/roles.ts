@@ -1,19 +1,52 @@
 import { Request, Response } from "express";
-import { members, roleColor, roleName } from "../schemas";
-import { getParams, getServerMember, sendError, sendSuccess } from "../utils";
+import {
+  members,
+  membersOptional,
+  roleColor,
+  roleDescription,
+  roleName,
+} from "../schemas";
+import {
+  assignRoleToMembers,
+  deleteServerRole,
+  getParams,
+  getServerMember,
+  sendError,
+  sendSuccess,
+} from "../utils";
 import { MAX_ROLES, prismaClient } from "../vars";
 import { object } from "zod";
 
-const createRoleSchema = object({ name: roleName, color: roleColor });
+const createRoleSchema = object({
+  name: roleName,
+  description: roleDescription,
+  color: roleColor,
+  members: membersOptional,
+});
 
-const editRoleSchema = object({ name: roleName, color: roleColor });
+const editRoleSchema = object({
+  name: roleName,
+  description: roleDescription,
+  color: roleColor,
+  members: membersOptional,
+});
 
 const assignRoleSchema = object({ members });
 
 export async function createRole(req: Request, res: Response) {
-  const { name, color } = getParams(req, ["name", "color"]);
+  const { name, description, color, members } = getParams(req, [
+    "name",
+    "description",
+    "color",
+    "members",
+  ]);
 
-  const schemaResult = createRoleSchema.safeParse({ name, color });
+  const schemaResult = createRoleSchema.safeParse({
+    name,
+    description,
+    color,
+    members,
+  });
 
   if (!schemaResult.success) {
     return sendError(400, res, schemaResult.error.errors, true);
@@ -24,12 +57,22 @@ export async function createRole(req: Request, res: Response) {
   });
 
   if (totalRoles >= MAX_ROLES) {
-    return sendError(400, res, `Can't create more than ${MAX_ROLES} channels.`);
+    return sendError(400, res, `Can't create more than ${MAX_ROLES} roles.`);
+  }
+
+  // Check members before creating
+  if (members) {
+    for (const member of members) {
+      if (!(await getServerMember(req.serverId, member))) {
+        return sendError(404, res, "Some members are not in this server.");
+      }
+    }
   }
 
   const roleData = await prismaClient.roles.create({
     data: {
       name,
+      description,
       hex_color: color || "#000000",
       server_id: req.serverId,
     },
@@ -37,25 +80,46 @@ export async function createRole(req: Request, res: Response) {
     select: {
       id: true,
       name: true,
+      description: true,
       hex_color: true,
       server_id: true,
       created_at: true,
     },
   });
 
+  if (members) {
+    await assignRoleToMembers(req.serverId, roleData.id, members);
+  }
+
   return sendSuccess(res, { roleData }, true);
 }
 
 export async function editRole(req: Request, res: Response) {
-  const { name, color } = getParams(req, ["name", "color"]);
+  const { name, description, color, members } = getParams(req, [
+    "name",
+    "description",
+    "color",
+    "members",
+  ]);
 
   const schemaResult = editRoleSchema.safeParse({
     name,
+    description,
     color,
+    members,
   });
 
   if (!schemaResult.success) {
     return sendError(400, res, schemaResult.error.errors, true);
+  }
+
+  // Check members before updating
+  if (members) {
+    for (const member of members) {
+      if (!(await getServerMember(req.serverId, member))) {
+        return sendError(404, res, "Some members are not in this server.");
+      }
+    }
   }
 
   const roleData = await prismaClient.roles.update({
@@ -65,17 +129,23 @@ export async function editRole(req: Request, res: Response) {
 
     data: {
       name,
+      description,
       hex_color: color || req.role.hex_color,
     },
 
     select: {
       id: true,
       name: true,
+      description: true,
       hex_color: true,
       server_id: true,
       created_at: true,
     },
   });
+
+  if (members) {
+    await assignRoleToMembers(req.serverId, req.roleId, members);
+  }
 
   return sendSuccess(res, { roleData }, true);
 }
@@ -97,32 +167,13 @@ export async function assignRole(req: Request, res: Response) {
     }
   }
 
-  await prismaClient.member_roles.createMany({
-    data: (members as string[]).map((v) => {
-      return {
-        profile_id: v,
-        role_id: req.roleId,
-        server_id: req.serverId,
-      };
-    }),
-    skipDuplicates: true,
-  });
+  await assignRoleToMembers(req.serverId, req.roleId, members);
 
   return sendSuccess(res, "Role assigned to member(s).");
 }
 
 export async function deleteRole(req: Request, res: Response) {
-  await prismaClient.member_roles.deleteMany({
-    where: {
-      role_id: req.roleId,
-    },
-  });
-
-  await prismaClient.roles.delete({
-    where: {
-      id: req.roleId,
-    },
-  });
+  await deleteServerRole(req.serverId, req.roleId);
 
   return sendSuccess(res, "Role deleted.");
 }

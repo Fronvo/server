@@ -278,9 +278,43 @@ export async function getBannedServerMember(
   });
 }
 
+export async function assignRoleToMembers(
+  serverId: string,
+  roleId: string,
+  members: string[]
+) {
+  await prismaClient.member_roles.createMany({
+    data: (members as string[]).map((v) => {
+      return {
+        profile_id: v,
+        role_id: roleId,
+        server_id: serverId,
+      };
+    }),
+
+    skipDuplicates: true,
+  });
+}
+
 export async function deleteMemberServerRoles(memberId: string) {
   await prismaClient.member_roles.deleteMany({
     where: { profile_id: memberId },
+  });
+}
+
+export async function deleteServerRole(serverId: string, roleId: string) {
+  await prismaClient.member_roles.deleteMany({
+    where: {
+      server_id: serverId,
+      role_id: roleId,
+    },
+  });
+
+  await prismaClient.roles.delete({
+    where: {
+      server_id: serverId,
+      id: roleId,
+    },
   });
 }
 
