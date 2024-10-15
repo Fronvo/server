@@ -17,8 +17,6 @@ async function authenticateSocket(
     const header = socket.handshake.query["authorization"] as string;
 
     if (!header) {
-      console.log(`[${path}]: No auth`);
-
       socket.disconnect();
 
       return;
@@ -35,8 +33,6 @@ async function authenticateSocket(
       },
       async (err, decoded) => {
         if (err) {
-          console.log(`[${path}]: Invalid auth`);
-
           socket.disconnect();
 
           return;
@@ -52,14 +48,10 @@ async function authenticateSocket(
 
         // Deleted account most likely, reject
         if (!user) {
-          console.log(`[${path}]: Account not found`);
-
           socket.disconnect();
 
           return;
         }
-
-        console.log(`[${path}]: ${id}`);
 
         addAssociatedSocket(socket.id, id);
 
