@@ -172,6 +172,7 @@ export async function fetchMe(req: Request, res: Response) {
               username: true,
               bio: true,
               created_at: true,
+              member_roles: true,
             },
           },
         },
@@ -217,10 +218,18 @@ export async function fetchMe(req: Request, res: Response) {
               username: string;
               bio: string;
               created_at: string;
+              member_roles: [];
             };
           }[]
         ).map(({ id, server_id, profile_id, accounts, ...member }) => {
-          return { ...member, ...accounts, id: profile_id };
+          const { member_roles, ...finalAccounts } = { ...accounts };
+
+          return {
+            ...member,
+            ...finalAccounts,
+            roles: accounts.member_roles,
+            id: profile_id,
+          };
         }),
         banned_members: (
           member_servers_banned as {
