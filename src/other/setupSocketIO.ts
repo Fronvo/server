@@ -53,7 +53,10 @@ async function authenticateSocket(
           return;
         }
 
-        addAssociatedSocket(socket.id, id);
+        addAssociatedSocket({
+          socketId: socket.id,
+          accountId: id,
+        });
 
         resolve(id);
       }

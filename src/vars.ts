@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { configDotenv } from "dotenv";
 import ImageKit from "imagekit";
-import { Resend } from "resend";
 import { Server } from "socket.io";
 import fetch from "node-fetch";
+import { AssociatedSocket, PendingAccount } from "types";
 
 (async () => {
   // @ts-ignore
@@ -18,7 +18,6 @@ export const imagekit = new ImageKit({
   publicKey: process.env.IMAGEKIT_PUBLIC_KEY as string,
   urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT as string,
 });
-export const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Other
 export const MAX_SERVERS = 10;
@@ -37,12 +36,36 @@ export function setServer(serverVar: Server): Server {
   return server;
 }
 
-export let associatedSockets: { socketId: string; accountId: string }[] = [];
+export let associatedSockets: AssociatedSocket[] = [];
 
-export function addAssociatedSocket(socketId: string, accountId: string) {
-  associatedSockets.push({ socketId, accountId });
+export function addAssociatedSocket(socket: AssociatedSocket) {
+  associatedSockets.push(socket);
 }
 
 export function removeAssociatedSocket(socketId: string) {
   associatedSockets = associatedSockets.filter((v) => v.socketId != socketId);
+}
+
+export let pendingAccounts: PendingAccount[] = [];
+
+export function addPendingAccount(account: PendingAccount) {
+  // Overwrite pending info
+  // First remove existing entry
+  if (getPendingAccount(account.email)) {
+    pendingAccounts = pendingAccounts.filter((v) => v.email !== account.email);
+  }
+
+  pendingAccounts.push(account);
+}
+
+export function isPendingAccount(email: string) {
+  return pendingAccounts.filter((v) => v.email === email).length > 0;
+}
+
+export function getPendingAccount(email: string) {
+  return pendingAccounts.find((v) => v.email === email);
+}
+
+export function removePendingAccount(email: string) {
+  pendingAccounts = pendingAccounts.filter((v) => v.email !== email);
 }

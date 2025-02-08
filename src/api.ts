@@ -13,6 +13,7 @@ import {
   generateAccessToken,
   login,
   register,
+  registerVerify,
 } from "./endpoints/auth";
 import {
   fetchMe,
@@ -74,12 +75,16 @@ import setupSocketIO from "./other/setupSocketIO";
 import startupChecks from "./other/startupChecks";
 
 // Target PORT
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
+
+// CORS
+import cors from "cors";
 
 // Initialise app
 startupChecks();
 
 const app = express();
+app.use(cors());
 const httpServer = createServerHTTP(app);
 setupSocketIO(httpServer);
 
@@ -98,6 +103,7 @@ app.use(performanceChecker);
 
 // Authentication
 app.post("/register", register);
+app.post("/register/verify", registerVerify);
 app.post("/login", login);
 
 // JWT required for the routes below this middleware

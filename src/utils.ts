@@ -133,7 +133,6 @@ export async function sendEmail(
         <style>
             .main {
                 width: 100%;
-                background: white;
                 padding: 10px;
             }
 
@@ -141,16 +140,8 @@ export async function sendEmail(
                 width: 40%;
                 margin: auto;
                 border-radius: 10px;
-                background: black;
                 box-shadow: black;
                 padding-top: 15px;
-            }
-
-            hr {
-                width: 100%;
-                opacity: 25%;
-                border-width: 1px;
-                border-color: rgb(125, 125, 125);
             }
 
             p {
@@ -161,7 +152,6 @@ export async function sendEmail(
                 padding-right: 50px;
                 padding-left: 50px;
                 margin-bottom: 10px;
-                color: white;
             }
 
             #logo {
@@ -206,20 +196,17 @@ export async function sendEmail(
     <body>
         <div class='main'>
             <div class='content'>
-
                 <p align='center' id='top'>
                     <a href='https://fronvo.com' id='top'>
-                        <img src='https://github.com/Fronvo/server/blob/v2/.github/email/email-logo-large.png?raw=true'>
+                        <img src='https://avatars.githubusercontent.com/u/91828881?s=200&v=4'>
                     </a>
-
-                    <hr />
                 </p>
 
-                <p align='center' id='colored'>Hello there,</p>
+                <p>Hello there,</p>
 
                 ${finalHtml}
 
-                <p align='start' id='footer'>
+                <p id='footer'>
 Sincerely,
 The Fronvo team
                 </p>
@@ -236,6 +223,20 @@ The Fronvo team
 
 export function generateChars(chars: number) {
   return crypto.randomBytes(20).toString("hex").substring(0, chars);
+}
+
+export function generateNumbers(
+  from: number,
+  to: number,
+  times: number
+): string {
+  let generatedNumbers = "";
+
+  for (let i = 0; i < times; i++) {
+    generatedNumbers += Math.floor(Math.random() * (to - from + 1)) + from;
+  }
+
+  return generatedNumbers;
 }
 
 export async function addServerMember(serverId: string, memberId: string) {

@@ -31,9 +31,30 @@ describe("Authentication", () => {
   it("Register", async () => {
     const res = await request.post("/register").send({
       username,
-      profileId,
       email,
       password,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("success");
+
+    const res2 = await request.post("/register").send({
+      username: username2,
+      email: email2,
+      password: password2,
+    });
+
+    expect(res2.status).toEqual(200);
+    expect(res2.type).toEqual(expect.stringContaining("json"));
+    expect(res2.body).toHaveProperty("success");
+  });
+
+  it("Register verification", async () => {
+    const res = await request.post("/register/verify").send({
+      profileId,
+      email,
+      code: "123456",
     });
 
     expect(res.status).toEqual(200);
@@ -42,11 +63,10 @@ describe("Authentication", () => {
     expect(res.body).toHaveProperty("refreshToken");
     expect(res.body).toHaveProperty("id");
 
-    const res2 = await request.post("/register").send({
-      username: username2,
+    const res2 = await request.post("/register/verify").send({
       profileId: profileId2,
       email: email2,
-      password: password2,
+      code: "123456",
     });
 
     expect(res2.status).toEqual(200);

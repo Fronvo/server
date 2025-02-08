@@ -6,17 +6,28 @@ import {
   deleteMemberServers,
   deleteServer,
   deleteUser,
+  generateNumbers,
   getParams,
+  sendEmail,
   sendError,
   sendSuccess,
 } from "../utils";
-import { imagekit, prismaClient } from "../vars";
+import {
+  addPendingAccount,
+  getPendingAccount,
+  imagekit,
+  isPendingAccount,
+  prismaClient,
+  removePendingAccount,
+} from "../vars";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { email, password, profileId, username } from "../schemas";
+import { code, email, password, profileId, username } from "../schemas";
 import { object } from "zod";
 
-const registerSchema = object({ username, profileId, email, password });
+const registerSchema = object({ username, email, password });
+
+const registerVerifySchema = object({ profileId, email, code });
 
 const loginSchema = object({ email, password });
 
@@ -25,9 +36,8 @@ const deleteAccountSchema = object({ password });
 const changePasswordSchema = object({ password, newPassword: password });
 
 export async function register(req: Request, res: Response) {
-  const { username, profileId, email, password } = getParams(req, [
+  const { username, email, password } = getParams(req, [
     "username",
-    "profileId",
     "email",
     "password",
   ]);
@@ -35,7 +45,6 @@ export async function register(req: Request, res: Response) {
   // Validate params
   const schemaResult = registerSchema.safeParse({
     username,
-    profileId,
     email,
     password,
   });
@@ -55,25 +64,89 @@ export async function register(req: Request, res: Response) {
     return sendError(400, res, "Email in use");
   }
 
+  // 123456 in test mode
+  const code =
+    process.env.NODE_ENV === "test" ? "123456" : generateNumbers(0, 9, 6);
+
+  // Create the account
+  addPendingAccount({
+    email,
+    password: hashSync(password, 10),
+    username,
+    code,
+  });
+
+  if (process.env.NODE_ENV !== "test") {
+    sendEmail(email, "Fronvo email verification code", [
+      `Your verification code is ${code}`,
+    ]);
+  }
+
+  return sendSuccess(res, "Account register verification email sent.");
+}
+
+export async function registerVerify(req: Request, res: Response) {
+  const { profileId, email, code } = getParams(req, ["profileId", "email", "code"]);
+
+  // Validate params
+  const schemaResult = registerVerifySchema.safeParse({
+    profileId,
+    email,
+    code,
+  });
+
+  if (!schemaResult.success) {
+    return sendError(400, res, schemaResult.error.errors, true);
+  }
+
+  if (!isPendingAccount(email)) {
+    return sendError(400, res, "Can't verify this account");
+  }
+
+  
+  // Should be unique email
+  const uniqueRes = await prismaClient.accounts.findFirst({
+    where: {
+      id: profileId,
+    },
+  });
+
+  if (uniqueRes) {
+    return sendError(400, res, "Profile ID in use");
+  }
+
+  const account = getPendingAccount(email);
+
   // Create the account
   await prismaClient.accounts.create({
     data: {
       id: profileId,
-      username,
-      email,
-      password: hashSync(password, 10),
+      username: account.username,
+      email: account.email,
+      password: account.password, // password already hashed
     },
   });
 
-  const accessToken = jwt.sign({ id: profileId }, process.env.JWT_SECRET, {
-    algorithm: "HS256",
-    expiresIn: "1h",
-  });
+  // Remove from pending
+  removePendingAccount(account.email);
 
-  const refreshToken = jwt.sign({ id: profileId }, process.env.JWT_SECRET, {
-    algorithm: "HS256",
-    expiresIn: "7d",
-  });
+  const accessToken = jwt.sign(
+    { id: profileId },
+    process.env.JWT_SECRET,
+    {
+      algorithm: "HS256",
+      expiresIn: "1h",
+    }
+  );
+
+  const refreshToken = jwt.sign(
+    { id: profileId },
+    process.env.JWT_SECRET,
+    {
+      algorithm: "HS256",
+      expiresIn: "7d",
+    }
+  );
 
   const finalDict = { accessToken, refreshToken };
 

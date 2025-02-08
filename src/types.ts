@@ -43,3 +43,15 @@ export interface ServerAccount {
   last_status: number;
   roles: member_roles[];
 }
+
+export interface AssociatedSocket {
+  socketId: string;
+  accountId: string;
+}
+
+export interface PendingAccount {
+  username: string;
+  email: string;
+  password: string;
+  code: string;
+}

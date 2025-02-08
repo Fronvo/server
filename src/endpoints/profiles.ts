@@ -8,7 +8,7 @@ import {
 } from "../utils";
 import { imagekit, prismaClient } from "../vars";
 import { accounts, member_roles, servers } from "@prisma/client";
-import { ChannelWithMessages, DMOption, FilterOption, LastStatus } from "types";
+import { DMOption, FilterOption, LastStatus } from "types";
 import { differenceInHours, differenceInMonths } from "date-fns";
 import { object } from "zod";
 import {

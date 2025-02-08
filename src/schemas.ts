@@ -16,6 +16,9 @@ export const email = string().email();
 
 export const password = string().min(8);
 
+// Register verification code
+export const code = string().length(6);
+
 // Status
 export const status = number().min(0).max(3);
 
