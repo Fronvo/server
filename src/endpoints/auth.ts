@@ -86,7 +86,11 @@ export async function register(req: Request, res: Response) {
 }
 
 export async function registerVerify(req: Request, res: Response) {
-  const { profileId, email, code } = getParams(req, ["profileId", "email", "code"]);
+  const { profileId, email, code } = getParams(req, [
+    "profileId",
+    "email",
+    "code",
+  ]);
 
   // Validate params
   const schemaResult = registerVerifySchema.safeParse({
@@ -103,7 +107,6 @@ export async function registerVerify(req: Request, res: Response) {
     return sendError(400, res, "Can't verify this account");
   }
 
-  
   // Should be unique email
   const uniqueRes = await prismaClient.accounts.findFirst({
     where: {
@@ -116,6 +119,11 @@ export async function registerVerify(req: Request, res: Response) {
   }
 
   const account = getPendingAccount(email);
+
+  // Check code
+  if (code !== account.code) {
+    return sendError(400, res, "Invalid code");
+  }
 
   // Create the account
   await prismaClient.accounts.create({
@@ -130,23 +138,15 @@ export async function registerVerify(req: Request, res: Response) {
   // Remove from pending
   removePendingAccount(account.email);
 
-  const accessToken = jwt.sign(
-    { id: profileId },
-    process.env.JWT_SECRET,
-    {
-      algorithm: "HS256",
-      expiresIn: "1h",
-    }
-  );
+  const accessToken = jwt.sign({ id: profileId }, process.env.JWT_SECRET, {
+    algorithm: "HS256",
+    expiresIn: "1h",
+  });
 
-  const refreshToken = jwt.sign(
-    { id: profileId },
-    process.env.JWT_SECRET,
-    {
-      algorithm: "HS256",
-      expiresIn: "7d",
-    }
-  );
+  const refreshToken = jwt.sign({ id: profileId }, process.env.JWT_SECRET, {
+    algorithm: "HS256",
+    expiresIn: "7d",
+  });
 
   const finalDict = { accessToken, refreshToken };
 
