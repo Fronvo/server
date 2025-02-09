@@ -14,11 +14,15 @@ import {
 } from "../utils";
 import {
   addPendingAccount,
+  addPendingResetAccount,
   getPendingAccount,
+  getPendingResetAccount,
   imagekit,
   isPendingAccount,
+  isPendingResetAccount,
   prismaClient,
   removePendingAccount,
+  removePendingResetAccount,
 } from "../vars";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
@@ -34,6 +38,14 @@ const loginSchema = object({ email, password });
 const deleteAccountSchema = object({ password });
 
 const changePasswordSchema = object({ password, newPassword: password });
+
+const resetPasswordSchema = object({ email });
+
+const resetPasswordVerifySchema = object({
+  email,
+  newPassword: password,
+  code,
+});
 
 export async function register(req: Request, res: Response) {
   const { username, email, password } = getParams(req, [
@@ -306,4 +318,93 @@ export async function generateAccessToken(req: Request, res: Response) {
   });
 
   return sendSuccess(res, { accessToken }, true);
+}
+
+export async function resetPassword(req: Request, res: Response) {
+  const { email } = getParams(req, ["email"]);
+
+  // Validate params
+  const schemaResult = resetPasswordSchema.safeParse({
+    email,
+  });
+
+  if (!schemaResult.success) {
+    return sendError(400, res, schemaResult.error.errors, true);
+  }
+
+  // Should be unique email
+  const uniqueRes = await prismaClient.accounts.findFirst({
+    where: {
+      email,
+    },
+  });
+
+  if (!uniqueRes) {
+    return sendError(400, res, "Account not found");
+  }
+
+  // 123456 in test mode
+  const code =
+    process.env.NODE_ENV === "test" ? "123456" : generateNumbers(0, 9, 6);
+
+  // Create the pending account
+  addPendingResetAccount({
+    email,
+    code,
+  });
+
+  if (process.env.NODE_ENV !== "test") {
+    sendEmail(email, "Fronvo reset password verification code", [
+      `Your verification code is ${code}`,
+      "This code only lasts for an hour",
+    ]);
+  }
+
+  return sendSuccess(res, "Account reset password verification email sent");
+}
+
+export async function resetPasswordVerify(req: Request, res: Response) {
+  const { email, newPassword, code } = getParams(req, [
+    "email",
+    "newPassword",
+    "code",
+  ]);
+
+  // Validate params
+  const schemaResult = resetPasswordVerifySchema.safeParse({
+    email,
+    newPassword,
+    code,
+  });
+
+  if (!schemaResult.success) {
+    return sendError(400, res, schemaResult.error.errors, true);
+  }
+
+  if (!isPendingResetAccount(email)) {
+    return sendError(400, res, "Can't verify this account");
+  }
+
+  const account = getPendingResetAccount(email);
+
+  // Check code
+  if (code !== account.code) {
+    return sendError(400, res, "Invalid code");
+  }
+
+  // Finally, update the account
+  await prismaClient.accounts.update({
+    where: {
+      email,
+    },
+
+    data: {
+      password: hashSync(newPassword, 10),
+    },
+  });
+
+  // Remove from pending
+  removePendingResetAccount(account.email);
+
+  return sendSuccess(res, "Password reset");
 }

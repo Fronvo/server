@@ -16,6 +16,7 @@ import {
   dmOption,
   filterOption,
   note,
+  profileId,
   status,
   text,
 } from "../schemas";
@@ -35,6 +36,8 @@ interface FetchedAccount extends accounts {
   dms: FetchedDM[];
   servers: servers[];
 }
+
+const fetchUserSchema = object({ id: profileId });
 
 const updateStatusSchema = object({ status });
 
@@ -129,10 +132,93 @@ export async function fetchMe(req: Request, res: Response) {
   //   })
   // );
 
+  return sendSuccess(
+    res,
+    {
+      profileData,
+    },
+    true
+  );
+}
+
+export async function fetchUser(req: Request, res: Response) {
+  const { id } = req.params;
+
+  const schemaResult = fetchUserSchema.safeParse({ id });
+
+  if (!schemaResult.success) {
+    return sendError(400, res, schemaResult.error.errors, true);
+  }
+
+  if (req.userId === id) {
+    return sendError(400, res, "Use '/me' instead to fetch your own profile");
+  }
+
+  const {
+    username,
+    bio,
+    avatar,
+    banner,
+    created_at,
+    last_note,
+    last_note_d,
+    last_status,
+  } = await prismaClient.accounts.findFirst({
+    where: {
+      id: req.userId,
+    },
+
+    select: {
+      id: true,
+      username: true,
+      bio: true,
+      avatar: true,
+      banner: true,
+      created_at: true,
+      last_note: true,
+      last_note_d: true,
+      last_status: true,
+    },
+  });
+
+  // Sanity check for account
+  if (!created_at) {
+    return sendError(404, res, "Account not found");
+  }
+
+  const profileData: Partial<FetchedAccount> = {
+    id,
+    username,
+    bio,
+    avatar,
+    banner,
+    created_at,
+    status: last_status as LastStatus,
+  };
+
+  // Note expires after 24 hours
+  if (
+    last_note &&
+    last_note_d &&
+    differenceInHours(new Date(), new Date(last_note_d)) < 24
+  ) {
+    profileData.note = last_note;
+  }
+
+  return sendSuccess(
+    res,
+    {
+      profileData,
+    },
+    true
+  );
+}
+
+export async function fetchServers(req: Request, res: Response) {
   const profileServersIds = (
     await prismaClient.member_servers.findMany({
       where: {
-        profile_id: profileData.id,
+        profile_id: req.userId,
       },
 
       select: {
@@ -141,7 +227,7 @@ export async function fetchMe(req: Request, res: Response) {
     })
   ).map((v) => v.server_id);
 
-  profileData.servers = await prismaClient.servers.findMany({
+  const tempServers: servers[] = await prismaClient.servers.findMany({
     where: {
       id: {
         in: profileServersIds,
@@ -199,7 +285,7 @@ export async function fetchMe(req: Request, res: Response) {
     },
   });
 
-  profileData.servers = profileData.servers.map(
+  const servers = tempServers.map(
     // @ts-ignore
     ({ member_servers_banned, member_servers, ...v }) => {
       return {
@@ -259,7 +345,7 @@ export async function fetchMe(req: Request, res: Response) {
   return sendSuccess(
     res,
     {
-      profileData,
+      servers,
     },
     true
   );

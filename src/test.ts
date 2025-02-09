@@ -78,6 +78,28 @@ describe("Authentication", () => {
     accessToken2 = `Bearer ${res2.body.accessToken}`;
   });
 
+  it("Reset password", async () => {
+    const res = await request.post("/reset").send({
+      email,
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("success");
+  });
+
+  it("Reset password verification", async () => {
+    const res = await request.post("/reset/verify").send({
+      email,
+      newPassword: password,
+      code: "123456",
+    });
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+    expect(res.body).toHaveProperty("success");
+  });
+
   it("Login", async () => {
     const res = await request.post("/login").send({
       email,
@@ -126,6 +148,17 @@ describe("Profiles", () => {
     expect(profileData).toBeDefined();
 
     expect(profileData.created_at).toBeDefined();
+  });
+
+  it("Fetch self servers", async () => {
+    const res = await request.get("/me/servers");
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    const serversData = res.body.servers;
+
+    expect(serversData).toBeDefined();
   });
 
   it("Update self status", async () => {
@@ -177,6 +210,19 @@ describe("Profiles", () => {
     expect(res.status).toEqual(200);
     expect(res.type).toEqual(expect.stringContaining("json"));
     expect(res.body).toHaveProperty("success");
+  });
+
+  it("Fetch user", async () => {
+    const res = await request.get(`/user/${profileId2}`);
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    const profileData = res.body.profileData;
+
+    expect(profileData).toBeDefined();
+
+    expect(profileData.created_at).toBeDefined();
   });
 });
 

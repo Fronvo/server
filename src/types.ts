@@ -55,3 +55,8 @@ export interface PendingAccount {
   password: string;
   code: string;
 }
+
+export interface PendingResetAccount {
+  email: string;
+  code: string;
+}

@@ -14,6 +14,8 @@ import {
   login,
   register,
   registerVerify,
+  resetPassword,
+  resetPasswordVerify,
 } from "./endpoints/auth";
 import {
   fetchMe,
@@ -23,6 +25,8 @@ import {
   updateFilter,
   updateNote,
   updateStatus,
+  fetchServers,
+  fetchUser,
 } from "./endpoints/profiles";
 import {
   createServer,
@@ -105,6 +109,8 @@ app.use(performanceChecker);
 app.post("/register", register);
 app.post("/register/verify", registerVerify);
 app.post("/login", login);
+app.post("/reset", resetPassword);
+app.post("/reset/verify", resetPasswordVerify);
 
 // JWT required for the routes below this middleware
 app.use(verifyJWT);
@@ -115,12 +121,14 @@ app.get("/token", generateAccessToken);
 // Profiles
 app.post("/me/password", changePassword);
 app.get("/me", fetchMe);
+app.get("/me/servers", fetchServers);
 app.post("/me/status", updateStatus);
 app.post("/me/note", updateNote);
 app.post("/me/post", sharePost);
 app.post("/me/dm", updateDM);
 app.post("/me/filter", updateFilter);
 app.post("/me/data", data);
+app.get('/user/:id', fetchUser);
 
 // Servers
 app.post("/servers/create", createServer);

@@ -3,7 +3,7 @@ import { configDotenv } from "dotenv";
 import ImageKit from "imagekit";
 import { Server } from "socket.io";
 import fetch from "node-fetch";
-import { AssociatedSocket, PendingAccount } from "types";
+import { AssociatedSocket, PendingAccount, PendingResetAccount } from "types";
 
 (async () => {
   // @ts-ignore
@@ -68,4 +68,35 @@ export function getPendingAccount(email: string) {
 
 export function removePendingAccount(email: string) {
   pendingAccounts = pendingAccounts.filter((v) => v.email !== email);
+}
+
+export let pendingResetAccounts: PendingResetAccount[] = [];
+
+export function addPendingResetAccount(account: PendingResetAccount) {
+  // Overwrite pending info
+  // First remove existing entry
+  if (getPendingResetAccount(account.email)) {
+    pendingResetAccounts = pendingResetAccounts.filter(
+      (v) => v.email !== account.email
+    );
+  }
+
+  pendingResetAccounts.push(account);
+
+  // Lasts for 1 hour
+  setTimeout(() => {
+    removePendingAccount(account.email);
+  }, 3600000);
+}
+
+export function isPendingResetAccount(email: string) {
+  return pendingResetAccounts.filter((v) => v.email === email).length > 0;
+}
+
+export function getPendingResetAccount(email: string) {
+  return pendingResetAccounts.find((v) => v.email === email);
+}
+
+export function removePendingResetAccount(email: string) {
+  pendingResetAccounts = pendingResetAccounts.filter((v) => v.email !== email);
 }
