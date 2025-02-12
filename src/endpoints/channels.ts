@@ -1,14 +1,20 @@
 import { Request, Response } from "express";
-import { channelName, description } from "../schemas";
-import { getParams, sendError, sendSuccess } from "../utils";
+import { channelName } from "../schemas";
+import {
+  getChannel,
+  getParams,
+  getServer,
+  informCustom,
+  sendError,
+  sendSuccess,
+} from "../utils";
 import { MAX_CHANNELS, prismaClient } from "../vars";
 import { object } from "zod";
 
-const createChannelSchema = object({ name: channelName, description });
+const createChannelSchema = object({ name: channelName });
 
 const editChannelSchema = object({
   name: channelName,
-  description,
 });
 
 export async function createChannel(req: Request, res: Response) {
@@ -35,20 +41,26 @@ export async function createChannel(req: Request, res: Response) {
   const channelData = await prismaClient.channels.create({
     data: {
       name,
-      description,
       server_id: req.serverId,
     },
 
     select: {
       id: true,
       name: true,
-      description: true,
       server_id: true,
       created_at: true,
     },
   });
 
-  return sendSuccess(res, { channelData }, true);
+  const channel = await getChannel(channelData.id);
+  const server = await getServer(req.serverId);
+
+  informCustom(req.userId, "channelCreated", "servers", {
+    server,
+    channel,
+  });
+
+  return sendSuccess(res, { channel }, true);
 }
 
 export async function editChannel(req: Request, res: Response) {
@@ -70,19 +82,24 @@ export async function editChannel(req: Request, res: Response) {
 
     data: {
       name,
-      description:
-        description !== undefined ? description : req.channel.description,
     },
 
     select: {
       id: true,
       name: true,
-      description: true,
       created_at: true,
     },
   });
 
-  return sendSuccess(res, { channelData }, true);
+  const channel = await getChannel(channelData.id);
+  const server = await getServer(req.serverId);
+
+  informCustom(req.userId, "channelEdited", "servers", {
+    server,
+    channel,
+  });
+
+  return sendSuccess(res, { channel }, true);
 }
 
 export async function deleteChannel(req: Request, res: Response) {
@@ -99,6 +116,13 @@ export async function deleteChannel(req: Request, res: Response) {
       id: req.channelId,
       server_id: req.serverId,
     },
+  });
+
+  const server = await getServer(req.serverId);
+
+  informCustom(req.userId, "channelDeleted", "servers", {
+    server,
+    channelId: req.channelId,
   });
 
   return sendSuccess(res, "Channel deleted.");

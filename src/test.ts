@@ -150,6 +150,39 @@ describe("Profiles", () => {
     expect(profileData.created_at).toBeDefined();
   });
 
+  it("Fetch self posts", async () => {
+    const res = await request.get("/me/posts");
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    const postsData = res.body.posts;
+
+    expect(postsData).toBeDefined();
+  });
+
+  it("Fetch self home posts", async () => {
+    const res = await request.get("/me/home");
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    const homePostsData = res.body.homePosts;
+
+    expect(homePostsData).toBeDefined();
+  });
+
+  it("Fetch self convos", async () => {
+    const res = await request.get("/me/convos");
+
+    expect(res.status).toEqual(200);
+    expect(res.type).toEqual(expect.stringContaining("json"));
+
+    const convosData = res.body.convos;
+
+    expect(convosData).toBeDefined();
+  });
+
   it("Fetch self servers", async () => {
     const res = await request.get("/me/servers");
 
@@ -163,22 +196,12 @@ describe("Profiles", () => {
 
   it("Update self status", async () => {
     const res = await request.post("/me/status").send({
-      status: 1,
+      status: "Example status",
     });
 
     expect(res.status).toEqual(200);
     expect(res.type).toEqual(expect.stringContaining("json"));
     expect(res.body).toHaveProperty("status");
-  });
-
-  it("Update self note", async () => {
-    const res = await request.post("/me/note").send({
-      note: "Example note",
-    });
-
-    expect(res.status).toEqual(200);
-    expect(res.type).toEqual(expect.stringContaining("json"));
-    expect(res.body).toHaveProperty("note");
   });
 
   it("Share post", async () => {
@@ -190,26 +213,6 @@ describe("Profiles", () => {
     expect(res.status).toEqual(200);
     expect(res.type).toEqual(expect.stringContaining("json"));
     expect(res.body).toHaveProperty("post");
-  });
-
-  it("Update DM preference", async () => {
-    const res = await request.post("/me/dm").send({
-      dmOption: 0,
-    });
-
-    expect(res.status).toEqual(200);
-    expect(res.type).toEqual(expect.stringContaining("json"));
-    expect(res.body).toHaveProperty("success");
-  });
-
-  it("Update filter preference", async () => {
-    const res = await request.post("/me/filter").send({
-      filterOption: 0,
-    });
-
-    expect(res.status).toEqual(200);
-    expect(res.type).toEqual(expect.stringContaining("json"));
-    expect(res.body).toHaveProperty("success");
   });
 
   it("Fetch user", async () => {
@@ -235,10 +238,10 @@ describe("Servers", () => {
     expect(res.status).toEqual(200);
     expect(res.type).toEqual(expect.stringContaining("json"));
 
-    const serverData = res.body.serverData as servers;
+    const server = res.body.server as servers;
 
-    serverId = serverData.id;
-    serverInvite = serverData.invite;
+    serverId = server.id;
+    serverInvite = server.invite;
   });
 
   it("Join server", async () => {
@@ -347,14 +350,13 @@ describe("Channels", () => {
     const res = await request.post("/channels/create").send({
       id: serverId,
       name: "general",
-      description: "Channel description amazing",
     });
 
     expect(res.status).toEqual(200);
     expect(res.type).toEqual(expect.stringContaining("json"));
 
-    const channelData = res.body.channelData as channels;
-    channelId = channelData.id;
+    const channel = res.body.channel as channels;
+    channelId = channel.id;
   });
 
   it("Edit channel", async () => {

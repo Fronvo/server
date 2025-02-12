@@ -1,7 +1,6 @@
 import {
-  LastStatus,
+  FetchedAccount,
   Namespaces,
-  OnlineStatus,
   RoleWithMembers,
   SocketEvents,
 } from "./types";
@@ -9,6 +8,8 @@ import { v4 } from "uuid";
 import { associatedSockets, prismaClient, server } from "./vars";
 import gmail from "gmail-send";
 import * as crypto from "node:crypto";
+import { channels, member_roles, posts, servers } from "@prisma/client";
+import { differenceInHours } from "date-fns";
 
 export function getNormalisedV4(): string {
   return v4().replace(/-/, "");
@@ -48,18 +49,19 @@ export function sendSuccess(
   return res.status(200).json(isRaw ? { ...msg } : { success: msg });
 }
 
-export function convertLastStatusToStatus(
-  lastStatus: LastStatus
-): OnlineStatus {
-  if (lastStatus === 0) return "Online";
-  else if (lastStatus === 1) return "Do Not Disturb";
-  else if (lastStatus === 2) return "Idle";
-  else if (lastStatus === 3) return "Offline";
-}
-
 export function getAccountSocketId(accountId: string): string {
   return associatedSockets.filter((v) => v.accountId === accountId)[0]
     ?.socketId;
+}
+
+export function getAccountSocketIds(accountId: string): string[] {
+  return associatedSockets
+    .filter((v) => v.accountId === accountId)
+    .map((v) => v.socketId);
+}
+
+export function isAccountOnline(accountId: string): boolean {
+  return getConnectedAccountSockets(accountId) > 0;
 }
 
 export function getConnectedAccountSockets(accountId: string): number {
@@ -85,6 +87,7 @@ export function informProfile(
   }
 }
 
+// TODO: Separate to profile only like this or global events
 export function informCustom(
   userId: string,
   event: SocketEvents,
@@ -237,6 +240,213 @@ export function generateNumbers(
   }
 
   return generatedNumbers;
+}
+
+export async function getAccount(profileId: string): Promise<Partial<FetchedAccount>> {
+  const {
+    username,
+    bio,
+    avatar,
+    banner,
+    created_at,
+    last_status,
+    last_status_d,
+  } = await prismaClient.accounts.findFirst({
+    where: {
+      id: profileId,
+    },
+
+    select: {
+      id: true,
+      username: true,
+      bio: true,
+      avatar: true,
+      banner: true,
+      created_at: true,
+      last_status: true,
+      last_status_d: true,
+    },
+  });
+
+  const profileData: Partial<FetchedAccount> = {
+    username,
+    bio,
+    avatar,
+    banner,
+    created_at,
+    online: getConnectedAccountSockets(profileId) > 0,
+    is_self: false,
+  };
+
+  // Note expires after 24 hours
+  if (
+    last_status &&
+    last_status_d &&
+    differenceInHours(new Date(), new Date(last_status_d)) < 24
+  ) {
+    profileData.status = last_status;
+  }
+
+  return profileData;
+}
+
+export async function getAccountPosts(profileId: string): Promise<posts[]> {
+  return await prismaClient.posts.findMany({
+    where: {
+      profile_id: profileId,
+    },
+  });
+}
+
+export async function getAccountServerIDs(
+  profileId: string
+): Promise<string[]> {
+  return (
+    await prismaClient.member_servers.findMany({
+      where: {
+        profile_id: profileId,
+      },
+
+      select: {
+        server_id: true,
+      },
+    })
+  ).map((v) => v.server_id);
+}
+
+export async function getServer(serverId: string): Promise<servers> {
+  const tempServers: servers[] = await prismaClient.servers.findMany({
+    where: {
+      id: serverId,
+    },
+
+    orderBy: {
+      created_at: "desc",
+    },
+
+    include: {
+      channels: {
+        orderBy: {
+          created_at: "asc",
+        },
+      },
+      roles: {
+        orderBy: {
+          created_at: "asc",
+        },
+      },
+      member_servers: {
+        include: {
+          accounts: {
+            select: {
+              avatar: true,
+              banner: true,
+              username: true,
+              bio: true,
+              created_at: true,
+              member_roles: true,
+            },
+          },
+        },
+        orderBy: {
+          joined_at: "desc",
+        },
+      },
+      member_servers_banned: {
+        include: {
+          accounts: {
+            select: {
+              avatar: true,
+              banner: true,
+              username: true,
+              bio: true,
+              created_at: true,
+            },
+          },
+        },
+        orderBy: {
+          banned_at: "desc",
+        },
+      },
+    },
+  });
+
+  const servers = tempServers.map(
+    // @ts-ignore
+    ({ member_servers_banned, member_servers, ...v }) => {
+      return {
+        ...v,
+        members: (
+          member_servers as {
+            id: string;
+            server_username: string;
+            server_avatar: string;
+            joined_at: string;
+            profile_id: string;
+            server_id: string;
+            accounts: {
+              avatar: string;
+              banner: string;
+              username: string;
+              bio: string;
+              created_at: string;
+              member_roles: member_roles[];
+              online: boolean;
+            };
+          }[]
+        ).map(({ id, server_id, profile_id, accounts, ...member }) => {
+          const { member_roles, ...finalAccounts } = { ...accounts };
+
+          return {
+            ...member,
+            ...finalAccounts,
+            roles: accounts.member_roles.filter(
+              (role) => role.server_id === server_id
+            ),
+            id: profile_id,
+            online: isAccountOnline(profile_id),
+          };
+        }),
+        banned_members: (
+          member_servers_banned as {
+            id: string;
+            server_username: string;
+            server_avatar: string;
+            banned_at: string;
+            profile_id: string;
+            server_id: string;
+            accounts: {
+              avatar: string;
+              banner: string;
+              username: string;
+              bio: string;
+              created_at: string;
+            };
+          }[]
+        ).map(({ id, server_id, profile_id, accounts, ...member }) => {
+          return { ...member, ...accounts, id: profile_id };
+        }),
+      };
+    }
+  );
+
+  return servers[0];
+}
+
+export async function getChannel(channelId: string): Promise<channels> {
+  const channel = await prismaClient.channels.findFirst({
+    where: {
+      id: channelId,
+    },
+  });
+
+  return channel;
+}
+
+export async function getAccountServers(profileId: string): Promise<servers[]> {
+  return await Promise.all(
+    (await getAccountServerIDs(profileId)).map((v) => getServer(v))
+  );
 }
 
 export async function addServerMember(serverId: string, memberId: string) {

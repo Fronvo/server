@@ -1,4 +1,5 @@
 import {
+  accounts,
   channels,
   member_messages,
   member_messages_pinned,
@@ -6,22 +7,44 @@ import {
   roles,
 } from "@prisma/client";
 
-export type LastStatus = 0 | 1 | 2 | 3;
-export type OnlineStatus = "Online" | "Do Not Disturb" | "Idle" | "Offline";
-
-export type DMOption = 0 | 1;
-export type DMSetting = "Everyone" | "Friends";
-
-export type FilterOption = 0 | 1;
-export type FilterSetting = "Everything" | "Nothing";
-
 export type Namespaces = "profiles" | "servers" | "dms";
 
-export type SocketEvents =
-  | "statusUpdated"
-  | "noteUpdated"
-  | "postShared"
-  | "serverCreated";
+export type ProfileEvents = "statusUpdated" | "postShared";
+
+export type DMsEvents = "statusUpdated" | "postShared";
+
+export type ServerEvents =
+  | "serverCreated"
+  | "serverJoined"
+  | "serverEdited"
+  | "serverDeleted"
+  | "serverLeft"
+  | "inviteRegenerated"
+  | "inviteToggled"
+  | "channelCreated"
+  | "channelEdited"
+  | "channelDeleted"
+  | "memberJoined"
+  | "memberLeft"
+  | "memberBanned"
+  | "memberUnbanned";
+
+export type SocketEvents = ProfileEvents | DMsEvents | ServerEvents;
+
+export interface FetchedDM {
+  id: string;
+  last_message_at: string;
+  other_user: accounts;
+}
+
+export interface FetchedAccount extends accounts {
+  id: string;
+  friends: string[];
+  pending_friend_requests: string[];
+  status: string;
+  online: boolean;
+  is_self: boolean;
+}
 
 export type RoleWithMembers = roles & { member_roles: member_roles[] };
 
@@ -39,8 +62,8 @@ export interface ServerAccount {
   banner: string;
   bio: string;
   created_at: Date;
-  last_note: string;
-  last_status: number;
+  joined_at: Date;
+  last_status: string;
   roles: member_roles[];
 }
 

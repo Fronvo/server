@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { generateChars, sendSuccess } from "../utils";
+import { generateChars, getServer, informCustom, sendSuccess } from "../utils";
 import { prismaClient } from "../vars";
 
 export async function regenerateInvite(req: Request, res: Response) {
@@ -13,6 +13,11 @@ export async function regenerateInvite(req: Request, res: Response) {
     data: {
       invite,
     },
+  });
+
+  informCustom(req.userId, "inviteRegenerated", "servers", {
+    server: await getServer(req.serverId),
+    invite,
   });
 
   return sendSuccess(res, { invite }, true);
@@ -29,6 +34,11 @@ export async function disableInvite(req: Request, res: Response) {
     },
   });
 
+  informCustom(req.userId, "inviteToggled", "servers", {
+    server: await getServer(req.serverId),
+    state: false,
+  });
+
   return sendSuccess(res, "Server invites disabled.");
 }
 
@@ -41,6 +51,11 @@ export async function enableInvite(req: Request, res: Response) {
     data: {
       invites_disabled: false,
     },
+  });
+
+  informCustom(req.userId, "inviteToggled", "servers", {
+    server: await getServer(req.serverId),
+    state: true,
   });
 
   return sendSuccess(res, "Server invites enabled.");

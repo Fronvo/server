@@ -6,13 +6,17 @@ import {
   server,
   setServer,
 } from "../vars";
-import binaryParser from "socket.io-msgpack-parser";
 import jwt from "jsonwebtoken";
+import { accounts, servers } from "@prisma/client";
+
+interface AccountWithServers extends Partial<accounts> {
+  servers: servers[];
+}
 
 async function authenticateSocket(
   socket: Socket,
   path: string
-): Promise<string> {
+): Promise<AccountWithServers> {
   return new Promise((resolve) => {
     const header = socket.handshake.query["authorization"] as string;
 
@@ -44,6 +48,10 @@ async function authenticateSocket(
           where: {
             id: id,
           },
+
+          include: {
+            servers: true
+          }
         });
 
         // Deleted account most likely, reject
@@ -58,7 +66,7 @@ async function authenticateSocket(
           accountId: id,
         });
 
-        resolve(id);
+        resolve(user);
       }
     );
   });
@@ -69,7 +77,6 @@ export default function setupSocketIO(httpServer: any): void {
     new Server(httpServer, {
       transports: ["websocket"],
       serveClient: false,
-      parser: binaryParser,
     })
   );
 
@@ -78,12 +85,12 @@ export default function setupSocketIO(httpServer: any): void {
 
   // Profile-related updates
   server.of("/profiles").on("connection", async (socket) => {
-    const userId = await authenticateSocket(socket, "/profiles");
+    const user = await authenticateSocket(socket, "/profiles");
 
-    if (!userId) return;
+    if (!user) return;
 
     // Self channel for when over 1 socket is on the same account
-    socket.join(userId);
+    socket.join(user.id);
 
     socket.on("disconnect", async () => {
       removeAssociatedSocket(socket.id);
@@ -92,12 +99,16 @@ export default function setupSocketIO(httpServer: any): void {
 
   // Server-related updates
   server.of("/servers").on("connection", async (socket) => {
-    const userId = await authenticateSocket(socket, "/servers");
+    const user = await authenticateSocket(socket, "/profiles");
 
-    if (!userId) return;
+    if (!user) return;
 
     // Self channel for when over 1 socket is on the same account
-    socket.join(userId);
+    socket.join(user.id);
+
+    for(const server of user.servers) {
+      socket.join(server.id);
+    }
 
     socket.on("disconnect", async () => {
       removeAssociatedSocket(socket.id);
@@ -106,12 +117,12 @@ export default function setupSocketIO(httpServer: any): void {
 
   // DM-related updates
   server.of("/dms").on("connection", async (socket) => {
-    const userId = await authenticateSocket(socket, "/dms");
+    const user = await authenticateSocket(socket, "/profiles");
 
-    if (!userId) return;
+    if (!user) return;
 
     // Self channel for when over 1 socket is on the same account
-    socket.join(userId);
+    socket.join(user.id);
 
     socket.on("disconnect", async () => {
       removeAssociatedSocket(socket.id);

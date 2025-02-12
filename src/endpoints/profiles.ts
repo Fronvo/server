@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import {
+  getAccount,
+  getAccountPosts,
+  getAccountServers,
   getParams,
   informProfile,
   sendEmail,
@@ -7,47 +10,17 @@ import {
   sendSuccess,
 } from "../utils";
 import { imagekit, prismaClient } from "../vars";
-import { accounts, member_roles, servers } from "@prisma/client";
-import { DMOption, FilterOption, LastStatus } from "types";
 import { differenceInHours, differenceInMonths } from "date-fns";
 import { object } from "zod";
-import {
-  attachment,
-  dmOption,
-  filterOption,
-  note,
-  profileId,
-  status,
-  text,
-} from "../schemas";
+import { attachment, status, profileId, text } from "../schemas";
 import { v4 } from "uuid";
-
-interface FetchedDM {
-  id: string;
-  last_message_at: string;
-  other_user: accounts;
-}
-
-interface FetchedAccount extends accounts {
-  status: LastStatus;
-  note: string;
-  dm_option: DMOption;
-  filter_option: FilterOption;
-  dms: FetchedDM[];
-  servers: servers[];
-}
+import { FetchedAccount } from "types";
 
 const fetchUserSchema = object({ id: profileId });
 
 const updateStatusSchema = object({ status });
 
-const updateNoteSchema = object({ note });
-
 const sharePostSchema = object({ text, attachment });
-
-const updateDMOptionSchema = object({ dmOption });
-
-const updateFilterOptionSchema = object({ filterOption });
 
 export async function fetchMe(req: Request, res: Response) {
   const {
@@ -57,11 +30,8 @@ export async function fetchMe(req: Request, res: Response) {
     avatar,
     banner,
     created_at,
-    last_note,
-    last_note_d,
     last_status,
-    dm_option,
-    filter_option,
+    last_status_d,
     last_data_req,
   } = await prismaClient.accounts.findFirst({
     where: {
@@ -75,11 +45,8 @@ export async function fetchMe(req: Request, res: Response) {
       avatar: true,
       banner: true,
       created_at: true,
-      last_note: true,
-      last_note_d: true,
       last_status: true,
-      dm_option: true,
-      filter_option: true,
+      last_status_d: true,
       last_data_req: true,
     },
   });
@@ -91,46 +58,21 @@ export async function fetchMe(req: Request, res: Response) {
     avatar,
     banner,
     created_at,
-    status: last_status as LastStatus,
-    dm_option: dm_option as DMOption,
-    filter_option: filter_option as FilterOption,
     last_data_req,
+    friends: [], // TODO
+    pending_friend_requests: [], // TODO
+    online: true,
+    is_self: true,
   };
 
   // Note expires after 24 hours
   if (
-    last_note &&
-    last_note_d &&
-    differenceInHours(new Date(), new Date(last_note_d)) < 24
+    last_status &&
+    last_status_d &&
+    differenceInHours(new Date(), new Date(last_status_d)) < 24
   ) {
-    profileData.note = last_note;
+    profileData.status = last_status;
   }
-
-  // const dms = await prismaClient.dms.findMany({
-  //   where: {
-  //     users: {
-  //       has: id,
-  //     },
-  //   },
-
-  //   orderBy: {
-  //     last_message_at: "desc",
-  //   },
-  // });
-
-  // profileData.dms = await Promise.all(
-  //   dms.map(async (v) => {
-  //     return {
-  //       id: v.id,
-  //       last_message_at: v.last_message_at.toString(),
-  //       other_user: await prismaClient.accounts.findFirst({
-  //         where: {
-  //           id: v.users.find((v2) => v2 !== id),
-  //         },
-  //       }),
-  //     };
-  //   })
-  // );
 
   return sendSuccess(
     res,
@@ -154,215 +96,107 @@ export async function fetchUser(req: Request, res: Response) {
     return sendError(400, res, "Use '/me' instead to fetch your own profile");
   }
 
-  const {
-    username,
-    bio,
-    avatar,
-    banner,
-    created_at,
-    last_note,
-    last_note_d,
-    last_status,
-  } = await prismaClient.accounts.findFirst({
-    where: {
-      id: req.userId,
-    },
-
-    select: {
-      id: true,
-      username: true,
-      bio: true,
-      avatar: true,
-      banner: true,
-      created_at: true,
-      last_note: true,
-      last_note_d: true,
-      last_status: true,
-    },
-  });
+  const account = await getAccount(id);
 
   // Sanity check for account
-  if (!created_at) {
+  if (!account) {
     return sendError(404, res, "Account not found");
-  }
-
-  const profileData: Partial<FetchedAccount> = {
-    id,
-    username,
-    bio,
-    avatar,
-    banner,
-    created_at,
-    status: last_status as LastStatus,
-  };
-
-  // Note expires after 24 hours
-  if (
-    last_note &&
-    last_note_d &&
-    differenceInHours(new Date(), new Date(last_note_d)) < 24
-  ) {
-    profileData.note = last_note;
   }
 
   return sendSuccess(
     res,
     {
-      profileData,
+      profileData: account,
     },
     true
   );
 }
 
 export async function fetchServers(req: Request, res: Response) {
-  const profileServersIds = (
-    await prismaClient.member_servers.findMany({
-      where: {
-        profile_id: req.userId,
-      },
-
-      select: {
-        server_id: true,
-      },
-    })
-  ).map((v) => v.server_id);
-
-  const tempServers: servers[] = await prismaClient.servers.findMany({
-    where: {
-      id: {
-        in: profileServersIds,
-      },
-    },
-
-    orderBy: {
-      created_at: "desc",
-    },
-
-    include: {
-      channels: {
-        orderBy: {
-          created_at: "asc",
-        },
-      },
-      roles: {
-        orderBy: {
-          created_at: "asc",
-        },
-      },
-      member_servers: {
-        include: {
-          accounts: {
-            select: {
-              avatar: true,
-              banner: true,
-              username: true,
-              bio: true,
-              created_at: true,
-              member_roles: true,
-            },
-          },
-        },
-        orderBy: {
-          joined_at: "desc",
-        },
-      },
-      member_servers_banned: {
-        include: {
-          accounts: {
-            select: {
-              avatar: true,
-              banner: true,
-              username: true,
-              bio: true,
-              created_at: true,
-            },
-          },
-        },
-        orderBy: {
-          banned_at: "desc",
-        },
-      },
-    },
-  });
-
-  const servers = tempServers.map(
-    // @ts-ignore
-    ({ member_servers_banned, member_servers, ...v }) => {
-      return {
-        ...v,
-        members: (
-          member_servers as {
-            id: string;
-            server_username: string;
-            server_avatar: string;
-            joined_at: string;
-            profile_id: string;
-            server_id: string;
-            accounts: {
-              avatar: string;
-              banner: string;
-              username: string;
-              bio: string;
-              created_at: string;
-              member_roles: member_roles[];
-            };
-          }[]
-        ).map(({ id, server_id, profile_id, accounts, ...member }) => {
-          const { member_roles, ...finalAccounts } = { ...accounts };
-
-          return {
-            ...member,
-            ...finalAccounts,
-            roles: accounts.member_roles.filter(
-              (role) => role.server_id === server_id
-            ),
-            id: profile_id,
-          };
-        }),
-        banned_members: (
-          member_servers_banned as {
-            id: string;
-            server_username: string;
-            server_avatar: string;
-            banned_at: string;
-            profile_id: string;
-            server_id: string;
-            accounts: {
-              avatar: string;
-              banner: string;
-              username: string;
-              bio: string;
-              created_at: string;
-            };
-          }[]
-        ).map(({ id, server_id, profile_id, accounts, ...member }) => {
-          return { ...member, ...accounts, id: profile_id };
-        }),
-      };
-    }
-  );
-
   return sendSuccess(
     res,
     {
-      servers,
+      servers: await getAccountServers(req.userId),
     },
     true
   );
 }
 
-// TODO
-// export async function fetchHomePosts(req: Request, res: Response) {
-//   const homePosts = await prismaClient.posts.findMany({
-//     where: {
-//       post_creator: {
-//         in: req.user.following,
-//       },
-//     },
-//   });
+export async function fetchConvos(req: Request, res: Response) {
+  const convosTemp = await prismaClient.private_messages_users.findMany({
+    where: {
+      profile_id: {
+        equals: req.userId,
+      },
+    },
 
-//   return sendSuccess(res, { homePosts }, true);
-// }
+    include: {
+      private_rooms: {
+        select: {
+          last_message_at: true,
+        },
+      },
+    },
+
+    orderBy: {
+      private_rooms: {
+        last_message_at: "desc",
+      },
+    },
+  });
+
+  const convos = await Promise.all(
+    convosTemp.map(async (v) => {
+      return {
+        id: v.room_id,
+        last_message_at: v.private_rooms.last_message_at.toString(),
+        other_user: await prismaClient.accounts.findFirst({
+          where: {
+            id: (
+              await prismaClient.private_messages_users.findFirst({
+                where: {
+                  room_id: v.room_id,
+                  profile_id: {
+                    not: req.userId,
+                  },
+                },
+
+                select: {
+                  profile_id: true,
+                },
+              })
+            ).profile_id,
+          },
+        }),
+      };
+    })
+  );
+
+  return sendSuccess(
+    res,
+    {
+      convos,
+    },
+    true
+  );
+}
+
+export async function fetchOurPosts(req: Request, res: Response) {
+  return sendSuccess(res, { posts: await getAccountPosts(req.userId) }, true);
+}
+
+// TODO
+export async function fetchHomePosts(req: Request, res: Response) {
+  // const homePosts = await prismaClient.posts.findMany({
+  //   where: {
+  //     profile_id: {
+  //       in: req.user.friends,
+  //     },
+  //   },
+  // });
+
+  return sendSuccess(res, { homePosts: [] }, true);
+}
 
 export async function updateStatus(req: Request, res: Response) {
   const { status } = getParams(req, ["status"]);
@@ -380,37 +214,13 @@ export async function updateStatus(req: Request, res: Response) {
 
     data: {
       last_status: status,
+      last_status_d: new Date(),
     },
   });
 
   informProfile(req.userId, "statusUpdated", { status });
 
   return sendSuccess(res, { status }, true);
-}
-
-export async function updateNote(req: Request, res: Response) {
-  const { note } = getParams(req, ["note"]);
-
-  const schemaResult = updateNoteSchema.safeParse({ note });
-
-  if (!schemaResult.success) {
-    return sendError(400, res, schemaResult.error.errors, true);
-  }
-
-  await prismaClient.accounts.update({
-    where: {
-      id: req.userId,
-    },
-
-    data: {
-      last_note: note,
-      last_note_d: new Date(),
-    },
-  });
-
-  informProfile(req.userId, "noteUpdated", { note });
-
-  return sendSuccess(res, { note }, true);
 }
 
 export async function sharePost(req: Request, res: Response) {
@@ -443,50 +253,6 @@ export async function sharePost(req: Request, res: Response) {
   return sendSuccess(res, { post }, true);
 }
 
-export async function updateDM(req: Request, res: Response) {
-  const { dmOption } = getParams(req, ["dmOption"]);
-
-  const schemaResult = updateDMOptionSchema.safeParse({ dmOption });
-
-  if (!schemaResult.success) {
-    return sendError(400, res, schemaResult.error.errors, true);
-  }
-
-  await prismaClient.accounts.update({
-    where: {
-      id: req.userId,
-    },
-
-    data: {
-      dm_option: dmOption as DMOption,
-    },
-  });
-
-  return sendSuccess(res, "DM Option updated.");
-}
-
-export async function updateFilter(req: Request, res: Response) {
-  const { filterOption } = getParams(req, ["filterOption"]);
-
-  const schemaResult = updateFilterOptionSchema.safeParse({ filterOption });
-
-  if (!schemaResult.success) {
-    return sendError(400, res, schemaResult.error.errors, true);
-  }
-
-  await prismaClient.accounts.update({
-    where: {
-      id: req.userId,
-    },
-
-    data: {
-      filter_option: filterOption as FilterOption,
-    },
-  });
-
-  return sendSuccess(res, "Filter Option updated.");
-}
-
 export async function data(req: Request, res: Response) {
   const profileData = await prismaClient.accounts.findFirst({
     where: {
@@ -501,11 +267,8 @@ export async function data(req: Request, res: Response) {
       avatar: true,
       banner: true,
       created_at: true,
-      last_note: true,
-      last_note_d: true,
       last_status: true,
-      dm_option: true,
-      filter_option: true,
+      last_status_d: true,
       last_data_req: true,
       posts: true,
       servers: true,

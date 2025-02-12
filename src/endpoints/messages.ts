@@ -125,6 +125,10 @@ export async function fetchMessages(req: Request, res: Response) {
       profile_id: true,
       created_at: true,
       reply_id: true,
+      attachments: true,
+      edited: true,
+      spotify_embed: true,
+      tenor_url: true,
     },
   });
 
@@ -150,7 +154,6 @@ export async function fetchMessages(req: Request, res: Response) {
             banner: true,
             bio: true,
             created_at: true,
-            last_note: true,
             last_status: true,
             username: true,
             member_servers: true,
@@ -158,16 +161,8 @@ export async function fetchMessages(req: Request, res: Response) {
           },
         });
 
-        const {
-          id,
-          avatar,
-          banner,
-          bio,
-          created_at,
-          last_note,
-          last_status,
-          username,
-        } = data;
+        const { id, avatar, banner, bio, created_at, last_status, username } =
+          data;
 
         const server_username = data.member_servers.filter(
           (v) => v.server_id === req.serverId
@@ -181,13 +176,17 @@ export async function fetchMessages(req: Request, res: Response) {
           (v) => v.server_id === req.serverId
         );
 
+        const joined_at = data.member_servers.filter(
+          (v) => v.server_id === req.serverId
+        )[0].joined_at;
+
         const finalData: ServerAccount = {
           id,
           avatar,
           banner,
           bio,
           created_at,
-          last_note,
+          joined_at,
           last_status,
           username,
           server_username,

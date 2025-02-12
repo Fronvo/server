@@ -19,19 +19,12 @@ export const password = string().min(8);
 // Register verification code
 export const code = string().length(6);
 
-// Status
-export const status = number().min(0).max(3);
-
 // Notes
-export const note = string().max(30);
+export const status = string().max(30);
 
 // Posts
 export const text = string().max(50).optional();
 export const attachment = string().regex(imageFolderRegex);
-
-// Profile Options
-export const dmOption = number().min(0).max(1);
-export const filterOption = number().min(0).max(1);
 
 // Servers
 export const name = string().max(30);
@@ -43,7 +36,6 @@ export const invite = string().length(8);
 
 // Channels
 export const channelName = string().min(1).max(20);
-export const description = string().max(500).optional();
 
 // Roles
 export const roleName = string().min(1).max(15);

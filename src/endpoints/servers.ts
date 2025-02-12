@@ -18,6 +18,9 @@ import {
   getServerMember,
   getBannedServerMember,
   removeServerMember,
+  informCustom,
+  getServer,
+  getAccount,
 } from "../utils";
 import { MAX_CONCURRENT_SERVERS, MAX_SERVERS, prismaClient } from "../vars";
 import { object } from "zod";
@@ -58,7 +61,7 @@ export async function createServer(req: Request, res: Response) {
     );
   }
 
-  const serverData = await prismaClient.servers.create({
+  const tempServer = await prismaClient.servers.create({
     data: {
       name,
       avatar: avatar,
@@ -76,12 +79,18 @@ export async function createServer(req: Request, res: Response) {
       invites_disabled: true,
       owner_id: true,
       created_at: true,
+      channels: true,
+      roles: true,
     },
   });
 
-  await addServerMember(serverData.id, req.userId);
+  await addServerMember(tempServer.id, req.userId);
 
-  return sendSuccess(res, { serverData }, true);
+  const server = await getServer(tempServer.id);
+
+  informCustom(req.userId, "serverCreated", "servers", { server });
+
+  return sendSuccess(res, { server }, true);
 }
 
 export async function joinServer(req: Request, res: Response) {
@@ -93,13 +102,13 @@ export async function joinServer(req: Request, res: Response) {
     return sendError(400, res, schemaResult.error.errors, true);
   }
 
-  const server = await prismaClient.servers.findFirst({
+  const tempServer = await prismaClient.servers.findFirst({
     where: {
       invite,
     },
   });
 
-  if (!server) {
+  if (!tempServer) {
     return sendError(404, res, "Server not found");
   }
 
@@ -111,7 +120,7 @@ export async function joinServer(req: Request, res: Response) {
     return sendError(400, res, "You have been banned from this server.");
   }
 
-  if (server.invites_disabled) {
+  if (tempServer.invites_disabled) {
     return sendError(400, res, "This server has disabled invites.");
   }
 
@@ -127,9 +136,17 @@ export async function joinServer(req: Request, res: Response) {
     );
   }
 
-  await addServerMember(server.id, req.userId);
+  await addServerMember(tempServer.id, req.userId);
 
-  return sendSuccess(res, "Server joined.");
+  const server = await getServer(req.serverId);
+  const member = await getAccount(req.userId);
+
+  informCustom(req.userId, "serverJoined", "servers", { server });
+
+  // TODO: Announce to server room only
+  informCustom(req.userId, "memberJoined", "servers", { server, member });
+
+  return sendSuccess(res, { server }, true);
 }
 
 export async function editServer(req: Request, res: Response) {
@@ -171,17 +188,25 @@ export async function editServer(req: Request, res: Response) {
     data: updateDict,
   });
 
-  return sendSuccess(res, { serverData: updateDict }, true);
+  const server = await getServer(req.serverId);
+
+  informCustom(req.userId, "serverEdited", "servers", { server });
+
+  return sendSuccess(res, { server }, true);
 }
 
 export async function deleteServer(req: Request, res: Response) {
   await deleteServerFunc(req.serverId);
+
+  informCustom(req.userId, "serverDeleted", "servers", { id: req.serverId });
 
   return sendSuccess(res, "Server deleted.");
 }
 
 export async function leaveServer(req: Request, res: Response) {
   await removeServerMember(req.serverId, req.userId);
+
+  informCustom(req.userId, "serverLeft", "servers", { id: req.serverId });
 
   return sendSuccess(res, "Left server.");
 }

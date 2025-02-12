@@ -9,11 +9,8 @@ CREATE TABLE accounts (
 	avatar				TEXT			DEFAULT '',
 	banner				TEXT			DEFAULT '',
 	created_at			TIMESTAMP		NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	last_status			SMALLINT		NOT NULL DEFAULT 0,
-	last_note			VARCHAR(255)	DEFAULT '',
-	last_note_d			TIMESTAMP		DEFAULT CURRENT_TIMESTAMP,
-	dm_option			SMALLINT		NOT NULL DEFAULT 0,
-	filter_option		SMALLINT		NOT NULL DEFAULT 0,
+	last_status			VARCHAR(255)	DEFAULT '',
+	last_status_d		TIMESTAMP		DEFAULT CURRENT_TIMESTAMP,
 	last_data_req		TIMESTAMP
 );
 
@@ -63,7 +60,6 @@ CREATE TABLE servers (
 CREATE TABLE channels (
 	id          		UUID 			PRIMARY KEY DEFAULT uuid_generate_v4(),
 	name				VARCHAR(20)		NOT NULL,
-	description			TEXT			DEFAULT '',
 	created_at			TIMESTAMP		NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	server_id			UUID			REFERENCES servers(id)
 );

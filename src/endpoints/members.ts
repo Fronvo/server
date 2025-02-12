@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import {
+  getAccount,
   getBannedServerMember,
   getParams,
+  getServer,
   getServerMember,
+  informCustom,
   removeServerMember,
   sendError,
   sendSuccess,
@@ -41,6 +44,13 @@ export async function kickMember(req: Request, res: Response) {
   }
 
   await removeServerMember(req.serverId, memberId);
+
+  const server = await getServer(req.serverId);
+  const member = await getAccount(req.userId);
+
+  informCustom(req.userId, "memberLeft", "servers", { server, member });
+
+  // TODO: informProfile target account serverLeft
 
   return sendSuccess(res, "Member kicked.");
 }
@@ -84,6 +94,12 @@ export async function banMember(req: Request, res: Response) {
     },
   });
 
+  const server = await getServer(req.serverId);
+  const member = await getAccount(req.userId);
+
+  informCustom(req.userId, "memberLeft", "servers", { server, member });
+  informCustom(req.userId, "memberBanned", "servers", { server, member });
+
   return sendSuccess(res, "Member banned.");
 }
 
@@ -120,6 +136,11 @@ export async function unbanMember(req: Request, res: Response) {
       server_id: req.serverId,
     },
   });
+
+  const server = await getServer(req.serverId);
+  const member = await getAccount(req.userId);
+
+  informCustom(req.userId, "memberUnbanned", "servers", { server, member });
 
   return sendSuccess(res, "Member unbanned.");
 }

@@ -21,12 +21,12 @@ import {
   fetchMe,
   data,
   sharePost,
-  updateDM,
-  updateFilter,
-  updateNote,
   updateStatus,
   fetchServers,
   fetchUser,
+  fetchOurPosts,
+  fetchHomePosts,
+  fetchConvos,
 } from "./endpoints/profiles";
 import {
   createServer,
@@ -121,14 +121,14 @@ app.get("/token", generateAccessToken);
 // Profiles
 app.post("/me/password", changePassword);
 app.get("/me", fetchMe);
+app.get("/me/posts", fetchOurPosts);
+app.get("/me/home", fetchHomePosts);
+app.get("/me/convos", fetchConvos);
 app.get("/me/servers", fetchServers);
 app.post("/me/status", updateStatus);
-app.post("/me/note", updateNote);
 app.post("/me/post", sharePost);
-app.post("/me/dm", updateDM);
-app.post("/me/filter", updateFilter);
 app.post("/me/data", data);
-app.get('/user/:id', fetchUser);
+app.get("/user/:id", fetchUser);
 
 // Servers
 app.post("/servers/create", createServer);

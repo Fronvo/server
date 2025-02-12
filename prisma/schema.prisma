@@ -16,11 +16,8 @@ model accounts {
   avatar                 String?                  @default("")
   banner                 String?                  @default("")
   created_at             DateTime                 @default(now()) @db.Timestamp(6)
-  last_status            Int                      @default(0) @db.SmallInt
-  last_note              String?                  @default("") @db.VarChar(255)
-  last_note_d            DateTime?                @default(now()) @db.Timestamp(6)
-  dm_option              Int                      @default(0) @db.SmallInt
-  filter_option          Int                      @default(0) @db.SmallInt
+  last_status            String?                  @default("") @db.VarChar(255)
+  last_status_d          DateTime?                @default(now()) @db.Timestamp(6)
   last_data_req          DateTime?                @db.Timestamp(6)
   member_messages        member_messages[]
   member_roles           member_roles[]
@@ -45,7 +42,6 @@ model posts {
 model channels {
   id                     String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name                   String                   @db.VarChar(20)
-  description            String?                  @default("")
   created_at             DateTime                 @default(now()) @db.Timestamp(6)
   server_id              String?                  @db.Uuid
   servers                servers?                 @relation(fields: [server_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
